@@ -1,0 +1,170 @@
+<resources>
+    <string name="app_name">DMS</string>
+
+
+    <!--<string name="google_map_api_key">AIzaSyDUMw_iho2IsA0i6TLHBGfpPhnyKPYqhjY</string>-->
+    <!--<string name="google_map_api_key">AIzaSyCgUU0YJCWoaq4BvqrEFNXmB0adLOpdTJg</string>-->
+    <!--<string name="google_map_api_key">AIzaSyAQ8ypd0IVOaKyInVordY6VgwF-Str6ktg</string>-->
+    <!--AIzaSyAQ8ypd0IVOaKyInVordY6VgwF-Str6ktg-->
+    <!--<string name="google_map_api_key">AIzaSyC8zolSz0ZiMmePfwnxyS7enzlPQLHvC_Y</string>-->
+    <string name="google_map_api_key">AIzaSyABcliaXt3SAy2G6O_rbBsA1c5fKubHy0c</string>
+
+    <string name="home_title">HOME</string>
+    <string name="username_label">USER NAME : </string>
+    <string name="date_label">DATE : </string>
+
+    <string name="sync_title">SYNC</string>
+    <string name="customer_visit_title">CUSTOMER VISIT</string>
+    <string name="customer_title">CUSTOMER</string>
+    <string name="customer_location_title">CUSTOMER LOCATION</string>
+
+    <string name="search">Search</string>
+    <string name="column">:</string>
+    <string name="customer_name_label">Customer Name:</string>
+    <string name="address_label">Address:</string>
+    <string name="phone_label">Phone:</string>
+    <string name="township_label">Township:</string>
+    <string name="credit_terms_label">Credit Terms:</string>
+    <string name="credit_limit_label">Credit Limit:</string>
+    <string name="credit_amount_label">Credit Amount:</string>
+    <string name="due_amount_label">Due Amount:</string>
+    <string name="prepaid_amount_label">Prepaid Amount:</string>
+    <string name="payment_type_label">Payment Type:</string>
+    <string name="latitude">Latitude:</string>
+    <string name="longitude">Longitude:</string>
+
+    <string name="sale">SALES</string>
+    <string name="sale_order">SALES ORDER</string>
+    <string name="sale_indirect">INDIRECT_SALE</string>
+    <string name="unsell_reason">UN-SELL REASON</string>
+    <string name="sale_return">SALES RETURN</string>
+    <string name="visit_record">VISIT RECORD</string>
+    <string name="posm">POSM</string>
+    <string name="location">LOCATION</string>
+    <string name="posm_checkout">POSM CHECKOUT</string>
+    <string name="sale_cancel">SALES CANCEL</string>
+    <string name="sale_cancel_checkout">SALES CANCEL CHECKOUT</string>
+    <string name="sale_order_checkout">SALE ORDER CHECKOUT</string>
+
+    <string name="category_previous">&lt;</string>
+    <string name="category_next">&gt;</string>
+    <string name="sale_date">Sales Date:</string>
+    <string name="cancel_date">Cancel Date:</string>
+    <string name="product">Product</string>
+    <string name="um">UM</string>
+    <string name="rq">Remaining Qty</string>
+    <string name="qty">Qty</string>
+    <string name="ordered_qty">Ordered Qty</string>
+    <string name="price">Price</string>
+    <string name="discount">Discount</string>
+    <string name="amount">Amount</string>
+    <string name="foc">FOC</string>
+    <string name="total_amount">Total Amount</string>
+    <string name="net_amount">Net Amount:</string>
+    <string name="available_quantity">Available Quantity:</string>
+    <string name="percent">Percent</string>
+    <string name="quantity_label">Quantity:</string>
+    <string name="general_sale_checkout">General Sale - Checkout</string>
+    <string name="serial">Serial</string>
+    <string name="invoice_id">Invoice ID:</string>
+    <string name="total_amount_">Total Amount:</string>
+    <string name="discount_">Discount:</string>
+    <string name="pay_amount">Pay Amount:</string>
+    <string name="payment_method">Payment :</string>
+    <string name="refund">Refund:</string>
+    <string name="change_due_label">Change Due:</string>
+    <string name="receipt_person">Receipt Person:</string>
+    <string name="confirm_and_print">Confirm &amp; Print</string>
+    <string name="promotion">Promotion</string>
+    <string name="net_amount1">Net Amount1:</string>
+    <string name="product_discount_percent">Product Dis(%)     :</string>
+    <string name="product_discount_amount">Product Dis(Amt)  :</string>
+    <string name="delivery_discount_percent">Delivery Dis(%)     :</string>
+    <string name="delivery_discount_amount">Delivery Dis(Amt)  :</string>
+    <string name="tax">Tax (Include)</string>
+    <string name="indirect_sale">* Indirect Sales</string>
+    <string name="direct_sale">* Direct Sales</string>
+
+    <string name="print">PRINT</string>
+    <string name="sale_man_label">Sales Man:</string>
+    <string name="branch_label">Branch:</string>
+
+    <string name="add_new_customer">ADD NEW CUSTOMER</string>
+    <string name="prospect_customer">Prospect Customer</string>
+
+    <string name="outlet_external_check">OUTLET EXTERNAL CHECK</string>
+    <string name="display_assessment">DISPLAY PROGRAM</string>
+    <string name="competitor_activitites">COMPETITORS ACTIVITIES</string>
+    <string name="outlet_stock_availability">OULTET STOCK AVAILABILITY</string>
+    <string name="size_in_store_share">SIZE AND STOCK SHARE</string>
+    <string name="incentive">INCENTIVE</string>
+
+    <string name="route_title">E-ROUTE</string>
+    <string name="credit_collection">CREDIT COLLECTION</string>
+    <string name="credit_collection_checkout">CREDIT COLLECTION CHECKOUT</string>
+    <string name="report">REPORT</string>
+
+    <string name="feedback_label">Feedback:</string>
+    <string name="remark_label">Remark:</string>
+    <string name="sale_checkout">SALES CHECKOUT</string>
+    <string name="volume_discount">Vol: Dis(%)</string>
+    <string name="t_volume_discount">Vol: Dis(Amt)</string>
+    <string name="sale_upload_success">Sale Upload Successfully.</string>
+    <string name="download_success">Download complete.</string>
+    <string name="title_activity_sale_exchange">SaleExchangeActivity</string>
+    <string name="promotion_customer_item">Promotion Item By Customer</string>
+    <string name="promotion_customer_discount">Volume Discount By Customer</string>
+    <string name="promotion_price">PROMOTION PRICE</string>
+    <string name="promotion_gift">PROMOTION GIFT</string>
+
+    <string name="sale_channel_name">SALE CHANNEL</string>
+    <string name="customer_name">CUSTOMER NAME</string>
+    <string name="sell_price">SELL PRICE</string>
+    <string name="new_price">NEW PRICE</string>
+    <string name="product_discount">PRODUCT DISCOUNT</string>
+    <string name="delivery_discount">DELIVERY DISCOUNT</string>
+
+    <string name="categorydiscount">CATEGORY DISCOUNT</string>
+    <string name="date">DATE</string>
+    <string name="product_name">PRODUCT NAME</string>
+    <string name="category_name">CATEGORY NAME</string>
+    <string name="to_quantity">TO QUANTITY</string>
+    <string name="from_quantity">FROM QUANTITY</string>
+    <string name="promotion_gift_quantity">PROMOTION GIFT QUANTITY</string>
+    <string name="gift_quantity">QUANTITY</string>
+
+    <string name="delivery">DELIVERY</string>
+    <string name="delivery_checkout">DELIVERY CHECKOUT</string>
+    <string name="cash_receive">CASH RECEIVE</string>
+
+    <string name="connection_error">Can\'t connect to server</string>
+    <string name="server_error">Server error occurs. \n Please Try again</string>
+    <string name="no_download_data_error">Please download information!</string>
+    <string name="sale_exchange">SALES EXCHANGE</string>
+    <string name="upload_succes_msg">Uploading success.</string>
+
+    <string name="vd_title">VOLUME DISCOUNT</string>
+    <string name="vd_filter_title">VOLUME DISCOUNT FILTER</string>
+    <string name="vd_from_date">FROM DATE</string>
+    <string name="vd_to_date">TO DATE</string>
+    <string name="vd_from_amt">FROM AMOUNT</string>
+    <string name="vd_to_amt">TO AMOUNT</string>
+    <string name="vd_discount">DISCOUNT PERCENT</string>
+    <string name="vd_discount_amount">DISCOUNT AMOUNT</string>
+    <string name="vd_discount_price">DISCOUNT PRICE</string>
+    <string name="vd_exclude">EXCLUDE</string>
+    <string name="vd_filter_category">CATEGORY</string>
+    <string name="vd_filter_group">GROUP</string>
+
+    <!-- Print -->
+    <string name="str_connected">connected </string>
+    <string name="str_disconnected">not connected to </string>
+    <string name="str_connecting">connecting to </string>
+    <string name="str_exit">Sure exit and close the equipment?</string>
+    <string name="str_scan">scanning equipment</string>
+    <string name="str_device">device</string>
+    <string name="str_scaning">scanning</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>

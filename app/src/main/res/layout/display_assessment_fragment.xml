@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:id="@+id/headerLayout"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/appbar_height"
+        android:background="@color/colorAccent">
+
+        <ImageView
+            android:id="@+id/cancel_img"
+            android:layout_width="@dimen/btn_appbar_width"
+            android:layout_height="@dimen/btn_appbar_height"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="20dp"
+            android:gravity="center"
+            android:src="@drawable/ic_cancel_xh_btn" />
+
+        <ImageView
+            android:id="@+id/camera_img"
+            android:layout_width="@dimen/btn_appbar_width"
+            android:layout_height="@dimen/btn_appbar_height"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="20dp"
+            android:layout_toRightOf="@+id/cancel_img"
+            android:gravity="center"
+            android:src="@drawable/ic_camrea_hx_btn" />
+
+        <ImageView
+            android:id="@+id/save_img"
+            android:layout_width="@dimen/btn_appbar_width"
+            android:layout_height="@dimen/btn_appbar_height"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="20dp"
+            android:layout_toRightOf="@+id/camera_img"
+            android:gravity="center"
+            android:src="@drawable/ic_done_hx_btn" />
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:text="@string/display_assessment"
+            android:textColor="#ffffff"
+            android:textSize="@dimen/appbar_title_size" />
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="20dp"
+        android:orientation="vertical">
+
+
+        <TableLayout
+            android:id="@+id/display_assessment_tb_layout"
+            android:layout_width="500dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp">
+
+            <TableRow android:layout_marginBottom="10dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_column="1"
+                    android:text="Customer Name :" />
+
+                <TextView
+                    android:id="@+id/txt_display_assess_customer_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_column="2"
+                    android:text="CUSTOMER NAME" />
+            </TableRow>
+
+            <TableRow>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_column="1"
+                    android:text="Image No :" />
+
+                <TextView
+                    android:id="@+id/txt_display_assess_image_no"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_column="2" />
+            </TableRow>
+
+            <TableRow>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_column="1"
+                    android:text="Taken Photo Name :" />
+
+                <EditText
+                    android:id="@+id/edit_display_assess_taken_photo_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_column="2"
+                    android:hint="Enter Photo Name Here" />
+
+            </TableRow>
+
+            <TableRow>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_column="1"
+                    android:layout_weight="1"
+                    android:text="Remark :" />
+
+                <EditText
+                    android:id="@+id/edit_display_assess_remark"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_column="2"
+                    android:hint="Enter Remark Here" />
+            </TableRow>
+        </TableLayout>
+
+            <LinearLayout
+                android:id="@+id/display_assessment_image_layout2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:orientation="vertical"
+                android:layout_weight="1">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginBottom="10dp"
+                    android:textSize="22sp"
+                    android:text="Taken Photo" />
+
+                <ImageView
+                    android:id="@+id/outlet_image"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+
+            </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

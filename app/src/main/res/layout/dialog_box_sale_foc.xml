@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical" >
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp" >
+
+       <!-- <TextView
+        android:id="@+id/dialog_sale_qty_txtView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="10dp"
+        android:gravity="center_vertical"
+            android:padding="10dp"
+            android:textStyle="bold"
+        android:text="FOC percent or Amount" />-->
+
+        <RadioGroup
+            android:id="@+id/rg_foc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/dialog_sale_qty_txtView"
+            android:layout_marginTop="5dp"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/radioPrecent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="FOC percent"
+                android:checked="true" />
+
+            <RadioButton
+                android:id="@+id/radioAmount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="FOC Amount" />
+
+        </RadioGroup>
+        <EditText
+            android:id="@+id/focPercent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/rg_foc"
+            android:ems="10"
+            android:maxLength="10"
+            android:layout_marginTop="5dp"
+            android:inputType="numberDecimal" >
+            <requestFocus />
+        </EditText>
+    </RelativeLayout>
+
+</LinearLayout>
