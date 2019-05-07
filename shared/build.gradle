@@ -1,9 +1,11 @@
 apply plugin: 'com.android.library'
 
+apply plugin: 'kotlin-android'
+
+apply plugin: 'kotlin-android-extensions'
+
 android {
     compileSdkVersion 28
-
-
 
     defaultConfig {
         minSdkVersion 15
@@ -25,10 +27,65 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
 
-    implementation 'com.android.support:appcompat-v7:28.0.0-alpha1'
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    implementation rootProject.ext.libraries.appCompat
+    implementation rootProject.ext.libraries.recyclerView
+    implementation rootProject.ext.libraries.cardView
+    implementation rootProject.ext.libraries.designSupport
+
+    //UI
+    implementation rootProject.ext.libraries.awesomeSplash
+    implementation rootProject.ext.libraries.materialCalendarView
+    implementation rootProject.ext.libraries.customCalendarView
+    implementation rootProject.ext.libraries.mpChart
+
+    //other
+    implementation rootProject.ext.libraries.multiDex
+    implementation rootProject.ext.libraries.permissionHelper
+    implementation rootProject.ext.libraries.mediaRouter
+
+    // Networking
+    implementation rootProject.ext.libraries.okhttp
+    implementation rootProject.ext.libraries.okhttpLogging
+
+    implementation rootProject.ext.libraries.retrofit
+    implementation rootProject.ext.libraries.retrofitConverter
+
+    // Rx
+    implementation rootProject.ext.libraries.retrofitAdapter
+    implementation rootProject.ext.libraries.rxjava
+    implementation rootProject.ext.libraries.rxandroid
+
+    //google play service
+    implementation rootProject.ext.libraries.googlePlace
+    implementation rootProject.ext.libraries.googleLocation
+    implementation rootProject.ext.libraries.googleMap
+
+    //firebase
+    implementation rootProject.ext.libraries.firebase
+    implementation rootProject.ext.libraries.crashlytics
+
+    //Architecture Component
+    implementation rootProject.ext.libraries.lifecycleExtension
+    annotationProcessor rootProject.ext.libraries.lifecycleCompiler
+//    implementation "androidx.paging:paging-runtime:$androidArchitectureVersion"
+
+    //Room
+    implementation rootProject.ext.libraries.roomRuntime
+    implementation rootProject.ext.libraries.roomRxjava
+    annotationProcessor rootProject.ext.libraries.roomCompiler
+
+    // Dependency Injection
+    implementation rootProject.ext.libraries.kodeinJvm
+    implementation rootProject.ext.libraries.kodeinAndroid
+
+    //testing
+    testImplementation rootProject.ext.testLibraries.junit
+    testImplementation rootProject.ext.testLibraries.mockito
+    testImplementation rootProject.ext.testLibraries.architecture
+    androidTestImplementation rootProject.ext.testLibraries.supportTestRunner
+    androidTestImplementation rootProject.ext.testLibraries.supportTestRules
+    androidTestImplementation rootProject.ext.testLibraries.espresso
 }

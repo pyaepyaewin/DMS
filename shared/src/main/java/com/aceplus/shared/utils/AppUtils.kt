@@ -9,9 +9,8 @@ import android.os.Environment
 import android.support.v7.app.AlertDialog
 import android.view.LayoutInflater
 import android.widget.Toast
-import com.aceplussolutions.rms.R
+import com.aceplus.shared.R
 import com.google.gson.Gson
-import kotlinx.android.synthetic.main.alert_dialog.view.*
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -52,36 +51,35 @@ object AppUtils {
         return gson.toJson(obj).toString()
     }
 
-    @SuppressLint("InflateParams")
-    fun getAlertDialog(str: String, ctxt: Context): AlertDialog {
-        val ab: AlertDialog.Builder = AlertDialog.Builder(ctxt, R.style.InvitationDialog)
-        ab.setTitle("Alert")
-        val view = LayoutInflater.from(ctxt).inflate(R.layout.alert_dialog, null)
-        ab.setView(view)
-        view.alertMessage.text = str
-        ab.setPositiveButton("OK") { dialog, _ -> dialog.dismiss() }
-        return ab.create()
-    }
-
-    @SuppressLint("InflateParams")
-    fun getProfileDialog(str: String, ctxt: Context): AlertDialog {
-        val ab: AlertDialog.Builder = AlertDialog.Builder(ctxt, R.style.InvitationDialog)
-        ab.setTitle("Profile")
-        val view = LayoutInflater.from(ctxt).inflate(R.layout.alert_dialog, null)
-        ab.setView(view)
-        view.alertMessage.text = str
-        ab.setPositiveButton("OK") { dialog, _ -> dialog.dismiss() }
-        return ab.create()
-    }
-
-    fun getListenerDailog(str: String, ctxt: Context, listener: DialogInterface.OnClickListener): AlertDialog.Builder {
-        var ab: AlertDialog.Builder = AlertDialog.Builder(ctxt, R.style.InvitationDialog)
-        ab.setTitle("Alert")
-        ab.setMessage(str)
-        ab.setPositiveButton("ok", listener)
-        return ab
-
-    }
+//    @SuppressLint("InflateParams")
+//    fun getAlertDialog(str: String, ctxt: Context): AlertDialog {
+//        val ab: AlertDialog.Builder = AlertDialog.Builder(ctxt, R.style.InvitationDialog)
+//        ab.setTitle("Alert")
+//        val view = LayoutInflater.from(ctxt).inflate(R.layout.alert_dialog, null)
+//        ab.setView(view)
+//        view.alertMessage.text = str
+//        ab.setPositiveButton("OK") { dialog, _ -> dialog.dismiss() }
+//        return ab.create()
+//    }
+//
+//    @SuppressLint("InflateParams")
+//    fun getProfileDialog(str: String, ctxt: Context): AlertDialog {
+//        val ab: AlertDialog.Builder = AlertDialog.Builder(ctxt, R.style.InvitationDialog)
+//        ab.setTitle("Profile")
+//        val view = LayoutInflater.from(ctxt).inflate(R.layout.alert_dialog, null)
+//        ab.setView(view)
+//        view.alertMessage.text = str
+//        ab.setPositiveButton("OK") { dialog, _ -> dialog.dismiss() }
+//        return ab.create()
+//    }
+//
+//    fun getListenerDailog(str: String, ctxt: Context, listener: DialogInterface.OnClickListener): AlertDialog.Builder {
+//        var ab: AlertDialog.Builder = AlertDialog.Builder(ctxt, R.style.InvitationDialog)
+//        ab.setTitle("Alert")
+//        ab.setMessage(str)
+//        ab.setPositiveButton("ok", listener)
+//        return ab
+//    }
 
     fun getAppVersion(context: Context): String {
         try {

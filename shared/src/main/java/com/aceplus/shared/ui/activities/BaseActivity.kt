@@ -10,7 +10,7 @@ import com.aceplussolutions.rms.constants.AppUtils
 
 abstract class BaseActivity : AppCompatActivity() {
 
-    abstract var layoutId:Int
+    abstract val layoutId:Int
     var pd: ProgressDialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,9 +39,9 @@ abstract class BaseActivity : AppCompatActivity() {
     }
 
     fun displayAlertError(str: String) {
-        val dialog = AppUtils.getAlertDialog(str, this)
-        if (!dialog.isShowing) {
-            dialog.show()
-        }
+//        val dialog = AppUtils.getAlertDialog(str, this)
+//        if (!dialog.isShowing) {
+//            dialog.show()
+//        }
     }
 }

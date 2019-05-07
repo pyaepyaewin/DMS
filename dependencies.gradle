@@ -1,120 +1,96 @@
 ext {
-    minSdkVersion = 19 //Android 4.4
-    targetSdkVersion = 27
-    compileSdkVersion = 27 //Android 8.0
-    buildToolVersion = "27.0.3"
+    supportLibraryVersion = "28.0.0"
 
-    //Android
-    androidSupportVersion = "27.1.1"
-    constraintlayoutVersion = "1.1.2"
-    butterknifeVersion = "8.8.1"
-    okhttpVersion = "3.9.1"
-    retrofitVersion = "2.4.0"
-    rxJavaVersion = "2.1.9"
-    rxAndroidVersion = "2.0.2"
-    rxJavaAdapterVersion = "1.0.0"
-    glideVersion = "4.7.1"
-    daggerVersion = "2.12"
-    eventBusVersion = "3.1.1"
-    jpoetVersion = "1.9.0"
-    javaxVersion = "1"
-    javaxAnnotationVersion = "1.0"
+    okhttpVersion = '3.8.1'
+    retrofitVersion = '2.2.0'
+    rxJavaVersion = '2.1.7'
+    rxAndroidVersion = "2.1.0"
+    rxJavaAdapterVersion = "2.1.0"
 
-    firebaseVersion = "16.0.0"
-    crashlyticsVersion = "2.9.3"
-    lifecycleVersion = "1.1.1"
-    roomVersion = "1.1.1-rc1"
+    androidArchitectureVersion = "1.1.1"
 
-    eftimoffViewPagerTransformerVersion = "1.0.1@aar"
-    florent37PanelVersion = "1.1.1"
-    hdodenhofCircleImageVersion = "2.2.0"
-    leakcanaryVersion = "1.5.4"
-    saschpeTabVersion = "1.1.2"
-    orhanobutLoggerVersion = "1.15"
-    sromkuStorageVersion = "1.2.0"
-    afollestadDialogVersion = "0.9.0.1"
-    tinyDBVersion = "1.0.1"
-    wdullaerDatePickerVersion = "3.6.0"
-    facebookLoginVersion = "4.33.0"
-    smsCatcherVersion = "0.3.2"
+    googleServiceVersion = "15.0.1"
+    firebaseVersion = "16.0.8"
+    crashlyticsVersion = "2.10.0"
 
-    //Testing
+    //DI
+    kodeinVersion = "6.1.0"
+
+    //testing
     junitVersion = "4.12"
-    supportTestVersion = "1.0.1"
+    supportTestVersion = "1.0.2"
+    mockitoVersion = "2.8.47"
     espressoVersion = "3.0.2"
-    mockitoVersion = "1.10.19"
 
     libraries = [
-            appCompat                   : "com.android.support:appcompat-v7:${androidSupportVersion}",
-            supportAnnotation           : "com.android.support:support-annotations:${androidSupportVersion}",
-            designSupport               : "com.android.support:design:${androidSupportVersion}",
-            vectorSupport               : "com.android.support:support-vector-drawable:${androidSupportVersion}",
-            cardView                    : "com.android.support:cardview-v7:${androidSupportVersion}",
-            recyclerView                : "com.android.support:recyclerview-v7:${androidSupportVersion}",
-            gridLayout                  : "com.android.support:gridlayout-v7:${androidSupportVersion}",
-            customTabs                  : "com.android.support:customtabs:${androidSupportVersion}",
-            constraintLayout            : "com.android.support.constraint:constraint-layout:${constraintlayoutVersion}",
-            butterknife                 : "com.jakewharton:butterknife:${butterknifeVersion}",
-            okhttp                      : "com.squareup.okhttp3:okhttp:${okhttpVersion}",
-            okhttpLogging               : "com.squareup.okhttp3:logging-interceptor:${okhttpVersion}",
-            retrofit                    : "com.squareup.retrofit2:retrofit:${retrofitVersion}",
-            retrofitConverter           : "com.squareup.retrofit2:converter-gson:${retrofitVersion}",
-            retrofitAdapter             : "com.squareup.retrofit2:adapter-rxjava:${retrofitVersion}",
-            rxjava                      : "io.reactivex.rxjava2:rxjava:${rxJavaVersion}",
-            rxandroid                   : "io.reactivex.rxjava2:rxandroid:${rxAndroidVersion}",
-            rxjavaAdapter               : "com.jakewharton.retrofit:retrofit2-rxjava2-adapter:${rxJavaAdapterVersion}",
-            glide                       : "com.github.bumptech.glide:glide:${glideVersion}",
-            eventBus                    : "org.greenrobot:eventbus:${eventBusVersion}",
-            dagger                      : "com.google.dagger:dagger:${daggerVersion}",
-            javax                       : "javax.inject:javax.inject:${javaxVersion}",
-            javapoet                    : "com.squareup:javapoet:${jpoetVersion}",
-            javaxannotation             : "javax.annotation:jsr250-api:${javaxAnnotationVersion}",
-            firebase                    : "com.google.firebase:firebase-core:${firebaseVersion}",
-            crashlytics                 : "com.crashlytics.sdk.android:crashlytics:${crashlyticsVersion}",
+            appCompat           : "com.android.support:appcompat-v7:${supportLibraryVersion}",
+            supportAnnotation   : "com.android.support:support-annotations:${supportLibraryVersion}",
+            designSupport       : "com.android.support:design:${supportLibraryVersion}",
+            vectorSupport       : "com.android.support:support-vector-drawable:${supportLibraryVersion}",
+            cardView            : "com.android.support:cardview-v7:${supportLibraryVersion}",
+            recyclerView        : "com.android.support:recyclerview-v7:${supportLibraryVersion}",
+
+            //UI
+            awesomeSplash       : 'com.github.ViksaaSkool:AwesomeSplash:v1.0.0',
+            materialCalendarView: 'com.prolificinteractive:material-calendarview:1.4.2',
+            customCalendarView  : 'com.github.npanigrahy:Custom-Calendar-View:v1.0',
+            mpChart             : 'com.github.PhilJay:MPAndroidChart:v3.1.0',
+
+            //other
+            multiDex            : "com.android.support:multidex:1.0.3",
+            permissionHelper    : "com.github.firetrap:permissionHelper:1.0.1",
+            mediaRouter         : "com.android.support:mediarouter-v7:24.2.1",
+
+            //Networking
+            okhttp              : "com.squareup.okhttp3:okhttp:${okhttpVersion}",
+            okhttpLogging       : "com.squareup.okhttp3:logging-interceptor:${okhttpVersion}",
+
+            retrofit            : "com.squareup.retrofit2:retrofit:${retrofitVersion}",
+            retrofitConverter   : "com.squareup.retrofit2:converter-gson:${retrofitVersion}",
+            retrofitAdapter     : "com.squareup.retrofit2:adapter-rxjava:${retrofitVersion}",
+
+            //Rx
+            rxjava              : "io.reactivex.rxjava2:rxjava:${rxJavaVersion}",
+            rxandroid           : "io.reactivex.rxjava2:rxandroid:${rxAndroidVersion}",
+            rxjavaAdapter       : "com.jakewharton.retrofit:retrofit2-rxjava2-adapter:${rxJavaAdapterVersion}",
+
+            //google play service
+            googlePlace         : "com.google.android.gms:play-services-places:${googleServiceVersion}",
+            googleLocation      : "com.google.android.gms:play-services-location:${googleServiceVersion}",
+            googleMap           : "com.google.android.gms:play-services-maps:${googleServiceVersion}",
+
+            //firebase
+            firebase            : "com.google.firebase:firebase-core:${firebaseVersion}",
+            crashlytics         : "com.crashlytics.sdk.android:crashlytics:${crashlyticsVersion}",
 
             //android architecture component
-            lifecycleExtension          : "android.arch.lifecycle:extensions:${lifecycleVersion}",
-            lifecycleLiveData           : "android.arch.lifecycle:livedata:${lifecycleVersion}",
-            lifecycleRuntime            : "android.arch.lifecycle:runtime:${lifecycleVersion}",
-            lifecycleCompiler           : "android.arch.lifecycle:compiler:${lifecycleVersion}",
-            roomRuntime                 : "android.arch.persistence.room:runtime:${roomVersion}",
-            roomCompiler                : "android.arch.persistence.room:compiler:${roomVersion}",
-            eftimoffViewPagerTransformer: "com.eftimoff:android-viewpager-transformers:${eftimoffViewPagerTransformerVersion}",
-            florent37ExtensionPanel     : "com.github.florent37:expansionpanel:${florent37PanelVersion}",
-            hdodenhofCircleImageView    : "de.hdodenhof:circleimageview:${hdodenhofCircleImageVersion}",
-            leakcanary                  : "com.squareup.leakcanary:leakcanary-android:${leakcanaryVersion}",
-            leakcanaryNoOp              : "com.squareup.leakcanary:leakcanary-android-no-op:${leakcanaryVersion}",
-            saschpeTab                  : "saschpe.android:customtabs:${saschpeTabVersion}",
-            orhanobutLogger             : "com.orhanobut:logger:${orhanobutLoggerVersion}",
-            sromkuStorage               : "com.sromku:simple-storage:${sromkuStorageVersion}",
-            afollestadDialog            : "com.afollestad.material-dialogs:commons:${afollestadDialogVersion}",
-            tinyDB                      : "com.mukesh:tinydb:${tinyDBVersion}",
-            wdullaerDatePicker          : "com.wdullaer:materialdatetimepicker:${wdullaerDatePickerVersion}",
-            facebookLogin               : "com.facebook.android:facebook-login:${facebookLoginVersion}",
-            smsCatcher                  : "com.github.stfalcon:smsverifycatcher:${smsCatcherVersion}"
-    ]
+            lifecycleExtension  : "android.arch.lifecycle:extensions:${androidArchitectureVersion}",
+            lifecycleLiveData   : "android.arch.lifecycle:livedata:${androidArchitectureVersion}",
+            lifecycleRuntime    : "android.arch.lifecycle:runtime:${androidArchitectureVersion}",
+            lifecycleCompiler   : "android.arch.lifecycle:compiler:${androidArchitectureVersion}",
 
-    aptLibraries = [
-            butterknifeCompiler: "com.jakewharton:butterknife-compiler:${butterknifeVersion}",
-            daggerCompiler     : "com.google.dagger:dagger-compiler:${daggerVersion}",
-            glideCompiler      : "com.github.bumptech.glide:compiler:${glideVersion}",
+            //Room
+            roomRuntime         : "android.arch.persistence.room:runtime:${androidArchitectureVersion}",
+            roomRxjava          : "android.arch.persistence.room:rxjava2:${androidArchitectureVersion}",
+            roomCompiler        : "android.arch.persistence.room:compiler:${androidArchitectureVersion}",
+
+            //Dependency Injection
+            kodeinJvm           : "org.kodein.di:kodein-di-generic-jvm:${kodeinVersion}",
+            kodeinAndroid       : "org.kodein.di:kodein-di-framework-android-support:${kodeinVersion}"
     ]
 
     testLibraries = [
-            junit             : "junit:junit:${junitVersion}",
-            supportAnnotations: "com.android.support:support-annotations:${androidSupportVersion}",
-            supportTestRunner : "com.android.support.test:runner:${supportTestVersion}",
-            supportTestRules  : "com.android.support.test:rules:${supportTestVersion}",
-            espresso          : "com.android.support.test.espresso:espresso-core:${espressoVersion}",
-            espressoContrib   : "com.android.support.test.espresso:espresso-contrib:${espressoVersion}",
-            mockito           : "org.mockito:mockito-all:${mockitoVersion}",
+            junit            : "junit:junit:${junitVersion}",
+            mockito          : "org.mockito:mockito-core:${mockitoVersion}",
+            architecture     : "android.arch.core:core-testing:${androidArchitectureVersion}",
+            supportTestRunner: "com.android.support.test:runner:${supportTestVersion}",
+            supportTestRules : "com.android.support.test:rules:${supportTestVersion}",
+            espresso         : "com.android.support.test.espresso:espresso-core:${espressoVersion}",
 
 //            // Dependencies for local unit tests
-//            testCompile       : "junit:junit:4.12",
-//            testCompile       : "org.mockito:mockito-all:1.10.19",
-            hamcrest          : "org.hamcrest:hamcrest-all:1.3",
-            powermockModule   : "org.powermock:powermock-module-junit4:1.6.2",
-            powermockApi      : "org.powermock:powermock-api-mockito:1.6.2"
+            hamcrest         : "org.hamcrest:hamcrest-all:1.3",
+            powermockModule  : "org.powermock:powermock-module-junit4:1.6.2",
+            powermockApi     : "org.powermock:powermock-api-mockito:1.6.2"
 
     ]
 }
