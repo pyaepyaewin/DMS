@@ -10,8 +10,8 @@
     <string name="google_map_api_key">AIzaSyABcliaXt3SAy2G6O_rbBsA1c5fKubHy0c</string>
 
     <string name="home_title">HOME</string>
-    <string name="username_label">USER NAME : </string>
-    <string name="date_label">DATE : </string>
+    <string name="username_label">USER NAME :</string>
+    <string name="date_label">DATE :</string>
 
     <string name="sync_title">SYNC</string>
     <string name="customer_visit_title">CUSTOMER VISIT</string>
@@ -77,10 +77,10 @@
     <string name="confirm_and_print">Confirm &amp; Print</string>
     <string name="promotion">Promotion</string>
     <string name="net_amount1">Net Amount1:</string>
-    <string name="product_discount_percent">Product Dis(%)     :</string>
-    <string name="product_discount_amount">Product Dis(Amt)  :</string>
-    <string name="delivery_discount_percent">Delivery Dis(%)     :</string>
-    <string name="delivery_discount_amount">Delivery Dis(Amt)  :</string>
+    <string name="product_discount_percent">Product Dis(%) :</string>
+    <string name="product_discount_amount">Product Dis(Amt) :</string>
+    <string name="delivery_discount_percent">Delivery Dis(%) :</string>
+    <string name="delivery_discount_amount">Delivery Dis(Amt) :</string>
     <string name="tax">Tax (Include)</string>
     <string name="indirect_sale">* Indirect Sales</string>
     <string name="direct_sale">* Direct Sales</string>
@@ -157,9 +157,9 @@
     <string name="vd_filter_group">GROUP</string>
 
     <!-- Print -->
-    <string name="str_connected">connected </string>
-    <string name="str_disconnected">not connected to </string>
-    <string name="str_connecting">connecting to </string>
+    <string name="str_connected">connected</string>
+    <string name="str_disconnected">not connected to</string>
+    <string name="str_connecting">connecting to</string>
     <string name="str_exit">Sure exit and close the equipment?</string>
     <string name="str_scan">scanning equipment</string>
     <string name="str_device">device</string>

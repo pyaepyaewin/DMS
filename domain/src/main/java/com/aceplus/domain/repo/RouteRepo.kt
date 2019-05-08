@@ -1,5 +1,5 @@
 package com.aceplus.domain.repo
 
-class RouteRepo{
+interface RouteRepo{
 
 }

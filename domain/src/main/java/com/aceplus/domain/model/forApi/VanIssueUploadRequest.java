@@ -1,5 +1,6 @@
 package com.aceplus.domain.model.forApi;
 
+import com.aceplus.domain.model.forApi.deviceissue.DeviceIssueItemList;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 

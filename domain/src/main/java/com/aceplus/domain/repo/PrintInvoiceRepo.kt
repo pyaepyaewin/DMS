@@ -1,4 +1,4 @@
 package com.aceplus.domain.repo
 
-class PrintInvoiceRepo {
+interface PrintInvoiceRepo {
 }
