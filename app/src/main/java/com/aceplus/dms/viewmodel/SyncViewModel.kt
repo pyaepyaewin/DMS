@@ -5,12 +5,14 @@ import com.aceplus.dms.utils.Utils
 import com.aceplus.domain.entity.customer.Customer
 import com.aceplus.domain.repo.SyncRepo
 import com.aceplus.shared.viewmodel.BaseViewModel
+import com.kkk.githubpaging.network.rx.SchedulerProvider
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import java.text.SimpleDateFormat
 import java.util.*
 
-class SyncViewModel(private val syncRepo: SyncRepo) : BaseViewModel() {
+class SyncViewModel(private val syncRepo: SyncRepo, private val schedulerProvider: SchedulerProvider) :
+    BaseViewModel() {
 
     var successState = MutableLiveData<Pair<String, String>>()
     var errorState = MutableLiveData<Pair<String, String>>()
@@ -326,8 +328,8 @@ class SyncViewModel(private val syncRepo: SyncRepo) : BaseViewModel() {
                     )
                     return@flatMap syncRepo.downloadPreOrderHistory(preOrderParam)
                 }
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.mainThread())
                 .subscribe({
                     //save data
                     if (it.aceplusStatusCode == 200) {

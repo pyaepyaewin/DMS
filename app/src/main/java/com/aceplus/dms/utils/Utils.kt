@@ -859,6 +859,23 @@ object Utils {
         textViewNo?.textSize = 25f
     }
 
+
+    fun askConfirmationDialog(title: String, message: String, type: String, activity: Activity,action:(String)->Unit) {
+        val alertDialog = AlertDialog.Builder(activity)
+            .setTitle(title)
+            .setMessage(message)
+            .setPositiveButton(
+                "Yes"
+            ) { dialogInterface, i -> action(type) }
+            .setNegativeButton("No", null)
+            .show()
+
+        val textViewYes = alertDialog.findViewById<TextView>(android.R.id.button1)
+        textViewYes?.textSize = 25f
+        val textViewNo = alertDialog.findViewById<TextView>(android.R.id.button2)
+        textViewNo?.textSize = 25f
+    }
+
 //    fun print(activity: Activity, customerName:String, cus_address:String, invoiceNumber:String, salePersonName:String, routeId:Int, townshipName:String, invoice:Invoice, soldProductList:List<SoldProduct>, presentList:List<Promotion>, printFor:String, mode:String) {
 //
 //        var portInfoList:List<PortInfo>? = null

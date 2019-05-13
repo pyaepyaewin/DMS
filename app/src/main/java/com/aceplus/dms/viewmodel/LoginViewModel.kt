@@ -10,11 +10,13 @@ import com.aceplus.domain.model.forApi.login.LoginResponse
 import com.aceplus.domain.repo.LoginRepo
 import com.aceplus.shared.viewmodel.BaseViewModel
 import com.aceplussolutions.rms.constants.AppUtils
+import com.kkk.githubpaging.network.rx.SchedulerProvider
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import java.util.ArrayList
 
-class LoginViewModel(private var loginRepo: LoginRepo) : BaseViewModel() {
+class LoginViewModel(private var loginRepo: LoginRepo, private val schedulerProvider: SchedulerProvider) :
+    BaseViewModel() {
     var errorState = MutableLiveData<Pair<String, Int>>()
     var successState = MutableLiveData<String>()
 
@@ -29,8 +31,8 @@ class LoginViewModel(private var loginRepo: LoginRepo) : BaseViewModel() {
             val paramData = Utils.createLoginParamData(userId, Utils.encodePassword(password), 0, deviceId)
             launch {
                 loginRepo.loginUser(paramData)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeOn(schedulerProvider.io())
+                    .observeOn(schedulerProvider.mainThread())
                     .subscribe({
                         doActionWhenSuccessLogin(it)
                     }, {

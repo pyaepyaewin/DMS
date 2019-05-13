@@ -3,18 +3,11 @@ package com.aceplus.dms.ui.activities
 import android.Manifest
 import android.app.AlertDialog
 import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProvider
-import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.content.SharedPreferences
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import com.aceplus.data.database.MyDatabase
-import com.aceplus.data.di.createDownloadWebService
-import com.aceplus.data.di.createOkHttpClient
-import com.aceplus.data.remote.DownloadApiService
 import com.aceplus.data.repoimpl.LoginRepoImpl
 import com.aceplus.dms.R
 import com.aceplus.data.utils.Constant
@@ -24,33 +17,28 @@ import com.aceplus.dms.di.provideDownloadApi
 import com.aceplus.dms.di.provideSharedPreferences
 import com.aceplus.dms.utils.Utils
 import com.aceplus.dms.viewmodel.LoginViewModel
-import com.aceplus.dms.viewmodel.factory.LoginViewModelFactory
-import com.aceplus.domain.repo.LoginRepo
-import com.aceplussolutions.rms.constants.AppConstants
 import com.aceplussolutions.rms.constants.AppUtils
 import com.aceplussolutions.rms.ui.activities.BaseActivity
 import com.firetrap.permissionhelper.action.OnDenyAction
 import com.firetrap.permissionhelper.action.OnGrantAction
 import com.firetrap.permissionhelper.helper.PermissionHelper
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.android.synthetic.main.change_ip_layout.view.*
+import org.kodein.di.Kodein
+import org.kodein.di.KodeinAware
+import org.kodein.di.android.kodein
+import org.kodein.di.generic.instance
 
-class LoginActivity : BaseActivity() {
+class LoginActivity : BaseActivity(), KodeinAware {
+    override val kodein: Kodein by kodein()
+
     override val layoutId: Int
         get() = activity_login
 
     private var permissionRequest: PermissionHelper.PermissionBuilder? = null
     private val REQUEST_STORAGE = 41
 
-    private lateinit var db: MyDatabase
-    private lateinit var downloadApi: DownloadApiService
-    private lateinit var shf: SharedPreferences
-    private lateinit var loginRepo: LoginRepo
-    private lateinit var loginViewModelFactory: LoginViewModelFactory
-
-    private lateinit var loginViewModel: LoginViewModel
+    private val loginViewModel: LoginViewModel by viewModel()
 
     private val onDenyAction = object : OnDenyAction() {
         override fun call(i: Int, b: Boolean) {
@@ -82,15 +70,6 @@ class LoginActivity : BaseActivity() {
             }
         }
 
-        db = provideDB(applicationContext)
-        downloadApi = provideDownloadApi()
-        shf = provideSharedPreferences(applicationContext)
-        loginRepo = LoginRepoImpl(downloadApi, db, shf)
-
-        loginViewModelFactory = LoginViewModelFactory(loginRepo)
-        loginViewModel = ViewModelProviders.of(this, loginViewModelFactory).get(LoginViewModel::class.java)
-
-
         editTextUserID.setText("T1")
         editTextPassword.setText("aceplus")
 
@@ -104,8 +83,12 @@ class LoginActivity : BaseActivity() {
 
         loginViewModel.successState.observe(this, Observer {
             Utils.cancelDialog()
-            startActivity(Intent(this, MainActivity::class.java))
-            finish()
+            it?.let { success ->
+                //null setter is to avoid sucessState liveData  bcoz loginviewmodel use in main activity too
+                loginViewModel.successState.postValue(null)
+                startActivity(Intent(this, MainActivity::class.java))
+                finish()
+            }
         })
         loginViewModel.errorState.observe(this, Observer {
             Utils.cancelDialog()
@@ -145,8 +128,11 @@ class LoginActivity : BaseActivity() {
 
             Constant.BASE_URL = newIp
 
-            downloadApi = createDownloadWebService(createOkHttpClient(), Constant.BASE_URL)
-            loginRepo = LoginRepoImpl(downloadApi, db, shf)
+            val downloadApi = provideDownloadApi()//need to create new instance (don't call instance from kodein)
+            val db: MyDatabase by instance()
+            val shf: SharedPreferences by instance()
+            val loginRepo =
+                LoginRepoImpl(downloadApi, db, shf) // need to create new instance(don't call instance from kodein)
             loginViewModel.setLoginRepo(loginRepo)
 
             dialog.dismiss()

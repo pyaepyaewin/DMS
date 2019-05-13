@@ -1,6 +1,7 @@
 package com.aceplus.data.di
 
 import com.aceplus.data.remote.DownloadApiService
+import com.aceplus.data.remote.RealTimeUploadApiService
 import com.aceplus.data.remote.UploadApiService
 import io.reactivex.schedulers.Schedulers.single
 import okhttp3.OkHttpClient
@@ -37,11 +38,11 @@ fun createDownloadWebService(okHttpClient: OkHttpClient, url: String): DownloadA
     return retrofit.create(DownloadApiService::class.java)
 }
 
-fun createUploadRealtimeWebService(okHttpClient: OkHttpClient, url: String): UploadApiService {
+fun createUploadRealtimeWebService(okHttpClient: OkHttpClient, url: String): RealTimeUploadApiService {
     val retrofit = Retrofit.Builder()
         .baseUrl(url)
         .client(okHttpClient)
         .addConverterFactory(GsonConverterFactory.create())
         .addCallAdapterFactory(RxJava2CallAdapterFactory.create()).build()
-    return retrofit.create(UploadApiService::class.java)
+    return retrofit.create(RealTimeUploadApiService::class.java)
 }

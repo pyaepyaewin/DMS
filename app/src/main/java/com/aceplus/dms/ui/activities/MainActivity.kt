@@ -1,36 +1,39 @@
 package com.aceplus.dms.ui.activities
 
-import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import com.aceplus.data.database.MyDatabase
-import com.aceplus.data.repoimpl.LoginRepoImpl
 import com.aceplus.data.utils.Constant
 import com.aceplus.dms.R
-import com.aceplus.dms.di.provideDB
-import com.aceplus.dms.di.provideDownloadApi
-import com.aceplus.dms.di.provideSharedPreferences
 import com.aceplus.dms.utils.Utils
 import com.aceplus.dms.viewmodel.LoginViewModel
-import com.aceplus.dms.viewmodel.factory.LoginViewModelFactory
+import com.aceplus.domain.repo.LoginRepo
 import com.aceplussolutions.rms.constants.AppUtils
 import com.aceplussolutions.rms.ui.activities.BaseActivity
+import com.kkk.githubpaging.network.rx.SchedulerProvider
 import kotlinx.android.synthetic.main.activity_home.*
+import org.kodein.di.Kodein
+import org.kodein.di.KodeinAware
+import org.kodein.di.android.kodein
+import org.kodein.di.generic.instance
 
-class MainActivity : BaseActivity(), Utils.OnActionClickListener {
+class MainActivity : BaseActivity(), Utils.OnActionClickListener, KodeinAware {
+    override val kodein: Kodein by kodein()
+
     override var layoutId: Int = R.layout.activity_home
 
-    lateinit var loginViewModel: LoginViewModel
+    private val loginViewModel: LoginViewModel by viewModel()
+
+    //you can use it too
+//    private val viewModeFactory: ViewModelProvider.Factory by instance()
+//
+//    private val loginViewModel: LoginViewModel by lazy {
+//        ViewModelProviders.of(this, viewModeFactory).get(LoginViewModel::class.java)
+//    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        val db = provideDB(applicationContext)
-        val downloadApi = provideDownloadApi()
-        val shf = provideSharedPreferences(applicationContext)
-        val loginRepo = LoginRepoImpl(downloadApi, db, shf)
-
-        val loginViewModelFactory = LoginViewModelFactory(loginRepo)
-        loginViewModel = ViewModelProviders.of(this, loginViewModelFactory).get(LoginViewModel::class.java)
 
         username.text = AppUtils.getStringFromShp(Constant.SALEMAN_NAME, this)
         date.text = Utils.getCurrentDate(false)
@@ -54,7 +57,9 @@ class MainActivity : BaseActivity(), Utils.OnActionClickListener {
 
 
     override fun onBackPressed() {
-        Utils.askConfirmationDialog("Logout", "Do you want to logout?", "", this)
+        Utils.askConfirmationDialog("Logout", "Do you want to logout?", "", this) {
+            onActionClick(it)
+        }
     }
 
     override fun onActionClick(type: String) {

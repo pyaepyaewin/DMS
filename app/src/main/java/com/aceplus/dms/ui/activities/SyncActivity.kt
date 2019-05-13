@@ -1,37 +1,28 @@
 package com.aceplus.dms.ui.activities
 
 import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.widget.Toast
-import com.aceplus.data.repoimpl.SyncRepoImpl
 import com.aceplus.dms.R
-import com.aceplus.dms.di.provideDB
-import com.aceplus.dms.di.provideDownloadApi
-import com.aceplus.dms.di.provideSharedPreferences
 import com.aceplus.dms.utils.Utils
 import com.aceplus.dms.viewmodel.SyncViewModel
-import com.aceplus.dms.viewmodel.factory.SyncViewModelFactory
-import com.aceplus.domain.repo.SyncRepo
 import com.aceplussolutions.rms.ui.activities.BaseActivity
 import kotlinx.android.synthetic.main.activity_sync.*
+import org.kodein.di.Kodein
+import org.kodein.di.KodeinAware
+import org.kodein.di.android.kodein
 
-class SyncActivity : BaseActivity(), Utils.OnActionClickListener {
+class SyncActivity : BaseActivity(), Utils.OnActionClickListener, KodeinAware {
+    override val kodein: Kodein by kodein()
+
     override val layoutId: Int
         get() = R.layout.activity_sync
 
-    private lateinit var syncViewModel: SyncViewModel
+    private val syncViewModel: SyncViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val db = provideDB(applicationContext)
-        val downloadApi = provideDownloadApi()
-        val shf = provideSharedPreferences(applicationContext)
-        val syncRepo: SyncRepo = SyncRepoImpl(downloadApi, db, shf)
-
-        val syncViewModelFactory = SyncViewModelFactory(syncRepo)
-        syncViewModel = ViewModelProviders.of(this, syncViewModelFactory).get(SyncViewModel::class.java)
         syncViewModel.successState.observe(this, Observer {
             Utils.cancelDialog()
             it?.let { successResult ->
