@@ -6,6 +6,8 @@ apply plugin: 'kotlin-android-extensions'
 
 apply plugin: 'io.fabric'
 
+apply plugin: 'kotlin-kapt'
+
 android {
     compileSdkVersion 28
     defaultConfig {
@@ -90,13 +92,13 @@ dependencies {
 
     //Architecture Component
     implementation rootProject.ext.libraries.lifecycleExtension
-    annotationProcessor rootProject.ext.libraries.lifecycleCompiler
+    kapt rootProject.ext.libraries.lifecycleCompiler
 //    implementation "androidx.paging:paging-runtime:$androidArchitectureVersion"
 
     //Room
     implementation rootProject.ext.libraries.roomRuntime
     implementation rootProject.ext.libraries.roomRxjava
-    annotationProcessor rootProject.ext.libraries.roomCompiler
+    kapt rootProject.ext.libraries.roomCompiler
 
     // Dependency Injection
     implementation rootProject.ext.libraries.kodeinJvm

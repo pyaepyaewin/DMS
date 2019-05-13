@@ -20,7 +20,7 @@ class SyncActivity : BaseActivity(), Utils.OnActionClickListener {
     override val layoutId: Int
         get() = R.layout.activity_sync
 
-    lateinit var syncViewModel: SyncViewModel
+    private lateinit var syncViewModel: SyncViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

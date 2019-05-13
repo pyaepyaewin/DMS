@@ -14,22 +14,22 @@ class InvoiceProduct {
     @ColumnInfo(name = "invoice_product_id")
     @SerializedName("invoice_product_id")
     @Expose
-    var invoice_product_id: Int = 0
+    var invoice_product_id: String = "0"
 
     @ColumnInfo(name = "product_id")
     @SerializedName("product_id")
     @Expose
-    var product_id: Int = 0
+    var product_id: String? = ""
 
     @ColumnInfo(name = "sale_quantity")
     @SerializedName("sale_quantity")
     @Expose
-    var sale_quantity: Double = 0.0
+    var sale_quantity: String? = ""
 
     @ColumnInfo(name = "discount_amount")
     @SerializedName("discount_amount")
     @Expose
-    var discount_amount: Double = 0.0
+    var discount_amount: String? = ""
 
     @ColumnInfo(name = "total_amount")
     @SerializedName("total_amount")

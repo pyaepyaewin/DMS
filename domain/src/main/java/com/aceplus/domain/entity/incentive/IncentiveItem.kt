@@ -34,7 +34,7 @@ class IncentiveItem {
     @ColumnInfo(name = "quantity")
     @SerializedName("quantity")
     @Expose
-    var quantity: Double = 0.0
+    var quantity: Int? = 0
 
     @ColumnInfo(name = "price")
     @SerializedName("price")

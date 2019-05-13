@@ -14,7 +14,7 @@ class ProductType {
     @ColumnInfo(name = "id")
     @SerializedName("id")
     @Expose
-    var id: Int = 0
+    var id: String = ""
 
     @ColumnInfo(name = "description")
     @SerializedName("description")

@@ -6,12 +6,24 @@ import com.aceplus.data.remote.DownloadApiService
 import com.aceplus.data.utils.Constant
 import com.aceplus.domain.entity.*
 import com.aceplus.domain.entity.classdiscount.*
+import com.aceplus.domain.entity.credit.Credit
 import com.aceplus.domain.entity.customer.Customer
+import com.aceplus.domain.entity.customer.CustomerBalance
 import com.aceplus.domain.entity.customer.CustomerFeedback
+import com.aceplus.domain.entity.delivery.Delivery
+import com.aceplus.domain.entity.delivery.DeliveryItem
+import com.aceplus.domain.entity.delivery.DeliveryPresent
+import com.aceplus.domain.entity.incentive.Incentive
+import com.aceplus.domain.entity.incentive.IncentiveItem
+import com.aceplus.domain.entity.invoice.Invoice
+import com.aceplus.domain.entity.invoice.InvoiceProduct
+import com.aceplus.domain.entity.posm.POSM
 import com.aceplus.domain.entity.predefine.District
 import com.aceplus.domain.entity.predefine.StateDivision
 import com.aceplus.domain.entity.predefine.Street
 import com.aceplus.domain.entity.predefine.Township
+import com.aceplus.domain.entity.preorder.PreOrder
+import com.aceplus.domain.entity.preorder.PreOrderProduct
 import com.aceplus.domain.entity.product.Product
 import com.aceplus.domain.entity.product.ProductCategory
 import com.aceplus.domain.entity.product.ProductType
@@ -20,6 +32,9 @@ import com.aceplus.domain.entity.promotion.PromotionGift
 import com.aceplus.domain.entity.promotion.PromotionGiftItem
 import com.aceplus.domain.entity.promotion.PromotionPrice
 import com.aceplus.domain.entity.sale.SaleMan
+import com.aceplus.domain.entity.sale.saletarget.SaleTargetCustomer
+import com.aceplus.domain.entity.sale.saletarget.SaleTargetSaleMan
+import com.aceplus.domain.entity.sale.salevisit.SaleVisitRecordDownload
 import com.aceplus.domain.entity.tdiscount.TDiscountByCategoryQuantity
 import com.aceplus.domain.entity.tdiscount.TDiscountByCategoryQuantityItem
 import com.aceplus.domain.entity.volumediscount.VolumeDiscount
@@ -33,22 +48,30 @@ import com.aceplus.domain.model.forApi.classdiscount.ClassDiscountForShowRespons
 import com.aceplus.domain.model.forApi.classdiscount.ClassDiscountPriceForApi
 import com.aceplus.domain.model.forApi.classdiscount.ClassDiscountResponse
 import com.aceplus.domain.model.forApi.company.CompanyInformationResponse
+import com.aceplus.domain.model.forApi.company.CompanyInfromationData
 import com.aceplus.domain.model.forApi.credit.CreditResponse
+import com.aceplus.domain.model.forApi.credit.DataForCredit
 import com.aceplus.domain.model.forApi.customer.CustomerForApi
 import com.aceplus.domain.model.forApi.customer.CustomerResponse
+import com.aceplus.domain.model.forApi.customer.CustomerVisitRequestData
 import com.aceplus.domain.model.forApi.customer.CustomerVisitResponse
+import com.aceplus.domain.model.forApi.delivery.DataForDelivery
 import com.aceplus.domain.model.forApi.delivery.DeliveryResponse
+import com.aceplus.domain.model.forApi.incentive.DataForIncentive
 import com.aceplus.domain.model.forApi.incentive.IncentiveResponse
 import com.aceplus.domain.model.forApi.other.GeneralData
 import com.aceplus.domain.model.forApi.other.GeneralResponse
 import com.aceplus.domain.model.forApi.posm.PosmShopTypeForApi
 import com.aceplus.domain.model.forApi.posm.PosmShopTypeResponse
+import com.aceplus.domain.model.forApi.preorder.DataForPreOrderHistory
 import com.aceplus.domain.model.forApi.preorder.PreOrderHistoryResponse
 import com.aceplus.domain.model.forApi.product.ProductForApi
 import com.aceplus.domain.model.forApi.product.ProductResponse
 import com.aceplus.domain.model.forApi.promotion.PromotionForApi
 import com.aceplus.domain.model.forApi.promotion.PromotionResponse
+import com.aceplus.domain.model.forApi.sale.salehistory.DataForSaleHistory
 import com.aceplus.domain.model.forApi.sale.salehistory.SaleHistoryResponse
+import com.aceplus.domain.model.forApi.sale.saletarget.DataForSaleTarget
 import com.aceplus.domain.model.forApi.sale.saletarget.SaleTargetResponse
 import com.aceplus.domain.model.forApi.volumediscount.DataForVolumeDiscount
 import com.aceplus.domain.model.forApi.volumediscount.VolumeDiscountResponse
@@ -57,8 +80,8 @@ import com.aceplussolutions.rms.constants.AppUtils
 import io.reactivex.Observable
 
 class SyncRepoImpl(
-        private val downloadApiService: DownloadApiService, private val db: MyDatabase,
-        private val shf: SharedPreferences
+    private val downloadApiService: DownloadApiService, private val db: MyDatabase,
+    private val shf: SharedPreferences
 ) : SyncRepo {
 
     override fun saveStartTime(time: String) {
@@ -67,15 +90,15 @@ class SyncRepoImpl(
 
     override fun getSaleManData(): SaleMan {
         val saleMan = SaleMan()
-        saleMan.id = AppUtils.getIntFromShp(Constant.SALEMAN_ID, shf)
+        saleMan.id = AppUtils.getStringFromShp(Constant.SALEMAN_ID, shf).toString()
         saleMan.user_id = AppUtils.getStringFromShp(Constant.SALEMAN_NO, shf).toString()
         saleMan.password = AppUtils.getStringFromShp(Constant.SALEMAN_PWD, shf)
         return saleMan
     }
 
     override fun getRouteScheduleID(): Int {
-        val saleManId = AppUtils.getIntFromShp(Constant.SALEMAN_ID, shf).toString()
-        val routeSchedule = db.routeScheduleV2Dao().dataBySaleManId(saleManId)
+        val saleManId = AppUtils.getStringFromShp(Constant.SALEMAN_ID, shf)
+        val routeSchedule = db.routeScheduleV2Dao().dataBySaleManId(saleManId!!)
         val routeScheduleItems = db.routeScheduleItemV2Dao().allDataByRouteScheduleId(routeSchedule.id.toString())
         return if (routeScheduleItems.count() > 0)
             routeScheduleItems[0].route_schedule_id
@@ -595,7 +618,7 @@ class SyncRepoImpl(
             }
             data.productType.map {
                 val productTypeEntity = ProductType()
-                productTypeEntity.id = it.id.toInt()
+                productTypeEntity.id = it.id
                 productTypeEntity.description = it.description
 
                 productTypeEnitiyList.add(productTypeEntity)
@@ -699,6 +722,409 @@ class SyncRepoImpl(
     }
 
     override fun savePosmAndShopTypeData(posmAndShopTypeList: List<PosmShopTypeForApi>) {
-//        val posmEntityList = mutableListOf<>()
+        val posmEntityList = mutableListOf<POSM>()
+        val shopTypeEntityList = mutableListOf<ShopType>()
+
+        posmAndShopTypeList.map { posmAndShopType ->
+            posmAndShopType.posmForApiList.map {
+                val posmEntity = POSM()
+                posmEntity.id = it.id.toInt()
+                posmEntity.invoice_no = it.invoiceNo
+                posmEntity.invoice_date = it.invoiceDate
+                posmEntity.shop_type_id = it.shopTypeId
+                posmEntity.stock_id = it.stockId
+
+                posmEntityList.add(posmEntity)
+            }
+
+            posmAndShopType.shopTypeForApiList.map {
+                val shopTypeEntity = ShopType()
+                shopTypeEntity.id = it.id.toInt()
+                shopTypeEntity.shop_type_no = it.shopTypeNo
+                shopTypeEntity.shop_type_name = it.shopTypeName
+
+                shopTypeEntityList.add(shopTypeEntity)
+            }
+        }
+
+        db.posmDao().deleteAll()
+        db.shopTypeDao().deleteAll()
+
+        db.posmDao().insertAll(posmEntityList)
+        db.shopTypeDao().insertAll(shopTypeEntityList)
+    }
+
+    override fun saveDeliveryData(deliveryList: List<DataForDelivery>) {
+        val deliveryEntityList = mutableListOf<Delivery>()
+        val deliveryItemEntityList = mutableListOf<DeliveryItem>()
+        val deliveryPresentEntityList = mutableListOf<DeliveryPresent>()
+        deliveryList.map { data ->
+            data.deliveryForApiList.map { delivery ->
+
+                val deliveryEntity = Delivery()
+                deliveryEntity.id = delivery.id.toInt()
+                deliveryEntity.invoice_no = delivery.invoiceNo
+                deliveryEntity.invoice_date = delivery.invoiceDate
+                deliveryEntity.customer_id = delivery.customerId
+                deliveryEntity.amount = delivery.amount
+                deliveryEntity.paid_amount = delivery.paidAmount
+                deliveryEntity.expire_date = delivery.expDate
+                deliveryEntity.sale_man_id = delivery.saleManId
+
+                deliveryEntityList.add(deliveryEntity)
+
+                delivery.deliveryItemForApiList.map {
+                    val deliveryItemEntity = DeliveryItem()
+                    deliveryItemEntity.id = it.id.toInt()
+                    deliveryItemEntity.delivery_id = it.saleOrderId
+                    deliveryItemEntity.stock_id = it.stockNo
+                    deliveryItemEntity.order_quantity = it.orderQty
+                    deliveryItemEntity.received_quantity = it.receiveQty
+                    deliveryItemEntity.s_price = it.sPrice
+                    deliveryItemEntity.foc_status = it.focStatus
+
+                    deliveryItemEntityList.add(deliveryItemEntity)
+                }
+
+                delivery.deliveryPresentForApiList.map {
+                    val deliveryPresentEntity = DeliveryPresent()
+                    deliveryPresentEntity.id = it.id.toInt()
+                    deliveryPresentEntity.sale_order_id = it.saleOrderId
+                    deliveryPresentEntity.stock_id = it.stockId
+                    deliveryPresentEntity.quantity = it.quantity
+
+                    deliveryPresentEntityList.add(deliveryPresentEntity)
+                }
+
+            }
+        }
+
+        db.deliveryDao().deleteAll()
+        db.deliveryItemDao().deleteAll()
+        db.deliveryPresentDao().deleteAll()
+
+        db.deliveryDao().insertAll(deliveryEntityList)
+        db.deliveryItemDao().insertAll(deliveryItemEntityList)
+        db.deliveryPresentDao().insertAll(deliveryPresentEntityList)
+    }
+
+    override fun saveCreditData(creditList: List<DataForCredit>) {
+        val creditEntityList = mutableListOf<Credit>()
+
+        val customerBalanceEntityList = mutableListOf<CustomerBalance>()
+
+        creditList.map { credit ->
+            credit.creditForApiList.map {
+                val creditEntity = Credit()
+                creditEntity.id = it.id
+                creditEntity.invoice_no = it.invoiceNo
+                creditEntity.invoice_date = it.invoiceDate
+                creditEntity.customer_id = it.customerId
+                creditEntity.amount = it.amount
+                creditEntity.pay_amount = it.payAmount
+                creditEntity.first_pay_amount = it.firstPayAmount
+                creditEntity.extra_amount = it.extraAmount
+                creditEntity.refund = it.refund
+                creditEntity.sale_status = it.saleStatus
+                creditEntity.invoice_status = it.invoiceStatus
+                creditEntity.sale_man_id = it.saleManId
+
+                creditEntityList.add(creditEntity)
+            }
+
+            credit.customerBalanceList.map {
+                val customerBalanceEntity = CustomerBalance()
+                customerBalanceEntity.id = it.id
+                customerBalanceEntity.customer_id = it.customerId
+                customerBalanceEntity.currency_id = it.currencyId
+                customerBalanceEntity.opening_balance = it.openingBalance
+                customerBalanceEntity.balance = it.balance
+
+                customerBalanceEntityList.add(customerBalanceEntity)
+            }
+        }
+
+
+        db.creditDao().deleteAll()
+        db.customerBalanceDao().deleteAll()
+
+        db.creditDao().insertAll(creditEntityList)
+        db.customerBalanceDao().insertAll(customerBalanceEntityList)
+    }
+
+    override fun saveCustomerVisitData(customerVisitList: List<CustomerVisitRequestData>) {
+        val saleVisitEntityList = mutableListOf<SaleVisitRecordDownload>()
+
+        customerVisitList.map { data ->
+            data.saleVisitRecordList.map {
+                val saleVisitEntity = SaleVisitRecordDownload()
+                saleVisitEntity.customer_id = it.customerId
+                saleVisitEntity.sale_man_id = it.salemanId
+                saleVisitEntity.latitude = it.latitude
+                saleVisitEntity.longitude = it.longitude
+                saleVisitEntity.visit_flag = it.visitFlg.toInt()
+                saleVisitEntity.sale_flag = it.saleFlg.toInt()
+                saleVisitEntity.record_date = it.recordDate
+
+                saleVisitEntityList.add(saleVisitEntity)
+            }
+        }
+        db.saleVisitRecordDownloadDao().deleteAll()
+        db.saleVisitRecordDownloadDao().insertAll(saleVisitEntityList)
+    }
+
+    override fun saveCompanyData(companyInfoList: List<CompanyInfromationData>) {
+        val companyInfoEntityList = mutableListOf<CompanyInformation>()
+
+        companyInfoList.map { data ->
+            data.companyInformation.map {
+                val companyInformationEntity = CompanyInformation()
+                companyInformationEntity.id = it.id
+                companyInformationEntity.description = it.description
+                companyInformationEntity.main_db_name = it.mainDBName
+                companyInformationEntity.home_currency_id = it.homeCurrencyId
+                companyInformationEntity.multi_currency = it.multiCurrency
+                companyInformationEntity.start_date = it.startDate
+                companyInformationEntity.end_date = it.endDate
+                companyInformationEntity.auto_generate = it.autoGenerate
+                companyInformationEntity.company_name = it.companyName
+                companyInformationEntity.short_name = it.shortName
+                companyInformationEntity.contact_person = it.contactPerson
+                companyInformationEntity.address = it.address
+                companyInformationEntity.email = it.email
+                companyInformationEntity.website = it.website
+                companyInformationEntity.serial_number = it.serialNumber
+                companyInformationEntity.phone_number = it.phoneNumber
+                companyInformationEntity.separator = it.isSeparator
+                companyInformationEntity.amount_format = it.amountFormat
+                companyInformationEntity.price_format = it.priceFormat
+                companyInformationEntity.quantity_format = it.quantityFormat
+                companyInformationEntity.rate_format = it.rateFormat
+                companyInformationEntity.valuation_method = it.valuationMethod
+                companyInformationEntity.font = it.font
+                companyInformationEntity.report_font = it.reportFont
+                companyInformationEntity.receipt_voucher = it.receiptVoucher
+                companyInformationEntity.print_port = it.prnPort
+                companyInformationEntity.pos_voucher_footer1 = it.posVoucherFooter1
+                companyInformationEntity.pos_voucher_footer2 = it.posVoucherFooter2
+                companyInformationEntity.stock_auto_generate = it.isStockAutoGenerate
+                companyInformationEntity.pc_count = it.pcCount
+                companyInformationEntity.expired_month = it.expiredMonth
+                companyInformationEntity.paid_status = it.paidstatus
+                companyInformationEntity.h1 = it.h1
+                companyInformationEntity.h2 = it.h2
+                companyInformationEntity.h3 = it.h3
+                companyInformationEntity.h4 = it.h4
+                companyInformationEntity.f1 = it.f1
+                companyInformationEntity.f2 = it.f2
+                companyInformationEntity.f3 = it.f3
+                companyInformationEntity.f4 = it.f4
+                companyInformationEntity.tax = it.tax
+                companyInformationEntity.branch_code = it.branchCode
+                companyInformationEntity.branch_name = it.branchName
+                companyInformationEntity.hb_code = it.hbCode
+                companyInformationEntity.credit_sale = it.creditSale
+                companyInformationEntity.use_combo = it.useCombo
+                companyInformationEntity.last_day_close_date = it.lastDayCloseDate
+                companyInformationEntity.last_update_invoice_date = it.lastUpdateInvoiceDate
+                companyInformationEntity.company_type = it.companyType
+                companyInformationEntity.company_code = it.companyCode
+                companyInformationEntity.start_time = it.startTime
+                companyInformationEntity.end_time = it.endTime
+                companyInformationEntity.branch_id = it.branchId
+                companyInformationEntity.print_copy = it.printCopy
+                companyInformationEntity.tax_type = it.taxType
+                companyInformationEntity.balance_control = it.balanceControl
+                companyInformationEntity.transaction_auto_generate = it.transactionAutoGenerate
+                companyInformationEntity.company_tax_reg_no = it.commonTaxRegNo
+
+                companyInfoEntityList.add(companyInformationEntity)
+            }
+        }
+
+        db.companyInformationDao().deleteAll()
+        db.companyInformationDao().insertAll(companyInfoEntityList)
+
+    }
+
+    override fun saveSaleTargetData(saleTargetList: List<DataForSaleTarget>) {
+        val saleTargetForSaleManEntityList = mutableListOf<SaleTargetSaleMan>()
+        val saleTargetForCustomerEntityList = mutableListOf<SaleTargetCustomer>()
+
+        saleTargetList.map { saleTarget ->
+            saleTarget.saleTargetForSaleManList.map {
+                val saleTargetSaleMan = SaleTargetSaleMan()
+                saleTargetSaleMan.id = it.id.toInt()
+                saleTargetSaleMan.from_date = it.fromDate
+                saleTargetSaleMan.to_date = it.toDate
+                saleTargetSaleMan.sale_man_id = it.saleManId
+                saleTargetSaleMan.category_id = it.categoryId
+                saleTargetSaleMan.group_code_id = it.groupCodeId
+                saleTargetSaleMan.stock_id = it.stockId
+                saleTargetSaleMan.target_amount = it.targetAmount
+                saleTargetSaleMan.date = it.date
+                saleTargetSaleMan.day = it.day
+                saleTargetSaleMan.date_status = it.dateStatus
+                saleTargetSaleMan.invoice_no = it.invoiceNo
+
+                saleTargetForSaleManEntityList.add(saleTargetSaleMan)
+            }
+
+            saleTarget.saleTargetForCustomerList.map {
+                val saleTargetCustomer = SaleTargetCustomer()
+                saleTargetCustomer.id = it.id.toInt()
+                saleTargetCustomer.from_date = it.fromDate
+                saleTargetCustomer.to_date = it.toDate
+                saleTargetCustomer.customer_id = it.customerId
+                saleTargetCustomer.sale_man_id = it.saleManId
+                saleTargetCustomer.category_id = it.categoryId
+                saleTargetCustomer.group_code_id = it.groupCodeId
+                saleTargetCustomer.stock_id = it.stockId
+                saleTargetCustomer.target_amount = it.targetAmount
+                saleTargetCustomer.date = it.date
+                saleTargetCustomer.day = it.day
+                saleTargetCustomer.date_status = it.dateStatus
+                saleTargetCustomer.invoice_no = it.invoiceNo
+
+                saleTargetForCustomerEntityList.add(saleTargetCustomer)
+            }
+        }
+
+
+        db.saleTargetSaleManDao().deleteAll()
+        db.saleTargetCustomerDao().deleteAll()
+
+        db.saleTargetSaleManDao().insertAll(saleTargetForSaleManEntityList)
+        db.saleTargetCustomerDao().insertAll(saleTargetForCustomerEntityList)
+    }
+
+    override fun saveSaleHistoryData(saleHistoryList: List<DataForSaleHistory>) {
+        val saleHistoryEntityList = mutableListOf<Invoice>()
+        val saleHistoryDetailEntityList = mutableListOf<InvoiceProduct>()
+
+        saleHistoryList.map { data ->
+            data.saleHistoryList.map { saleHistory ->
+                val invoice = Invoice()
+                invoice.invoice_id = saleHistory.id
+                invoice.sale_date = saleHistory.date
+                invoice.customer_id = saleHistory.customerId
+                invoice.total_amount = saleHistory.totalAmt
+                invoice.pay_amount = saleHistory.totalPayAmt
+                invoice.refund_amount = saleHistory.totalRefundAmt
+                invoice.sale_person_id = saleHistory.salepersonId
+                invoice.location_code = saleHistory.locationCode
+                invoice.cash_or_credit = saleHistory.invoiceStatus
+                invoice.device_id = saleHistory.deviceId
+                invoice.sale_flag = 1
+
+                saleHistoryEntityList.add(invoice)
+
+                saleHistory.saleHistoryDetailList.map {
+                    val invoiceProduct = InvoiceProduct()
+                    invoiceProduct.invoice_product_id = it.gettSaleId()
+                    invoiceProduct.product_id = it.productId
+                    invoiceProduct.sale_quantity = it.qty
+                    invoiceProduct.discount_amount = it.discountAmt
+
+                    saleHistoryDetailEntityList.add(invoiceProduct)
+                }
+            }
+        }
+
+        db.invoiceDao().deleteAll()
+        db.invoiceDao().insertAll(saleHistoryEntityList)
+    }
+
+    override fun saveIncentiveData(incentiveList: List<DataForIncentive>) {
+        val incentiveEntityList = mutableListOf<Incentive>()
+        val incentiveItemEntityList = mutableListOf<IncentiveItem>()
+
+        incentiveList.map { data ->
+            data.incentiveList.map {
+                val incentive = Incentive()
+                incentive.id = it.id
+                incentive.invoice_no = it.invoiceNo
+                incentive.invoice_date = it.invoiceDate
+                incentive.standard_external_check_id = it.standardExternalCheckId
+                incentive.outlet_visibility_id = it.outletVisibilityId
+                incentive.customer_id = it.customerId
+                incentive.sale_man_id = it.saleManId
+                incentive.incentive_program_name = it.incentiveProgramName
+
+                incentiveEntityList.add(incentive)
+
+                it.displayProgramItem.map { item ->
+                    val incentiveItem = IncentiveItem()
+                    incentiveItem.id = item.id
+                    incentiveItem.display_program_id = item.displayProgramId
+                    incentiveItem.incentive_id = item.incentiveId
+                    incentiveItem.stock_id = item.stockId
+                    incentiveItem.quantity = item.quantity
+                    incentiveItem.price = item.price
+
+                    incentiveItemEntityList.add(incentiveItem)
+                }
+            }
+        }
+        db.incentiveDao().deleteAll()
+        db.incentiveItemDao().deleteAll()
+
+        db.incentiveDao().insertAll(incentiveEntityList)
+        db.incentiveItemDao().insertAll(incentiveItemEntityList)
+    }
+
+    override fun savePreOrderData(preOrderList: List<DataForPreOrderHistory>) {
+        val preOrderEntityList = mutableListOf<PreOrder>()
+        val preOrderItemEntityList = mutableListOf<PreOrderProduct>()
+
+        preOrderList.map { data ->
+            data.preOrderHistoryForApiList.map {
+                val preOrder = PreOrder()
+                preOrder.invoice_id = it.invoiceNo
+                preOrder.customer_id = it.customerId
+                preOrder.sale_man_id = it.saleManId
+                preOrder.dev_id = ""
+                preOrder.pre_order_date = it.invoiceDate
+                preOrder.expected_delivery_date = it.deliveryDate
+                preOrder.advance_payment_amount = it.paidAmount
+                preOrder.net_amount = it.amount
+                preOrder.location_id = it.locationId
+                preOrder.discount = it.discount
+                preOrder.discount_percent = it.discountPer
+                preOrder.tax_amount = it.taxAmount
+                preOrder.remark = it.remark
+                preOrder.bank_name = it.cardCodeId
+                preOrder.bank_account_no = it.cardNo
+                preOrder.delete_flag = 1
+                preOrder.sale_flag = 1
+                //todo if you want to do samparoo
+
+                preOrderEntityList.add(preOrder)
+
+                it.itemHistoryList.map { product ->
+                    val preOrderProduct = PreOrderProduct()
+                    preOrderProduct.sale_order_id = product.saleOrderId
+                    preOrderProduct.product_id = product.stockId
+                    preOrderProduct.order_quantity = product.orderQty
+                    preOrderProduct.price = product.getsPrice()
+                    preOrderProduct.total_amount = 0.0
+                    preOrderProduct.promotion_price = product.promotionPrice
+                    preOrderProduct.volume_discount = product.volumeDiscount
+                    preOrderProduct.volume_discount_percent = product.volumeDiscountPer
+                    preOrderProduct.delete_flag = 1
+                    preOrderProduct.exclude = product.exclude
+                    preOrderProduct.promotion_plan_id = product.promotionPlanId
+
+                    preOrderItemEntityList.add(preOrderProduct)
+                }
+            }
+        }
+
+        db.preOrderDao().deleteAll()
+        db.preOrderProductDao().deleteAll()
+        db.preOrderPresentDao().deleteAll()
+
+        db.preOrderDao().insertAll(preOrderEntityList)
+        db.preOrderProductDao().insertAll(preOrderItemEntityList)
     }
 }

@@ -186,15 +186,26 @@ class SyncViewModel(private val syncRepo: SyncRepo) : BaseViewModel() {
                     } else {
                         errorState.postValue(Pair(it.aceplusStatusMessage, "download"))
                     }
-                    val deliveryParam = Utils.createParamData(
+
+                    val deliveryParam = Utils.createParamDataWithCustomerIDList(
                         saleMan.user_id,
                         saleMan.password!!,
-                        routeScheduleID
+                        routeScheduleID,
+                        customerIdList
                     )
                     return@flatMap syncRepo.downloadDelivery(deliveryParam)
                 }
                 .flatMap {
-                    //do something
+                    //save data
+                    if (it.aceplusStatusCode == 200) {
+                        val deliveryList = it.dataForDeliveryList
+                        if (deliveryList.count() > 0) {
+                            syncRepo.saveDeliveryData(deliveryList)
+                        }
+                    } else {
+                        errorState.postValue(Pair(it.aceplusStatusMessage, "download"))
+                    }
+
                     val creditParam = Utils.createParamDataWithCustomerIDList(
                         saleMan.user_id,
                         saleMan.password!!,
@@ -204,7 +215,16 @@ class SyncViewModel(private val syncRepo: SyncRepo) : BaseViewModel() {
                     return@flatMap syncRepo.downloadCredit(creditParam)
                 }
                 .flatMap {
-                    //do something
+                    //save data
+                    if (it.aceplusStatusCode == 200) {
+                        val creditList = it.dataForCreditList
+                        if (creditList.count() > 0) {
+                            syncRepo.saveCreditData(creditList)
+                        }
+                    } else {
+                        errorState.postValue(Pair(it.aceplusStatusMessage, "download"))
+                    }
+
                     val customerVisitParam = Utils.createParamData(
                         saleMan.user_id,
                         saleMan.password!!,
@@ -214,7 +234,16 @@ class SyncViewModel(private val syncRepo: SyncRepo) : BaseViewModel() {
                     return@flatMap syncRepo.downloadCustomerVisit(customerVisitParam)
                 }
                 .flatMap {
-                    //do something
+                    //save data
+                    if (it.aceplusStatusCode == 200) {
+                        val customerVisitList = it.customerVisitRequestDataList
+                        if (customerVisitList.count() > 0) {
+                            syncRepo.saveCustomerVisitData(customerVisitList)
+                        }
+                    } else {
+                        errorState.postValue(Pair(it.aceplusStatusMessage, "download"))
+                    }
+
                     val companyParam = Utils.createParamData(
                         saleMan.user_id,
                         saleMan.password!!,
@@ -223,7 +252,16 @@ class SyncViewModel(private val syncRepo: SyncRepo) : BaseViewModel() {
                     return@flatMap syncRepo.downloadCompanyInformation(companyParam)
                 }
                 .flatMap {
-                    //do something
+                    //save data
+                    if (it.aceplusStatusCode == 200) {
+                        val companyInfoList = it.data
+                        if (companyInfoList.count() > 0) {
+                            syncRepo.saveCompanyData(companyInfoList)
+                        }
+                    } else {
+                        errorState.postValue(Pair(it.aceplusStatusMessage, "download"))
+                    }
+
                     val saleTargetParam = Utils.createParamData(
                         saleMan.user_id,
                         saleMan.password!!,
@@ -232,7 +270,16 @@ class SyncViewModel(private val syncRepo: SyncRepo) : BaseViewModel() {
                     return@flatMap syncRepo.downloadSaleTarget(saleTargetParam)
                 }
                 .flatMap {
-                    //do something
+                    //save data
+                    if (it.aceplusStatusCode == 200) {
+                        val saleTargetList = it.dataForSaleTargetList
+                        if (saleTargetList.count() > 0) {
+                            syncRepo.saveSaleTargetData(saleTargetList)
+                        }
+                    } else {
+                        errorState.postValue(Pair(it.aceplusStatusMessage, "download"))
+                    }
+
                     val saleHistoryParam = Utils.createParamDataWithCustomerIDList(
                         saleMan.user_id,
                         saleMan.password!!,
@@ -242,7 +289,16 @@ class SyncViewModel(private val syncRepo: SyncRepo) : BaseViewModel() {
                     return@flatMap syncRepo.downloadSaleHistory(saleHistoryParam)
                 }
                 .flatMap {
-                    //do something
+                    //save data
+                    if (it.aceplusStatusCode == 200) {
+                        val saleHistoryList = it.dataForSaleHistoryList
+                        if (saleHistoryList.count() > 0) {
+                            syncRepo.saveSaleHistoryData(saleHistoryList)
+                        }
+                    } else {
+                        errorState.postValue(Pair(it.aceplusStatusMessage, "download"))
+                    }
+
                     val incentiveParam = Utils.createParamDataWithCustomerIDList(
                         saleMan.user_id,
                         saleMan.password!!,
@@ -252,7 +308,16 @@ class SyncViewModel(private val syncRepo: SyncRepo) : BaseViewModel() {
                     return@flatMap syncRepo.downloadIncentive(incentiveParam)
                 }
                 .flatMap {
-                    //do something
+                    //save data
+                    if (it.aceplusStatusCode == 200) {
+                        val incentiveList = it.dataForIncentive
+                        if (incentiveList.count() > 0) {
+                            syncRepo.saveIncentiveData(incentiveList)
+                        }
+                    } else {
+                        errorState.postValue(Pair(it.aceplusStatusMessage, "download"))
+                    }
+
                     val preOrderParam = Utils.createParamDataWithCustomerIDList(
                         saleMan.user_id,
                         saleMan.password!!,
@@ -264,7 +329,16 @@ class SyncViewModel(private val syncRepo: SyncRepo) : BaseViewModel() {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
-                    //do something
+                    //save data
+                    if (it.aceplusStatusCode == 200) {
+                        val preOrderList = it.dataForPreOrderList
+                        if (preOrderList.count() > 0) {
+                            syncRepo.savePreOrderData(preOrderList)
+                        }
+                    } else {
+                        errorState.postValue(Pair(it.aceplusStatusMessage, "download"))
+                    }
+
                     successState.postValue(Pair("Successfully Downloaded", "download"))
                 }, {
                     errorState.postValue(Pair(it.localizedMessage, "download"))

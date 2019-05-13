@@ -4,6 +4,8 @@ apply plugin: 'kotlin-android'
 
 apply plugin: 'kotlin-android-extensions'
 
+apply plugin: 'kotlin-kapt'
+
 android {
     compileSdkVersion 28
 
@@ -68,7 +70,7 @@ dependencies {
 
     //Architecture Component
     implementation rootProject.ext.libraries.lifecycleExtension
-    annotationProcessor rootProject.ext.libraries.lifecycleCompiler
+    kapt rootProject.ext.libraries.lifecycleCompiler
 //    implementation "androidx.paging:paging-runtime:$androidArchitectureVersion"
 
     //Room

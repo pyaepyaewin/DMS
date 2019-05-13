@@ -32,14 +32,6 @@ class MainActivity : BaseActivity(), Utils.OnActionClickListener {
         val loginViewModelFactory = LoginViewModelFactory(loginRepo)
         loginViewModel = ViewModelProviders.of(this, loginViewModelFactory).get(LoginViewModel::class.java)
 
-
-        //db data test
-//        val saleMans = db?.saleManDao()?.allData
-//        val routes = db?.routeDao()?.allData
-//        val routeAssigns = db?.routeAssignDao()?.allData
-//        val routeScheduleV2 = db?.routeScheduleV2Dao()?.allData
-//        val routeScheduleItemV2 = db?.routeScheduleItemV2Dao()?.allData
-
         username.text = AppUtils.getStringFromShp(Constant.SALEMAN_NAME, this)
         date.text = Utils.getCurrentDate(false)
 

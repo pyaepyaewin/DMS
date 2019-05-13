@@ -44,11 +44,11 @@ class SaleVisitRecordDownload {
     @ColumnInfo(name = "visit_flag")
     @SerializedName("visit_flag")
     @Expose
-    var visit_flag: String? = null
+    var visit_flag: Int? = 0
 
     @ColumnInfo(name = "sale_flag")
     @SerializedName("sale_flag")
     @Expose
-    var sale_flag: String? = null
+    var sale_flag: Int? = 0
 
 }

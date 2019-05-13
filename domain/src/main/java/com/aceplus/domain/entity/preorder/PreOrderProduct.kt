@@ -19,12 +19,12 @@ class PreOrderProduct {
     @ColumnInfo(name = "sale_order_id")
     @SerializedName("sale_order_id")
     @Expose
-    var sale_order_id: Int = 0
+    var sale_order_id:String? = null
 
     @ColumnInfo(name = "product_id")
     @SerializedName("product_id")
     @Expose
-    var product_id: Int = 0
+    var product_id: String? = null
 
     @ColumnInfo(name = "order_quantity")
     @SerializedName("order_quantity")
@@ -39,7 +39,7 @@ class PreOrderProduct {
     @ColumnInfo(name = "total_amount")
     @SerializedName("total_amount")
     @Expose
-    var total_amount: String? = null
+    var total_amount: Double? = 0.0
 
     @ColumnInfo(name = "promotion_price")
     @SerializedName("promotion_price")
@@ -49,7 +49,7 @@ class PreOrderProduct {
     @ColumnInfo(name = "promotion_plan_id")
     @SerializedName("promotion_plan_id")
     @Expose
-    var promotion_plan_id: Int = 0
+    var promotion_plan_id: String? = null
 
     @ColumnInfo(name = "volume_discount")
     @SerializedName("volume_discount")
@@ -79,5 +79,5 @@ class PreOrderProduct {
     @ColumnInfo(name = "delete_flag")
     @SerializedName("delete_flag")
     @Expose
-    var delete_flag: String? = null
+    var delete_flag: Int? = 0
 }

@@ -19,27 +19,27 @@ class DeliveryItem {
     @ColumnInfo(name = "delivery_id")
     @SerializedName("delivery_id")
     @Expose
-    var delivery_id: Int = 0
+    var delivery_id: String? = null
 
     @ColumnInfo(name = "stock_id")
     @SerializedName("stock_id")
     @Expose
-    var stock_id: Int = 0
+    var stock_id: String? = null
 
     @ColumnInfo(name = "order_quantity")
     @SerializedName("order_quantity")
     @Expose
-    var order_quantity: Double = 0.0
+    var order_quantity: String? = null
 
     @ColumnInfo(name = "received_quantity")
     @SerializedName("received_quantity")
     @Expose
-    var received_quantity: Double = 0.0
+    var received_quantity: String? = null
 
     @ColumnInfo(name = "s_price")
     @SerializedName("s_price")
     @Expose
-    var s_price: Double = 0.0
+    var s_price: String? = null
 
     @ColumnInfo(name = "foc_status")
     @SerializedName("foc_status")

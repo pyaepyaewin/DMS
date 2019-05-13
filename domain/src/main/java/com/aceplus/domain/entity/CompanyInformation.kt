@@ -29,12 +29,12 @@ class CompanyInformation {
     @ColumnInfo(name = "home_currency_id")
     @SerializedName("home_currency_id")
     @Expose
-    var home_currency_id: String? = null
+    var home_currency_id: Int? = 0
 
     @ColumnInfo(name = "multi_currency")
     @SerializedName("multi_currency")
     @Expose
-    var multi_currency: String? = null
+    var multi_currency: Int? = 0
 
     @ColumnInfo(name = "start_date")
     @SerializedName("start_date")
@@ -49,7 +49,7 @@ class CompanyInformation {
     @ColumnInfo(name = "auto_generate")
     @SerializedName("auto_generate")
     @Expose
-    var auto_generate: String? = null
+    var auto_generate: Int? = 0
 
     @ColumnInfo(name = "company_name")
     @SerializedName("company_name")
@@ -94,27 +94,27 @@ class CompanyInformation {
     @ColumnInfo(name = "is_separator")
     @SerializedName("is_separator")
     @Expose
-    var separator: String? = null
+    var separator: Int? = 0
 
     @ColumnInfo(name = "amount_format")
     @SerializedName("amount_format")
     @Expose
-    var amount_format: String? = null
+    var amount_format: Int? = 0
 
     @ColumnInfo(name = "price_format")
     @SerializedName("price_format")
     @Expose
-    var price_format: String? = null
+    var price_format: Int? = 0
 
     @ColumnInfo(name = "quantity_format")
     @SerializedName("quantity_format")
     @Expose
-    var quantity_format: String? = null
+    var quantity_format: Int? = 0
 
     @ColumnInfo(name = "rate_format")
     @SerializedName("rate_format")
     @Expose
-    var rate_format: String? = null
+    var rate_format: Int? = 0
 
     @ColumnInfo(name = "valuation_method")
     @SerializedName("valuation_method")
@@ -154,7 +154,7 @@ class CompanyInformation {
     @ColumnInfo(name = "is_stock_auto_generate")
     @SerializedName("is_stock_auto_generate")
     @Expose
-    var stock_auto_generate: String? = null
+    var stock_auto_generate: Int? = 0
 
     @ColumnInfo(name = "pc_count")
     @SerializedName("pc_count")
@@ -214,7 +214,7 @@ class CompanyInformation {
     @ColumnInfo(name = "tax")
     @SerializedName("tax")
     @Expose
-    var tax: String? = null
+    var tax: Int? = 0
 
     @ColumnInfo(name = "branch_code")
     @SerializedName("branch_code")
@@ -234,12 +234,12 @@ class CompanyInformation {
     @ColumnInfo(name = "credit_sale")
     @SerializedName("credit_sale")
     @Expose
-    var credit_sale: String? = null
+    var credit_sale: Int? = 0
 
     @ColumnInfo(name = "use_combo")
     @SerializedName("use_combo")
     @Expose
-    var use_combo: String? = null
+    var use_combo: Int? = 0
 
     @ColumnInfo(name = "last_day_close_date")
     @SerializedName("last_day_close_date")
@@ -274,12 +274,12 @@ class CompanyInformation {
     @ColumnInfo(name = "branch_id")
     @SerializedName("branch_id")
     @Expose
-    var branch_id: String? = null
+    var branch_id: Int? = 0
 
     @ColumnInfo(name = "print_copy")
     @SerializedName("print_copy")
     @Expose
-    var print_copy: String? = null
+    var print_copy: Int? = 0
 
     @ColumnInfo(name = "tax_type")
     @SerializedName("tax_type")
@@ -294,7 +294,7 @@ class CompanyInformation {
     @ColumnInfo(name = "transaction_auto_generate")
     @SerializedName("transaction_auto_generate")
     @Expose
-    var transaction_auto_generate: String? = null
+    var transaction_auto_generate: Int? = 0
 
     @ColumnInfo(name = "company_tax_reg_no")
     @SerializedName("company_tax_reg_no")

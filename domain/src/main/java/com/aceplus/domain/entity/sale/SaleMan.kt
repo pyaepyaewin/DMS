@@ -14,7 +14,7 @@ class SaleMan {
     @ColumnInfo(name = "id")
     @SerializedName("id")
     @Expose
-    var id: Int = 0
+    var id: String = ""
 
     @ColumnInfo(name = "user_id")
     @SerializedName("user_id")

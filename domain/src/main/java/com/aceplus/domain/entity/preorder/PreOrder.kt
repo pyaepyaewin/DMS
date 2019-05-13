@@ -19,27 +19,27 @@ class PreOrder {
     @ColumnInfo(name = "invoice_id")
     @SerializedName("invoice_id")
     @Expose
-    var invoice_id: Int = 0
+    var invoice_id: String? = null
 
     @ColumnInfo(name = "customer_id")
     @SerializedName("customer_id")
     @Expose
-    var customer_id: Int = 0
+    var customer_id: String? = null
 
     @ColumnInfo(name = "sale_man_id")
     @SerializedName("sale_man_id")
     @Expose
-    var sale_man_id: Int = 0
+    var sale_man_id: String? = null
 
     @ColumnInfo(name = "dev_id")
     @SerializedName("dev_id")
     @Expose
-    var dev_id: Int = 0
+    var dev_id: String? = null
 
-    @ColumnInfo(name = "per_order_date")
-    @SerializedName("per_order_date")
+    @ColumnInfo(name = "pre_order_date")
+    @SerializedName("pre_order_date")
     @Expose
-    var per_order_date: String? = null
+    var pre_order_date: String? = null
 
     @ColumnInfo(name = "expected_delivery_date")
     @SerializedName("expected_delivery_date")
@@ -49,27 +49,27 @@ class PreOrder {
     @ColumnInfo(name = "advance_payment_amount")
     @SerializedName("advance_payment_amount")
     @Expose
-    var advance_payment_amount: Double = 0.0
+    var advance_payment_amount: String? = null
 
     @ColumnInfo(name = "net_amount")
     @SerializedName("net_amount")
     @Expose
-    var net_amount: Double = 0.0
+    var net_amount: String? = null
 
     @ColumnInfo(name = "location_id")
     @SerializedName("location_id")
     @Expose
-    var location_id: Int = 0
+    var location_id: String? = null
 
     @ColumnInfo(name = "discount")
     @SerializedName("discount")
     @Expose
-    var discount: Double = 0.0
+    var discount: String? = null
 
     @ColumnInfo(name = "discount_percent")
     @SerializedName("discount_percent")
     @Expose
-    var discount_percent: Double = 0.0
+    var discount_percent: String? = null
 
     @ColumnInfo(name = "volume_discount")
     @SerializedName("volume_discount")
@@ -104,10 +104,10 @@ class PreOrder {
     @ColumnInfo(name = "delete_flag")
     @SerializedName("delete_flag")
     @Expose
-    var delete_flag: String? = null
+    var delete_flag: Int? = 0
 
     @ColumnInfo(name = "sale_flag")
     @SerializedName("sale_flag")
     @Expose
-    var sale_flag: String? = null
+    var sale_flag: Int? = 0
 }

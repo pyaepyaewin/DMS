@@ -19,13 +19,13 @@ class POSM {
     @ColumnInfo(name = "invoice_no")
     @SerializedName("invoice_no")
     @Expose
-    var invoice_no: Int = 0
+    var invoice_no: String? = null
 
 
     @ColumnInfo(name = "invoice_date")
     @SerializedName("invoice_date")
     @Expose
-    var invoice_date: Int = 0
+    var invoice_date: String? = null
 
     @ColumnInfo(name = "shop_type_id")
     @SerializedName("shop_type_id")

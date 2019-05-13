@@ -118,7 +118,7 @@ class LoginRepoImpl(
         val saleManEntityList = mutableListOf<com.aceplus.domain.entity.sale.SaleMan>()
         saleManList.map {
             val saleManEntity = com.aceplus.domain.entity.sale.SaleMan()
-            saleManEntity.id = it.id.toInt()
+            saleManEntity.id = it.id
             saleManEntity.user_id = it.saleManNo
             saleManEntity.password = it.password
             saleManEntity.user_name = it.saleManName

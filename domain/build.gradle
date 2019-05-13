@@ -4,6 +4,8 @@ apply plugin: 'kotlin-android'
 
 apply plugin: 'kotlin-android-extensions'
 
+apply plugin: 'kotlin-kapt'
+
 android {
     compileSdkVersion 28
 
@@ -12,7 +14,6 @@ android {
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
-//        multiDexEnabled true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
@@ -28,9 +29,6 @@ dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
 
-    //other
-//    implementation rootProject.ext.libraries.multiDex
-
     // Networking
     implementation rootProject.ext.libraries.retrofitConverter
 
@@ -42,7 +40,7 @@ dependencies {
     //Room
     implementation rootProject.ext.libraries.roomRuntime
     implementation rootProject.ext.libraries.roomRxjava
-    annotationProcessor rootProject.ext.libraries.roomCompiler
+    kapt rootProject.ext.libraries.roomCompiler
 
     // Dependency Injection
     implementation rootProject.ext.libraries.kodeinJvm

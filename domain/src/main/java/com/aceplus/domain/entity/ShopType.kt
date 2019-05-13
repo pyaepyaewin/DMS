@@ -19,7 +19,7 @@ class ShopType {
     @ColumnInfo(name = "shop_type_no")
     @SerializedName("shop_type_no")
     @Expose
-    var shop_type_no: Int = 0
+    var shop_type_no: String? = null
 
     @ColumnInfo(name = "shop_type_name")
     @SerializedName("shop_type_name")

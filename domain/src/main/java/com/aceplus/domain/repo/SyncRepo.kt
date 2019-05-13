@@ -9,22 +9,30 @@ import com.aceplus.domain.model.forApi.classdiscount.ClassDiscountForShowRespons
 import com.aceplus.domain.model.forApi.classdiscount.ClassDiscountPriceForApi
 import com.aceplus.domain.model.forApi.classdiscount.ClassDiscountResponse
 import com.aceplus.domain.model.forApi.company.CompanyInformationResponse
+import com.aceplus.domain.model.forApi.company.CompanyInfromationData
 import com.aceplus.domain.model.forApi.credit.CreditResponse
+import com.aceplus.domain.model.forApi.credit.DataForCredit
 import com.aceplus.domain.model.forApi.customer.CustomerForApi
 import com.aceplus.domain.model.forApi.customer.CustomerResponse
+import com.aceplus.domain.model.forApi.customer.CustomerVisitRequestData
 import com.aceplus.domain.model.forApi.customer.CustomerVisitResponse
+import com.aceplus.domain.model.forApi.delivery.DataForDelivery
 import com.aceplus.domain.model.forApi.delivery.DeliveryResponse
+import com.aceplus.domain.model.forApi.incentive.DataForIncentive
 import com.aceplus.domain.model.forApi.incentive.IncentiveResponse
 import com.aceplus.domain.model.forApi.other.GeneralData
 import com.aceplus.domain.model.forApi.other.GeneralResponse
 import com.aceplus.domain.model.forApi.posm.PosmShopTypeForApi
 import com.aceplus.domain.model.forApi.posm.PosmShopTypeResponse
+import com.aceplus.domain.model.forApi.preorder.DataForPreOrderHistory
 import com.aceplus.domain.model.forApi.preorder.PreOrderHistoryResponse
 import com.aceplus.domain.model.forApi.product.ProductForApi
 import com.aceplus.domain.model.forApi.product.ProductResponse
 import com.aceplus.domain.model.forApi.promotion.PromotionForApi
 import com.aceplus.domain.model.forApi.promotion.PromotionResponse
+import com.aceplus.domain.model.forApi.sale.salehistory.DataForSaleHistory
 import com.aceplus.domain.model.forApi.sale.salehistory.SaleHistoryResponse
+import com.aceplus.domain.model.forApi.sale.saletarget.DataForSaleTarget
 import com.aceplus.domain.model.forApi.sale.saletarget.SaleTargetResponse
 import com.aceplus.domain.model.forApi.volumediscount.DataForVolumeDiscount
 import com.aceplus.domain.model.forApi.volumediscount.VolumeDiscountResponse
@@ -64,4 +72,12 @@ interface SyncRepo {
     fun saveDiscountCategoryQuantityData(discountCategoryQuantityList: List<DataForDiscountCategoryQuantity>)
     fun saveGeneralData(generalDataList: List<GeneralData>)
     fun savePosmAndShopTypeData(posmAndShopTypeList: List<PosmShopTypeForApi>)
+    fun saveDeliveryData(deliveryList: List<DataForDelivery>)
+    fun saveCreditData(creditList: List<DataForCredit>)
+    fun saveCustomerVisitData(customerVisitList: List<CustomerVisitRequestData>)
+    fun saveCompanyData(companyInfoList: List<CompanyInfromationData>)
+    fun saveSaleTargetData(saleTargetList: List<DataForSaleTarget>)
+    fun saveSaleHistoryData(saleHistoryList: List<DataForSaleHistory>)
+    fun saveIncentiveData(incentiveList: List<DataForIncentive>)
+    fun savePreOrderData(preOrderList: List<DataForPreOrderHistory>)
 }

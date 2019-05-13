@@ -20,27 +20,27 @@ class SaleTargetCustomer {
     @ColumnInfo(name = "customer_id")
     @SerializedName("customer_id")
     @Expose
-    var customer_id: Int = 0
+    var customer_id: String? = null
 
     @ColumnInfo(name = "sale_man_id")
     @SerializedName("sale_man_id")
     @Expose
-    var sale_man_id: Int = 0
+    var sale_man_id: String? = null
 
     @ColumnInfo(name = "category_id")
     @SerializedName("category_id")
     @Expose
-    var category_id: Int = 0
+    var category_id: String? = null
 
     @ColumnInfo(name = "group_code_id")
     @SerializedName("group_code_id")
     @Expose
-    var group_code_id: Int = 0
+    var group_code_id: String? = null
 
     @ColumnInfo(name = "stock_id")
     @SerializedName("stock_id")
     @Expose
-    var stock_id: Int = 0
+    var stock_id: String? = null
 
     @ColumnInfo(name = "invoice_no")
     @SerializedName("invoice_no")
@@ -50,7 +50,7 @@ class SaleTargetCustomer {
     @ColumnInfo(name = "target_amount")
     @SerializedName("target_amount")
     @Expose
-    var target_amount: Double = 0.0
+    var target_amount: String? = null
 
     @ColumnInfo(name = "from_date")
     @SerializedName("from_date")

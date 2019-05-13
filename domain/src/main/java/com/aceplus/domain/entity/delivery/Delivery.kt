@@ -19,7 +19,7 @@ class Delivery {
     @ColumnInfo(name = "invoice_no")
     @SerializedName("invoice_no")
     @Expose
-    var invoice_no: Int = 0
+    var invoice_no: String? = null
 
     @ColumnInfo(name = "invoice_date")
     @SerializedName("invoice_date")
@@ -29,17 +29,17 @@ class Delivery {
     @ColumnInfo(name = "customer_id")
     @SerializedName("customer_id")
     @Expose
-    var customer_id: Int = 0
+    var customer_id: String? = null
 
     @ColumnInfo(name = "amount")
     @SerializedName("amount")
     @Expose
-    var amount: Double = 0.0
+    var amount: String? = null
 
     @ColumnInfo(name = "paid_amount")
     @SerializedName("paid_amount")
     @Expose
-    var paid_amount: Double = 0.0
+    var paid_amount: String? = null
 
     @ColumnInfo(name = "expire_date")
     @SerializedName("expire_date")
@@ -49,5 +49,5 @@ class Delivery {
     @ColumnInfo(name = "sale_man_id")
     @SerializedName("sale_man_id")
     @Expose
-    var sale_man_id: Int = 0
+    var sale_man_id:String? = null
 }

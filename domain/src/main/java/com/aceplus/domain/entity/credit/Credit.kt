@@ -19,7 +19,7 @@ class Credit {
     @ColumnInfo(name = "invoice_no")
     @SerializedName("invoice_no")
     @Expose
-    var invoice_no: Int = 0
+    var invoice_no: String? = null
 
     @ColumnInfo(name = "invoice_date")
     @SerializedName("invoice_date")
@@ -69,5 +69,5 @@ class Credit {
     @ColumnInfo(name = "sale_man_id")
     @SerializedName("sale_man_id")
     @Expose
-    var sale_man_id: Int = 0
+    var sale_man_id: String? = null
 }

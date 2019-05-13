@@ -19,17 +19,17 @@ class DeliveryPresent {
     @ColumnInfo(name = "sale_order_id")
     @SerializedName("sale_order_id")
     @Expose
-    var sale_order_id: Int = 0
+    var sale_order_id: String? = null
 
     @ColumnInfo(name = "stock_id")
     @SerializedName("stock_id")
     @Expose
-    var stock_id: Int = 0
+    var stock_id: String? = null
 
     @ColumnInfo(name = "quantity")
     @SerializedName("quantity")
     @Expose
-    var quantity: Double = 0.0
+    var quantity: String? = null
 
     @ColumnInfo(name = "delivery_flag")
     @SerializedName("delivery_flag")
