@@ -19,7 +19,7 @@ class VolumeDiscountFilter {
     @ColumnInfo(name = "discount_plan_no")
     @SerializedName("discount_plan_no")
     @Expose
-    var discount_plan_no: Int = 0
+    var discount_plan_no: String? = null
 
     @ColumnInfo(name = "date")
     @SerializedName("date")

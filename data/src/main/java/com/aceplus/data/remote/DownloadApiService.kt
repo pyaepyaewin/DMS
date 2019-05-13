@@ -96,7 +96,7 @@ interface DownloadApiService {
 
     @FormUrlEncoded
     @POST("saleOrderHistory")
-    fun getPreOrderHistoryFromApi(@Field("param_data") paramData: String): Observable<PreOrderHistoryResponse>
+    fun getPreOrderHistoryi(@Field("param_data") paramData: String): Observable<PreOrderHistoryResponse>
 
     @FormUrlEncoded
     @POST("classDiscount")

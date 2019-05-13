@@ -18,7 +18,7 @@ class ClassDiscountByPrice {
     @ColumnInfo(name = "class_discount_no")
     @SerializedName("class_discount_no")
     @Expose
-    var class_discount_no: Int = 0
+    var class_discount_no: String? = null
 
     @ColumnInfo(name = "date")
     @SerializedName("date")
@@ -58,7 +58,7 @@ class ClassDiscountByPrice {
     @ColumnInfo(name = "thursday")
     @SerializedName("thursday")
     @Expose
-    var sale_id: String? = null
+    var thursday: String? = null
 
     @ColumnInfo(name = "friday")
     @SerializedName("friday")

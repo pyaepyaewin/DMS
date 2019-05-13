@@ -24,5 +24,5 @@ class GroupCode {
     @ColumnInfo(name = "group_no")
     @SerializedName("group_no")
     @Expose
-    var group_no: Int = 0
+    var group_no:  String? = null
 }

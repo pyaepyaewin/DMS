@@ -19,22 +19,22 @@ class PromotionGift {
     @ColumnInfo(name = "promotion_plan_id")
     @SerializedName("promotion_plan_id")
     @Expose
-    var promotion_plan_id: Int = 0
+    var promotion_plan_id: String? = null
 
     @ColumnInfo(name = "stock_id")
     @SerializedName("stock_id")
     @Expose
-    var stock_id: Int = 0
+    var stock_id: String? = null
 
     @ColumnInfo(name = "from_quantity")
     @SerializedName("from_quantity")
     @Expose
-    var from_quantity: Double = 0.0
+    var from_quantity: String? = null
 
     @ColumnInfo(name = "to_quantity")
     @SerializedName("to_quantity")
     @Expose
-    var to_quantity: Double = 0.0
+    var to_quantity: String? = null
 
     @ColumnInfo(name = "active")
     @SerializedName("active")

@@ -58,6 +58,7 @@ import com.aceplus.data.database.dao.volumediscount.VolumeDiscountFilterItemDao
 import com.aceplus.data.database.dao.volumediscount.VolumeDiscountItemDao
 import com.aceplus.domain.entity.*
 import com.aceplus.domain.entity.cash.CashReceive
+import com.aceplus.domain.entity.cash.CashReceiveItem
 import com.aceplus.domain.entity.classdiscount.*
 import com.aceplus.domain.entity.competitor.Competitor
 import com.aceplus.domain.entity.competitor.CompetitorActivities
@@ -109,185 +110,49 @@ import com.aceplus.domain.entity.volumediscount.VolumeDiscountFilterItem
 import com.aceplus.domain.entity.volumediscount.VolumeDiscountItem
 
 @Database(
-    entities = arrayOf(
-        //cash
-        CashReceive::class,
-        CashReceive::class,
-
-        //class discount
-        ClassDiscountByPrice::class,
-        ClassDiscountByPriceGift::class,
-        ClassDiscountByPriceItem::class,
-        ClassDiscountForShow::class,
-        ClassDiscountForShowGift::class,
-        ClassDiscountForShowItem::class,
-
-        //competitor
-        CompetitorActivities::class,
-        CompetitorActivitiesDetail::class,
-        CompetitorActivity::class,
-        Competitor::class,
-
-        //credit
-        Credit::class,
-        CreditItem::class,
-
-        //customer
-        CustomerBalance::class,
-        CustomerCategory::class,
-        Customer::class,
-        CustomerFeedback::class,
-        CustomerVisitRecordReport::class,
-        DidCustomerFeedback::class,
-
-        //delivery
-        Delivery::class,
-        DeliveryItem::class,
-        DeliveryItemUpload::class,
-        DeliveryPresent::class,
-        DeliveryUpload::class,
-
-        //device issue
-        DeviceIssueRequest::class,
-        DeviceIssueRequestItem::class,
-
-        //incentive
-        Incentive::class,
-        IncentiveItem::class,
-        IncentivePaid::class,
-
-        //invoice
-        InvoiceCancel::class,
-        InvoiceCancelProduct::class,
-        Invoice::class,
-        InvoicePresent::class,
-        InvoiceProduct::class,
-
-        //outlet
-        OutletExternalCheck::class,
-        OutletExternalCheckDetail::class,
-        OutletStockAvailability::class,
-        OutletStockAvailabilityDetail::class,
-        OutletVisibility::class,
-
-        //posm
-        POSMByCustomer::class,
-        POSM::class,
-
-        //predefine
-        District::class,
-        StateDivision::class,
-        Street::class,
-        Township::class,
-
-        //preorder
-        PreOrder::class,
-        PreOrderPresent::class,
-        PreOrderProduct::class,
-
-        //product
-        ProductCategory::class,
-        Product::class,
-        ProductGroup::class,
-        ProductType::class,
-
-        //promotion
-        PromotionAmount::class,
-        Promotion::class,
-        PromotionDate::class,
-        PromotionGift::class,
-        PromotionGiftItem::class,
-        PromotionInvoice::class,
-        PromotionPrice::class,
-
-        //route
-        RouteAssign::class,
-        Route::class,
-        RouteSchedule::class,
-        RouteScheduleItem::class,
-        RouteScheduleItemV2::class,
-        RouteScheduleV2::class,
-        TempForSaleManRoute::class,
-
-        //sale
-        //sale exchange
-        SaleExchange::class,
-        SaleExchangeDetail::class,
-        //sale return
-        SaleReturn::class,
-        SaleReturnDetail::class,
-        //sale target
-        SaleTargetCustomer::class,
-        SaleTargetSaleMan::class,
-        //sale visit
-        SaleVisitRecordDownload::class,
-        SaleVisitRecordUpload::class,
-
-        SaleChannel::class,
-        SaleMan::class,
-
-        //size in store share
-        SizeInStoreShare::class,
-        SizeInStoreShareDetail::class,
-
-        //t discount
-        TDiscountByCategoryQuantity::class,
-        TDiscountByCategoryQuantityItem::class,
-
-        //volume discount
-        VolumeDiscount::class,
-        VolumeDiscountFilter::class,
-        VolumeDiscountFilterItem::class,
-        VolumeDiscountFilterItem::class,
-        VolumeDiscountItem::class,
-
-        Class::class,
-        CompanyInformation::class,
-        Currency::class,
-        GroupCode::class,
-        Location::class,
-        ShopType::class,
-        SMSRecord::class,
-        UM::class
-
-
-    ), version = 1, exportSchema = false
+    entities = [CashReceive::class, CashReceiveItem::class, ClassDiscountByPrice::class, ClassDiscountByPriceGift::class, ClassDiscountByPriceItem::class, ClassDiscountForShow::class, ClassDiscountForShowGift::class, ClassDiscountForShowItem::class, CompetitorActivities::class, CompetitorActivitiesDetail::class, CompetitorActivity::class, Competitor::class, Credit::class, CreditItem::class, CustomerBalance::class, CustomerCategory::class, Customer::class, CustomerFeedback::class, CustomerVisitRecordReport::class, DidCustomerFeedback::class, Delivery::class, DeliveryItem::class, DeliveryItemUpload::class, DeliveryPresent::class, DeliveryUpload::class, DeviceIssueRequest::class, DeviceIssueRequestItem::class, Incentive::class, IncentiveItem::class, IncentivePaid::class, InvoiceCancel::class, InvoiceCancelProduct::class, Invoice::class, InvoicePresent::class, InvoiceProduct::class, OutletExternalCheck::class, OutletExternalCheckDetail::class, OutletStockAvailability::class, OutletStockAvailabilityDetail::class, OutletVisibility::class, POSMByCustomer::class, POSM::class, District::class, StateDivision::class, Street::class, Township::class, PreOrder::class, PreOrderPresent::class, PreOrderProduct::class, ProductCategory::class, Product::class, ProductGroup::class, ProductType::class, PromotionAmount::class, Promotion::class, PromotionDate::class, PromotionGift::class, PromotionGiftItem::class, PromotionInvoice::class, PromotionPrice::class, RouteAssign::class, Route::class, RouteSchedule::class, RouteScheduleItem::class, RouteScheduleItemV2::class, RouteScheduleV2::class, TempForSaleManRoute::class, SaleExchange::class, SaleExchangeDetail::class, SaleReturn::class, SaleReturnDetail::class, SaleTargetCustomer::class, SaleTargetSaleMan::class, SaleVisitRecordDownload::class, SaleVisitRecordUpload::class, SaleChannel::class, SaleMan::class, SizeInStoreShare::class, SizeInStoreShareDetail::class, TDiscountByCategoryQuantity::class, TDiscountByCategoryQuantityItem::class, VolumeDiscount::class, VolumeDiscountFilter::class, VolumeDiscountFilterItem::class, VolumeDiscountItem::class, Class::class, CompanyInformation::class, Currency::class, GroupCode::class, Location::class, ShopType::class, SMSRecord::class, UM::class],
+    version = 1,
+    exportSchema = false
 )
 abstract class MyDatabase : RoomDatabase() {
-
-    //    abstract fun annualRevenueDao(): AnnualRevenueDao
-//cash
+    //cash
     abstract fun cashReceiveDao(): CashReceiveDao
+
     abstract fun cashReceiveItemDao(): CashReceiveItemDao
 
     //class discount
     abstract fun classDiscountByPriceDao(): ClassDiscountByPriceDao
+
     abstract fun classDiscountByPriceGiftDao(): ClassDiscountByPriceGiftDao
     abstract fun classDiscountByPriceItemDao(): ClassDiscountByPriceItemDao
     abstract fun classDiscountForShowDao(): ClassDiscountForShowDao
     abstract fun classDiscountForShowGiftDao(): ClassDiscountForShowGiftDao
-    abstract fun classDiscountForShowItemDao():   ClassDiscountForShowItemDao
+    abstract fun classDiscountForShowItemDao(): ClassDiscountForShowItemDao
 
     //competitor
     abstract fun competitorActivitiesDao(): CompetitorActivitiesDao
+
     abstract fun competitorActivitiesDetailDao(): CompetitorActivitiesDetailDao
     abstract fun competitorActivityDao(): CompetitorActivityDao
     abstract fun competitorDao(): CompetitorDao
 
     //credit
     abstract fun creditDao(): CreditDao
+
     abstract fun creditItemDao(): CreditItemDao
 
     //customer
     abstract fun customerBalanceDao(): CustomerBalanceDao
+
     abstract fun customerCategoryDao(): CustomerCategoryDao
     abstract fun customerDao(): CustomerDao
     abstract fun customerFeedbackDao(): CustomerFeedbackDao
     abstract fun customerVisitRecordReportDao(): CustomerVisitRecordReportDao
-    abstract fun didCustomerFeedbackDao():DidCustomerFeedbackDao
+    abstract fun didCustomerFeedbackDao(): DidCustomerFeedbackDao
 
     //delivery
     abstract fun deliveryDao(): DeliveryDao
+
     abstract fun deliveryItemDao(): DeliveryItemDao
     abstract fun deliveryItemUpload(): DeliveryItemUploadDao
     abstract fun deliveryPresentDao(): DeliveryPresentDao
@@ -295,15 +160,18 @@ abstract class MyDatabase : RoomDatabase() {
 
     //device issue
     abstract fun deviceIssueRequestDao(): DeviceIssueRequestDao
+
     abstract fun deviceIssueRequestItemDao(): DeviceIssueRequestItemDao
 
     //incentive
     abstract fun incentiveDao(): IncentiveDao
+
     abstract fun incentiveItemDao(): IncentiveItemDao
     abstract fun incentivePaidDao(): IncentivePaidDao
 
     //invoice
     abstract fun invoiceCancelDao(): InvoiceCancelDao
+
     abstract fun invoiceCancelProductDao(): InvoiceCancelProductDao
     abstract fun invoiceDao(): InvoiceDao
     abstract fun invoicePresentDao(): InvoicePresentDao
@@ -311,6 +179,7 @@ abstract class MyDatabase : RoomDatabase() {
 
     //outlet
     abstract fun outletExternalCheckDao(): OutletExternalCheckDao
+
     abstract fun outletExternalCheckDetailDao(): OutletExternalCheckDetailDao
     abstract fun outletStockAvailabilityDao(): OutletStockAvailabilityDao
     abstract fun outletStockAvailabilityDetailDao(): OutletStockAvailabilityDetailDao
@@ -318,55 +187,65 @@ abstract class MyDatabase : RoomDatabase() {
 
     //posm
     abstract fun posmByCustomerDao(): POSMByCustomerDao
+
     abstract fun posmDao(): POSMDao
 
     //predefine
     abstract fun districtDao(): DistrictDao
+
     abstract fun stateDivisionDao(): StateDivisionDao
     abstract fun streetDao(): StreetDao
     abstract fun townshipDao(): TownshipDao
 
     //preorder
     abstract fun preOrderDao(): PreOrderDao
+
     abstract fun preOrderPresentDao(): PreOrderPresentDao
     abstract fun preOrderProductDao(): PreOrderProductDao
 
     //product
     abstract fun productCategoryDao(): ProductCategoryDao
+
     abstract fun productDao(): ProductDao
     abstract fun productGroupDao(): ProductGroupDao
     abstract fun productTypeDao(): ProductTypeDao
 
     //promotion
     abstract fun promotionAmountDao(): PromotionAmountDao
+
     abstract fun promotionDao(): PromotionDao
     abstract fun promotionDateDao(): PromotionDateDao
     abstract fun promotionGiftDao(): PromotionGiftDao
     abstract fun promotionGiftItemDao(): PromotionGiftItemDao
-    abstract fun promotionInvoiceDao():PromotionInvoiceDao
-    abstract fun promotionPriceDao():PromotionPriceDao
+    abstract fun promotionInvoiceDao(): PromotionInvoiceDao
+    abstract fun promotionPriceDao(): PromotionPriceDao
 
     //route
     abstract fun routeAssignDao(): RouteAssignDao
+
     abstract fun routeDao(): RouteDao
     abstract fun routeScheduleDao(): RouteScheduleDao
     abstract fun routeScheduleItemDao(): RouteScheduleItemDao
     abstract fun routeScheduleItemV2Dao(): RouteScheduleItemV2Dao
-    abstract fun routeScheduleV2Dao():RouteScheduleV2Dao
-    abstract fun tempForSaleManRouteDao():TempForSaleManRouteDao
+    abstract fun routeScheduleV2Dao(): RouteScheduleV2Dao
+    abstract fun tempForSaleManRouteDao(): TempForSaleManRouteDao
 
     //sale
     //sale exchange
     abstract fun saleExchangeDao(): SaleExchangeDao
+
     abstract fun saleExchangeDetailDao(): SaleExchangeDetailDao
     //sale return
     abstract fun saleReturnDao(): SaleReturnDao
+
     abstract fun saleReturnDetailDao(): SaleReturnDetailDao
     //sale target
     abstract fun saleTargetCustomerDao(): SaleTargetCustomerDao
+
     abstract fun saleTargetSaleManDao(): SaleTargetSaleManDao
     //sale visit
     abstract fun saleVisitRecordDownloadDao(): SaleVisitRecordDownloadDao
+
     abstract fun saleVisitRecordUploadDao(): SaleVisitRecordUploadDao
 
     abstract fun saleChannelDao(): SaleChannelDao
@@ -374,14 +253,17 @@ abstract class MyDatabase : RoomDatabase() {
 
     //size in store share
     abstract fun sizeInStoreShareDao(): SizeInStoreShareDao
+
     abstract fun sizeInStoreShareDetailDao(): SizeInStoreShareDetailDao
 
     //t discount
     abstract fun tDiscountByCategoryQuantityDao(): TDiscountByCategoryQuantityDao
+
     abstract fun tDiscountByCategoryQuantityItemDao(): TDiscountByCategoryQuantityItemDao
 
     //volume discount
     abstract fun volumeDiscountDao(): VolumeDiscountDao
+
     abstract fun volumeDiscountFilterDao(): VolumeDiscountFilterDao
     abstract fun volumeDiscountFilterItemDao(): VolumeDiscountFilterItemDao
     abstract fun volumeDiscountItemDao(): VolumeDiscountItemDao
@@ -390,20 +272,24 @@ abstract class MyDatabase : RoomDatabase() {
     abstract fun companyInformationDao(): CompanyInformationDao
     abstract fun currencyDao(): CurrencyDao
     abstract fun groupCodeDao(): GroupCodeDao
-    abstract fun locationDao():LocationDao
-    abstract fun shopTypeDao():ShopTypeDao
-    abstract fun smsRecordDao():SMSRecordDao
+    abstract fun locationDao(): LocationDao
+    abstract fun shopTypeDao(): ShopTypeDao
+    abstract fun smsRecordDao(): SMSRecordDao
     abstract fun umDao(): UMDao
+
     companion object {
+        @Volatile
         private var INSTANCE: MyDatabase? = null
-        private val DB_NAME = "myeadb.db"
+        private const val DB_NAME = "dms.db"
 
         fun getInstance(context: Context): MyDatabase? {
-            if (INSTANCE == null) {
-                INSTANCE = Room.databaseBuilder(context, MyDatabase::class.java, DB_NAME)
-                    .allowMainThreadQueries()
-                    .fallbackToDestructiveMigration()
-                    .build()
+            synchronized(MyDatabase::class.java) {
+                if (INSTANCE == null) {
+                    INSTANCE = Room.databaseBuilder(context, MyDatabase::class.java, DB_NAME)
+                        .allowMainThreadQueries()
+                        .fallbackToDestructiveMigration()
+                        .build()
+                }
             }
             return INSTANCE
         }

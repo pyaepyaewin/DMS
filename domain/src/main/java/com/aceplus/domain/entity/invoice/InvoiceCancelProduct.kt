@@ -10,6 +10,12 @@ import com.google.gson.annotations.SerializedName
 @Entity(tableName = "invoice_cancel_product")
 class InvoiceCancelProduct {
 
+    @PrimaryKey
+    @ColumnInfo(name = "id")
+    @SerializedName("id")
+    @Expose
+    var id: Int = 0
+
     @ColumnInfo(name = "invoice_product_id")
     @SerializedName("invoice_product_id")
     @Expose

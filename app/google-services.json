@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "270254405701",
+    "firebase_url": "https://dms-redevelop.firebaseio.com",
+    "project_id": "dms-redevelop",
+    "storage_bucket": "dms-redevelop.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:270254405701:android:009c9e1a20924e9d",
+        "android_client_info": {
+          "package_name": "com.aceplus.dms"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "270254405701-k4a6t18lrncupuiv1p81pl6rm8q0rlu7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBrL2hHw_uFxSVtATeX7O-xe04vsvgTwWw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "270254405701-k4a6t18lrncupuiv1p81pl6rm8q0rlu7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

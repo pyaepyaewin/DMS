@@ -94,7 +94,7 @@ class CompanyInformation {
     @ColumnInfo(name = "is_separator")
     @SerializedName("is_separator")
     @Expose
-    var is_separator: String? = null
+    var separator: String? = null
 
     @ColumnInfo(name = "amount_format")
     @SerializedName("amount_format")
@@ -154,7 +154,7 @@ class CompanyInformation {
     @ColumnInfo(name = "is_stock_auto_generate")
     @SerializedName("is_stock_auto_generate")
     @Expose
-    var is_stock_auto_generate: String? = null
+    var stock_auto_generate: String? = null
 
     @ColumnInfo(name = "pc_count")
     @SerializedName("pc_count")

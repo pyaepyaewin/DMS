@@ -19,12 +19,12 @@ class ClassDiscountByPriceGift {
     @ColumnInfo(name = "class_discount_id")
     @SerializedName("class_discount_id")
     @Expose
-    var class_discount_id: Int = 0
+    var class_discount_id: String? = null
 
     @ColumnInfo(name = "stock_id")
     @SerializedName("stock_id")
     @Expose
-    var stock_id: Int = 0
+    var stock_id: String? = null
 
     @ColumnInfo(name = "quantity")
     @SerializedName("quantity")

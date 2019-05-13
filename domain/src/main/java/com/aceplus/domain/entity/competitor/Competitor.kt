@@ -3,6 +3,8 @@ package com.aceplus.domain.entity.competitor
 import android.arch.persistence.room.ColumnInfo
 import android.arch.persistence.room.Entity
 import android.arch.persistence.room.PrimaryKey
+import android.arch.persistence.room.TypeConverters
+import com.aceplus.domain.typeconverter.StringListTypeConverter
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 
@@ -10,6 +12,7 @@ import com.google.gson.annotations.SerializedName
 @Entity(tableName = "competitor")
 class Competitor {
 
+    @PrimaryKey
     @ColumnInfo(name = "competitor_id")
     @SerializedName("competitor_id")
     @Expose
@@ -30,6 +33,7 @@ class Competitor {
     @Expose
     var note: String? = null
 
+    @TypeConverters(StringListTypeConverter::class)
     @ColumnInfo(name = "image_list")
     @SerializedName("image_list")
     @Expose

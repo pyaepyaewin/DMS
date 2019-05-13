@@ -5,7 +5,7 @@ ext {
     retrofitVersion = '2.2.0'
     rxJavaVersion = '2.1.7'
     rxAndroidVersion = "2.1.0"
-    rxJavaAdapterVersion = "2.1.0"
+    rxJavaAdapterVersion = "2.4.0"
 
     androidArchitectureVersion = "1.1.1"
 
@@ -47,12 +47,13 @@ ext {
 
             retrofit            : "com.squareup.retrofit2:retrofit:${retrofitVersion}",
             retrofitConverter   : "com.squareup.retrofit2:converter-gson:${retrofitVersion}",
-            retrofitAdapter     : "com.squareup.retrofit2:adapter-rxjava:${retrofitVersion}",
+//            retrofitAdapter     : "com.squareup.retrofit2:adapter-rxjava:${retrofitVersion}",
 
             //Rx
             rxjava              : "io.reactivex.rxjava2:rxjava:${rxJavaVersion}",
             rxandroid           : "io.reactivex.rxjava2:rxandroid:${rxAndroidVersion}",
-            rxjavaAdapter       : "com.jakewharton.retrofit:retrofit2-rxjava2-adapter:${rxJavaAdapterVersion}",
+//            rxjavaAdapter       : "com.jakewharton.retrofit:retrofit2-rxjava2-adapter:${rxJavaAdapterVersion}",
+            rxjavaAdapter       : "com.squareup.retrofit2:adapter-rxjava2:${rxJavaAdapterVersion}",
 
             //google play service
             googlePlace         : "com.google.android.gms:play-services-places:${googleServiceVersion}",
@@ -83,6 +84,7 @@ ext {
             junit            : "junit:junit:${junitVersion}",
             mockito          : "org.mockito:mockito-core:${mockitoVersion}",
             architecture     : "android.arch.core:core-testing:${androidArchitectureVersion}",
+            room             : "android.arch.persistence.room:testing:${androidArchitectureVersion}",
             supportTestRunner: "com.android.support.test:runner:${supportTestVersion}",
             supportTestRules : "com.android.support.test:rules:${supportTestVersion}",
             espresso         : "com.android.support.test.espresso:espresso-core:${espressoVersion}",

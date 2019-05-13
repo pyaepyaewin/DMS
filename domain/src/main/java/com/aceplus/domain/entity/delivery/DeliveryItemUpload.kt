@@ -10,6 +10,12 @@ import com.google.gson.annotations.SerializedName
 @Entity(tableName = "delivery_item_upload")
 class DeliveryItemUpload {
 
+    @PrimaryKey
+    @ColumnInfo(name = "id")
+    @SerializedName("id")
+    @Expose
+    var id: Int = 0
+
     @ColumnInfo(name = "delivery_id")
     @SerializedName("delivery_id")
     @Expose

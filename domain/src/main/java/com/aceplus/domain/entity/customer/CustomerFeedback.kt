@@ -19,7 +19,7 @@ class CustomerFeedback {
     @ColumnInfo(name = "invoice_no")
     @SerializedName("invoice_no")
     @Expose
-    var invoice_no: Int = 0
+    var invoice_no:  String? = null
 
     @ColumnInfo(name = "invoice_date")
     @SerializedName("invoice_date")

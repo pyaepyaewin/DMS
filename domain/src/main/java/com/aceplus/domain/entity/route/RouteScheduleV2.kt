@@ -19,7 +19,7 @@ class RouteScheduleV2 {
     @ColumnInfo(name = "schedule_no")
     @SerializedName("schedule_no")
     @Expose
-    var schedule_no: Int = 0
+    var schedule_no: String = ""
 
     @ColumnInfo(name = "schedule_date")
     @SerializedName("schedule_date")
@@ -29,12 +29,12 @@ class RouteScheduleV2 {
     @ColumnInfo(name = "sale_man_id")
     @SerializedName("sale_man_id")
     @Expose
-    var sale_man_id: Int = 0
+    var sale_man_id: String = ""
 
     @ColumnInfo(name = "route_id")
     @SerializedName("route_id")
     @Expose
-    var route_id: Int = 0
+    var route_id: String = ""
 
     @ColumnInfo(name = "commission")
     @SerializedName("commission")

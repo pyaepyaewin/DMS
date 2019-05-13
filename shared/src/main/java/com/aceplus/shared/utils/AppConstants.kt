@@ -9,7 +9,7 @@ object AppConstants {
     //share preference name and key for activate key store
     const val SHP_NAME = "dms"
     const val SHP_ACT_KEY = ""
-    const val SHP_STRING_ERR = "error"
+    const val SHP_STRING_ERR = ""
     const val SHP_INT_ERR = -1
 
     const val PROGRESS_TEXT = "Loading..."

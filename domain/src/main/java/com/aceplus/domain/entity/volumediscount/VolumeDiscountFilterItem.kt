@@ -19,32 +19,32 @@ class VolumeDiscountFilterItem {
     @ColumnInfo(name = "volume_discount_id")
     @SerializedName("volume_discount_id")
     @Expose
-    var volume_discount_id: Int = 0
+    var volume_discount_id: String? = null
 
     @ColumnInfo(name = "category_id")
     @SerializedName("category_id")
     @Expose
-    var category_id: Int = 0
+    var category_id: String? = null
 
     @ColumnInfo(name = "group_code_id")
     @SerializedName("group_code_id")
     @Expose
-    var group_code_id: Int = 0
+    var group_code_id: String? = null
 
     @ColumnInfo(name = "from_sale_amount")
     @SerializedName("from_sale_amount")
     @Expose
-    var from_sale_amount: Double = 0.0
+    var from_sale_amount: String? = null
 
     @ColumnInfo(name = "to_sale_amount")
     @SerializedName("to_sale_amount")
     @Expose
-    var to_sale_amount: Double = 0.0
+    var to_sale_amount: String? = null
 
     @ColumnInfo(name = "discount_percent")
     @SerializedName("discount_percent")
     @Expose
-    var discount_percent: Double = 0.0
+    var discount_percent: String? = null
 
     @ColumnInfo(name = "discount_amount")
     @SerializedName("discount_amount")

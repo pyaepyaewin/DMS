@@ -11,6 +11,11 @@ import com.google.gson.annotations.SerializedName
 class OutletStockAvailabilityDetail {
 
     @PrimaryKey
+    @ColumnInfo(name = "id")
+    @SerializedName("id")
+    @Expose
+    var id: Int = 0
+
     @ColumnInfo(name = "outlet_stock_availability_id")
     @SerializedName("outlet_stock_availability_id")
     @Expose

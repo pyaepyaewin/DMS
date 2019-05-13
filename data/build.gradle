@@ -4,6 +4,8 @@ apply plugin: 'kotlin-android'
 
 apply plugin: 'kotlin-android-extensions'
 
+apply plugin: 'kotlin-kapt'
+
 android {
     compileSdkVersion 28
 
@@ -35,13 +37,14 @@ dependencies {
     implementation rootProject.ext.libraries.retrofitConverter
 
     // Rx
-    implementation rootProject.ext.libraries.retrofitAdapter
+    implementation rootProject.ext.libraries.rxjavaAdapter
     implementation rootProject.ext.libraries.rxjava
     implementation rootProject.ext.libraries.rxandroid
 
     //Room
     implementation rootProject.ext.libraries.roomRuntime
     implementation rootProject.ext.libraries.roomRxjava
+    kapt rootProject.ext.libraries.roomCompiler
     annotationProcessor rootProject.ext.libraries.roomCompiler
 
     // Dependency Injection

@@ -10,10 +10,16 @@ import com.google.gson.annotations.SerializedName
 @Entity(tableName = "township")
 class Township {
 
+    @PrimaryKey
+    @ColumnInfo(name = "id")
+    @SerializedName("id")
+    @Expose
+    var id: Int = 0
+
     @ColumnInfo(name = "township_id")
     @SerializedName("township_id")
     @Expose
-    var township_id: Int = 0
+    var township_id:  String? = null
 
     @ColumnInfo(name = "township_name")
     @SerializedName("township_name")

@@ -1,75 +1,79 @@
-//package com.aceplus.dms.utils
-//
-//import android.R
-//import android.app.Activity
-//import android.app.ProgressDialog
-//import android.content.Context
-//import android.content.DialogInterface
-//import android.content.Intent
-//import android.database.DatabaseUtils
-//import android.database.sqlite.SQLiteDatabase
-//import android.graphics.Bitmap
-//import android.graphics.BitmapFactory
-//import android.os.Build
-//import android.os.Environment
-//import android.os.Handler
-//import android.provider.Settings
-//import android.util.Base64
-//import android.util.Log
-//import android.widget.ArrayAdapter
-//import android.widget.TextView
-//import android.widget.Toast
-//import com.starmicronics.stario.PortInfo
-//import com.starmicronics.stario.StarIOPort
-//import com.starmicronics.stario.StarIOPortException
-//import com.starmicronics.starioextension.ICommandBuilder
-//import com.starmicronics.starioextension.StarIoExt
-//import com.starmicronics.starprntsdk.Communication
-//import com.starmicronics.starprntsdk.PrinterSetting
-//import org.json.JSONException
-//import org.json.JSONObject
-//import java.io.*
-//import java.text.DecimalFormat
-//import java.text.ParseException
-//import java.text.SimpleDateFormat
-//import java.util.*
-//
-//object Utils {
-//
-//    private var database: SQLiteDatabase? = null
-//
-//    private val decimalFormatterWithComma = DecimalFormat("###,##0")
-//    private val decimalFormatterWithComma1 = DecimalFormat("###,##0.##")
-//
-//    var progressDialog: ProgressDialog? = null
-//
-//    val MODE_CUSTOMER_FEEDBACK = "mode_customer_feedback"
-//    val MODE_GENERAL_SALE = "mode_general_sale"
-//
-//    val forPackageSale = "for-package-sale"
-//    val forPreOrderSale = "for-pre-order-sale"
-//    val FOR_DELIVERY = "for-delivery"
-//    val FOR_OTHERS = "for-others"
-//    val FOR_SALE = "for-sales"
-//    val FOR_SALE_RETURN = "for-sale-return"
-//    val FOR_SALE_RETURN_EXCHANGE = "for-sale_return_exchange"
-//    val FOR_SALE_EXCHANGE = "for_sale_exchange"
-//    val FOR_DISPLAY_ASSESSMENT = "for_display_assessment"
-//    val FOR_OUTLET_STOCK_AVAILABILITY = "for_outlet_stock_availibility"
-//    val FOR_SIZE_IN_STORE_SHARE = "for_size_in_store_share"
-//    val FOR_COMPETITORACTIVITY = "for_competitoractivity"
-//    val PRINT_FOR_NORMAL_SALE = "print-for-normal-sale"
-//    val PRINT_FOR_C = "print-for-c"
-//    val PRINT_FOR_PRE_ORDER = "print-for-preorder"
-//    val FOR_VAN_ISSUE = "for-van-issue"
-//
-//    private var formatter: Formatter? = null
-//    private var act: Activity? = null
-//    internal var taxPercent = 0.0
-//    internal var taxType:String? = null
-//    internal var totalDiscountAmt = 0.0
-//
-//
+package com.aceplus.dms.utils
+
+import android.app.Activity
+import android.app.ProgressDialog
+import android.content.Context
+import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.os.Build
+import android.os.Environment
+import android.os.Handler
+import android.provider.Settings
+import android.support.v7.app.AlertDialog
+import android.util.Base64
+import android.util.Log
+import android.widget.TextView
+import android.widget.Toast
+import com.aceplus.data.utils.Constant
+import com.aceplus.dms.R
+import com.aceplus.dms.ui.activities.LoginActivity
+import com.aceplus.domain.model.INVOICECANCEL
+import com.aceplus.domain.model.forApi.credit.CreditApi
+import com.aceplus.domain.model.forApi.login.LoginCreditRequest
+import com.aceplus.domain.model.forApi.login.LoginRequest
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
+import org.json.JSONException
+import org.json.JSONObject
+import java.io.*
+import java.text.DecimalFormat
+import java.text.SimpleDateFormat
+import java.util.*
+
+object Utils {
+
+    private val decimalFormatterWithComma = DecimalFormat("###,##0")
+    private val decimalFormatterWithComma1 = DecimalFormat("###,##0.##")
+
+    var progressDialog: ProgressDialog? = null
+
+    val MODE_CUSTOMER_FEEDBACK = "mode_customer_feedback"
+    val MODE_GENERAL_SALE = "mode_general_sale"
+
+    val forPackageSale = "for-package-sale"
+    val forPreOrderSale = "for-pre-order-sale"
+    val FOR_DELIVERY = "for-delivery"
+    val FOR_OTHERS = "for-others"
+    val FOR_SALE = "for-sales"
+    val FOR_SALE_RETURN = "for-sale-return"
+    val FOR_SALE_RETURN_EXCHANGE = "for-sale_return_exchange"
+    val FOR_SALE_EXCHANGE = "for_sale_exchange"
+    val FOR_DISPLAY_ASSESSMENT = "for_display_assessment"
+    val FOR_OUTLET_STOCK_AVAILABILITY = "for_outlet_stock_availibility"
+    val FOR_SIZE_IN_STORE_SHARE = "for_size_in_store_share"
+    val FOR_COMPETITORACTIVITY = "for_competitoractivity"
+    val PRINT_FOR_NORMAL_SALE = "print-for-normal-sale"
+    val PRINT_FOR_C = "print-for-c"
+    val PRINT_FOR_PRE_ORDER = "print-for-preorder"
+    val FOR_VAN_ISSUE = "for-van-issue"
+
+    private var formatter: Formatter? = null
+    private var act: Activity? = null
+    private var taxPercent = 0.0
+    private var taxType: String? = null
+    internal var totalDiscountAmt = 0.0
+
+
+    val isOsMarshmallow: Boolean
+        get() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+
+    private lateinit var onActionClickListener: OnActionClickListener
+
+    interface OnActionClickListener {
+        fun onActionClick(type: String)
+    }
+
 //    private val mCallback = Communication.SendCallback { result, communicateResult ->
 //        val msg:String
 //        var flg = 1
@@ -88,12 +92,7 @@
 //
 //        commonDialog(msg, act, flg)
 //    }
-//
-//    val isOsMarshmallow:Boolean
-//        get() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
-//
-//    var onActionClickListener:OnActionClickListener
-//
+
 //    fun getInvoiceID(context: Context, mode:String, salemanID:String, locationCode:String):String {
 //
 //        if (database == null)
@@ -173,7 +172,7 @@
 //
 //        return prefix + String.format("%0" + (idLength - prefix.length) + "d", currentInvoiceNumber)
 //    }
-//
+
 //    fun getRouteID_v2(context: Context, saleman_Id:String):Int {
 //        var routeID = 0
 //        if (database == null)
@@ -214,7 +213,7 @@
 //
 //
 //    }
-//
+
 //    fun getRouteName(context: Context, routeId:Int):String {
 //        var routeName = ""
 //        if (database == null)
@@ -231,45 +230,7 @@
 //        cursor.close()
 //        return routeName
 //    }
-//
-//    /*public static int getRouteID(String saleman_Id) {
-//           int routeID = 0;
-//           Cursor cursor = database.rawQuery("select * from " + DatabaseContract.RouteSchedule_v2.tb + " where " +
-//                   DatabaseContract.RouteSchedule_v2.saleManId + " = '" + saleman_Id + "' ", null);
-//           while (cursor.moveToNext()) {
-//               routeID = cursor.getInt(cursor.getColumnIndex(DatabaseContract.RouteSchedule_v2.routeId));
-//           }
-//           Log.i("routeID>>>", routeID + "");
-//           return routeID;
-//       }*/
-//
-//    /*public static int getRouteID_v1(String saleman_Id) {
-//        int routeID = 0;
-//
-//        Cursor cursor = database.rawQuery("select * from " + DatabaseContract.RouteScheduleItem.tb + " where " +
-//                DatabaseContract.RouteScheduleItem.saleManID + " = '" + saleman_Id + "' ", null);
-//        while (cursor.moveToNext()) {
-//            routeID = cursor.getInt(cursor.getColumnIndex(DatabaseContract.RouteScheduleItem.routeID));
-//        }
-//        Log.i("routeID>>>", routeID + "");
-//        return routeID;
-//    }*/
-//
-//    /*  public static int getRouteID_v1(Context context, String saleman_Id) {
-//          int routeID = 0;
-//          if (database == null) {
-//              database = new Database(context).getReadableDatabase();
-//          }
-//
-//          Cursor cursor = database.rawQuery("select * from " + DatabaseContract.RouteScheduleItem.tb + " where " +
-//                  DatabaseContract.RouteScheduleItem.saleManID + " = '" + saleman_Id + "' ", null);
-//          while (cursor.moveToNext()) {
-//              routeID = cursor.getInt(cursor.getColumnIndex(DatabaseContract.RouteScheduleItem.routeID));
-//          }
-//          Log.i("routeID>>>", routeID + "");
-//          return routeID;
-//      }*/
-//
+
 //    fun getRouteScheduleID_v2(context: Context, saleman_Id:String):Int {
 //        var routeScheduleID = 0
 //        var id = 0
@@ -294,28 +255,27 @@
 //        Log.i("routeID>>>", (routeScheduleID).toString() + "")
 //        return routeScheduleID
 //    }
-//
-//
+
 //    fun backToHome(activity: Activity) {
 //        val intent = Intent(activity, HomeActivity::class.java)
 //        activity.startActivity(intent)
 //        activity.finish()
 //    }
-//
-//    /**
-//     * Go to Login activity.
-//     *
-//     * @param activity current activity name
-//     */
-//    fun backToLogin(activity: Activity) {
-//        val intent = Intent(activity, LoginActivity::class.java)
-//        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
-//        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-//        activity.startActivity(intent)
-//        activity.finish()
-//    }
-//
+
+    /**
+     * Go to Login activity.
+     *
+     * @param activity current activity name
+     */
+    fun backToLogin(activity: Activity) {
+        val intent = Intent(activity, LoginActivity::class.java)
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        activity.startActivity(intent)
+        activity.finish()
+    }
+
 //    fun backToCustomerVisit(activity: Activity) {
 //        val intent = Intent(activity, CustomerVisitActivity::class.java)
 //        activity.startActivity(intent)
@@ -334,291 +294,282 @@
 //        activity.startActivity(intent)
 //        activity.finish()
 //    }
-//
-//    fun formatAmount(amount:Double?):String {
-//
-//        return decimalFormatterWithComma1.format(amount)
-//    }
-//
-//    /*public static String formatAmount1(Double amount) {
-//
-//           return decimalFormatterWithComma1.format(amount);
-//       }*/
-//
-//    fun getCurrentDate(withTime:Boolean):String {
-//
-//        var dateFormat = "yyyy-MM-dd"
-//        if (withTime)
-//        {
-//
-//            dateFormat += " HH:mm:ss"
-//        }
-//
-//        return SimpleDateFormat(dateFormat).format(Date())
-//    }
-//
-//    fun getDate(withTime:Boolean):String {
-//        val calendar = Calendar.getInstance()
-//        calendar.time = Date()
-//        calendar.add(Calendar.DAY_OF_YEAR, -1)
-//        val newDate = calendar.time
-//        var dateFormat = "yyyy-MM-dd"
-//        if (withTime)
-//        {
-//
-//            dateFormat += " HH:mm:ss"
-//        }
-//
-//        return SimpleDateFormat(dateFormat).format(newDate)
-//    }
-//
-//    fun callDialog(message:String, activity: Activity) {
-//
-//        if (progressDialog == null)
-//        {
-//            progressDialog = ProgressDialog(activity, ProgressDialog.THEME_HOLO_LIGHT)
-//        }
-//
-//        progressDialog!!.isIndeterminate = false
-//        progressDialog!!.setProgressStyle(ProgressDialog.STYLE_SPINNER)
-//        progressDialog!!.setMessage(message)
-//
-//        val handler = Handler()
-//        handler.post(Runnable {
-//            if (activity.isFinishing) {
-//                return@Runnable
-//            } else {
-//                progressDialog = ProgressDialog(activity, ProgressDialog.THEME_HOLO_LIGHT)
-//                progressDialog!!.isIndeterminate = false
-//                progressDialog!!.setProgressStyle(ProgressDialog.STYLE_SPINNER)
-//                progressDialog!!.setMessage(message)
-//                progressDialog!!.show()
-//                progressDialog!!.setCanceledOnTouchOutside(false)
-//            }
-//        })
-//    }
-//
-//    fun cancelDialog() {
-//        if (progressDialog != null)
-//        {
-//            progressDialog!!.cancel()
-//        }
-//    }
-//
-//    fun commonDialog(message:String, activity: Activity?, flag:Int) {
-//        val handler = Handler()
-//        handler.post(Runnable {
-//            if (activity!!.isFinishing) {
-//                return@Runnable
-//            } else {
-//                var statusImage = 0
-//                var title = ""
-//                if (flag == 0) {
-//                    statusImage = R.drawable.success
-//                    title = "Success"
-//                } else if (flag == 1) {
-//                    statusImage = R.drawable.fail
-//                    title = "Error"
-//                } else if (flag == 2) {
-//                    statusImage = R.drawable.info
-//                    title = "Info"
-//                }
-//
-//                AlertDialog.Builder(activity)
-//                    .setTitle(title)
-//                    .setMessage(message)
-//                    .setPositiveButton("OK", null)
-//                    .setCancelable(false)
-//                    .setIcon(statusImage)
-//                    .show()
-//            }
-//        })
-//    }
-//
-//    fun encodePassword(str:String):String {
-//        var data:ByteArray? = null
-//        try
-//        {
-//            data = str.toByteArray(charset("UTF-8"))
-//        }
-//        catch (e: UnsupportedEncodingException) {
-//            e.printStackTrace()
-//        }
-//
-//        return Base64.encodeToString(data, Base64.NO_WRAP)
-//    }
-//
-//    fun getJsonString(`object`:Any):String {
-//        val gson = Gson()
-//        val jsonString = String.valueOf(gson.toJson(`object`))
-//        Log.d("jsonString>>>", jsonString)
-//        return jsonString
-//
-//    }
-//
-//    fun createDownloadProductParamData(user_no:String, password:String, routeId:Int, status:String):String {
-//        var paramData = ""
-//        val loginRequest = LoginRequest()
-//        loginRequest.setSiteActivationKey(Constant.SITE_ACTIVATION_KEY)
-//        loginRequest.setTabletActivationKey(Constant.TABLET_ACTIVATION_KEY)
-//        loginRequest.setUserId(user_no)
-//        //loginRequest.setPassword(Utils.encodePassword(editTextPassword.getText().toString()));
-//        //String encodedPwd = Utils.encodePassword(password);
-//        //Log.i("encodedPwd>>>", encodedPwd);
-//        loginRequest.setPassword(password)
-//        loginRequest.setDate(Utils.getCurrentDate(false))
-//        loginRequest.setRoute(routeId)
-//        val objectList = ArrayList<Any>()
-//        /*Object object = new Object();
-//               objectList.add(object);*/
-//        loginRequest.setData(objectList)
-//
-//        val jsonObject = JSONObject()
-//        try
-//        {
-//            jsonObject.put("site_activation_key", Constant.SITE_ACTIVATION_KEY)
-//            jsonObject.put("tablet_activation_key", Constant.TABLET_ACTIVATION_KEY)
-//            jsonObject.put("user_id", loginRequest.getUserId())
-//            jsonObject.put("password", loginRequest.getPassword())
-//            jsonObject.put("route", loginRequest.getRoute())
-//            jsonObject.put("date", loginRequest.getDate())
-//            jsonObject.put("data", loginRequest.getData())
-//            jsonObject.put("status", status)
-//        }
-//        catch (e: JSONException) {
-//            e.printStackTrace()
-//        }
-//
-//        Log.i("param_data>>>", jsonObject.toString())
-//
-//        paramData = jsonObject.toString()
-//        return paramData
-//    }
-//
-//    fun createParamData(user_no:String, password:String, routeId:Int):String {
-//        var paramData = ""
-//        val loginRequest = LoginRequest()
-//        loginRequest.setSiteActivationKey(Constant.SITE_ACTIVATION_KEY)
-//        loginRequest.setTabletActivationKey(Constant.TABLET_ACTIVATION_KEY)
-//        loginRequest.setUserId(user_no)
-//        //loginRequest.setPassword(Utils.encodePassword(editTextPassword.getText().toString()));
-//        //String encodedPwd = Utils.encodePassword(password);
-//        //Log.i("encodedPwd>>>", encodedPwd);
-//        loginRequest.setPassword(password)
-//        loginRequest.setDate(Utils.getCurrentDate(false))
-//        loginRequest.setRoute(routeId)
-//        val objectList = ArrayList<Any>()
-//        /*Object object = new Object();
-//               objectList.add(object);*/
-//        loginRequest.setData(objectList)
-//
-//        val jsonObject = JSONObject()
-//        try
-//        {
-//            jsonObject.put("site_activation_key", Constant.SITE_ACTIVATION_KEY)
-//            jsonObject.put("tablet_activation_key", Constant.TABLET_ACTIVATION_KEY)
-//            jsonObject.put("user_id", loginRequest.getUserId())
-//            jsonObject.put("password", loginRequest.getPassword())
-//            jsonObject.put("route", loginRequest.getRoute())
-//            jsonObject.put("date", loginRequest.getDate())
-//            jsonObject.put("data", loginRequest.getData())
-//        }
-//        catch (e: JSONException) {
-//            e.printStackTrace()
-//        }
-//
-//        Log.i("param_data>>>", jsonObject.toString())
-//
-//        paramData = jsonObject.toString()
-//        return paramData
-//    }
-//
-//    fun createParamData(user_no:String, password:String, routeId:Int, saleman_id:String):String {
-//        var paramData = ""
-//        val loginRequest = LoginRequest()
-//        loginRequest.setSiteActivationKey(Constant.SITE_ACTIVATION_KEY)
-//        loginRequest.setTabletActivationKey(Constant.TABLET_ACTIVATION_KEY)
-//        loginRequest.setUserId(user_no)
-//        loginRequest.setSaleManId(saleman_id)
-//        //loginRequest.setPassword(Utils.encodePassword(editTextPassword.getText().toString()));
-//        //String encodedPwd = Utils.encodePassword(password);
-//        //Log.i("encodedPwd>>>", encodedPwd);
-//        loginRequest.setPassword(password)
-//        loginRequest.setDate(Utils.getCurrentDate(false))
-//        loginRequest.setRoute(routeId)
-//        val objectList = ArrayList<Any>()
-//        /*Object object = new Object();
-//               objectList.add(object);*/
-//        loginRequest.setData(objectList)
-//
-//        val jsonObject = JSONObject()
-//        try
-//        {
-//            jsonObject.put("site_activation_key", Constant.SITE_ACTIVATION_KEY)
-//            jsonObject.put("tablet_activation_key", Constant.TABLET_ACTIVATION_KEY)
-//            jsonObject.put("user_id", loginRequest.getUserId())
-//            jsonObject.put("password", loginRequest.getPassword())
-//            jsonObject.put("route", loginRequest.getRoute())
-//            jsonObject.put("date", loginRequest.getDate())
-//            jsonObject.put("data", loginRequest.getData())
-//            jsonObject.put("saleman_id", loginRequest.getSaleManId())
-//        }
-//        catch (e: JSONException) {
-//            e.printStackTrace()
-//        }
-//
-//        Log.i("param_data>>>", jsonObject.toString())
-//
-//        paramData = jsonObject.toString()
-//        return paramData
-//    }
-//
-//    fun createLoginParamData(user_no:String, password:String, routeId:Int, tabletKey:String):String {
-//        var paramData = ""
-//        val loginRequest = LoginRequest()
-//        loginRequest.setSiteActivationKey(Constant.SITE_ACTIVATION_KEY)
-//        loginRequest.setTabletActivationKey(Constant.TABLET_ACTIVATION_KEY)
-//        loginRequest.setUserId(user_no)
-//        //loginRequest.setPassword(Utils.encodePassword(editTextPassword.getText().toString()));
-//        //String encodedPwd = Utils.encodePassword(password);
-//        //Log.i("encodedPwd>>>", encodedPwd);
-//        loginRequest.setPassword(password)
-//        loginRequest.setDate(Utils.getCurrentDate(false))
-//        loginRequest.setRoute(routeId)
-//        loginRequest.setTabletKey(tabletKey)
-//        val objectList = ArrayList<Any>()
-//        /*Object object = new Object();
-//               objectList.add(object);*/
-//        loginRequest.setData(objectList)
-//
-//        val jsonObject = JSONObject()
-//        try
-//        {
-//            jsonObject.put("site_activation_key", Constant.SITE_ACTIVATION_KEY)
-//            jsonObject.put("tablet_activation_key", Constant.TABLET_ACTIVATION_KEY)
-//            jsonObject.put("user_id", loginRequest.getUserId())
-//            jsonObject.put("password", loginRequest.getPassword())
-//            jsonObject.put("route", loginRequest.getRoute())
-//            jsonObject.put("tablet_key", loginRequest.getTabletKey())
-//            jsonObject.put("date", loginRequest.getDate())
-//            jsonObject.put("data", loginRequest.getData())
-//        }
-//        catch (e: JSONException) {
-//            e.printStackTrace()
-//        }
-//
-//        Log.i("param_data>>>", jsonObject.toString())
-//
-//        paramData = jsonObject.toString()
-//        return paramData
-//    }
-//
-//    fun getDeviceId(activity: Activity):String {
-//        return Settings.Secure.getString(activity.contentResolver,
-//            Settings.Secure.ANDROID_ID)
-//
-//    }
-//
+
+    fun formatAmount(amount: Double?): String {
+
+        return decimalFormatterWithComma1.format(amount)
+    }
+
+
+    fun getCurrentDate(withTime: Boolean): String {
+
+        var dateFormat = "yyyy-MM-dd"
+        if (withTime) {
+
+            dateFormat += " HH:mm:ss"
+        }
+
+        return SimpleDateFormat(dateFormat).format(Date())
+    }
+
+    fun getDate(withTime: Boolean): String {
+        val calendar = Calendar.getInstance()
+        calendar.time = Date()
+        calendar.add(Calendar.DAY_OF_YEAR, -1)
+        val newDate = calendar.time
+        var dateFormat = "yyyy-MM-dd"
+        if (withTime) {
+
+            dateFormat += " HH:mm:ss"
+        }
+
+        return SimpleDateFormat(dateFormat).format(newDate)
+    }
+
+    fun callDialog(message: String, activity: Activity) {
+
+        if (progressDialog == null) {
+            progressDialog = ProgressDialog(activity, ProgressDialog.THEME_HOLO_LIGHT)
+        }
+
+        progressDialog!!.isIndeterminate = false
+        progressDialog!!.setProgressStyle(ProgressDialog.STYLE_SPINNER)
+        progressDialog!!.setMessage(message)
+
+        val handler = Handler()
+        handler.post(Runnable {
+            if (activity.isFinishing) {
+                return@Runnable
+            } else {
+                progressDialog = ProgressDialog(activity, ProgressDialog.THEME_HOLO_LIGHT)
+                progressDialog!!.isIndeterminate = false
+                progressDialog!!.setProgressStyle(ProgressDialog.STYLE_SPINNER)
+                progressDialog!!.setMessage(message)
+                progressDialog!!.show()
+                progressDialog!!.setCanceledOnTouchOutside(false)
+            }
+        })
+    }
+
+    fun cancelDialog() {
+        if (progressDialog != null) {
+            progressDialog!!.cancel()
+        }
+    }
+
+    fun commonDialog(message: String, activity: Activity?, flag: Int) {
+        val handler = Handler()
+        handler.post(Runnable {
+            if (activity!!.isFinishing) {
+                return@Runnable
+            } else {
+                var statusImage = 0
+                var title = ""
+                if (flag == 0) {
+                    statusImage = R.drawable.success
+                    title = "Success"
+                } else if (flag == 1) {
+                    statusImage = R.drawable.fail
+                    title = "Error"
+                } else if (flag == 2) {
+                    statusImage = R.drawable.info
+                    title = "Info"
+                }
+
+                AlertDialog.Builder(activity)
+                    .setTitle(title)
+                    .setMessage(message)
+                    .setPositiveButton("OK", null)
+                    .setCancelable(false)
+                    .setIcon(statusImage)
+                    .show()
+            }
+        })
+    }
+
+    fun encodePassword(str: String): String {
+        var data: ByteArray? = null
+        try {
+            data = str.toByteArray(charset("UTF-8"))
+        } catch (e: UnsupportedEncodingException) {
+            e.printStackTrace()
+        }
+
+        return Base64.encodeToString(data, Base64.NO_WRAP)
+    }
+
+    fun getJsonString(`object`: Any): String {
+        val gson = Gson()
+        val jsonString = gson.toJson(`object`).toString()
+        Log.d("jsonString>>>", jsonString)
+        return jsonString
+    }
+
+    private fun getJsonFromObject(`object`: Any): String {
+        val gson = GsonBuilder().serializeNulls().create()
+        return gson.toJson(`object`)
+    }
+
+    fun createParamData(user_no: String, password: String, routeId: Int): String {
+        var paramData = ""
+        val loginRequest = LoginRequest()
+        loginRequest.siteActivationKey = Constant.SITE_ACTIVATION_KEY
+        loginRequest.tabletActivationKey = Constant.TABLET_ACTIVATION_KEY
+        loginRequest.userId = user_no
+        loginRequest.password = password
+        loginRequest.date = Utils.getCurrentDate(false)
+        loginRequest.route = routeId
+        val objectList = ArrayList<Any>()
+        loginRequest.data = objectList
+
+        val jsonObject = JSONObject()
+        try {
+            jsonObject.put("site_activation_key", Constant.SITE_ACTIVATION_KEY)
+            jsonObject.put("tablet_activation_key", Constant.TABLET_ACTIVATION_KEY)
+            jsonObject.put("user_id", loginRequest.userId)
+            jsonObject.put("password", loginRequest.password)
+            jsonObject.put("route", loginRequest.route)
+            jsonObject.put("date", loginRequest.date)
+            jsonObject.put("data", loginRequest.data)
+        } catch (e: JSONException) {
+            e.printStackTrace()
+        }
+
+        Log.i("param_data>>>", jsonObject.toString())
+
+        paramData = jsonObject.toString()
+        return paramData
+    }
+
+    fun createParamData(user_no: String, password: String, routeId: Int, saleman_id: String): String {
+        var paramData = ""
+        val loginRequest = LoginRequest()
+        loginRequest.siteActivationKey = Constant.SITE_ACTIVATION_KEY
+        loginRequest.tabletActivationKey = Constant.TABLET_ACTIVATION_KEY
+        loginRequest.userId = user_no
+        loginRequest.saleManId = saleman_id
+        loginRequest.password = password
+        loginRequest.date = Utils.getCurrentDate(false)
+        loginRequest.route = routeId
+        val objectList = ArrayList<Any>()
+        loginRequest.data = objectList
+
+        val jsonObject = JSONObject()
+        try {
+            jsonObject.put("site_activation_key", Constant.SITE_ACTIVATION_KEY)
+            jsonObject.put("tablet_activation_key", Constant.TABLET_ACTIVATION_KEY)
+            jsonObject.put("user_id", loginRequest.userId)
+            jsonObject.put("password", loginRequest.password)
+            jsonObject.put("route", loginRequest.route)
+            jsonObject.put("date", loginRequest.date)
+            jsonObject.put("data", loginRequest.data)
+            jsonObject.put("saleman_id", loginRequest.saleManId)
+        } catch (e: JSONException) {
+            e.printStackTrace()
+        }
+
+        Log.i("param_data>>>", jsonObject.toString())
+
+        paramData = jsonObject.toString()
+        return paramData
+    }
+
+    fun createLoginParamData(user_no: String, password: String, routeId: Int, tabletKey: String): String {
+        var paramData = ""
+        val loginRequest = LoginRequest()
+        loginRequest.siteActivationKey = Constant.SITE_ACTIVATION_KEY
+        loginRequest.tabletActivationKey = Constant.TABLET_ACTIVATION_KEY
+        loginRequest.userId = user_no
+        loginRequest.password = password
+        loginRequest.date = Utils.getCurrentDate(false)
+        loginRequest.route = routeId
+        loginRequest.tabletKey = tabletKey
+        val objectList = ArrayList<Any>()
+        loginRequest.data = objectList
+
+        val jsonObject = JSONObject()
+        try {
+            jsonObject.put("site_activation_key", Constant.SITE_ACTIVATION_KEY)
+            jsonObject.put("tablet_activation_key", Constant.TABLET_ACTIVATION_KEY)
+            jsonObject.put("user_id", loginRequest.getUserId())
+            jsonObject.put("password", loginRequest.getPassword())
+            jsonObject.put("route", loginRequest.getRoute())
+            jsonObject.put("tablet_key", loginRequest.getTabletKey())
+            jsonObject.put("date", loginRequest.getDate())
+            jsonObject.put("data", loginRequest.getData())
+        } catch (e: JSONException) {
+            e.printStackTrace()
+        }
+
+        Log.i("param_data>>>", jsonObject.toString())
+
+        paramData = jsonObject.toString()
+        return paramData
+    }
+
+    fun createDownloadProductParamData(user_no: String, password: String, routeId: Int, status: String): String {
+        var paramData = ""
+        val loginRequest = LoginRequest()
+        loginRequest.siteActivationKey = Constant.SITE_ACTIVATION_KEY
+        loginRequest.tabletActivationKey = Constant.TABLET_ACTIVATION_KEY
+        loginRequest.userId = user_no
+        loginRequest.password = password
+        loginRequest.date = Utils.getCurrentDate(false)
+        loginRequest.route = routeId
+        val objectList = ArrayList<Any>()
+        loginRequest.data = objectList
+
+        val jsonObject = JSONObject()
+        try {
+            jsonObject.put("site_activation_key", Constant.SITE_ACTIVATION_KEY)
+            jsonObject.put("tablet_activation_key", Constant.TABLET_ACTIVATION_KEY)
+            jsonObject.put("user_id", loginRequest.userId)
+            jsonObject.put("password", loginRequest.password)
+            jsonObject.put("route", loginRequest.route)
+            jsonObject.put("date", loginRequest.date)
+            jsonObject.put("data", loginRequest.data)
+            jsonObject.put("status", status)
+        } catch (e: JSONException) {
+            e.printStackTrace()
+        }
+
+        Log.i("param_data>>>", jsonObject.toString())
+
+        paramData = jsonObject.toString()
+        return paramData
+    }
+
+    fun createParamDataWithCustomerIDList(
+        saleManNo: String,
+        password: String,
+        routeId: Int,
+        customerIdList: List<Int>
+    ): String {
+        val loginRequest = LoginCreditRequest()
+        loginRequest.siteActivationKey = Constant.SITE_ACTIVATION_KEY
+        loginRequest.tabletActivationKey = Constant.TABLET_ACTIVATION_KEY
+        loginRequest.userId = saleManNo
+        loginRequest.password = password
+        loginRequest.date = Utils.getCurrentDate(false)
+        loginRequest.route = routeId
+
+        val creditApiList = ArrayList<CreditApi>()
+        val creditApi = CreditApi()
+        creditApi.idList = customerIdList
+        creditApiList.add(creditApi)
+        loginRequest.data = creditApiList
+        return getJsonFromObject(loginRequest)
+    }
+
+
+    fun getDeviceId(activity: Activity): String {
+        return Settings.Secure.getString(
+            activity.contentResolver,
+            Settings.Secure.ANDROID_ID
+        )
+
+    }
+
 //    fun getDeviceIssueInvoiceNo(context: Context):String {
 //        if (database == null)
 //        {
@@ -641,7 +592,7 @@
 //
 //        return invoiceNo + String.format("%0" + (idLength - invoiceNo.length) + "d", next)
 //    }
-//
+
 //    fun getInvoiceNo(context: Context, salemanId:String, locationCode:String, mode:String):String {
 //
 //        if (database == null)
@@ -850,7 +801,7 @@
 //
 //        return invoiceNo + String.format("%0" + (idLength - invoiceNo.length) + "d", next)
 //    }
-//
+
 //    fun getInvoiceNoForPOSM(context: Context, saleManId:String, locationCode:String):String {
 //
 //        val idLength = 14
@@ -877,39 +828,37 @@
 //
 //        return invoiceNo + String.format("%0" + (idLength - invoiceNo.length) + "d", next)
 //    }
-//
-//    fun isNumeric(str:String):Boolean {
-//        try
-//        {
-//            val d = java.lang.Double.parseDouble(str)
-//        }
-//        catch (nfe:NumberFormatException) {
-//            return false
-//        }
-//
-//        return true
-//    }
-//
-//    fun setOnActionClickListener(onActionClickListener:OnActionClickListener) {
-//        Utils.onActionClickListener = onActionClickListener
-//    }
-//
-//    fun askConfirmationDialog(title:String, message:String, type:String, activity: Activity) {
-//
-//        val alertDialog = AlertDialog.Builder(activity)
-//            .setTitle(title)
-//            .setMessage(message)
-//            .setPositiveButton("Yes",
-//                DialogInterface.OnClickListener { dialogInterface, i -> onActionClickListener.onActionClick(type) })
-//            .setNegativeButton("No", null)
-//            .show()
-//
-//        val textViewYes = alertDialog.findViewById(android.R.id.button1) as TextView
-//        textViewYes.textSize = 25f
-//        val textViewNo = alertDialog.findViewById(android.R.id.button2) as TextView
-//        textViewNo.textSize = 25f
-//    }
-//
+
+    fun isNumeric(str: String): Boolean {
+        try {
+            val d = java.lang.Double.parseDouble(str)
+        } catch (nfe: NumberFormatException) {
+            return false
+        }
+
+        return true
+    }
+
+    fun setOnActionClickListener(onActionClickListener: OnActionClickListener) {
+        Utils.onActionClickListener = onActionClickListener
+    }
+
+    fun askConfirmationDialog(title: String, message: String, type: String, activity: Activity) {
+        val alertDialog = AlertDialog.Builder(activity)
+            .setTitle(title)
+            .setMessage(message)
+            .setPositiveButton(
+                "Yes"
+            ) { dialogInterface, i -> onActionClickListener.onActionClick(type) }
+            .setNegativeButton("No", null)
+            .show()
+
+        val textViewYes = alertDialog.findViewById<TextView>(android.R.id.button1)
+        textViewYes?.textSize = 25f
+        val textViewNo = alertDialog.findViewById<TextView>(android.R.id.button2)
+        textViewNo?.textSize = 25f
+    }
+
 //    fun print(activity: Activity, customerName:String, cus_address:String, invoiceNumber:String, salePersonName:String, routeId:Int, townshipName:String, invoice:Invoice, soldProductList:List<SoldProduct>, presentList:List<Promotion>, printFor:String, mode:String) {
 //
 //        var portInfoList:List<PortInfo>? = null
@@ -1027,8 +976,8 @@
 //            })
 //            .show()
 //    }
-//
-//
+
+
 //    private fun Print_BMP(mActivity: Activity):ByteArray? {
 //        val mBitmap = BitmapFactory.decodeResource(mActivity.resources,
 //            R.drawable.global_sky_logo)
@@ -1042,7 +991,7 @@
 //        }
 //        return null
 //    }
-//
+
 //    fun printForEndOfDayReport(activity: Activity, saleManDailyReport:SaleManDailyReport, mBTService:BluetoothService) {
 //
 //        try
@@ -1057,7 +1006,7 @@
 //        }
 //
 //    }
-//
+
 //    fun printWithHSPOS(activity: Activity, customerName:String, cus_address:String, invoiceNumber:String, salePersonName:String, routeId:Int, townshipName:String, invoice:Invoice, soldProductList:List<SoldProduct>, presentList:List<Promotion>, printFor:String, mode:String, mBTService:BluetoothService) {
 //        try
 //        {
@@ -1073,7 +1022,7 @@
 //        }
 //
 //    }
-//
+
 //    private fun sendDataByte2BT(mActivity: Activity, mService:BluetoothService, data:ByteArray) {
 //
 //        if (mService.getState() !== BluetoothService.STATE_CONNECTED)
@@ -1086,7 +1035,7 @@
 //        commonDialog("Success", mActivity, 0)
 //
 //    }
-//
+
 //    fun printSaleExchange(activity: Activity,
 //                          invoiceNumber:String,
 //                          saleReturnInvoiceNumber:String, salePersonName:String, invoice:Invoice, soldProductList:List<SoldProduct>, saleReturnList:List<SoldProduct>, returnDiscountAmt:Double) {
@@ -1206,7 +1155,7 @@
 //            })
 //            .show()
 //    }
-//
+
 //    fun printSaleExchangeWithHSPOS(activity: Activity,
 //                                   invoiceNumber:String,
 //                                   saleReturnInvoiceNumber:String, salePersonName:String, invoice:Invoice, soldProductList:List<SoldProduct>, saleReturnList:List<SoldProduct>, returnDiscountAmt:Double, mBTService:BluetoothService, cusName:String, routeId:Int, township:String, cusAddress:String) {
@@ -1224,8 +1173,8 @@
 //        }
 //
 //    }
-//
-//
+
+
 //    fun printCreditWithHSPOS(activity: Activity, customerName:String, customerAddress:String, invoiceNumber:String, townshipName:String, salePersonName:String, routeId:Int, creditInvoiceList:CreditInvoice, mBTService:BluetoothService) {
 //
 //        try
@@ -1240,7 +1189,7 @@
 //        }
 //
 //    }
-//
+
 //    fun printCredit(activity: Activity, customerName:String, cus_address:String, invoiceNumber:String, townshipName:String, salePersonName:String, routeId:Int, creditInvoiceList:CreditInvoice) {
 //
 //        var portInfoList:List<PortInfo>? = null
@@ -1323,7 +1272,7 @@
 //            })
 //            .show()
 //    }
-//
+
 //    fun printDailyReportForSaleMan(activity: Activity, saleManDailyReport:SaleManDailyReport) {
 //
 //        var portInfoList:List<PortInfo>? = null
@@ -1406,8 +1355,8 @@
 //            })
 //            .show()
 //    }
-//
-//
+
+
 //    fun printDeliverWithHSPOS(activity: Activity, customerName:String, cus_address:String, orderInvoiceNo:String, orderSaleManName:String, invoiceNumber:String, salePersonName:String, routeId:Int, townshipName:String, invoice:Invoice, soldProductList:List<SoldProduct>, presentList:List<Promotion>, printFor:String, mode:String, mBTService:BluetoothService) {
 //        try
 //        {
@@ -1423,7 +1372,7 @@
 //        }
 //
 //    }
-//
+
 //    fun printDeliver(activity: Activity, customerName:String, cus_address:String, orderInvoiceNo:String, orderSaleManName:String, invoiceNumber:String, salePersonName:String, routeId:Int, townshipName:String, invoice:Invoice, soldProductList:List<SoldProduct>, presentList:List<Promotion>, printFor:String, mode:String) {
 //
 //        var portInfoList:List<PortInfo>? = null
@@ -1506,13 +1455,13 @@
 //            })
 //            .show()
 //    }
-//
-//    private fun showToast(activity: Activity, message:String) {
-//
-//        Toast.makeText(activity, message, Toast.LENGTH_SHORT).show()
-//    }
-//
-//    @Throws(UnsupportedEncodingException::class)
+
+    private fun showToast(activity: Activity, message: String) {
+
+        Toast.makeText(activity, message, Toast.LENGTH_SHORT).show()
+    }
+
+    @Throws(UnsupportedEncodingException::class)
 //    private fun getPrintDataByteArrayList(activity: Activity, customerName:String, cus_address:String, invoiceNumber:String, salePersonName:String, routeId:Int, townshipName:String, invoice:Invoice, soldProductList:List<SoldProduct>, presentList:List<Promotion>?, printFor:String, mode:String, imgByte:ByteArray?):List<ByteArray> {
 //
 //
@@ -2158,7 +2107,7 @@
 //
 //        return printDataByteArrayList
 //    }
-//
+
 //    @Throws(UnsupportedEncodingException::class)
 //    private fun getPrintDataByteArrayListDeliver(activity: Activity, customerName:String, cus_address:String, orderInvoiceNo:String, orderSaleManName:String, invoiceNumber:String, salePersonName:String, routeId:Int, townshipName:String, invoice:Invoice, soldProductList:List<SoldProduct>, presentList:List<Promotion>?, printFor:String, mode:String):List<ByteArray> {
 //
@@ -2528,7 +2477,7 @@
 //
 //        return printDataByteArrayList
 //    }
-//
+
 //    @Throws(UnsupportedEncodingException::class)
 //    private fun convertFromListByteArrayTobyteArray(ByteArray:List<ByteArray>):ByteArray {
 //        var dataLength = 0
@@ -2547,57 +2496,16 @@
 //
 //        return byteArray
 //    }
-//
+
 //    internal fun getTaxAmount() {
 //        val cursorTax = database!!.rawQuery("SELECT TaxType, Tax FROM COMPANYINFORMATION", null)
-//        while (cursorTax.moveToNext())
-//        {
+//        while (cursorTax.moveToNext()) {
 //            taxType = cursorTax.getString(cursorTax.getColumnIndex("TaxType"))
 //            taxPercent = cursorTax.getDouble(cursorTax.getColumnIndex("Tax"))
 //        }
 //        cursorTax.close()
 //    }
-//
-//    fun backupDatabase(context: Context) {
-//        val today = Utils.getCurrentDate(true)
-//
-//        try
-//        {
-//            val sd = Environment.getExternalStorageDirectory()
-//            val data = Environment.getDataDirectory()
-//
-//            if (sd.canWrite())
-//            {
-//                Toast.makeText(context, "Backup database is starting...",
-//                    Toast.LENGTH_SHORT).show()
-//                val currentDBPath = "/data/com.aceplus.samparoo/databases/" + Database.DB_NAME
-//
-//                val backupDBPath = "Samparoo_DB_Backup_$today.db"
-//                val currentDB = File(data, currentDBPath)
-//
-//                val folderPath = "mnt/sdcard/Samparoo_DB_Backup"
-//                val f = File(folderPath)
-//                f.mkdir()
-//                val backupDB = File(f, backupDBPath)
-//                val source = FileInputStream(currentDB).channel
-//                val destination = FileOutputStream(backupDB).channel
-//                destination.transferFrom(source, 0, source.size())
-//                source.close()
-//                destination.close()
-//                Toast.makeText(context, "Backup database Successful!",
-//                    Toast.LENGTH_SHORT).show()
-//            }
-//            else
-//            {
-//                Toast.makeText(context, "Please set Permission for Storage in Setting!", Toast.LENGTH_SHORT).show()
-//            }
-//        }
-//        catch (e:Exception) {
-//            Toast.makeText(context, "Cannot Backup!", Toast.LENGTH_SHORT).show()
-//        }
-//
-//    }
-//
+
 //    fun getProductNameAndPrice(invoicePresent:Promotion):String? {
 //        val cursorProductName = database!!.rawQuery("SELECT PRODUCT_NAME, SELLING_PRICE FROM PRODUCT WHERE ID = " + invoicePresent.getPromotionProductId(), null)
 //        var productName:String? = null
@@ -2609,7 +2517,7 @@
 //        cursorProductName.close()
 //        return productName
 //    }
-//
+
 //    private fun getPrintDataByteArrayListForCredit(activity: Activity, customerName:String, cus_address:String, invoiceNumber:String, townShipName:String, salePersonName:String, routeId:Int, creditInvoice:CreditInvoice):List<ByteArray> {
 //        val printDataByteArrayList = ArrayList<ByteArray>()
 //
@@ -2668,7 +2576,7 @@
 //
 //        return printDataByteArrayList
 //    }
-//
+
 //    private fun getPrintDataByteArrayListForDailyReport(activity: Activity, saleManDailyReport:SaleManDailyReport):List<ByteArray> {
 //        val printDataByteArrayList = ArrayList<ByteArray>()
 //
@@ -2742,8 +2650,8 @@
 //
 //        return printDataByteArrayList
 //    }
-//
-//
+
+
 //    @Throws(UnsupportedEncodingException::class)
 //    private fun getPrintDataByteArrayListForSaleExchange(activity: Activity, saleInvoiceNumber:String, saleReturnInvoiceNumber:String, salePersonName:String, invoice:Invoice, soldProductList:List<SoldProduct>, saleReturnList:List<SoldProduct>, returnDiscountAmt:Double?, cusName:String, routeId:Int, township:String, cusAddress:String, imgByte:ByteArray?):List<ByteArray> {
 //
@@ -3011,7 +2919,7 @@
 //
 //        return printDataByteArrayList
 //    }
-//
+
 //    fun checkDuplicateInvoice(context: Context, invoiceNo:String, tableName:String, columnName:String):Boolean {
 //        if (database == null)
 //        {
@@ -3036,268 +2944,216 @@
 //            true
 //        }
 //    }
-//
-//    fun saveInvoiceImageIntoGallery(invoiceNo:String, context: Context, bitmap: Bitmap, directoryName:String) {
-//        val sdCard = Environment.getExternalStorageDirectory()
-//        val directory = File(sdCard.absolutePath + "/ScreenShot/" + directoryName)
-//        directory.mkdirs()
-//
-//        var filename = "$invoiceNo.jpg"
-//        var yourFile = File(directory, filename)
-//        val time = getCurrentDate(true)
-//
-//        while (yourFile.exists())
-//        {
-//            filename = invoiceNo + "_" + time + ".jpg"
-//            yourFile = File(directory, filename)
-//            break
-//        }
-//
-//        val image = yourFile.toString()
-//        Log.e(image, "ImageOOO")
-//
-//
-//        val fos: FileOutputStream
-//        try
-//        {
-//            fos = FileOutputStream(yourFile, true)
-//            bitmap.compress(Bitmap.CompressFormat.PNG, 40, fos)//change 100 to 40
-//
-//            fos.flush()
-//            fos.close()
-//            Toast.makeText(context, "Image saved to /sdcard/ScreenShot/$directoryName$filename.jpg", Toast.LENGTH_SHORT).show()
-//        }
-//        catch (e: FileNotFoundException) {
-//            Log.e("GREC", e.message, e)
-//        }
-//        catch (e: IOException) {
-//            Log.e("GREC", e.message, e)
-//        }
-//
-//        val bitmapOrg1 = BitmapFactory.decodeFile(image)
-//        val bao1 = ByteArrayOutputStream()
-//        Log.e(bitmapOrg1.toString() + "", "BitMap1")
-//        Log.e(bao1.toString(), "BAO")
-//        bitmapOrg1.compress(Bitmap.CompressFormat.JPEG, 40, bao1) //change 90 to 40
-//
-//        Log.e("here1", "here1")
-//        val ba1 = bao1.toByteArray()
-//
-//        val imgBase64Str = Base64.encodeToString(ba1, Base64.NO_WRAP)
-//        Log.e("ImageBase64String", imgBase64Str.toString() + "aa")
-//    }
-//
-//    internal fun setupPrintLayoutWithPromo(nameFragments:Array<String>):MutableList<String> {
-//        val nameList = ArrayList<String>()
-//        var concatName = nameFragments[0]
-//        var i = 1
-//        while (i != nameFragments.size)
-//        {
-//            if (concatName.length > 13)
-//            {
-//                nameList.add(concatName)
-//                concatName = nameFragments[i]
-//                nameList.add(concatName)
-//                concatName = ""
-//            }
-//            else
-//            {
-//
-//                var concatName1 = ""
-//                if (concatName.equals("", ignoreCase = true))
-//                {
-//                    concatName1 = nameFragments[i]
-//                }
-//                else
-//                {
-//                    concatName1 = concatName + " " + nameFragments[i]
-//                }
-//
-//                if (concatName1.length < 13)
-//                {
-//                    if (concatName.length > 0)
-//                    {
-//                        concatName += " " + nameFragments[i]
-//                    }
-//                    else
-//                    {
-//                        concatName += nameFragments[i] + " "
-//                    }
-//                }
-//                else
-//                {
-//                    nameList.add(concatName)
-//                    nameList.add(nameFragments[i])
-//                    concatName = ""
-//                }
-//            }
-//            i++
-//        }
-//
-//        if (nameList.size == 0)
-//        {
-//            nameList.add(concatName)
-//        }
-//        else
-//        {
-//            val lastString = nameList[nameList.size - 1]
-//            if (lastString.length > 13)
-//            {
-//                nameList.add(concatName)
-//            }
-//            else
-//            {
-//                nameList[nameList.size - 1] = lastString + concatName
-//            }
-//        }
-//
-//        for (j in nameList.indices)
-//        {
-//            if (nameList[j].length < 13)
-//            {
-//                val stringLength = 10 - nameList[j].length
-//                var s = nameList[j]
-//                for (k in 0 until stringLength)
-//                {
-//                    s += " "
-//                    nameList[j] = s
-//                }
-//            }
-//        }
-//
-//        return nameList
-//    }
-//
-//    fun onDecimalFormat(value:Double):Double {
-//        val f = DecimalFormat("##.0000")
-//        val formattedValue = f.format(value)
-//        return java.lang.Double.parseDouble(formattedValue)
-//    }
-//
-//    internal fun setupPrintLayoutNoPromo(nameFragments:Array<String>):MutableList<String> {
-//        val nameList = ArrayList<String>()
-//        var concatName = nameFragments[0]
-//        //boolean flag = true;
-//        val firstName = ""
-//        var i = 1
-//        while (i != nameFragments.size)
-//        {
-//            if (concatName.length > 23)
-//            {
-//                nameList.add(concatName)
-//                concatName = nameFragments[i]
-//                nameList.add(concatName)
-//                concatName = ""
-//            }
-//            else
-//            {
-//
-//                var concatName1 = ""
-//                if (concatName.equals("", ignoreCase = true))
-//                {
-//                    concatName1 = nameFragments[i]
-//                }
-//                else
-//                {
-//                    concatName1 = concatName + " " + nameFragments[i]
-//                }
-//
-//                if (concatName1.length < 20)
-//                {
-//                    if (concatName.length > 0)
-//                    {
-//                        concatName += " " + nameFragments[i]
-//                    }
-//                    else
-//                    {
-//                        concatName += nameFragments[i] + " "
-//                    }
-//
-//
-//                }
-//                else
-//                {
-//                    nameList.add(concatName)
-//                    nameList.add(nameFragments[i])
-//                    concatName = ""
-//                }
-//            }
-//            i++
-//        }
-//
-//
-//        if (nameList.size > 0)
-//        {
-//            val lastString = nameList[nameList.size - 1]
-//            if (lastString.length > 23)
-//            {
-//                nameList.add(concatName)
-//            }
-//            else
-//            {
-//                nameList[nameList.size - 1] = lastString + concatName
-//            }
-//        }
-//        else if (nameList.size == 0 && concatName != "")
-//        {
-//            nameList.add(concatName)
-//        }
-//
-//        for (j in nameList.indices)
-//        {
-//            if (nameList[j].length < 20)
-//            {
-//                val stringLength = 10 - nameList[j].length
-//                var s = nameList[j]
-//                for (k in 0 until stringLength)
-//                {
-//                    s += " "
-//                    nameList[j] = s
-//                }
-//            }
-//        }
-//        return nameList
-//    }
-//
-//    /**
-//     * Calculate total amount, total discount amount and total net amount of given product list
-//     *
-//     * @param productList SoldProduct Object List
-//     * @param flag        true: sale; false: sale order
-//     * @return 0 index: total amount, 1 index total discount amount, 2 index total net amount
-//     */
-//    fun calculateReportAmounts(productList:List<JSONObject>, flag:Boolean):DoubleArray {
-//        val amountArray = doubleArrayOf(0.0, 0.0, 0.0, 0.0)
-//
-//        for (soldProduct in productList)
-//        {
-//            try
-//            {
-//                amountArray[0] += soldProduct.getDouble("totalAmount")
-//                amountArray[1] += soldProduct.getDouble("discount")
-//                amountArray[2] += soldProduct.getDouble("netAmount")
-//                if (!flag)
-//                {
-//                    amountArray[3] += soldProduct.getDouble("advancedPaymentAmount")
-//                }
-//            }
-//            catch (e: JSONException) {
-//                e.printStackTrace()
-//            }
-//
-//        }
-//
-//        return amountArray
-//    }
-//
-//    fun calculate_Cancel_Amounts(invoicecancelList:List<INVOICECANCEL>, flag:Boolean):DoubleArray {
-//        val amountArray = doubleArrayOf(0.0, 0.0, 0.0, 0.0)
-//        for (invoicecancel in invoicecancelList)
-//        {
-//            amountArray[0] += invoicecancel.getTotalAmount()
-//            amountArray[1] += invoicecancel.getDisAmount()
-//            amountArray[2] += invoicecancel.getNetAmount()
-//        }
-//        return amountArray
-//    }
-//}
+
+    fun saveInvoiceImageIntoGallery(invoiceNo: String, context: Context, bitmap: Bitmap, directoryName: String) {
+        val sdCard = Environment.getExternalStorageDirectory()
+        val directory = File(sdCard.absolutePath + "/ScreenShot/" + directoryName)
+        directory.mkdirs()
+
+        var filename = "$invoiceNo.jpg"
+        var yourFile = File(directory, filename)
+        val time = getCurrentDate(true)
+
+        while (yourFile.exists()) {
+            filename = invoiceNo + "_" + time + ".jpg"
+            yourFile = File(directory, filename)
+            break
+        }
+
+        val image = yourFile.toString()
+        Log.e(image, "ImageOOO")
+
+
+        val fos: FileOutputStream
+        try {
+            fos = FileOutputStream(yourFile, true)
+            bitmap.compress(Bitmap.CompressFormat.PNG, 40, fos)//change 100 to 40
+
+            fos.flush()
+            fos.close()
+            Toast.makeText(context, "Image saved to /sdcard/ScreenShot/$directoryName$filename.jpg", Toast.LENGTH_SHORT)
+                .show()
+        } catch (e: FileNotFoundException) {
+            Log.e("GREC", e.message, e)
+        } catch (e: IOException) {
+            Log.e("GREC", e.message, e)
+        }
+
+        val bitmapOrg1 = BitmapFactory.decodeFile(image)
+        val bao1 = ByteArrayOutputStream()
+        Log.e(bitmapOrg1.toString() + "", "BitMap1")
+        Log.e(bao1.toString(), "BAO")
+        bitmapOrg1.compress(Bitmap.CompressFormat.JPEG, 40, bao1) //change 90 to 40
+
+        Log.e("here1", "here1")
+        val ba1 = bao1.toByteArray()
+
+        val imgBase64Str = Base64.encodeToString(ba1, Base64.NO_WRAP)
+        Log.e("ImageBase64String", imgBase64Str.toString() + "aa")
+    }
+
+    internal fun setupPrintLayoutWithPromo(nameFragments: Array<String>): MutableList<String> {
+        val nameList = ArrayList<String>()
+        var concatName = nameFragments[0]
+        var i = 1
+        while (i != nameFragments.size) {
+            if (concatName.length > 13) {
+                nameList.add(concatName)
+                concatName = nameFragments[i]
+                nameList.add(concatName)
+                concatName = ""
+            } else {
+
+                var concatName1 = ""
+                if (concatName.equals("", ignoreCase = true)) {
+                    concatName1 = nameFragments[i]
+                } else {
+                    concatName1 = concatName + " " + nameFragments[i]
+                }
+
+                if (concatName1.length < 13) {
+                    if (concatName.length > 0) {
+                        concatName += " " + nameFragments[i]
+                    } else {
+                        concatName += nameFragments[i] + " "
+                    }
+                } else {
+                    nameList.add(concatName)
+                    nameList.add(nameFragments[i])
+                    concatName = ""
+                }
+            }
+            i++
+        }
+
+        if (nameList.size == 0) {
+            nameList.add(concatName)
+        } else {
+            val lastString = nameList[nameList.size - 1]
+            if (lastString.length > 13) {
+                nameList.add(concatName)
+            } else {
+                nameList[nameList.size - 1] = lastString + concatName
+            }
+        }
+
+        for (j in nameList.indices) {
+            if (nameList[j].length < 13) {
+                val stringLength = 10 - nameList[j].length
+                var s = nameList[j]
+                for (k in 0 until stringLength) {
+                    s += " "
+                    nameList[j] = s
+                }
+            }
+        }
+
+        return nameList
+    }
+
+    fun onDecimalFormat(value: Double): Double {
+        val f = DecimalFormat("##.0000")
+        val formattedValue = f.format(value)
+        return java.lang.Double.parseDouble(formattedValue)
+    }
+
+    internal fun setupPrintLayoutNoPromo(nameFragments: Array<String>): MutableList<String> {
+        val nameList = ArrayList<String>()
+        var concatName = nameFragments[0]
+        //boolean flag = true;
+        val firstName = ""
+        var i = 1
+        while (i != nameFragments.size) {
+            if (concatName.length > 23) {
+                nameList.add(concatName)
+                concatName = nameFragments[i]
+                nameList.add(concatName)
+                concatName = ""
+            } else {
+
+                var concatName1 = ""
+                if (concatName.equals("", ignoreCase = true)) {
+                    concatName1 = nameFragments[i]
+                } else {
+                    concatName1 = concatName + " " + nameFragments[i]
+                }
+
+                if (concatName1.length < 20) {
+                    if (concatName.length > 0) {
+                        concatName += " " + nameFragments[i]
+                    } else {
+                        concatName += nameFragments[i] + " "
+                    }
+
+
+                } else {
+                    nameList.add(concatName)
+                    nameList.add(nameFragments[i])
+                    concatName = ""
+                }
+            }
+            i++
+        }
+
+
+        if (nameList.size > 0) {
+            val lastString = nameList[nameList.size - 1]
+            if (lastString.length > 23) {
+                nameList.add(concatName)
+            } else {
+                nameList[nameList.size - 1] = lastString + concatName
+            }
+        } else if (nameList.size == 0 && concatName != "") {
+            nameList.add(concatName)
+        }
+
+        for (j in nameList.indices) {
+            if (nameList[j].length < 20) {
+                val stringLength = 10 - nameList[j].length
+                var s = nameList[j]
+                for (k in 0 until stringLength) {
+                    s += " "
+                    nameList[j] = s
+                }
+            }
+        }
+        return nameList
+    }
+
+    /**
+     * Calculate total amount, total discount amount and total net amount of given product list
+     *
+     * @param productList SoldProduct Object List
+     * @param flag        true: sale; false: sale order
+     * @return 0 index: total amount, 1 index total discount amount, 2 index total net amount
+     */
+    fun calculateReportAmounts(productList: List<JSONObject>, flag: Boolean): DoubleArray {
+        val amountArray = doubleArrayOf(0.0, 0.0, 0.0, 0.0)
+
+        for (soldProduct in productList) {
+            try {
+                amountArray[0] += soldProduct.getDouble("totalAmount")
+                amountArray[1] += soldProduct.getDouble("discount")
+                amountArray[2] += soldProduct.getDouble("netAmount")
+                if (!flag) {
+                    amountArray[3] += soldProduct.getDouble("advancedPaymentAmount")
+                }
+            } catch (e: JSONException) {
+                e.printStackTrace()
+            }
+
+        }
+
+        return amountArray
+    }
+
+    fun calculate_Cancel_Amounts(invoicecancelList: List<INVOICECANCEL>, flag: Boolean): DoubleArray {
+        val amountArray = doubleArrayOf(0.0, 0.0, 0.0, 0.0)
+        for (invoicecancel in invoicecancelList) {
+            amountArray[0] += invoicecancel.getTotalAmount()
+            amountArray[1] += invoicecancel.getDisAmount()
+            amountArray[2] += invoicecancel.getNetAmount()
+        }
+        return amountArray
+    }
+}

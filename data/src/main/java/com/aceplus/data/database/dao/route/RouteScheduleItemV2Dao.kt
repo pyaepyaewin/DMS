@@ -9,13 +9,16 @@ import android.arch.persistence.room.Query
 
 
 @Dao
-interface RouteScheduleItemV2Dao{
+interface RouteScheduleItemV2Dao {
 
     @get:Query("select * from route_schedule_item_v2")
     val allDataLD: LiveData<List<RouteScheduleItemV2>>
 
     @get:Query("select * from route_schedule_item_v2")
     val allData: List<RouteScheduleItemV2>
+
+    @Query("select * from route_schedule_item_v2 where route_schedule_id = :routeScheduleId")
+    fun allDataByRouteScheduleId(routeScheduleId: String): List<RouteScheduleItemV2>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(list: List<RouteScheduleItemV2>)

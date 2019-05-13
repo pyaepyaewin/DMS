@@ -12,6 +12,7 @@ android {
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
+//        multiDexEnabled true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
@@ -27,12 +28,16 @@ dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
 
+    //other
+//    implementation rootProject.ext.libraries.multiDex
+
     // Networking
     implementation rootProject.ext.libraries.retrofitConverter
 
     // Rx
     implementation rootProject.ext.libraries.rxjava
     implementation rootProject.ext.libraries.rxandroid
+//    implementation rootProject.ext.libraries.rxjavaAdapter
 
     //Room
     implementation rootProject.ext.libraries.roomRuntime

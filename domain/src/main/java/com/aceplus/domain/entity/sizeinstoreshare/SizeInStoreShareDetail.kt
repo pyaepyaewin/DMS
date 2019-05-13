@@ -10,6 +10,12 @@ import com.google.gson.annotations.SerializedName
 @Entity(tableName = "size_in_store_share_detail")
 class SizeInStoreShareDetail {
 
+    @PrimaryKey
+    @ColumnInfo(name = "id")
+    @SerializedName("id")
+    @Expose
+    var id: Int = 0
+
     @ColumnInfo(name = "size_in_store_share_id")
     @SerializedName("size_in_store_share_id")
     @Expose

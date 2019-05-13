@@ -19,12 +19,12 @@ class ClassDiscountForShowItem {
     @ColumnInfo(name = "class_discount_id")
     @SerializedName("class_discount_id")
     @Expose
-    var class_discount_id: Int = 0
+    var class_discount_id: String? = null
 
     @ColumnInfo(name = "class_id")
     @SerializedName("class_id")
     @Expose
-    var class_id: Int = 0
+    var class_id: String? = null
 
     @ColumnInfo(name = "from_quantity")
     @SerializedName("from_quantity")

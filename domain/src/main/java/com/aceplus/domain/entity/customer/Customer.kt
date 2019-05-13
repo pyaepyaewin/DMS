@@ -19,7 +19,7 @@ class Customer {
     @ColumnInfo(name = "customer_id")
     @SerializedName("customer_id")
     @Expose
-    var customer_id: Int = 0
+    var customer_id: String? = null
 
     @ColumnInfo(name = "customer_name")
     @SerializedName("customer_name")
@@ -29,7 +29,7 @@ class Customer {
     @ColumnInfo(name = "customer_type_id")
     @SerializedName("customer_type_id")
     @Expose
-    var customer_type_id: Int = 0
+    var customer_type_id: String? = null
 
     @ColumnInfo(name = "customer_type_name")
     @SerializedName("customer_type_name")
@@ -59,22 +59,22 @@ class Customer {
     @ColumnInfo(name = "credit_limit")
     @SerializedName("credit_limit")
     @Expose
-    var credit_limit: Double = 0.0
+    var credit_limit: String? = null
 
     @ColumnInfo(name = "credit_amount")
     @SerializedName("credit_amount")
     @Expose
-    var credit_amount: Double = 0.0
+    var credit_amount: String? = null
 
     @ColumnInfo(name = "due_amount")
     @SerializedName("due_amount")
     @Expose
-    var due_amount: Double = 0.0
+    var due_amount: String? = null
 
     @ColumnInfo(name = "prepaid_amount")
     @SerializedName("prepaid_amount")
     @Expose
-    var prepaid_amount: Double = 0.0
+    var prepaid_amount: String? = null
 
     @ColumnInfo(name = "payment_type")
     @SerializedName("payment_type")
@@ -84,7 +84,7 @@ class Customer {
     @ColumnInfo(name = "is_in_route")
     @SerializedName("is_in_route")
     @Expose
-    var is_in_route: String? = null
+    var in_route: String? = null
 
     @ColumnInfo(name = "latitude")
     @SerializedName("latitude")
@@ -129,12 +129,12 @@ class Customer {
     @ColumnInfo(name = "township_number")
     @SerializedName("township_number")
     @Expose
-    var township_number: Int = 0
+    var township_number: String? = null
 
     @ColumnInfo(name = "customer_category_no")
     @SerializedName("customer_category_no")
     @Expose
-    var customer_category_no: Int = 0
+    var customer_category_no: String? = null
 
     @ColumnInfo(name = "contact_person")
     @SerializedName("contact_person")
@@ -149,7 +149,7 @@ class Customer {
     @ColumnInfo(name = "created_user_id")
     @SerializedName("created_user_id")
     @Expose
-    var created_user_id: Int = 0
+    var created_user_id: String? = null
 
     @ColumnInfo(name = "created_date")
     @SerializedName("created_date")

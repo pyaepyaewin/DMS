@@ -19,7 +19,7 @@ class Street {
     @ColumnInfo(name = "street_id")
     @SerializedName("street_id")
     @Expose
-    var street_id: Int = 0
+    var street_id:  String? = null
 
     @ColumnInfo(name = "street_name")
     @SerializedName("street_name")

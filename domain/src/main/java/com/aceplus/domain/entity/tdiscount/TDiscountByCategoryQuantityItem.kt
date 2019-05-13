@@ -19,12 +19,12 @@ class TDiscountByCategoryQuantityItem {
     @ColumnInfo(name = "t_promotion_plan_id")
     @SerializedName("t_promotion_plan_id")
     @Expose
-    var t_promotion_plan_id: Int = 0
+    var t_promotion_plan_id: String? = null
 
     @ColumnInfo(name = "stock_id")
     @SerializedName("stock_id")
     @Expose
-    var stock_id: Int = 0
+    var stock_id: String? = null
 
     @ColumnInfo(name = "currency_id")
     @SerializedName("currency_id")

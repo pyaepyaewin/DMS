@@ -24,7 +24,7 @@ class Class {
     @ColumnInfo(name = "class_id")
     @SerializedName("class_id")
     @Expose
-    var class_id: Int = 0
+    var class_id:  String? = null
 
 
 }

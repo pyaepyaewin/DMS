@@ -14,12 +14,12 @@ class Location {
     @ColumnInfo(name = "location_id")
     @SerializedName("location_id")
     @Expose
-    var location_id: Int = 0
+    var location_id:  String = ""
 
     @ColumnInfo(name = "location_no")
     @SerializedName("location_no")
     @Expose
-    var location_no: Int = 0
+    var location_no:  String? = null
 
     @ColumnInfo(name = "location_name")
     @SerializedName("location_name")
@@ -29,7 +29,7 @@ class Location {
     @ColumnInfo(name = "branch_id")
     @SerializedName("branch_id")
     @Expose
-    var branch_id: Int = 0
+    var branch_id:  String? = null
 
     @ColumnInfo(name = "branch_name")
     @SerializedName("branch_name")

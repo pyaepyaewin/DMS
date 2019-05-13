@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.ProgressDialog
 import android.content.Context
 import android.content.DialogInterface
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.os.Environment
 import android.support.v7.app.AlertDialog
@@ -19,6 +20,22 @@ import java.util.*
 
 object AppUtils {
 
+    fun saveStringToShp(key: String, value: String, sharedPreferences: SharedPreferences) {
+        sharedPreferences.edit().putString(key, value).apply()
+    }
+
+    fun getStringFromShp(key: String, sharedPreferences: SharedPreferences): String? {
+        return sharedPreferences.getString(key, null)
+    }
+
+    fun saveIntToShp(key: String, value: Int, sharedPreferences: SharedPreferences) {
+        sharedPreferences.edit().putInt(key, value).apply()
+    }
+
+    fun getIntFromShp(key: String, sharedPreferences: SharedPreferences): Int {
+        return sharedPreferences.getInt(key, AppConstants.SHP_INT_ERR)
+    }
+
     fun saveStringToShp(key: String, value: String, ctxt: Context) {
         val shp = ctxt.getSharedPreferences(AppConstants.SHP_NAME, 0)
         shp!!.edit().putString(key, value).apply()
@@ -26,7 +43,7 @@ object AppUtils {
 
     fun getStringFromShp(key: String, ctxt: Context): String? {
         val shp = ctxt.getSharedPreferences(AppConstants.SHP_NAME, 0)
-        return shp!!.getString(key, AppConstants.SHP_STRING_ERR)
+        return shp!!.getString(key, null)
     }
 
     fun saveIntToShp(key: String, value: Int, ctxt: Context) {
@@ -100,6 +117,7 @@ object AppUtils {
         return SimpleDateFormat(dateFormat).format(Date())
     }
 
+
     fun backupDatabase(context: Context) {
         val today = getCurrentDate(true)
 
@@ -108,14 +126,16 @@ object AppUtils {
             val data = Environment.getDataDirectory()
 
             if (sd.canWrite()) {
-                Toast.makeText(context, "Backup database is starting...",
-                        Toast.LENGTH_SHORT).show()
-                val currentDBPath = "/data/com.aceplussolutions.rms/databases/ros.db"
+                Toast.makeText(
+                    context, "Backup database is starting...",
+                    Toast.LENGTH_SHORT
+                ).show()
+                val currentDBPath = "/data/" + context.packageName + "/databases/dms.db"
 
-                val backupDBPath = "RoS_DB_Backup_$today.db"
+                val backupDBPath = "DMS_DB_Backup_$today.db"
                 val currentDB = File(data, currentDBPath)
 
-                val folderPath = "mnt/sdcard/RoS_DB_Backup"
+                val folderPath = "mnt/sdcard/DMS_DB_BACKUP"
                 val f = File(folderPath)
                 f.mkdir()
                 val backupDB = File(f, backupDBPath)
@@ -124,8 +144,10 @@ object AppUtils {
                 destination.transferFrom(source, 0, source.size())
                 source.close()
                 destination.close()
-                Toast.makeText(context, "Backup database Successful!",
-                        Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    context, "Backup database Successful!",
+                    Toast.LENGTH_SHORT
+                ).show()
             } else {
                 Toast.makeText(context, "Please set Permission for Storage in Setting!", Toast.LENGTH_SHORT).show()
             }
@@ -134,5 +156,6 @@ object AppUtils {
         }
 
     }
+
 
 }

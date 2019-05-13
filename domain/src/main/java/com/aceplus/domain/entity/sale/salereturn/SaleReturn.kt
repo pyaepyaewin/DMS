@@ -10,6 +10,7 @@ import com.google.gson.annotations.SerializedName
 @Entity(tableName = "sale_return")
 class SaleReturn {
 
+    @PrimaryKey
     @ColumnInfo(name = "sale_return_id")
     @SerializedName("sale_return_id")
     @Expose

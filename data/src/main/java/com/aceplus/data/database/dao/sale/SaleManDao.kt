@@ -9,13 +9,16 @@ import android.arch.persistence.room.Query
 
 
 @Dao
-interface SaleManDao{
+interface SaleManDao {
 
     @get:Query("select * from sale_man")
     val allDataLD: LiveData<List<SaleMan>>
 
     @get:Query("select * from sale_man")
     val allData: List<SaleMan>
+
+    @Query("select * from sale_man where user_id = :userId and password = :password")
+    fun data(userId: String, password: String): List<SaleMan>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(list: List<SaleMan>)

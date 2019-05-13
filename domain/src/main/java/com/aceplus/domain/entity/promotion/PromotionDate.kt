@@ -19,7 +19,7 @@ class PromotionDate {
     @ColumnInfo(name = "promotion_plan_id")
     @SerializedName("promotion_plan_id")
     @Expose
-    var promotion_plan_id: Int = 0
+    var promotion_plan_id: String? = null
 
     @ColumnInfo(name = "date")
     @SerializedName("date")

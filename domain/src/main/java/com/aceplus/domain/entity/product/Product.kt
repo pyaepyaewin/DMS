@@ -18,7 +18,7 @@ class Product {
     @ColumnInfo(name = "product_id")
     @SerializedName("product_id")
     @Expose
-    var product_id: Int = 0
+    var product_id:  String? = null
 
     @ColumnInfo(name = "product_name")
     @SerializedName("product_name")
@@ -28,12 +28,12 @@ class Product {
     @ColumnInfo(name = "category_id")
     @SerializedName("category_id")
     @Expose
-    var category_id: Int = 0
+    var category_id:  String? = null
 
     @ColumnInfo(name = "group_id")
     @SerializedName("group_id")
     @Expose
-    var group_id: Int = 0
+    var group_id:  String? = null
 
     @ColumnInfo(name = "total_quantity")
     @SerializedName("total_quantity")
@@ -48,12 +48,12 @@ class Product {
     @ColumnInfo(name = "selling_price")
     @SerializedName("selling_price")
     @Expose
-    var selling_price: Double = 0.0
+    var selling_price:  String? = null
 
     @ColumnInfo(name = "purchase_price")
     @SerializedName("purchase_price")
     @Expose
-    var purchase_price: Double = 0.0
+    var purchase_price:  String? = null
 
     @ColumnInfo(name = "discount_type")
     @SerializedName("discount_type")

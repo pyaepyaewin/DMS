@@ -52,7 +52,8 @@ dependencies {
     implementation rootProject.ext.libraries.retrofitConverter
 
     // Rx
-    implementation rootProject.ext.libraries.retrofitAdapter
+//    implementation rootProject.ext.libraries.retrofitAdapter
+    implementation rootProject.ext.libraries.rxjavaAdapter
     implementation rootProject.ext.libraries.rxjava
     implementation rootProject.ext.libraries.rxandroid
 

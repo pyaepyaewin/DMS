@@ -19,7 +19,7 @@ class TDiscountByCategoryQuantity {
     @ColumnInfo(name = "promotion_plan_no")
     @SerializedName("promotion_plan_no")
     @Expose
-    var promotion_plan_no: Int = 0
+    var promotion_plan_no: String? = null
 
     @ColumnInfo(name = "date")
     @SerializedName("date")
@@ -114,7 +114,7 @@ class TDiscountByCategoryQuantity {
     @ColumnInfo(name = "category_id")
     @SerializedName("category_id")
     @Expose
-    var category_id: Int = 0
+    var category_id: String? = null
 
     @ColumnInfo(name = "currency_id")
     @SerializedName("currency_id")
