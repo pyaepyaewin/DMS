@@ -843,21 +843,21 @@ object Utils {
         Utils.onActionClickListener = onActionClickListener
     }
 
-    fun askConfirmationDialog(title: String, message: String, type: String, activity: Activity) {
-        val alertDialog = AlertDialog.Builder(activity)
-            .setTitle(title)
-            .setMessage(message)
-            .setPositiveButton(
-                "Yes"
-            ) { dialogInterface, i -> onActionClickListener.onActionClick(type) }
-            .setNegativeButton("No", null)
-            .show()
-
-        val textViewYes = alertDialog.findViewById<TextView>(android.R.id.button1)
-        textViewYes?.textSize = 25f
-        val textViewNo = alertDialog.findViewById<TextView>(android.R.id.button2)
-        textViewNo?.textSize = 25f
-    }
+//    fun askConfirmationDialog(title: String, message: String, type: String, activity: Activity) {
+//        val alertDialog = AlertDialog.Builder(activity)
+//            .setTitle(title)
+//            .setMessage(message)
+//            .setPositiveButton(
+//                "Yes"
+//            ) { dialogInterface, i -> onActionClickListener.onActionClick(type) }
+//            .setNegativeButton("No", null)
+//            .show()
+//
+//        val textViewYes = alertDialog.findViewById<TextView>(android.R.id.button1)
+//        textViewYes?.textSize = 25f
+//        val textViewNo = alertDialog.findViewById<TextView>(android.R.id.button2)
+//        textViewNo?.textSize = 25f
+//    }
 
 
     fun askConfirmationDialog(title: String, message: String, type: String, activity: Activity,action:(String)->Unit) {

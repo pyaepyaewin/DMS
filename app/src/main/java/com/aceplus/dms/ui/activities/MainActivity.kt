@@ -18,7 +18,7 @@ import org.kodein.di.KodeinAware
 import org.kodein.di.android.kodein
 import org.kodein.di.generic.instance
 
-class MainActivity : BaseActivity(), Utils.OnActionClickListener, KodeinAware {
+class MainActivity : BaseActivity(), KodeinAware {
     override val kodein: Kodein by kodein()
 
     override var layoutId: Int = R.layout.activity_home
@@ -38,7 +38,6 @@ class MainActivity : BaseActivity(), Utils.OnActionClickListener, KodeinAware {
         username.text = AppUtils.getStringFromShp(Constant.SALEMAN_NAME, this)
         date.text = Utils.getCurrentDate(false)
 
-        Utils.setOnActionClickListener(this)//set on action click listener
         cancel_img.setOnClickListener { onBackPressed() }
         buttonSync.setOnClickListener { startActivity(Intent(this, SyncActivity::class.java)) }
         buttonRoute.setOnClickListener {
@@ -58,17 +57,13 @@ class MainActivity : BaseActivity(), Utils.OnActionClickListener, KodeinAware {
 
     override fun onBackPressed() {
         Utils.askConfirmationDialog("Logout", "Do you want to logout?", "", this) {
-            onActionClick(it)
+            val intent = Intent(this, LoginActivity::class.java)
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            startActivity(intent)
+            finish()
         }
-    }
-
-    override fun onActionClick(type: String) {
-        val intent = Intent(this, LoginActivity::class.java)
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        startActivity(intent)
-        finish()
     }
 
 }
