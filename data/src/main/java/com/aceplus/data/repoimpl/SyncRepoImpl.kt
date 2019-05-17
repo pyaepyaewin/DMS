@@ -3,6 +3,7 @@ package com.aceplus.data.repoimpl
 import android.content.SharedPreferences
 import com.aceplus.data.database.MyDatabase
 import com.aceplus.data.remote.DownloadApiService
+import com.aceplus.data.remote.UploadApiService
 import com.aceplus.data.utils.Constant
 import com.aceplus.domain.entity.*
 import com.aceplus.domain.entity.classdiscount.*
@@ -59,6 +60,7 @@ import com.aceplus.domain.model.forApi.delivery.DataForDelivery
 import com.aceplus.domain.model.forApi.delivery.DeliveryResponse
 import com.aceplus.domain.model.forApi.incentive.DataForIncentive
 import com.aceplus.domain.model.forApi.incentive.IncentiveResponse
+import com.aceplus.domain.model.forApi.invoice.InvoiceResponse
 import com.aceplus.domain.model.forApi.other.GeneralData
 import com.aceplus.domain.model.forApi.other.GeneralResponse
 import com.aceplus.domain.model.forApi.posm.PosmShopTypeForApi
@@ -78,9 +80,12 @@ import com.aceplus.domain.model.forApi.volumediscount.VolumeDiscountResponse
 import com.aceplus.domain.repo.SyncRepo
 import com.aceplussolutions.rms.constants.AppUtils
 import io.reactivex.Observable
+import retrofit2.Call
 
 class SyncRepoImpl(
-    private val downloadApiService: DownloadApiService, private val db: MyDatabase,
+    private val downloadApiService: DownloadApiService,
+    private val uploadApiService: UploadApiService,
+    private val db: MyDatabase,
     private val shf: SharedPreferences
 ) : SyncRepo {
 
@@ -176,6 +181,10 @@ class SyncRepoImpl(
 
     override fun downloadPreOrderHistory(paramData: String): Observable<PreOrderHistoryResponse> {
         return downloadApiService.getPreOrderHistoryi(paramData)
+    }
+
+    override fun downloadConfirmSuccess(paramData: String): Observable<InvoiceResponse> {
+        return uploadApiService.uploadConfirmDownloadSuccess(paramData)
     }
 
     override fun saveCustomerData(customerList: List<CustomerForApi>) {
@@ -1126,5 +1135,14 @@ class SyncRepoImpl(
 
         db.preOrderDao().insertAll(preOrderEntityList)
         db.preOrderProductDao().insertAll(preOrderItemEntityList)
+    }
+
+
+    override fun deleteAllData() {
+        db.clearAllTables()//todo check clear table ( CLASS & PRODUCT )
+    }
+
+    override fun deleteProductData() {
+        db.productDao().deleteAll()
     }
 }

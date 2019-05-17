@@ -1,10 +1,6 @@
 package com.aceplussolutions.rms.constants
 
-object AppConstants {
-
-    const val BASE_URL = "http://aceplusactivation.com"
-    var BACKEND_URL = "http://192.168.7.194:8006"
-    var IMG_URL_PREFIX = " http://128.199.226.122:8086/uploads/"
+object SharedConstants {
 
     //share preference name and key for activate key store
     const val SHP_NAME = "dms"

@@ -1,16 +1,11 @@
 package com.aceplussolutions.rms.constants
 
-import android.annotation.SuppressLint
 import android.app.ProgressDialog
 import android.content.Context
-import android.content.DialogInterface
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.os.Environment
-import android.support.v7.app.AlertDialog
-import android.view.LayoutInflater
 import android.widget.Toast
-import com.aceplus.shared.R
 import com.google.gson.Gson
 import java.io.File
 import java.io.FileInputStream
@@ -33,32 +28,32 @@ object AppUtils {
     }
 
     fun getIntFromShp(key: String, sharedPreferences: SharedPreferences): Int {
-        return sharedPreferences.getInt(key, AppConstants.SHP_INT_ERR)
+        return sharedPreferences.getInt(key, SharedConstants.SHP_INT_ERR)
     }
 
     fun saveStringToShp(key: String, value: String, ctxt: Context) {
-        val shp = ctxt.getSharedPreferences(AppConstants.SHP_NAME, 0)
+        val shp = ctxt.getSharedPreferences(SharedConstants.SHP_NAME, 0)
         shp!!.edit().putString(key, value).apply()
     }
 
     fun getStringFromShp(key: String, ctxt: Context): String? {
-        val shp = ctxt.getSharedPreferences(AppConstants.SHP_NAME, 0)
+        val shp = ctxt.getSharedPreferences(SharedConstants.SHP_NAME, 0)
         return shp!!.getString(key, null)
     }
 
     fun saveIntToShp(key: String, value: Int, ctxt: Context) {
-        val shp = ctxt.getSharedPreferences(AppConstants.SHP_NAME, 0)
+        val shp = ctxt.getSharedPreferences(SharedConstants.SHP_NAME, 0)
         shp!!.edit().putInt(key, value).apply()
     }
 
     fun getIntFromShp(key: String, ctxt: Context): Int? {
-        val shp = ctxt.getSharedPreferences(AppConstants.SHP_NAME, 0)
-        return shp!!.getInt(key, AppConstants.SHP_INT_ERR)
+        val shp = ctxt.getSharedPreferences(SharedConstants.SHP_NAME, 0)
+        return shp!!.getInt(key, SharedConstants.SHP_INT_ERR)
     }
 
     fun getDialog(ctxt: Context): ProgressDialog {
         val pd = ProgressDialog(ctxt)
-        pd.setMessage(AppConstants.PROGRESS_TEXT)
+        pd.setMessage(SharedConstants.PROGRESS_TEXT)
         return pd
     }
 

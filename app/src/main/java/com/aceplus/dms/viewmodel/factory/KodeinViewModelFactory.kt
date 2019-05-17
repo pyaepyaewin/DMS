@@ -12,6 +12,7 @@ import org.kodein.di.generic.instanceOrNull
 class KodeinViewModelFactory(val kodein: Kodein) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T =
         kodein.direct.Instance(TT(modelClass))
+
 }
 
 //no use now (you can see sample usage in Main Activity)

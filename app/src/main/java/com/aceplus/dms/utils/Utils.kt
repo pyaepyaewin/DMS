@@ -1,5 +1,6 @@
 package com.aceplus.dms.utils
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.ProgressDialog
 import android.content.Context
@@ -19,6 +20,7 @@ import com.aceplus.data.utils.Constant
 import com.aceplus.dms.R
 import com.aceplus.dms.ui.activities.LoginActivity
 import com.aceplus.domain.model.INVOICECANCEL
+import com.aceplus.domain.model.forApi.ConfirmRequestSuccess
 import com.aceplus.domain.model.forApi.credit.CreditApi
 import com.aceplus.domain.model.forApi.login.LoginCreditRequest
 import com.aceplus.domain.model.forApi.login.LoginRequest
@@ -561,6 +563,18 @@ object Utils {
         return getJsonFromObject(loginRequest)
     }
 
+
+    @SuppressLint("SimpleDateFormat")
+    fun confirmRequestSuccessForProduct(saleman_Id: String, routeIdV2:Int): String {
+        val confirmRequestSuccess = ConfirmRequestSuccess()
+        confirmRequestSuccess.siteActivationKey = Constant.SITE_ACTIVATION_KEY
+        confirmRequestSuccess.tabletActivationKey = Constant.TABLET_ACTIVATION_KEY
+        confirmRequestSuccess.userId = saleman_Id
+        confirmRequestSuccess.route = routeIdV2.toString()
+        confirmRequestSuccess.date = SimpleDateFormat("yyyy-MM-dd").format(Date())
+        confirmRequestSuccess.successCode = 200
+        return getJsonFromObject(confirmRequestSuccess)
+    }
 
     fun getDeviceId(activity: Activity): String {
         return Settings.Secure.getString(
@@ -3173,4 +3187,5 @@ object Utils {
         }
         return amountArray
     }
+
 }

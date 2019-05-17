@@ -1,6 +1,7 @@
 package com.aceplus.data.remote
 
 import com.aceplus.domain.model.forApi.invoice.InvoiceResponse
+import io.reactivex.Observable
 import retrofit2.Call
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
@@ -70,7 +71,7 @@ interface UploadApiService {
 
     @FormUrlEncoded
     @POST("deviceIssue/status")
-    fun uploadConfirmDownloadSuccess(@Field("param_data") paramData: String): Call<InvoiceResponse>
+    fun uploadConfirmDownloadSuccess(@Field("param_data") paramData: String): Observable<InvoiceResponse>
 
     @FormUrlEncoded
     @POST("upload/unsellReason")

@@ -6,9 +6,9 @@ import com.aceplus.data.database.MyDatabase
 import com.aceplus.data.di.createDownloadWebService
 import com.aceplus.data.di.createOkHttpClient
 import com.aceplus.data.utils.Constant
-import com.aceplussolutions.rms.constants.AppConstants
+import com.aceplussolutions.rms.constants.SharedConstants
 
 fun provideDB(context: Context): MyDatabase = MyDatabase.getInstance(context)!!
 fun provideDownloadApi() = createDownloadWebService(createOkHttpClient(), Constant.BASE_URL)
 fun provideSharedPreferences(context: Context): SharedPreferences =
-    context.getSharedPreferences(AppConstants.SHP_NAME, 0)
+    context.getSharedPreferences(SharedConstants.SHP_NAME, 0)

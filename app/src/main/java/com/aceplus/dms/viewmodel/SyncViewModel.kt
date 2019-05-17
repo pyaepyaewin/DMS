@@ -328,9 +328,7 @@ class SyncViewModel(private val syncRepo: SyncRepo, private val schedulerProvide
                     )
                     return@flatMap syncRepo.downloadPreOrderHistory(preOrderParam)
                 }
-                .subscribeOn(schedulerProvider.io())
-                .observeOn(schedulerProvider.mainThread())
-                .subscribe({
+                .flatMap {
                     //save data
                     if (it.aceplusStatusCode == 200) {
                         val preOrderList = it.dataForPreOrderList
@@ -341,7 +339,17 @@ class SyncViewModel(private val syncRepo: SyncRepo, private val schedulerProvide
                         errorState.postValue(Pair(it.aceplusStatusMessage, "download"))
                     }
 
-                    successState.postValue(Pair("Successfully Downloaded", "download"))
+                    val downloadConfirmParam = Utils.confirmRequestSuccessForProduct(saleMan.user_id, routeScheduleID)
+                    return@flatMap syncRepo.downloadConfirmSuccess(downloadConfirmParam)
+                }
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.mainThread())
+                .subscribe({
+                    if (it.aceplusStatusCode == 200) {
+                        successState.postValue(Pair("Successfully Downloaded", "download"))
+                    } else {
+                        errorState.postValue(Pair(it.aceplusStatusMessage, "download"))
+                    }
                 }, {
                     errorState.postValue(Pair(it.localizedMessage, "download"))
                 })
@@ -357,14 +365,45 @@ class SyncViewModel(private val syncRepo: SyncRepo, private val schedulerProvide
     }
 
     fun deleteAllData() {
-
+        syncRepo.deleteAllData()
     }
 
     fun deleteProductData() {
-
+        syncRepo.deleteProductData()
     }
 
     fun downloadReissue() {
+        val saleMan = syncRepo.getSaleManData()
+        val routeScheduleID = syncRepo.getRouteScheduleID()
+        val reissueParamData =
+            Utils.createDownloadProductParamData(saleMan.user_id, saleMan.password!!, routeScheduleID, "reissue")
+        launch {
+            syncRepo.downloadProduct(reissueParamData)
+                .flatMap {
+                    //save data
+                    if (it.aceplusStatusCode == 200) {
+                        val productApiList = it.dataForProductList[0].productList
+                        if (productApiList.count() > 0) {
+                            syncRepo.saveProductData(productApiList)
+                        }
+                    } else {
+                        errorState.postValue(Pair(it.aceplusStatusMessage, "download_reissue"))
+                    }
 
+                    val downloadConfirmParam = Utils.confirmRequestSuccessForProduct(saleMan.user_id, routeScheduleID)
+                    return@flatMap syncRepo.downloadConfirmSuccess(downloadConfirmParam)
+                }
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.mainThread())
+                .subscribe({
+                    if (it.aceplusStatusCode == 200) {
+                        successState.postValue(Pair("Successfully Downloaded", "download_reissue"))
+                    } else {
+                        errorState.postValue(Pair(it.aceplusStatusMessage, "download_reissue"))
+                    }
+                }, {
+                    errorState.postValue(Pair(it.localizedMessage, "download_reissue"))
+                })
+        }
     }
 }

@@ -8,6 +8,7 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import android.widget.Toast
 import com.aceplus.data.database.MyDatabase
+import com.aceplus.data.remote.DownloadApiService
 import com.aceplus.data.repoimpl.LoginRepoImpl
 import com.aceplus.dms.R
 import com.aceplus.data.utils.Constant
@@ -129,6 +130,7 @@ class LoginActivity : BaseActivity(), KodeinAware {
             Constant.BASE_URL = newIp
 
             val downloadApi = provideDownloadApi()//need to create new instance (don't call instance from kodein)
+//            var dapi: DownloadApiService by instance()
             val db: MyDatabase by instance()
             val shf: SharedPreferences by instance()
             val loginRepo =

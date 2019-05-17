@@ -4,7 +4,14 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import com.aceplus.data.database.MyDatabase
+import com.aceplus.data.di.createDownloadWebService
+import com.aceplus.data.di.createUploadRealtimeWebService
+import com.aceplus.data.di.createUploadWebService
+import com.aceplus.data.remote.DownloadApiService
+import com.aceplus.data.remote.RealTimeUploadApiService
+import com.aceplus.data.remote.UploadApiService
 import com.aceplus.data.utils.Constant
+import com.aceplus.dms.MyApp
 import com.aceplus.dms.R
 import com.aceplus.dms.utils.Utils
 import com.aceplus.dms.viewmodel.LoginViewModel
@@ -16,10 +23,17 @@ import kotlinx.android.synthetic.main.activity_home.*
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.kodein
+import org.kodein.di.generic.bind
 import org.kodein.di.generic.instance
+import org.kodein.di.generic.singleton
+import java.util.Collections.singleton
 
 class MainActivity : BaseActivity(), KodeinAware {
-    override val kodein: Kodein by kodein()
+    override val kodein: Kodein by Kodein.lazy {
+        import(MyApp().networkModule, allowOverride = true)
+        import(MyApp().repoModule, allowOverride = true)
+        import(MyApp().vmModule, allowOverride = true)
+    }
 
     override var layoutId: Int = R.layout.activity_home
 
@@ -56,7 +70,7 @@ class MainActivity : BaseActivity(), KodeinAware {
 
 
     override fun onBackPressed() {
-        Utils.askConfirmationDialog("Logout", "Do you want to logout?", "", this) {
+        Utils.askConfirmationDialog("Logout", "Do you want to logout?", "", this) { type ->
             val intent = Intent(this, LoginActivity::class.java)
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)

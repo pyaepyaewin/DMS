@@ -7,14 +7,10 @@ import android.os.Bundle
 import android.support.v4.app.FragmentActivity
 import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
-import android.widget.Toast
-import com.aceplussolutions.rms.constants.AppConstants
 import com.aceplussolutions.rms.constants.AppUtils
 import org.kodein.di.KodeinAware
 import org.kodein.di.direct
-import org.kodein.di.generic.bind
 import org.kodein.di.generic.instance
-import org.kodein.di.generic.singleton
 
 abstract class BaseActivity : AppCompatActivity() {
 

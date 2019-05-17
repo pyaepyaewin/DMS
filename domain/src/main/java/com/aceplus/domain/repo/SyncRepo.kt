@@ -20,6 +20,7 @@ import com.aceplus.domain.model.forApi.delivery.DataForDelivery
 import com.aceplus.domain.model.forApi.delivery.DeliveryResponse
 import com.aceplus.domain.model.forApi.incentive.DataForIncentive
 import com.aceplus.domain.model.forApi.incentive.IncentiveResponse
+import com.aceplus.domain.model.forApi.invoice.InvoiceResponse
 import com.aceplus.domain.model.forApi.other.GeneralData
 import com.aceplus.domain.model.forApi.other.GeneralResponse
 import com.aceplus.domain.model.forApi.posm.PosmShopTypeForApi
@@ -37,6 +38,7 @@ import com.aceplus.domain.model.forApi.sale.saletarget.SaleTargetResponse
 import com.aceplus.domain.model.forApi.volumediscount.DataForVolumeDiscount
 import com.aceplus.domain.model.forApi.volumediscount.VolumeDiscountResponse
 import io.reactivex.Observable
+import retrofit2.Call
 
 interface SyncRepo {
     fun saveStartTime(time: String)
@@ -62,6 +64,7 @@ interface SyncRepo {
     fun downloadSaleHistory(paramData: String): Observable<SaleHistoryResponse>
     fun downloadIncentive(paramData: String): Observable<IncentiveResponse>
     fun downloadPreOrderHistory(paramData: String): Observable<PreOrderHistoryResponse>
+    fun downloadConfirmSuccess(paramData: String): Observable<InvoiceResponse>
 
     fun saveCustomerData(customerList: List<CustomerForApi>)
     fun saveProductData(productApiList: List<ProductForApi>)
@@ -80,4 +83,7 @@ interface SyncRepo {
     fun saveSaleHistoryData(saleHistoryList: List<DataForSaleHistory>)
     fun saveIncentiveData(incentiveList: List<DataForIncentive>)
     fun savePreOrderData(preOrderList: List<DataForPreOrderHistory>)
+
+    fun deleteAllData()
+    fun deleteProductData()
 }
