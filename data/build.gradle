@@ -41,6 +41,10 @@ dependencies {
     implementation rootProject.ext.libraries.rxjava
     implementation rootProject.ext.libraries.rxandroid
 
+    //Architecture Component
+    implementation rootProject.ext.libraries.lifecycleExtension
+    kapt rootProject.ext.libraries.lifecycleCompiler
+
     //Room
     implementation rootProject.ext.libraries.roomRuntime
     implementation rootProject.ext.libraries.roomRxjava

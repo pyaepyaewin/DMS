@@ -1,39 +1,20 @@
 package com.aceplus.dms.ui.activities
 
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Bundle
-import com.aceplus.data.database.MyDatabase
-import com.aceplus.data.di.createDownloadWebService
-import com.aceplus.data.di.createUploadRealtimeWebService
-import com.aceplus.data.di.createUploadWebService
-import com.aceplus.data.remote.DownloadApiService
-import com.aceplus.data.remote.RealTimeUploadApiService
-import com.aceplus.data.remote.UploadApiService
 import com.aceplus.data.utils.Constant
-import com.aceplus.dms.MyApp
 import com.aceplus.dms.R
 import com.aceplus.dms.utils.Utils
 import com.aceplus.dms.viewmodel.LoginViewModel
-import com.aceplus.domain.repo.LoginRepo
 import com.aceplussolutions.rms.constants.AppUtils
 import com.aceplussolutions.rms.ui.activities.BaseActivity
-import com.kkk.githubpaging.network.rx.SchedulerProvider
 import kotlinx.android.synthetic.main.activity_home.*
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.kodein
-import org.kodein.di.generic.bind
-import org.kodein.di.generic.instance
-import org.kodein.di.generic.singleton
-import java.util.Collections.singleton
 
 class MainActivity : BaseActivity(), KodeinAware {
-    override val kodein: Kodein by Kodein.lazy {
-        import(MyApp().networkModule, allowOverride = true)
-        import(MyApp().repoModule, allowOverride = true)
-        import(MyApp().vmModule, allowOverride = true)
-    }
+    override val kodein: Kodein by kodein()
 
     override var layoutId: Int = R.layout.activity_home
 

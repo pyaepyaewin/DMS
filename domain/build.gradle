@@ -43,8 +43,8 @@ dependencies {
     kapt rootProject.ext.libraries.roomCompiler
 
     // Dependency Injection
-    implementation rootProject.ext.libraries.kodeinJvm
-    implementation rootProject.ext.libraries.kodeinAndroid
+//    implementation rootProject.ext.libraries.kodeinJvm
+//    implementation rootProject.ext.libraries.kodeinAndroid
 
     //testing
     testImplementation rootProject.ext.testLibraries.junit
