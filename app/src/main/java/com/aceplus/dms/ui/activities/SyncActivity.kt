@@ -1,6 +1,8 @@
 package com.aceplus.dms.ui.activities
 
 import android.arch.lifecycle.Observer
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import com.aceplus.dms.R
@@ -17,6 +19,12 @@ class SyncActivity : BaseActivity(), KodeinAware {
 
     override val layoutId: Int
         get() = R.layout.activity_sync
+
+    companion object {
+        fun newIntent(context: Context): Intent {
+            return Intent(context, SyncActivity::class.java)
+        }
+    }
 
     private val syncViewModel: SyncViewModel by viewModel()
 
@@ -64,7 +72,18 @@ class SyncActivity : BaseActivity(), KodeinAware {
                 syncViewModel.uploadAllData()
             }
         }
-        buttonReissue.setOnClickListener { syncViewModel.downloadReissue() }
+        buttonReissue.setOnClickListener {
+            Utils.askConfirmationDialog(
+                "DOWNLOAD",
+                "Do you want to download reissue?",
+                "download_reissue",
+                this@SyncActivity
+            ) { type ->
+                Toast.makeText(applicationContext, type, Toast.LENGTH_SHORT).show()
+                Utils.callDialog("Please wait...", this)
+                syncViewModel.downloadReissue()
+            }
+        }
         buttonSaleVisitRecord.setOnClickListener {
             Utils.askConfirmationDialog(
                 "UPLOAD",

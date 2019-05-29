@@ -3,6 +3,7 @@ package com.aceplus.dms.ui.activities
 import android.Manifest
 import android.app.AlertDialog
 import android.arch.lifecycle.Observer
+import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
@@ -35,6 +36,12 @@ class LoginActivity : BaseActivity(), KodeinAware {
 
     override val layoutId: Int
         get() = activity_login
+
+    companion object {
+        fun newIntent(context: Context): Intent {
+            return Intent(context,LoginActivity::class.java)
+        }
+    }
 
     private var permissionRequest: PermissionHelper.PermissionBuilder? = null
     private val REQUEST_STORAGE = 41
@@ -87,7 +94,7 @@ class LoginActivity : BaseActivity(), KodeinAware {
             it?.let { success ->
                 //null setter is to avoid sucessState liveData  bcoz loginviewmodel use in main activity too
                 loginViewModel.successState.postValue(null)
-                startActivity(Intent(this, MainActivity::class.java))
+                startActivity(MainActivity.newIntent(this))
                 finish()
             }
         })

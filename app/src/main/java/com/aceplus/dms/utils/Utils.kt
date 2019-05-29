@@ -270,7 +270,7 @@ object Utils {
      * @param activity current activity name
      */
     fun backToLogin(activity: Activity) {
-        val intent = Intent(activity, LoginActivity::class.java)
+        val intent = LoginActivity.newIntent(activity)
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -565,7 +565,7 @@ object Utils {
 
 
     @SuppressLint("SimpleDateFormat")
-    fun confirmRequestSuccessForProduct(saleman_Id: String, routeIdV2:Int): String {
+    fun confirmRequestSuccessForProduct(saleman_Id: String, routeIdV2: Int): String {
         val confirmRequestSuccess = ConfirmRequestSuccess()
         confirmRequestSuccess.siteActivationKey = Constant.SITE_ACTIVATION_KEY
         confirmRequestSuccess.tabletActivationKey = Constant.TABLET_ACTIVATION_KEY
@@ -874,7 +874,13 @@ object Utils {
 //    }
 
 
-    fun askConfirmationDialog(title: String, message: String, type: String, activity: Activity,action:(String)->Unit) {
+    fun askConfirmationDialog(
+        title: String,
+        message: String,
+        type: String,
+        activity: Activity,
+        action: (String) -> Unit
+    ) {
         val alertDialog = AlertDialog.Builder(activity)
             .setTitle(title)
             .setMessage(message)

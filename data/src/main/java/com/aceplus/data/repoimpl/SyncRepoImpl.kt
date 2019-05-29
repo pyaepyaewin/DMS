@@ -604,7 +604,7 @@ class SyncRepoImpl(
         generalDataList.map { data ->
             data.class_.map {
                 val classEntity = Class()
-                classEntity.id = it.id.toInt()
+                classEntity.id = it.id
                 classEntity.name = it.name
                 classEntity.class_id = it.classId
 
@@ -613,6 +613,7 @@ class SyncRepoImpl(
             data.district.map {
                 val districtEntity = District()
                 districtEntity.id = it.id.toInt()
+
                 districtEntity.name = it.name
 
                 districtEnitiyList.add(districtEntity)

@@ -10,6 +10,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 class SyncViewModel(private val syncRepo: SyncRepo, private val schedulerProvider: SchedulerProvider) :
     BaseViewModel() {
