@@ -9,7 +9,7 @@ import android.arch.persistence.room.Query
 
 
 @Dao
-interface PreOrderDao{
+interface PreOrderDao {
 
     @get:Query("select * from pre_order")
     val allDataLD: LiveData<List<PreOrder>>
@@ -17,10 +17,16 @@ interface PreOrderDao{
     @get:Query("select * from pre_order")
     val allData: List<PreOrder>
 
+    @get:Query("select * from pre_order WHERE delete_flag = 0")
+    val allActiveData: List<PreOrder>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(list: List<PreOrder>)
 
     @Query("Delete from pre_order")
     fun deleteAll()
+
+    @Query("update pre_order set delete_flag = 1 WHERE delete_flag = 0")
+    fun updateAllInactiveData()
 
 }

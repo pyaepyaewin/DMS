@@ -8,6 +8,7 @@ import android.widget.Toast
 import com.aceplus.dms.R
 import com.aceplus.dms.utils.Utils
 import com.aceplus.dms.viewmodel.SyncViewModel
+import com.aceplussolutions.rms.constants.AppUtils
 import com.aceplussolutions.rms.ui.activities.BaseActivity
 import kotlinx.android.synthetic.main.activity_sync.*
 import org.kodein.di.Kodein
@@ -39,6 +40,7 @@ class SyncActivity : BaseActivity(), KodeinAware {
                     "download" -> {
                     }
                     "upload" -> {
+                        AppUtils.backupDatabase(this)
                     }
                     "upload_sale_visit_record" -> {
                     }

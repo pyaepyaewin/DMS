@@ -17,6 +17,9 @@ interface IncentivePaidDao{
     @get:Query("select * from incentive_paid")
     val allData: List<IncentivePaid>
 
+    @get:Query("SELECT * FROM incentive_paid WHERE delete_flag = 0")
+    val allActiveData: List<IncentivePaid>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(list: List<IncentivePaid>)
 

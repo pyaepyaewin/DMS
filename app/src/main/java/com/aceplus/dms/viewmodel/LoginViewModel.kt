@@ -4,6 +4,7 @@ import android.arch.lifecycle.MutableLiveData
 import android.util.Log
 import android.widget.Toast
 import com.aceplus.data.utils.Constant
+import com.aceplus.dms.utils.ParamUtils
 import com.aceplus.dms.utils.Utils
 import com.aceplus.domain.model.forApi.login.DataForLogin
 import com.aceplus.domain.model.forApi.login.LoginResponse
@@ -28,7 +29,7 @@ class LoginViewModel(private var loginRepo: LoginRepo, private val schedulerProv
                 errorState.postValue(Pair("User ID or Password is incorrect!", 1))
             }
         } else {
-            val paramData = Utils.createLoginParamData(userId, Utils.encodePassword(password), 0, deviceId)
+            val paramData = ParamUtils.createLoginParamData(userId, Utils.encodePassword(password), 0, deviceId)
             launch {
                 loginRepo.loginUser(paramData)
                     .subscribeOn(schedulerProvider.io())

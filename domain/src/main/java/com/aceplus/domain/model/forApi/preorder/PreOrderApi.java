@@ -91,6 +91,21 @@ public class PreOrderApi {
     @Expose
     private String bankAccountNo;
 
+    @SerializedName("ProductDiscountPer")
+    @Expose
+    private String productDiscountPercent;
+
+    @SerializedName("ProductDiscountAmount")
+    @Expose
+    private String productDiscountAmount;
+
+    @SerializedName("DeliveryDiscountPer")
+    @Expose
+    private String deliveryDiscountPercent;
+
+    @SerializedName("DeliveryDiscountAmount")
+    @Expose
+    private String deliveryDiscountAmount;
     /**
      * pre order detail
      */
@@ -314,5 +329,37 @@ public class PreOrderApi {
 
     public void setBankAccountNo(String bankAccountNo) {
         this.bankAccountNo = bankAccountNo;
+    }
+
+    public String getProductDiscountPercent() {
+        return productDiscountPercent;
+    }
+
+    public void setProductDiscountPercent(String productDiscountPercent) {
+        this.productDiscountPercent = productDiscountPercent;
+    }
+
+    public String getProductDiscountAmount() {
+        return productDiscountAmount;
+    }
+
+    public void setProductDiscountAmount(String productDiscountAmount) {
+        this.productDiscountAmount = productDiscountAmount;
+    }
+
+    public String getDeliveryDiscountPercent() {
+        return deliveryDiscountPercent;
+    }
+
+    public void setDeliveryDiscountPercent(String deliveryDiscountPercent) {
+        this.deliveryDiscountPercent = deliveryDiscountPercent;
+    }
+
+    public String getDeliveryDiscountAmount() {
+        return deliveryDiscountAmount;
+    }
+
+    public void setDeliveryDiscountAmount(String deliveryDiscountAmount) {
+        this.deliveryDiscountAmount = deliveryDiscountAmount;
     }
 }

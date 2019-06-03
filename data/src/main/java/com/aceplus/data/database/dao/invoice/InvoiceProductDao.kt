@@ -9,7 +9,7 @@ import android.arch.persistence.room.Query
 
 
 @Dao
-interface InvoiceProductDao{
+interface InvoiceProductDao {
 
     @get:Query("select * from invoice_product")
     val allDataLD: LiveData<List<InvoiceProduct>>
@@ -22,5 +22,8 @@ interface InvoiceProductDao{
 
     @Query("Delete from invoice_product")
     fun deleteAll()
+
+    @Query("select * from invoice_product WHERE invoice_product_id = :invoice_id")
+    fun allDataById(invoice_id: String): List<InvoiceProduct>
 
 }

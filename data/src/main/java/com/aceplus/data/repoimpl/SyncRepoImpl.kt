@@ -44,43 +44,61 @@ import com.aceplus.domain.entity.volumediscount.VolumeDiscountFilterItem
 import com.aceplus.domain.entity.volumediscount.VolumeDiscountItem
 import com.aceplus.domain.model.forApi.DataForDiscountCategoryQuantity
 import com.aceplus.domain.model.forApi.DiscountCategoryQuantityResponse
+import com.aceplus.domain.model.forApi.ERouteReport
+import com.aceplus.domain.model.forApi.cashreceive.CashReceiveApi
+import com.aceplus.domain.model.forApi.cashreceive.CashReceiveItemApi
 import com.aceplus.domain.model.forApi.classdiscount.ClassDiscountDataForShow
 import com.aceplus.domain.model.forApi.classdiscount.ClassDiscountForShowResponse
 import com.aceplus.domain.model.forApi.classdiscount.ClassDiscountPriceForApi
 import com.aceplus.domain.model.forApi.classdiscount.ClassDiscountResponse
 import com.aceplus.domain.model.forApi.company.CompanyInformationResponse
 import com.aceplus.domain.model.forApi.company.CompanyInfromationData
+import com.aceplus.domain.model.forApi.competitor.CompetitorRequestData
+import com.aceplus.domain.model.forApi.competitor.CompetitorSizeinstoreshareData
+import com.aceplus.domain.model.forApi.competitor.Competitor_Activity
 import com.aceplus.domain.model.forApi.credit.CreditResponse
 import com.aceplus.domain.model.forApi.credit.DataForCredit
-import com.aceplus.domain.model.forApi.customer.CustomerForApi
-import com.aceplus.domain.model.forApi.customer.CustomerResponse
-import com.aceplus.domain.model.forApi.customer.CustomerVisitRequestData
-import com.aceplus.domain.model.forApi.customer.CustomerVisitResponse
+import com.aceplus.domain.model.forApi.customer.*
 import com.aceplus.domain.model.forApi.delivery.DataForDelivery
+import com.aceplus.domain.model.forApi.delivery.DeliveryApi
+import com.aceplus.domain.model.forApi.delivery.DeliveryItemApi
 import com.aceplus.domain.model.forApi.delivery.DeliveryResponse
+import com.aceplus.domain.model.forApi.deviceissue.DeviceIssueItem
+import com.aceplus.domain.model.forApi.deviceissue.DeviceIssueItem_Request
+import com.aceplus.domain.model.forApi.displayassessment.DisplayAssessment
 import com.aceplus.domain.model.forApi.incentive.DataForIncentive
+import com.aceplus.domain.model.forApi.incentive.IncentivePaidUploadData
 import com.aceplus.domain.model.forApi.incentive.IncentiveResponse
+import com.aceplus.domain.model.forApi.incentive.IncentiveUploadData
+import com.aceplus.domain.model.forApi.invoice.InvoiceDetail
+import com.aceplus.domain.model.forApi.invoice.InvoicePresent
 import com.aceplus.domain.model.forApi.invoice.InvoiceResponse
 import com.aceplus.domain.model.forApi.other.GeneralData
 import com.aceplus.domain.model.forApi.other.GeneralResponse
+import com.aceplus.domain.model.forApi.posm.PosmByCustomerApi
 import com.aceplus.domain.model.forApi.posm.PosmShopTypeForApi
 import com.aceplus.domain.model.forApi.posm.PosmShopTypeResponse
-import com.aceplus.domain.model.forApi.preorder.DataForPreOrderHistory
-import com.aceplus.domain.model.forApi.preorder.PreOrderHistoryResponse
+import com.aceplus.domain.model.forApi.preorder.*
 import com.aceplus.domain.model.forApi.product.ProductForApi
 import com.aceplus.domain.model.forApi.product.ProductResponse
 import com.aceplus.domain.model.forApi.promotion.PromotionForApi
 import com.aceplus.domain.model.forApi.promotion.PromotionResponse
+import com.aceplus.domain.model.forApi.sale.SaleVisitRecord
 import com.aceplus.domain.model.forApi.sale.salehistory.DataForSaleHistory
 import com.aceplus.domain.model.forApi.sale.salehistory.SaleHistoryResponse
+import com.aceplus.domain.model.forApi.sale.salereturn.SaleReturnApi
+import com.aceplus.domain.model.forApi.sale.salereturn.SaleReturnItem
 import com.aceplus.domain.model.forApi.sale.saletarget.DataForSaleTarget
 import com.aceplus.domain.model.forApi.sale.saletarget.SaleTargetResponse
+import com.aceplus.domain.model.forApi.sizeinstore.SizeInStoreShare
+import com.aceplus.domain.model.forApi.tsale.TSaleFeedback
+import com.aceplus.domain.model.forApi.tsale.TSaleFeedbackData
 import com.aceplus.domain.model.forApi.volumediscount.DataForVolumeDiscount
 import com.aceplus.domain.model.forApi.volumediscount.VolumeDiscountResponse
 import com.aceplus.domain.repo.SyncRepo
 import com.aceplussolutions.rms.constants.AppUtils
 import io.reactivex.Observable
-import retrofit2.Call
+import java.util.ArrayList
 
 class SyncRepoImpl(
     private val downloadApiService: DownloadApiService,
@@ -93,6 +111,14 @@ class SyncRepoImpl(
         AppUtils.saveStringToShp(Constant.START_TIME, time, shf)
     }
 
+    override fun getLocationCode(): Int {
+        val locationDataList = db.locationDao().allData
+        if (locationDataList.isNotEmpty()) {
+            return locationDataList.first().location_id.toInt()
+        }
+        return 0
+    }
+
     override fun getSaleManData(): SaleMan {
         val saleMan = SaleMan()
         saleMan.id = AppUtils.getStringFromShp(Constant.SALEMAN_ID, shf).toString()
@@ -101,7 +127,7 @@ class SyncRepoImpl(
         return saleMan
     }
 
-    override fun getRouteScheduleID(): Int {
+    override fun getRouteScheduleIDV2(): Int {
         val saleManId = AppUtils.getStringFromShp(Constant.SALEMAN_ID, shf)
         val routeSchedule = db.routeScheduleV2Dao().dataBySaleManId(saleManId!!)
         val routeScheduleItems = db.routeScheduleItemV2Dao().allDataByRouteScheduleId(routeSchedule.id.toString())
@@ -113,6 +139,525 @@ class SyncRepoImpl(
 
     override fun getCustomerIdList(): List<Int> {
         return db.customerDao().allID
+    }
+
+    override fun getCustomerList(): List<CustomerForApi> {
+        return db.customerDao().customerList
+    }
+
+    override fun getExistingCustomerList(): List<ExistingCustomerForApi> {
+        return db.customerDao().existingCustomerList
+    }
+
+    override fun getInvoiceDataList(): List<com.aceplus.domain.model.forApi.invoice.Invoice> {
+        val mmCurrencyId = db.currencyDao().mmCurrencyId
+        val invoiceForApiList = mutableListOf<com.aceplus.domain.model.forApi.invoice.Invoice>()
+        db.invoiceDao().activeData.map { it ->
+            val invoiceForApi = com.aceplus.domain.model.forApi.invoice.Invoice()
+            invoiceForApi.id = it.invoice_id
+            invoiceForApi.customerId = it.customer_id
+            invoiceForApi.date = it.sale_date
+            invoiceForApi.totalAmt = it.total_amount?.toDouble() ?: 0.0
+            invoiceForApi.totalQty = it.total_quantity.toInt()
+            invoiceForApi.totalDiscountAmt = it.total_discount_amount
+            invoiceForApi.totalPayAmt = it.pay_amount?.toDouble() ?: 0.0
+            invoiceForApi.totalRefundAmt = it.refund_amount?.toDouble() ?: 0.0
+            invoiceForApi.receiptPerson = it.receipt_person_name
+            invoiceForApi.salepersonId = it.sale_person_id?.toInt() ?: 0
+            invoiceForApi.locationCode = it.location_code?.toInt() ?: 0
+            invoiceForApi.deviceId = it.device_id
+            invoiceForApi.invoiceTime = it.invoice_time
+            invoiceForApi.currencyId = mmCurrencyId
+            invoiceForApi.invoiceStatus = it.invoice_status
+            invoiceForApi.discountPercent = it.total_discount_percent?.toDouble() ?: 0.0
+            invoiceForApi.rate = it.rate?.toDouble() ?: 0.0
+            invoiceForApi.taxAmount = it.tax_amount
+            invoiceForApi.dueDate = it.due_date
+            invoiceForApi.bankName = it.bank_name
+            invoiceForApi.bankAccountNo = it.bank_account_no
+
+            invoiceForApi.productDiscountPercent = "promotionDiscountPercent"//todo change table column
+            invoiceForApi.productDiscountAmount = "promotionDiscountAmount"//todo change table column
+            invoiceForApi.deliveryDiscountPercent = "deliveryDiscountPercent"//todo change table column
+            invoiceForApi.deliveryDiscountAmount = "deliveryDiscountAmount"//todo change table column
+
+            val invoiceDetailForApiList = ArrayList<InvoiceDetail>()
+            val invoiceDetailList = db.invoiceProductDao().allDataById(it.invoice_id)
+            invoiceDetailList.map {
+                val invoiceDetail = InvoiceDetail()
+                invoiceDetail.tsaleId = it.invoice_product_id
+                invoiceDetail.productId = it.product_id?.toInt() ?: 0
+                invoiceDetail.qty = it.sale_quantity?.toInt() ?: 0
+                invoiceDetail.discountAmt = it.discount_amount?.toDouble() ?: 0.0
+                invoiceDetail.amt = it.total_amount
+                invoiceDetail.discountPercent = it.discount_percent
+                invoiceDetail.s_price = it.s_price
+                invoiceDetail.p_price = it.p_price
+                invoiceDetail.promotionPrice = it.promotion_price
+                invoiceDetail.promotion_plan_id = it.promotion_plan_id
+                invoiceDetail.exclude = it.exclude?.toInt() ?: 0
+                invoiceDetail.itemDiscountAmount = it.item_discount_amount
+                invoiceDetail.itemDiscountPercent = it.item_discount_percent
+
+                invoiceDetailForApiList.add(invoiceDetail)
+            }
+
+            invoiceForApi.invoiceDetail = invoiceDetailForApiList
+
+            invoiceForApiList.add(invoiceForApi)
+        }
+        return invoiceForApiList
+    }
+
+    override fun getInvoicePresentList(): List<InvoicePresent> {
+        val invoicePresentForApiList = mutableListOf<InvoicePresent>()
+        db.invoicePresentDao().allData.map {
+            val invoicePresent = InvoicePresent()
+            invoicePresent.tsaleId = it.tsale_id.toString()
+            invoicePresent.stockId = it.stock_id
+            invoicePresent.quantity = it.quantity.toInt()
+            invoicePresent.pcAddress = it.pc_address
+            invoicePresent.locationId = it.location_id.toString()
+            invoicePresent.price = it.price
+            invoicePresent.currencyId = it.currency_id
+            invoicePresent.rate = it.rate?.toDouble() ?: 0.0
+            invoicePresent.p_price = it.p_price
+            invoicePresentForApiList.add(invoicePresent)
+        }
+        return invoicePresentForApiList
+    }
+
+    override fun getPreOrderDataList(): List<PreOrderApi> {
+        val preOrderApiList = mutableListOf<PreOrderApi>()
+        val preOrderList = db.preOrderDao().allActiveData
+        preOrderList.map { it ->
+            val preOrderApi = PreOrderApi()
+            preOrderApi.id = it.invoice_id
+            preOrderApi.customerId = it.customer_id?.toInt() ?: 0
+            preOrderApi.saleManId = it.sale_man_id
+            preOrderApi.deviceId = it.dev_id
+            preOrderApi.saleOrderDate = it.pre_order_date
+            preOrderApi.expectedDeliveredDate = it.expected_delivery_date
+            preOrderApi.advancedPaymentAmt = it.advance_payment_amount?.toDouble() ?: 0.0
+            preOrderApi.netAmt = it.net_amount?.toDouble() ?: 0.0
+            preOrderApi.locationId = it.location_id?.toInt() ?: 0
+            preOrderApi.discount = it.discount?.toDouble() ?: 0.0
+            preOrderApi.discountPer = it.discount_percent?.toDouble() ?: 0.0
+            preOrderApi.taxAmount = it.tax_amount?.toDouble() ?: 0.0
+            preOrderApi.remark = it.remark
+            preOrderApi.bankName = it.bank_name
+            preOrderApi.bankAccountNo = it.bank_account_no
+            preOrderApi.productDiscountPercent = "preOrder.getProductDiscountPercent()"//todo change table
+            preOrderApi.productDiscountAmount = "preOrder.getProductDiscountAmount()"//todo change table
+            preOrderApi.deliveryDiscountPercent = "preOrder.getDeliveryDiscountPercent()"//todo change table
+            preOrderApi.deliveryDiscountAmount = "preOrder.getDeliveryDiscountAmount()"//todo change table
+
+            val preOrderProductList = db.preOrderProductDao().allDataById(it.invoice_id)
+
+            val preOrderDetailApiList = ArrayList<PreOrderDetailApi>()
+            preOrderProductList.map {
+                val preOrderDetailApi = PreOrderDetailApi()
+                preOrderDetailApi.saleOrderId = it.sale_order_id
+                preOrderDetailApi.productId = it.product_id?.toInt() ?: 0
+                preOrderDetailApi.qty = it.order_quantity?.toDouble() ?: 0.0
+                preOrderDetailApi.promotionPrice = it.promotion_price?.toDouble() ?: 0.0
+                preOrderDetailApi.volumeDiscount = it.volume_discount?.toDouble() ?: 0.0
+                preOrderDetailApi.volumeDiscountPer = it.volume_discount_percent?.toDouble() ?: 0.0
+                preOrderDetailApi.exclude = it.exclude?.toInt() ?: 0
+                preOrderDetailApi.s_Price = it.price?.toDouble() ?: 0.0
+                preOrderDetailApi.promotionPlanId = it.promotion_plan_id?.toInt() ?: 0
+                preOrderDetailApiList.add(preOrderDetailApi)
+            }
+
+            preOrderApi.preOrderDetailList = preOrderDetailApiList
+
+            preOrderApiList.add(preOrderApi)
+        }
+
+        return preOrderApiList
+    }
+
+    override fun getPreOrderPresentDataList(): List<PreOrderPresentApi> {
+        val preOrderPresentApiList = mutableListOf<PreOrderPresentApi>()
+        val preOrderPresentList = db.preOrderPresentDao().allActiveData
+        preOrderPresentList.map {
+            val preOrderPresentApi = PreOrderPresentApi()
+            preOrderPresentApi.saleOrderId = it.pre_order_id.toString()
+            preOrderPresentApi.productId = it.stock_id
+            preOrderPresentApi.quantity = it.quantity.toInt()
+//            preOrderPresentApi.setStatus(cursorPreOrderPresent.getString(cursorPreOrderPresent.getColumnIndex("status")));
+            preOrderPresentApi.status = "Y"
+            preOrderPresentApiList.add(preOrderPresentApi)
+        }
+        return preOrderPresentApiList
+    }
+
+    override fun getSaleReturnDataList(): List<SaleReturnApi> {
+        val mmCurrencyId = db.currencyDao().mmCurrencyId
+        val saleReturnList = db.saleReturnDao().allActiveData
+        val saleReturnApiList = ArrayList<SaleReturnApi>()
+        saleReturnList.map { it ->
+            val saleReturnApi = SaleReturnApi()
+            saleReturnApi.invoiceNo = it.sale_return_id.toString()
+            saleReturnApi.customerId = it.customer_id
+            saleReturnApi.invoiceDate = it.return_date
+            saleReturnApi.locationId = it.location_id
+            saleReturnApi.pcAddress = it.pc_address
+            saleReturnApi.amount = it.amount
+            saleReturnApi.payAmount = it.pay_amount
+            saleReturnApi.disAmount = it.discount
+            saleReturnApi.taxAmount = it.tax
+            saleReturnApi.taxPercent = it.tax_percent
+            saleReturnApi.currencyId = mmCurrencyId
+            saleReturnApi.rate = 1.0
+            saleReturnApi.invoiceStatus = it.invoice_status
+            saleReturnApi.saleManId = it.sale_man_id
+            saleReturnApi.saleId = it.sale_id.toString()
+
+            val saleReturnDetailList = db.saleReturnDetailDao().allActiveDataById(it.sale_return_id)
+
+            val saleReturnDetailApiList = ArrayList<SaleReturnItem>()
+            saleReturnDetailList.map {
+                val saleReturnItem = SaleReturnItem()
+                saleReturnItem.invoiceNo = it.sale_return_id.toString()
+                saleReturnItem.stockId = it.product_id.toString()
+                saleReturnItem.price = it.price
+                saleReturnItem.quantity = it.quantity.toInt()
+                saleReturnDetailApiList.add(saleReturnItem)
+            }
+
+            saleReturnApi.saleReturnItemList = saleReturnDetailApiList
+            saleReturnApiList.add(saleReturnApi)
+        }
+        return saleReturnApiList
+    }
+
+    override fun getPosmByCustomerDataList(): List<PosmByCustomerApi> {
+        val posmByCustomerApiList = mutableListOf<PosmByCustomerApi>()
+        val posmByCustomerList = db.posmByCustomerDao().allActiveData
+        posmByCustomerList.map {
+            val posmByCustomerApi = PosmByCustomerApi()
+            posmByCustomerApi.invoiceNo = it.invoice_no
+            posmByCustomerApi.invoiceDate = it.invoice_date
+            posmByCustomerApi.customerId = it.customer_id
+            posmByCustomerApi.stockId = it.stock_id
+            posmByCustomerApi.shopTypeId = it.shop_type_id
+            posmByCustomerApi.saleManId = it.sale_man_id.toString()
+            posmByCustomerApi.quantity = it.quantity.toInt()
+            posmByCustomerApi.price = it.price
+            posmByCustomerApiList.add(posmByCustomerApi)
+        }
+        return posmByCustomerApiList
+    }
+
+    override fun getDeliveryDataList(): List<DeliveryApi> {
+        val locationCode = this.getLocationCode()
+        val salemanId = AppUtils.getStringFromShp(Constant.SALEMAN_ID, shf).toString()
+
+        val deliveryApiList = ArrayList<DeliveryApi>()
+        val deliveryDataList = db.deliveryUploadDao().allData
+        deliveryDataList.map { it ->
+            val deliveryApi = DeliveryApi()
+            deliveryApi.invoiceNo = it.invoice_no.toString()
+            deliveryApi.invoiceDate = it.invoice_date
+            deliveryApi.saleId = it.sale_id.toString()
+            deliveryApi.remark = it.remark
+            deliveryApi.customerId = it.customer_id
+            deliveryApi.locationId = locationCode
+            deliveryApi.saleManId = salemanId.toInt()
+            val deliveryItemDataList = db.deliveryItemUpload().allDataById(it.invoice_no)
+            val deliveryItemApiList = ArrayList<DeliveryItemApi>()
+            deliveryItemDataList.map {
+                val deliveryItemApi = DeliveryItemApi()
+                deliveryItemApi.deliveryId = it.delivery_id.toString()
+                deliveryItemApi.stockId = it.stock_id
+                deliveryItemApi.deliveryQty = it.quantity?.toInt() ?: 0
+                deliveryItemApi.foc = it.foc?.toShort() ?: 0
+                deliveryItemApiList.add(deliveryItemApi)
+            }
+            deliveryApi.deliveryItemApi = deliveryItemApiList
+            deliveryApiList.add(deliveryApi)
+        }
+        return deliveryApiList
+    }
+
+    override fun getCashReceiveDataList(): List<CashReceiveApi> {
+        val cashReceiveApiList = ArrayList<CashReceiveApi>()
+        val cashReceiveDataList = db.cashReceiveDao().allData
+        cashReceiveDataList.map {
+            val cashReceiveApi = CashReceiveApi()
+            cashReceiveApi.receiveNo = it.receive_no
+            cashReceiveApi.receiveDate = it.receive_date
+            cashReceiveApi.customerId = it.customer_id
+            cashReceiveApi.amount = it.amount
+            cashReceiveApi.currencyId = it.currency_id
+            cashReceiveApi.status = it.status
+            cashReceiveApi.locationId = it.location_id
+            cashReceiveApi.paymentType = it.payment_type
+            cashReceiveApi.cashReceiveType = it.cash_receive_type
+            cashReceiveApi.saleId = it.sale_id
+            cashReceiveApi.saleManId = it.sale_man_id
+
+            val cashReceiveItemApiList = ArrayList<CashReceiveItemApi>()
+            val cashReceiveItemDataList = db.cashReceiveItemDao().allDataById(it.receive_no)
+            cashReceiveItemDataList.map {
+                val cashReceiveItemApi = CashReceiveItemApi()
+                cashReceiveItemApi.receiveNo = it.receive_no
+                cashReceiveItemApi.saleId = it.sale_id?.toInt() ?: 0
+                cashReceiveItemApiList.add(cashReceiveItemApi)
+            }
+            cashReceiveApi.cashReceiveItem = cashReceiveItemApiList
+
+            cashReceiveApiList.add(cashReceiveApi)
+        }
+        return cashReceiveApiList
+    }
+
+    override fun getDisplayAssessmentDataList(): List<DisplayAssessment> {
+        val displayAssessmentList = ArrayList<DisplayAssessment>()
+
+        val displayAssessmentDataList = db.outletVisibilityDao().allActiveData
+        displayAssessmentDataList.map {
+            val displayAssessment = DisplayAssessment()
+            displayAssessment.invoiceNo = it.invoice_no
+            displayAssessment.invoiceDate = it.invoice_date
+            displayAssessment.customerId = it.customer_id
+            displayAssessment.saleManId = it.sale_man_id
+            displayAssessment.image = it.image
+            displayAssessment.imageNo = it.image_no
+            displayAssessment.imageName = it.image_name
+            displayAssessment.dateAndTime = it.date_and_time
+            displayAssessment.remark = it.remark
+
+            displayAssessmentList.add(displayAssessment)
+        }
+        return displayAssessmentList
+    }
+
+    override fun getCompetitorSizeInStoreShareDataList(): List<CompetitorSizeinstoreshareData> {
+        val competitorSizeInStoreShareDataList = ArrayList<CompetitorSizeinstoreshareData>()
+        val competitorSizeInStoreShareData = CompetitorSizeinstoreshareData()
+
+        val sizeInStoreShareList = ArrayList<SizeInStoreShare>()
+
+        val sizeInStoreShareEntitiyDataList = db.sizeInStoreShareDao().allActiveData
+        sizeInStoreShareEntitiyDataList.map {
+
+            val sizeInStoreShare = SizeInStoreShare()
+            sizeInStoreShare.sizeInStoreShareNo = it.size_in_store_share_id.toString()
+            sizeInStoreShare.customerId = it.customer_id
+            sizeInStoreShare.date = it.invoice_date
+            sizeInStoreShare.stockId = it.stock_id
+            sizeInStoreShare.quantity = it.quantity
+            sizeInStoreShare.status = it.status
+            sizeInStoreShare.remark = it.remark
+            sizeInStoreShare.salemanId = it.sale_man_id
+
+            sizeInStoreShareList.add(sizeInStoreShare)
+        }
+
+        competitorSizeInStoreShareData.sizeInStoreShare = sizeInStoreShareList
+        competitorSizeInStoreShareDataList.add(competitorSizeInStoreShareData)
+
+        return competitorSizeInStoreShareDataList
+    }
+
+    override fun getCustomerVisitDataList(): List<CustomerVisitRequestData> {
+        val customerVisitRequestDataList = ArrayList<CustomerVisitRequestData>()
+        val customerVisitRequestData = CustomerVisitRequestData()
+
+        val saleVisitRecordList = ArrayList<SaleVisitRecord>()
+
+        val saleVisitRecordUploadDataList = db.saleVisitRecordUploadDao().allData
+        saleVisitRecordUploadDataList.map {
+            val saleVisitRecord = SaleVisitRecord()
+
+            saleVisitRecord.id = it.id
+            saleVisitRecord.customerId = it.customer_id
+            saleVisitRecord.latitude = it.latitude
+            saleVisitRecord.longitude = it.longitude
+            saleVisitRecord.salemanId = it.sale_man_id
+            saleVisitRecord.saleFlg = it.sale_flag?.toShort() ?: 0
+            saleVisitRecord.visitFlg = it.visit_flag?.toShort() ?: 0
+            saleVisitRecord.recordDate = it.record_date
+            saleVisitRecordList.add(saleVisitRecord)
+        }
+        customerVisitRequestData.saleVisitRecordList = saleVisitRecordList
+
+        customerVisitRequestDataList.add(customerVisitRequestData)
+        return customerVisitRequestDataList
+    }
+
+    override fun getTSaleFeedbackDataList(): List<TSaleFeedbackData> {
+        val feedbackList = ArrayList<TSaleFeedback>()
+
+        val tSaleFeedbackDataList = db.didCustomerFeedbackDao().allData
+        tSaleFeedbackDataList.map {
+            val customerFeedback = TSaleFeedback()
+            customerFeedback.id = it.invoice_no.toString()
+            customerFeedback.invoiceDate = it.invoice_date
+            customerFeedback.customerId = it.customer_no.toString()
+            customerFeedback.saleManId = it.sale_man_id
+            customerFeedback.customerFeedbackId = it.feedback_no
+            customerFeedback.description = it.description
+            customerFeedback.remark = it.remark
+            customerFeedback.route_id = it.route_id
+            feedbackList.add(customerFeedback)
+        }
+
+        val feedbackDataList = ArrayList<TSaleFeedbackData>()
+        val tSaleFeedbackData = TSaleFeedbackData()
+        tSaleFeedbackData.feedBackList = feedbackList
+        feedbackDataList.add(tSaleFeedbackData)
+        return feedbackDataList
+    }
+
+    override fun getIncentiveUploadDataList(): List<IncentiveUploadData> {
+        val incentiveUploadDataList = ArrayList<IncentiveUploadData>()
+        val incentivePaidUploadDataList = ArrayList<IncentivePaidUploadData>()
+
+        val incentivePaidDataList = db.incentivePaidDao().allActiveData
+        incentivePaidDataList.map {
+            val incentivePaidUploadData = IncentivePaidUploadData()
+            incentivePaidUploadData.invoiceNo = it.invoice_no.toString()
+            incentivePaidUploadData.invoiceDate = it.invoice_date
+            incentivePaidUploadData.customerId = it.customer_id
+            incentivePaidUploadData.stockId = it.stock_id
+            incentivePaidUploadData.quantity = it.quantity
+            incentivePaidUploadData.paidQuantity = it.paid_quantity
+            incentivePaidUploadData.saleManId = it.sale_man_id
+            incentivePaidUploadDataList.add(incentivePaidUploadData)
+        }
+        val incentiveUploadData = IncentiveUploadData()
+        incentiveUploadData.incentivePaidUploadDataList = incentivePaidUploadDataList
+        incentiveUploadDataList.add(incentiveUploadData)
+        return incentiveUploadDataList
+    }
+
+    override fun getSaleCancelDataList(): List<com.aceplus.domain.model.forApi.invoice.Invoice> {
+        val mmCurrencyId = db.currencyDao().mmCurrencyId
+        val invoiceList = ArrayList<com.aceplus.domain.model.forApi.invoice.Invoice>()
+        val invoiceCancelList = db.invoiceCancelDao().allActiveData
+        invoiceCancelList.map { it ->
+            val invoice = com.aceplus.domain.model.forApi.invoice.Invoice()
+
+            invoice.id = it.invoice_id.toString()
+            invoice.customerId = it.customer_id.toString()
+            invoice.date = it.sale_date
+            invoice.totalAmt = it.total_amount
+            invoice.totalQty = it.total_quantity
+            invoice.totalDiscountAmt = it.total_discount_amount
+            invoice.totalPayAmt = it.pay_amount
+            invoice.totalRefundAmt = it.refund_amount
+            invoice.receiptPerson = it.receipt_person_name
+            invoice.salepersonId = it.sale_person_id
+            invoice.locationCode = it.location_code?.toInt() ?: 0
+            invoice.deviceId = it.device_id
+            invoice.invoiceTime = it.invoice_time
+            invoice.currencyId = mmCurrencyId
+            invoice.invoiceStatus = it.invoice_status
+            invoice.discountPercent = it.total_discount_percent?.toDouble() ?: 0.0
+            invoice.rate = it.rate?.toDouble() ?: 0.0
+            invoice.taxAmount = it.tax_amount
+            invoice.dueDate = it.due_date
+            invoice.bankName = it.bank_name
+            invoice.bankAccountNo = it.bank_account_no
+
+            val invoiceDetailList = ArrayList<InvoiceDetail>()
+            val invoiceCancelProductList = db.invoiceCancelProductDao().allDataById(invoice.id)
+            invoiceCancelProductList.map {
+                val invoiceDetail = InvoiceDetail()
+                invoiceDetail.tsaleId = it.invoice_product_id.toString()
+                invoiceDetail.productId = it.product_id
+                invoiceDetail.qty = it.sale_quantity.toInt()
+                invoiceDetail.discountAmt = it.discount_amount
+                invoiceDetail.amt = it.total_amount
+                invoiceDetail.discountPercent = it.discount_percent
+                invoiceDetail.s_price = it.s_price
+                invoiceDetail.p_price = it.p_price
+                invoiceDetail.promotionPrice = it.promotion_price
+                invoiceDetail.promotion_plan_id = it.promotion_plan_id
+                invoiceDetail.exclude = it.exclude?.toInt() ?: 0
+
+                invoiceDetailList.add(invoiceDetail)
+            }
+            invoice.invoiceDetail = invoiceDetailList
+            invoiceList.add(invoice)
+        }
+
+
+        return invoiceList
+    }
+
+    override fun getDeviceIssueDataList(routeScheduleID: Int): List<DeviceIssueItem_Request> {
+        val request = DeviceIssueItem_Request()
+        val requestList = ArrayList<DeviceIssueItem_Request>()
+
+        val deviceIssueRequestDataList = db.deviceIssueRequestDao().allData
+
+        deviceIssueRequestDataList.map { it ->
+            request.invoiceNo = it.invoice_no.toString()
+            request.date = it.date
+            request.remark = it.remark
+            if (it.route_id != 0)
+                request.routeId = it.route_id.toString()
+            else
+                request.routeId = routeScheduleID.toString()
+
+            val itemLists = ArrayList<DeviceIssueItem>()
+            val deviceIssueRequestItemDataList = db.deviceIssueRequestItemDao().allDataById(it.invoice_no)
+
+            deviceIssueRequestItemDataList.map {
+                val deviceIssueItem = DeviceIssueItem()
+                deviceIssueItem.stockId = it.stock_id.toString()
+                deviceIssueItem.quantity = it.quantity
+                deviceIssueItem.invoiceNo = it.invoice_no.toString()
+                itemLists.add(deviceIssueItem)
+            }
+            request.deviceIssueItemList = itemLists
+            requestList.add(request)
+        }
+
+        return requestList
+    }
+
+    override fun getCompetitorRequestDataList(): List<CompetitorRequestData> {
+        val competitorRequestDataList = ArrayList<CompetitorRequestData>()
+        val competitorActivities = ArrayList<Competitor_Activity>()
+
+        val competitorActivityDataList = db.competitorActivityDao().allData
+        competitorActivityDataList.map {
+            val competitorActivity = Competitor_Activity()
+            competitorActivity.competitorActivitiesNo = it.id.toString()
+            competitorActivity.customerId = it.customer_id
+            competitorActivity.competitorName = it.competitor_name
+            competitorActivity.activities = it.activity
+            competitorActivity.invoiceDate = it.invoice_date
+            competitorActivity.saleManId = it.sale_man_id?.toInt() ?: 0
+            competitorActivities.add(competitorActivity)
+        }
+        val competitorRequestData = CompetitorRequestData()
+        competitorRequestData.competitorActivityList = competitorActivities
+        competitorRequestDataList.add(competitorRequestData)
+        return competitorRequestDataList
+    }
+
+    override fun getSaleManRouteDataList(): List<ERouteReport> {
+        val eRouteReportArrayList = ArrayList<ERouteReport>()
+        val saleManRouteDataList = db.tempForSaleManRouteDao().allData
+        saleManRouteDataList.map {
+            val eRouteReport = ERouteReport()
+            eRouteReport.customerId = it.customer_id
+            eRouteReport.saleManId = it.sale_man_id
+            eRouteReport.routeId = it.route_id
+            eRouteReport.arrivalTime = it.arrival_time
+            eRouteReport.departureTime = it.departure_time
+            eRouteReport.latitude = it.latitude?.toDouble() ?: 0.0
+            eRouteReport.longitude = it.longitude?.toDouble() ?: 0.0
+
+            eRouteReportArrayList.add(eRouteReport)
+        }
+        return eRouteReportArrayList
     }
 
     override fun downloadCustomer(paramData: String): Observable<CustomerResponse> {
@@ -1145,5 +1690,100 @@ class SyncRepoImpl(
 
     override fun deleteProductData() {
         db.productDao().deleteAll()
+    }
+
+    override fun uploadCustomer(paramData: String): Observable<InvoiceResponse> {
+        return uploadApiService.uploadCustomer(paramData)
+    }
+
+    override fun uploadExistingCustomer(paramData: String): Observable<InvoiceResponse> {
+        return uploadApiService.uploadExistingCustomer(paramData)
+    }
+
+    override fun uploadSaleInvoice(paramData: String): Observable<InvoiceResponse> {
+        return uploadApiService.uploadSaleInvoice(paramData)
+    }
+
+    override fun uploadPreOrder(paramData: String): Observable<InvoiceResponse> {
+        return uploadApiService.uploadPreOrderData(paramData)
+    }
+
+    override fun uploadIndirectPreOrder(paramData: String): Observable<InvoiceResponse> {
+        return uploadApiService.uploadIndirectPreOrderData(paramData)
+    }
+
+    override fun uploadSaleReturn(paramData: String): Observable<InvoiceResponse> {
+        return uploadApiService.uploadSaleReturn(paramData)
+    }
+
+    override fun uploadPosmByCustomer(paramData: String): Observable<InvoiceResponse> {
+        return uploadApiService.uploadPosmByCustomer(paramData)
+    }
+
+    override fun uploadDelivery(paramData: String): Observable<InvoiceResponse> {
+        return uploadApiService.uploadDelivery(paramData)
+    }
+
+    override fun uploadCashReceive(paramData: String): Observable<InvoiceResponse> {
+        return uploadApiService.uploadCashReceive(paramData)
+    }
+
+    override fun uploadDisplayAssessment(paramData: String): Observable<InvoiceResponse> {
+        return uploadApiService.uploadDisplayAssessment(paramData)
+    }
+
+    override fun uploadCompetitorSizeInStoreShare(paramData: String): Observable<InvoiceResponse> {
+        return uploadApiService.uploadCompetitorSizeInStore(paramData)
+    }
+
+    override fun uploadCustomerVisit(paramData: String): Observable<InvoiceResponse> {
+        return uploadApiService.uploadCustomerVisit(paramData)
+    }
+
+    override fun uploadUnsellReason(paramData: String): Observable<InvoiceResponse> {
+        return uploadApiService.uploadUnsellReason(paramData)
+    }
+
+    override fun uploadIncentive(paramData: String): Observable<InvoiceResponse> {
+        return uploadApiService.uploadIncentive(paramData)
+    }
+
+    override fun uploadSaleCancel(paramData: String): Observable<InvoiceResponse> {
+        return uploadApiService.uploadSaleCancel(paramData)
+    }
+
+    override fun uploadVanIssue(paramData: String): Observable<InvoiceResponse> {
+        return uploadApiService.uploadVanIssue(paramData)
+    }
+
+    override fun uploadCompetitor(paramData: String): Observable<InvoiceResponse> {
+        return uploadApiService.uploadCompetitor(paramData)
+    }
+
+    override fun uploadSaleManRoute(paramData: String): Observable<InvoiceResponse> {
+        return uploadApiService.uploadSaleManRoute(paramData)
+    }
+
+    override fun updateAllInactiveDataPreOrder() {
+        db.preOrderDao().updateAllInactiveData()
+        db.preOrderProductDao().updateAllInactiveData()
+        db.preOrderPresentDao().updateAllInactiveData()
+    }
+
+    override fun updateAllInactiveDataSaleReturn() {
+        db.saleReturnDao().updateAllInactiveData()
+        db.saleReturnDetailDao().updateAllInactiveData()
+    }
+
+    override fun updateAllInactiveDataPosmByCustomer() {
+        db.posmByCustomerDao().updateAllInactiveData()
+    }
+
+    override fun updateAllInactiveDataDisplayAssessment() {
+        db.outletVisibilityDao().updateAllInactiveData()
+    }
+
+    override fun updateAllInactiveDataCompetitorSizeInStoreShare() {
+        db.sizeInStoreShareDao().updateAllInactiveData()
     }
 }

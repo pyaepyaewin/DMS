@@ -9,13 +9,16 @@ import android.arch.persistence.room.Query
 
 
 @Dao
-interface CurrencyDao{
+interface CurrencyDao {
 
     @get:Query("select * from currency")
     val allDataLD: LiveData<List<Currency>>
 
     @get:Query("select * from currency")
     val allData: List<Currency>
+
+    @get:Query("select id from currency where currency = 'MMK'")
+    val mmCurrencyId: Int
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(list: List<Currency>)

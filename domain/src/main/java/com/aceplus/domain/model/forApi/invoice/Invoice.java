@@ -79,6 +79,22 @@ public class Invoice implements Serializable{
 
     private String printmode;
 
+    @SerializedName("ProductDiscountPer")
+    @Expose
+    private String productDiscountPercent;
+
+    @SerializedName("ProductDiscountAmount")
+    @Expose
+    private String productDiscountAmount;
+
+    @SerializedName("DeliveryDiscountPer")
+    @Expose
+    private String deliveryDiscountPercent;
+
+    @SerializedName("DeliveryDiscountAmount")
+    @Expose
+    private String deliveryDiscountAmount;
+
     public String getId() {
         return id;
     }
@@ -262,4 +278,39 @@ public class Invoice implements Serializable{
         return printmode;
     }
 
+    public void setPrintmode(String printmode) {
+        this.printmode = printmode;
+    }
+
+    public String getProductDiscountPercent() {
+        return productDiscountPercent;
+    }
+
+    public void setProductDiscountPercent(String productDiscountPercent) {
+        this.productDiscountPercent = productDiscountPercent;
+    }
+
+    public String getProductDiscountAmount() {
+        return productDiscountAmount;
+    }
+
+    public void setProductDiscountAmount(String productDiscountAmount) {
+        this.productDiscountAmount = productDiscountAmount;
+    }
+
+    public String getDeliveryDiscountPercent() {
+        return deliveryDiscountPercent;
+    }
+
+    public void setDeliveryDiscountPercent(String deliveryDiscountPercent) {
+        this.deliveryDiscountPercent = deliveryDiscountPercent;
+    }
+
+    public String getDeliveryDiscountAmount() {
+        return deliveryDiscountAmount;
+    }
+
+    public void setDeliveryDiscountAmount(String deliveryDiscountAmount) {
+        this.deliveryDiscountAmount = deliveryDiscountAmount;
+    }
 }

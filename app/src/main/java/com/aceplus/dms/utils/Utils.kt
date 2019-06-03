@@ -22,8 +22,13 @@ import com.aceplus.dms.ui.activities.LoginActivity
 import com.aceplus.domain.model.INVOICECANCEL
 import com.aceplus.domain.model.forApi.ConfirmRequestSuccess
 import com.aceplus.domain.model.forApi.credit.CreditApi
+import com.aceplus.domain.model.forApi.customer.*
+import com.aceplus.domain.model.forApi.invoice.Invoice
+import com.aceplus.domain.model.forApi.invoice.InvoicePresent
 import com.aceplus.domain.model.forApi.login.LoginCreditRequest
 import com.aceplus.domain.model.forApi.login.LoginRequest
+import com.aceplus.domain.model.forApi.sale.DataforSaleUpload
+import com.aceplus.domain.model.forApi.tsale.TsaleRequest
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import org.json.JSONException
@@ -407,163 +412,6 @@ object Utils {
         return jsonString
     }
 
-    private fun getJsonFromObject(`object`: Any): String {
-        val gson = GsonBuilder().serializeNulls().create()
-        return gson.toJson(`object`)
-    }
-
-    fun createParamData(user_no: String, password: String, routeId: Int): String {
-        var paramData = ""
-        val loginRequest = LoginRequest()
-        loginRequest.siteActivationKey = Constant.SITE_ACTIVATION_KEY
-        loginRequest.tabletActivationKey = Constant.TABLET_ACTIVATION_KEY
-        loginRequest.userId = user_no
-        loginRequest.password = password
-        loginRequest.date = Utils.getCurrentDate(false)
-        loginRequest.route = routeId
-        val objectList = ArrayList<Any>()
-        loginRequest.data = objectList
-
-        val jsonObject = JSONObject()
-        try {
-            jsonObject.put("site_activation_key", Constant.SITE_ACTIVATION_KEY)
-            jsonObject.put("tablet_activation_key", Constant.TABLET_ACTIVATION_KEY)
-            jsonObject.put("user_id", loginRequest.userId)
-            jsonObject.put("password", loginRequest.password)
-            jsonObject.put("route", loginRequest.route)
-            jsonObject.put("date", loginRequest.date)
-            jsonObject.put("data", loginRequest.data)
-        } catch (e: JSONException) {
-            e.printStackTrace()
-        }
-
-        Log.i("param_data>>>", jsonObject.toString())
-
-        paramData = jsonObject.toString()
-        return paramData
-    }
-
-    fun createParamData(user_no: String, password: String, routeId: Int, saleman_id: String): String {
-        var paramData = ""
-        val loginRequest = LoginRequest()
-        loginRequest.siteActivationKey = Constant.SITE_ACTIVATION_KEY
-        loginRequest.tabletActivationKey = Constant.TABLET_ACTIVATION_KEY
-        loginRequest.userId = user_no
-        loginRequest.saleManId = saleman_id
-        loginRequest.password = password
-        loginRequest.date = Utils.getCurrentDate(false)
-        loginRequest.route = routeId
-        val objectList = ArrayList<Any>()
-        loginRequest.data = objectList
-
-        val jsonObject = JSONObject()
-        try {
-            jsonObject.put("site_activation_key", Constant.SITE_ACTIVATION_KEY)
-            jsonObject.put("tablet_activation_key", Constant.TABLET_ACTIVATION_KEY)
-            jsonObject.put("user_id", loginRequest.userId)
-            jsonObject.put("password", loginRequest.password)
-            jsonObject.put("route", loginRequest.route)
-            jsonObject.put("date", loginRequest.date)
-            jsonObject.put("data", loginRequest.data)
-            jsonObject.put("saleman_id", loginRequest.saleManId)
-        } catch (e: JSONException) {
-            e.printStackTrace()
-        }
-
-        Log.i("param_data>>>", jsonObject.toString())
-
-        paramData = jsonObject.toString()
-        return paramData
-    }
-
-    fun createLoginParamData(user_no: String, password: String, routeId: Int, tabletKey: String): String {
-        var paramData = ""
-        val loginRequest = LoginRequest()
-        loginRequest.siteActivationKey = Constant.SITE_ACTIVATION_KEY
-        loginRequest.tabletActivationKey = Constant.TABLET_ACTIVATION_KEY
-        loginRequest.userId = user_no
-        loginRequest.password = password
-        loginRequest.date = Utils.getCurrentDate(false)
-        loginRequest.route = routeId
-        loginRequest.tabletKey = tabletKey
-        val objectList = ArrayList<Any>()
-        loginRequest.data = objectList
-
-        val jsonObject = JSONObject()
-        try {
-            jsonObject.put("site_activation_key", Constant.SITE_ACTIVATION_KEY)
-            jsonObject.put("tablet_activation_key", Constant.TABLET_ACTIVATION_KEY)
-            jsonObject.put("user_id", loginRequest.getUserId())
-            jsonObject.put("password", loginRequest.getPassword())
-            jsonObject.put("route", loginRequest.getRoute())
-            jsonObject.put("tablet_key", loginRequest.getTabletKey())
-            jsonObject.put("date", loginRequest.getDate())
-            jsonObject.put("data", loginRequest.getData())
-        } catch (e: JSONException) {
-            e.printStackTrace()
-        }
-
-        Log.i("param_data>>>", jsonObject.toString())
-
-        paramData = jsonObject.toString()
-        return paramData
-    }
-
-    fun createDownloadProductParamData(user_no: String, password: String, routeId: Int, status: String): String {
-        var paramData = ""
-        val loginRequest = LoginRequest()
-        loginRequest.siteActivationKey = Constant.SITE_ACTIVATION_KEY
-        loginRequest.tabletActivationKey = Constant.TABLET_ACTIVATION_KEY
-        loginRequest.userId = user_no
-        loginRequest.password = password
-        loginRequest.date = Utils.getCurrentDate(false)
-        loginRequest.route = routeId
-        val objectList = ArrayList<Any>()
-        loginRequest.data = objectList
-
-        val jsonObject = JSONObject()
-        try {
-            jsonObject.put("site_activation_key", Constant.SITE_ACTIVATION_KEY)
-            jsonObject.put("tablet_activation_key", Constant.TABLET_ACTIVATION_KEY)
-            jsonObject.put("user_id", loginRequest.userId)
-            jsonObject.put("password", loginRequest.password)
-            jsonObject.put("route", loginRequest.route)
-            jsonObject.put("date", loginRequest.date)
-            jsonObject.put("data", loginRequest.data)
-            jsonObject.put("status", status)
-        } catch (e: JSONException) {
-            e.printStackTrace()
-        }
-
-        Log.i("param_data>>>", jsonObject.toString())
-
-        paramData = jsonObject.toString()
-        return paramData
-    }
-
-    fun createParamDataWithCustomerIDList(
-        saleManNo: String,
-        password: String,
-        routeId: Int,
-        customerIdList: List<Int>
-    ): String {
-        val loginRequest = LoginCreditRequest()
-        loginRequest.siteActivationKey = Constant.SITE_ACTIVATION_KEY
-        loginRequest.tabletActivationKey = Constant.TABLET_ACTIVATION_KEY
-        loginRequest.userId = saleManNo
-        loginRequest.password = password
-        loginRequest.date = Utils.getCurrentDate(false)
-        loginRequest.route = routeId
-
-        val creditApiList = ArrayList<CreditApi>()
-        val creditApi = CreditApi()
-        creditApi.idList = customerIdList
-        creditApiList.add(creditApi)
-        loginRequest.data = creditApiList
-        return getJsonFromObject(loginRequest)
-    }
-
-
     @SuppressLint("SimpleDateFormat")
     fun confirmRequestSuccessForProduct(saleman_Id: String, routeIdV2: Int): String {
         val confirmRequestSuccess = ConfirmRequestSuccess()
@@ -573,7 +421,7 @@ object Utils {
         confirmRequestSuccess.route = routeIdV2.toString()
         confirmRequestSuccess.date = SimpleDateFormat("yyyy-MM-dd").format(Date())
         confirmRequestSuccess.successCode = 200
-        return getJsonFromObject(confirmRequestSuccess)
+        return ParamUtils.getJsonFromObject(confirmRequestSuccess)
     }
 
     fun getDeviceId(activity: Activity): String {

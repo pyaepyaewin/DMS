@@ -9,7 +9,7 @@ import android.arch.persistence.room.Query
 
 
 @Dao
-interface DeviceIssueRequestItemDao{
+interface DeviceIssueRequestItemDao {
 
     @get:Query("select * from device_issue_request_item")
     val allDataLD: LiveData<List<DeviceIssueRequestItem>>
@@ -17,10 +17,14 @@ interface DeviceIssueRequestItemDao{
     @get:Query("select * from device_issue_request_item")
     val allData: List<DeviceIssueRequestItem>
 
+    @Query("select * from device_issue_request_item where invoice_no =:invoice_no")
+    fun allDataById(invoice_no: Int): List<DeviceIssueRequestItem>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(list: List<DeviceIssueRequestItem>)
 
     @Query("Delete from device_issue_request_item")
     fun deleteAll()
+
 
 }

@@ -18,7 +18,7 @@ class IncentivePaid {
     @ColumnInfo(name = "invoice_no")
     @SerializedName("invoice_no")
     @Expose
-    var class_discount_id: Int = 0
+    var invoice_no: Int = 0
 
     @ColumnInfo(name = "invoice_date")
     @SerializedName("invoice_date")

@@ -8,7 +8,7 @@ import android.arch.persistence.room.OnConflictStrategy
 import android.arch.persistence.room.Query
 
 @Dao
-interface InvoiceCancelProductDao{
+interface InvoiceCancelProductDao {
 
     @get:Query("select * from invoice_cancel_product")
     val allDataLD: LiveData<List<InvoiceCancelProduct>>
@@ -21,5 +21,8 @@ interface InvoiceCancelProductDao{
 
     @Query("Delete from invoice_cancel_product")
     fun deleteAll()
+
+
+    fun allDataById(id: String?): List<InvoiceCancelProduct>
 
 }

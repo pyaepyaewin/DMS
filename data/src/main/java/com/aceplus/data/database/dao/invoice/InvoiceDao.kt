@@ -17,6 +17,9 @@ interface InvoiceDao{
     @get:Query("select * from invoice")
     val allData: List<Invoice>
 
+    @get:Query("select * from invoice where sale_flag = 1")
+    val activeData:List<Invoice>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(list: List<Invoice>)
 

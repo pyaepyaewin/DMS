@@ -9,13 +9,16 @@ import android.arch.persistence.room.Query
 
 
 @Dao
-interface InvoiceCancelDao{
+interface InvoiceCancelDao {
 
     @get:Query("select * from invoice_cancel")
     val allDataLD: LiveData<List<InvoiceCancel>>
 
     @get:Query("select * from invoice_cancel")
     val allData: List<InvoiceCancel>
+
+    @get:Query("select * from invoice_cancel WHERE sale_date >= DATE('now')")
+    val allActiveData: List<InvoiceCancel>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(list: List<InvoiceCancel>)

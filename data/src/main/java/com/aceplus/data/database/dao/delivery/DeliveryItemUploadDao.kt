@@ -17,10 +17,14 @@ interface DeliveryItemUploadDao {
     @get:Query("select * from delivery_item_upload")
     val allData: List<DeliveryItemUpload>
 
+    @Query("select * from delivery_item_upload where delivery_id = :invoice_no")
+    fun allDataById(invoice_no: Int): List<DeliveryItemUpload>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(list: List<DeliveryItemUpload>)
 
     @Query("Delete from delivery_item_upload")
     fun deleteAll()
+
 
 }
