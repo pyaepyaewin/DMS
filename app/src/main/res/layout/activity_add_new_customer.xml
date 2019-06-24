@@ -83,7 +83,7 @@
                     android:text="Customer Name:" />
 
                 <EditText
-                    android:id="@+id/customerName"
+                    android:id="@+id/tvCustomerName"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="3"
@@ -146,7 +146,7 @@
                     android:text="Address:" />
 
                 <EditText
-                    android:id="@+id/address"
+                    android:id="@+id/tvAddress"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="3"
@@ -184,7 +184,7 @@
                     android:text="Township:" />
 
                 <Spinner
-                    android:id="@+id/township"
+                    android:id="@+id/tvTownship"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="3" />

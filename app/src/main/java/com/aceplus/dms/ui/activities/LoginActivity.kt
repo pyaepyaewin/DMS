@@ -9,14 +9,11 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import android.widget.Toast
 import com.aceplus.data.database.MyDatabase
-import com.aceplus.data.remote.DownloadApiService
 import com.aceplus.data.repoimpl.LoginRepoImpl
 import com.aceplus.dms.R
 import com.aceplus.data.utils.Constant
 import com.aceplus.dms.R.layout.activity_login
-import com.aceplus.dms.di.provideDB
 import com.aceplus.dms.di.provideDownloadApi
-import com.aceplus.dms.di.provideSharedPreferences
 import com.aceplus.dms.utils.Utils
 import com.aceplus.dms.viewmodel.LoginViewModel
 import com.aceplussolutions.rms.constants.AppUtils
@@ -44,7 +41,7 @@ class LoginActivity : BaseActivity(), KodeinAware {
     }
 
     private var permissionRequest: PermissionHelper.PermissionBuilder? = null
-    private val REQUEST_STORAGE = 41
+    private val requestStorage = 41
 
     private val loginViewModel: LoginViewModel by viewModel()
 
@@ -117,7 +114,7 @@ class LoginActivity : BaseActivity(), KodeinAware {
             .build(*permissionArr)
             .onPermissionsGranted(onGrantAction)
             .onPermissionsDenied(onDenyAction)
-            .request(REQUEST_STORAGE)
+            .request(requestStorage)
     }
 
     private fun showDialogToChangeIP() {

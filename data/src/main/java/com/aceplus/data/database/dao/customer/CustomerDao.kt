@@ -9,6 +9,7 @@ import android.arch.persistence.room.OnConflictStrategy
 import android.arch.persistence.room.Query
 import com.aceplus.domain.model.forApi.customer.CustomerForApi
 import com.aceplus.domain.model.forApi.customer.ExistingCustomerForApi
+import io.reactivex.Observable
 
 @Dao
 interface CustomerDao {
@@ -19,6 +20,13 @@ interface CustomerDao {
     @get:Query("select * from customer")
     val allData: List<Customer>
 
+    //todo check
+    @get:Query("select c.id,c.customer_id,c.customer_name,c.customer_type_id,c.customer_type_name,c.address,c.phone,c.township,c.credit_term,c.credit_limit,c.credit_amount,c.due_amount,c.prepaid_amount,c.payment_type,c.is_in_route,c.latitude,c.longitude,c.visit_record,c.district_id,c.state_division_id,c.shop_type_id,c.street_id,c.fax,t.township_name as township_number,c.customer_category_no,c.contact_person,c.route_schedule_status,c.created_user_id,c.created_date,c.flag  from customer as c,township as t where c.township_number == t.township_id")
+    val allCustomerData: Observable<List<Customer>>
+
+    @Query("select * from customer where id=:customerId")
+    fun dataById(customerId: Int): Customer
+
     @get:Query("select id from customer")
     val allID: List<Int>
 
@@ -27,6 +35,7 @@ interface CustomerDao {
 
     @get:Query("select * from customer where flag =2")
     val existingCustomerList: List<ExistingCustomerForApi>
+
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(list: List<Customer>)

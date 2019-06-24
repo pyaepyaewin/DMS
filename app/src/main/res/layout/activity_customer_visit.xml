@@ -90,7 +90,7 @@
                 android:background="@drawable/delivery" />
 
             <Button
-                android:id="@+id/buttonInvoiceCanel"
+                android:id="@+id/buttonInvoiceCancel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="20dp"

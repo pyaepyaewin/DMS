@@ -16,6 +16,9 @@ interface DeviceIssueRequestDao {
     @get:Query("select * from device_issue_request")
     val allData: List<DeviceIssueRequest>
 
+    @get:Query("select count(*) from device_issue_request")
+    val dataCount: Int
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(list: List<DeviceIssueRequest>)
 

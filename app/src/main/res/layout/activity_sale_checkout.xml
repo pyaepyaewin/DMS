@@ -782,7 +782,7 @@
                                 android:text="Prepaid Amt: " />
 
                             <EditText
-                                android:id="@+id/prepaidAmount"
+                                android:id="@+id/tvPrepaidAmount"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="3"

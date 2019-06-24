@@ -17,6 +17,9 @@ interface DeliveryUploadDao {
     @get:Query("select * from delivery_upload")
     val allData: List<DeliveryUpload>
 
+    @get:Query("select count(*) from delivery_upload")
+    val dataCount: Int
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(list: List<DeliveryUpload>)
 

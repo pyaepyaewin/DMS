@@ -1,14 +1,17 @@
 package com.aceplus.domain.entity.customer
 
+import android.annotation.SuppressLint
 import android.arch.persistence.room.ColumnInfo
 import android.arch.persistence.room.Entity
 import android.arch.persistence.room.PrimaryKey
+import android.os.Parcel
+import android.os.Parcelable
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 
 
 @Entity(tableName = "customer")
-class Customer {
+class Customer() : Parcelable {
 
     @PrimaryKey
     @ColumnInfo(name = "id")
@@ -160,4 +163,84 @@ class Customer {
     @SerializedName("flag")
     @Expose
     var flag: String? = null
+
+    constructor(parcel: Parcel) : this() {
+        id = parcel.readInt()
+        customer_id = parcel.readString()
+        customer_name = parcel.readString()
+        customer_type_id = parcel.readString()
+        customer_type_name = parcel.readString()
+        address = parcel.readString()
+        phone = parcel.readString()
+        township = parcel.readString()
+        credit_term = parcel.readString()
+        credit_limit = parcel.readString()
+        credit_amount = parcel.readString()
+        due_amount = parcel.readString()
+        prepaid_amount = parcel.readString()
+        payment_type = parcel.readString()
+        in_route = parcel.readString()
+        latitude = parcel.readString()
+        longitude = parcel.readString()
+        visit_record = parcel.readString()
+        district_id = parcel.readInt()
+        state_division_id = parcel.readInt()
+        shop_type_id = parcel.readInt()
+        street_id = parcel.readInt()
+        fax = parcel.readString()
+        township_number = parcel.readString()
+        customer_category_no = parcel.readString()
+        contact_person = parcel.readString()
+        route_schedule_status = parcel.readString()
+        created_user_id = parcel.readString()
+        created_date = parcel.readString()
+        flag = parcel.readString()
+    }
+
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeInt(id)
+        parcel.writeString(customer_id)
+        parcel.writeString(customer_name)
+        parcel.writeString(customer_type_id)
+        parcel.writeString(customer_type_name)
+        parcel.writeString(address)
+        parcel.writeString(phone)
+        parcel.writeString(township)
+        parcel.writeString(credit_term)
+        parcel.writeString(credit_limit)
+        parcel.writeString(credit_amount)
+        parcel.writeString(due_amount)
+        parcel.writeString(prepaid_amount)
+        parcel.writeString(payment_type)
+        parcel.writeString(in_route)
+        parcel.writeString(latitude)
+        parcel.writeString(longitude)
+        parcel.writeString(visit_record)
+        parcel.writeInt(district_id)
+        parcel.writeInt(state_division_id)
+        parcel.writeInt(shop_type_id)
+        parcel.writeInt(street_id)
+        parcel.writeString(fax)
+        parcel.writeString(township_number)
+        parcel.writeString(customer_category_no)
+        parcel.writeString(contact_person)
+        parcel.writeString(route_schedule_status)
+        parcel.writeString(created_user_id)
+        parcel.writeString(created_date)
+        parcel.writeString(flag)
+    }
+
+    override fun describeContents(): Int {
+        return 0
+    }
+
+    companion object CREATOR : Parcelable.Creator<Customer> {
+        override fun createFromParcel(parcel: Parcel): Customer {
+            return Customer(parcel)
+        }
+
+        override fun newArray(size: Int): Array<Customer?> {
+            return arrayOfNulls(size)
+        }
+    }
 }

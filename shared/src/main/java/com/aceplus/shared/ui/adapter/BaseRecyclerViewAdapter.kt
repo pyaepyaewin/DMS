@@ -1,4 +1,4 @@
-package com.aceplussolutions.rms.ui.adapter
+package com.aceplus.shared.ui.adapter
 
 import android.content.Context
 import android.support.annotation.NonNull
@@ -7,13 +7,11 @@ import android.view.LayoutInflater
 import android.support.v7.widget.RecyclerView
 import java.util.*
 
-abstract class BaseRvAdapter<V : BaseViewHolder<O>,O>(context: Context) : RecyclerView.Adapter<V>() {
+abstract class BaseRecyclerViewAdapter<V : BaseViewHolder<O>,O> : RecyclerView.Adapter<V>() {
     protected var mDataList: ArrayList<O>
-    protected var mInflater: LayoutInflater
 
     init {
         mDataList = ArrayList()
-        mInflater = LayoutInflater.from(context)
     }
 
     override fun onBindViewHolder(@NonNull holder: V, position: Int) {

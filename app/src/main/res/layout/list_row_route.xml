@@ -44,7 +44,7 @@
 
 
     <TextView
-        android:id="@+id/phone"
+        android:id="@+id/tvPhone"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
@@ -55,7 +55,7 @@
         />
 
     <TextView
-        android:id="@+id/address"
+        android:id="@+id/tvAddress"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"

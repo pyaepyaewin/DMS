@@ -42,5 +42,21 @@ class Constant {
             BASE_URL = ip
         }
 
+        const val FOR_PACKAGE_SALE = "for-package-sale"
+        const val FOR_PRE_ORDER_SALE = "for-pre-order-sale"
+        const val FOR_DELIVERY = "for-delivery"
+        const val FOR_OTHERS = "for-others"
+        const val FOR_SALE = "for-sales"
+        const val FOR_SALE_RETURN = "for-sale-return"
+        const val FOR_SALE_RETURN_EXCHANGE = "for-sale_return_exchange"
+        const val FOR_SALE_EXCHANGE = "for_sale_exchange"
+        const val FOR_DISPLAY_ASSESSMENT = "for_display_assessment"
+        const val FOR_OUTLET_STOCK_AVAILABILITY = "for_outlet_stock_availibility"
+        const val FOR_SIZE_IN_STORE_SHARE = "for_size_in_store_share"
+        const val FOR_COMPETITORACTIVITY = "for_competitoractivity"
+        const val PRINT_FOR_NORMAL_SALE = "print-for-normal-sale"
+        const val PRINT_FOR_C = "print-for-c"
+        const val PRINT_FOR_PRE_ORDER = "print-for-preorder"
+        const val FOR_VAN_ISSUE = "for-van-issue"
     }
 }

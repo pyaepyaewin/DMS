@@ -17,6 +17,9 @@ interface SizeInStoreShareDao {
     @get:Query("select * from size_in_store_share where delete_flag = 0")
     val allActiveData: List<SizeInStoreShare>
 
+    @get:Query("select count(*) from size_in_store_share")
+    val dataCount: Int
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(list: List<SizeInStoreShare>)
 

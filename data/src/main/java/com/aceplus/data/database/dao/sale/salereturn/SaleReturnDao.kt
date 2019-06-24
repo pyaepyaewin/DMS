@@ -9,7 +9,7 @@ import android.arch.persistence.room.Query
 
 
 @Dao
-interface SaleReturnDao{
+interface SaleReturnDao {
 
     @get:Query("select * from sale_return")
     val allDataLD: LiveData<List<SaleReturn>>
@@ -19,6 +19,12 @@ interface SaleReturnDao{
 
     @get:Query("select * from sale_return WHERE delete_flag = 0")
     val allActiveData: List<SaleReturn>
+
+    @get:Query("select count(*) from sale_return WHERE sale_return_id LIKE 'SX%'")
+    val dataCountForSaleReturnExchange: Int
+
+    @get:Query("select count(*) from sale_return WHERE sale_return_id LIKE 'SR%'")
+    val dataCount: Int
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(list: List<SaleReturn>)

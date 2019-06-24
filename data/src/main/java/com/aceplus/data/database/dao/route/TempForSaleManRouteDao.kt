@@ -9,7 +9,7 @@ import android.arch.persistence.room.Query
 
 
 @Dao
-interface TempForSaleManRouteDao{
+interface TempForSaleManRouteDao {
 
     @get:Query("select * from temp_for_sale_man_route")
     val allDataLD: LiveData<List<TempForSaleManRoute>>
@@ -22,5 +22,8 @@ interface TempForSaleManRouteDao{
 
     @Query("Delete from temp_for_sale_man_route")
     fun deleteAll()
+
+    @Query("Update temp_for_sale_man_route set  departure_time=:currentDate where customer_id=:customerId")
+    fun updateDepartureTime(customerId: Int, currentDate: String)
 
 }

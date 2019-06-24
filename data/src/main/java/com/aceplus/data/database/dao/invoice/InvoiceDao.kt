@@ -9,7 +9,7 @@ import android.arch.persistence.room.Query
 
 
 @Dao
-interface InvoiceDao{
+interface InvoiceDao {
 
     @get:Query("select * from invoice")
     val allDataLD: LiveData<List<Invoice>>
@@ -18,7 +18,10 @@ interface InvoiceDao{
     val allData: List<Invoice>
 
     @get:Query("select * from invoice where sale_flag = 1")
-    val activeData:List<Invoice>
+    val activeData: List<Invoice>
+
+    @get:Query("select count(*) from invoice WHERE invoice_id LIKE 'SX%'")
+    val dataCountForSaleExchange: Int
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(list: List<Invoice>)

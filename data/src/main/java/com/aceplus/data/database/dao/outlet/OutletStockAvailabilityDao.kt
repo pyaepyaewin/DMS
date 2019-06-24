@@ -9,13 +9,16 @@ import android.arch.persistence.room.Query
 
 
 @Dao
-interface OutletStockAvailabilityDao{
+interface OutletStockAvailabilityDao {
 
     @get:Query("select * from outlet_stock_availability")
     val allDataLD: LiveData<List<OutletStockAvailability>>
 
     @get:Query("select * from outlet_stock_availability")
     val allData: List<OutletStockAvailability>
+
+    @get:Query("select count(*) from outlet_stock_availability")
+    val dataCount: Int
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(list: List<OutletStockAvailability>)

@@ -9,13 +9,16 @@ import android.arch.persistence.room.Query
 
 
 @Dao
-interface CompetitorActivityDao{
+interface CompetitorActivityDao {
 
     @get:Query("select * from competitor_activity")
     val allDataLD: LiveData<List<CompetitorActivity>>
 
     @get:Query("select * from competitor_activity")
     val allData: List<CompetitorActivity>
+
+    @get:Query("select count(*) from competitor_activity")
+    val dataCount: Int
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(list: List<CompetitorActivity>)

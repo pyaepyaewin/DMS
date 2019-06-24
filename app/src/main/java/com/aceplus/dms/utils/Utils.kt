@@ -21,16 +21,7 @@ import com.aceplus.dms.R
 import com.aceplus.dms.ui.activities.LoginActivity
 import com.aceplus.domain.model.INVOICECANCEL
 import com.aceplus.domain.model.forApi.ConfirmRequestSuccess
-import com.aceplus.domain.model.forApi.credit.CreditApi
-import com.aceplus.domain.model.forApi.customer.*
-import com.aceplus.domain.model.forApi.invoice.Invoice
-import com.aceplus.domain.model.forApi.invoice.InvoicePresent
-import com.aceplus.domain.model.forApi.login.LoginCreditRequest
-import com.aceplus.domain.model.forApi.login.LoginRequest
-import com.aceplus.domain.model.forApi.sale.DataforSaleUpload
-import com.aceplus.domain.model.forApi.tsale.TsaleRequest
 import com.google.gson.Gson
-import com.google.gson.GsonBuilder
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.*
@@ -38,6 +29,7 @@ import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
 
+@SuppressLint("StaticFieldLeak")
 object Utils {
 
     private val decimalFormatterWithComma = DecimalFormat("###,##0")
@@ -47,23 +39,6 @@ object Utils {
 
     val MODE_CUSTOMER_FEEDBACK = "mode_customer_feedback"
     val MODE_GENERAL_SALE = "mode_general_sale"
-
-    val forPackageSale = "for-package-sale"
-    val forPreOrderSale = "for-pre-order-sale"
-    val FOR_DELIVERY = "for-delivery"
-    val FOR_OTHERS = "for-others"
-    val FOR_SALE = "for-sales"
-    val FOR_SALE_RETURN = "for-sale-return"
-    val FOR_SALE_RETURN_EXCHANGE = "for-sale_return_exchange"
-    val FOR_SALE_EXCHANGE = "for_sale_exchange"
-    val FOR_DISPLAY_ASSESSMENT = "for_display_assessment"
-    val FOR_OUTLET_STOCK_AVAILABILITY = "for_outlet_stock_availibility"
-    val FOR_SIZE_IN_STORE_SHARE = "for_size_in_store_share"
-    val FOR_COMPETITORACTIVITY = "for_competitoractivity"
-    val PRINT_FOR_NORMAL_SALE = "print-for-normal-sale"
-    val PRINT_FOR_C = "print-for-c"
-    val PRINT_FOR_PRE_ORDER = "print-for-preorder"
-    val FOR_VAN_ISSUE = "for-van-issue"
 
     private var formatter: Formatter? = null
     private var act: Activity? = null
@@ -455,7 +430,7 @@ object Utils {
 //        return invoiceNo + String.format("%0" + (idLength - invoiceNo.length) + "d", next)
 //    }
 
-//    fun getInvoiceNo(context: Context, salemanId:String, locationCode:String, mode:String):String {
+//    fun getInvoiceNo1(context: Context, salemanId:String, locationCode:String, mode:String):String {
 //
 //        if (database == null)
 //        {
@@ -663,6 +638,72 @@ object Utils {
 //
 //        return invoiceNo + String.format("%0" + (idLength - invoiceNo.length) + "d", next)
 //    }
+
+    fun getInvoiceNo(saleManId:String, locationCode:String, mode:String,nextCount:String):String {
+
+        val idLength = 18
+
+        var invoiceNo = String()
+        if (mode == Constant.FOR_PACKAGE_SALE)
+        {
+
+            invoiceNo += "P"
+        }
+        else if (mode == Constant.FOR_PRE_ORDER_SALE)
+        {
+
+            invoiceNo += "SO"
+        }
+        else if (mode == Constant.FOR_DELIVERY)
+        {
+
+            invoiceNo += "OS"
+        }
+        else if (mode == Constant.FOR_SALE_RETURN)
+        {
+
+            invoiceNo += "SR"
+        }
+        else if (mode == Constant.FOR_SALE_EXCHANGE || mode == Constant.FOR_SALE_RETURN_EXCHANGE)
+        {
+
+            invoiceNo += "SX"
+
+        }
+        else if (mode == Constant.FOR_DISPLAY_ASSESSMENT)
+        {
+
+            invoiceNo += "DA"
+        }
+        else if (mode == Constant.FOR_OUTLET_STOCK_AVAILABILITY)
+        {
+
+            invoiceNo += "OSA"
+
+        }
+        else if (mode == Constant.FOR_SIZE_IN_STORE_SHARE)
+        {
+
+            invoiceNo += "SIS"
+
+        }
+        else if (mode == Constant.FOR_COMPETITORACTIVITY)
+        {
+
+            invoiceNo += "CA"
+
+        }
+        else if (mode == Constant.FOR_VAN_ISSUE)
+        {
+            invoiceNo += "DQ"
+        }
+
+        invoiceNo += locationCode
+        invoiceNo += saleManId
+        invoiceNo += SimpleDateFormat("yyMMdd").format(Date())
+
+        return invoiceNo + String.format("%0" + (idLength - invoiceNo.length) + "d", nextCount)
+    }
 
 //    fun getInvoiceNoForPOSM(context: Context, saleManId:String, locationCode:String):String {
 //
