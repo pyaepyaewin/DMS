@@ -80,8 +80,7 @@ class CustomerActivity : BaseActivity(), KodeinAware {
         catchEvents()
 
         customerViewModel.customerDataList.observe(this, Observer { it ->
-            it?.let { mCustomerListAdapter.setNewList(it as ArrayList<Customer>) }
-                ?: Utils.commonDialog("No issued product", this, 2)
+            mCustomerListAdapter.setNewList(it as ArrayList<Customer>)
         })
 
         customerViewModel.loadCustomer()
@@ -189,6 +188,8 @@ class CustomerActivity : BaseActivity(), KodeinAware {
         ivCancel.setOnClickListener { onBackPressed() }
         btnOk.setOnClickListener {
             if (didCustomerSelected()) {
+                //insert arrival & departure time for temp for sale man route
+                customerViewModel.insertDataForTempSaleManRoute(selectedCustomer!!, Utils.getCurrentDate(true))
                 val intent = SaleReturnActivity.newIntentFromCustomer(applicationContext, "yes", selectedCustomer!!)
                 startActivity(intent)
             }
@@ -206,6 +207,8 @@ class CustomerActivity : BaseActivity(), KodeinAware {
 
     private fun onClickSaleButton() {
         if (didCustomerSelected()) {
+            //insert arrival & departure time for temp for sale man route
+            customerViewModel.insertDataForTempSaleManRoute(selectedCustomer!!, Utils.getCurrentDate(true))
             val intent = SaleActivity.newIntentFromCustomer(applicationContext, "no", selectedCustomer!!)
             startActivity(intent)
         }
@@ -213,6 +216,8 @@ class CustomerActivity : BaseActivity(), KodeinAware {
 
     private fun onClickSaleOrderButton() {
         if (didCustomerSelected()) {
+            //insert arrival & departure time for temp for sale man route
+            customerViewModel.insertDataForTempSaleManRoute(selectedCustomer!!, Utils.getCurrentDate(true))
             val intent = SaleOrderActivity.newIntentFromCustomer(applicationContext, true, selectedCustomer!!)
             startActivity(intent)
         }
@@ -220,6 +225,8 @@ class CustomerActivity : BaseActivity(), KodeinAware {
 
     private fun onClickUnSellReasonButton() {
         if (didCustomerSelected()) {
+            //insert arrival & departure time for temp for sale man route
+            customerViewModel.insertDataForTempSaleManRoute(selectedCustomer!!, Utils.getCurrentDate(true))
             customerViewModel.loadDidCustomerFeedback(
                 selectedCustomer!!,
                 {
@@ -278,6 +285,8 @@ class CustomerActivity : BaseActivity(), KodeinAware {
 
     private fun onClickSaleReturnButton() {
         if (didCustomerSelected()) {
+            //insert arrival & departure time for temp for sale man route
+            customerViewModel.insertDataForTempSaleManRoute(selectedCustomer!!, Utils.getCurrentDate(true))
             val intent = SaleReturnActivity.newIntentFromCustomer(applicationContext, "no", selectedCustomer!!)
             startActivity(intent)
         }
@@ -285,6 +294,8 @@ class CustomerActivity : BaseActivity(), KodeinAware {
 
     private fun onClickPosmButton() {
         if (didCustomerSelected()) {
+            //insert arrival & departure time for temp for sale man route
+            customerViewModel.insertDataForTempSaleManRoute(selectedCustomer!!, Utils.getCurrentDate(true))
             val intent = PosmActivity.newIntentFromCustomer(applicationContext, selectedCustomer!!)
             startActivity(intent)
         }
@@ -292,6 +303,8 @@ class CustomerActivity : BaseActivity(), KodeinAware {
 
     private fun onClickBtnLocation() {
         if (didCustomerSelected()) {
+            //insert arrival & departure time for temp for sale man route
+            customerViewModel.insertDataForTempSaleManRoute(selectedCustomer!!, Utils.getCurrentDate(true))
             val intent = AddNewCustomerLocationActivity.newIntentFromCustomerActivity(
                 applicationContext,
                 salemanId = AppUtils.getStringFromShp(Constant.SALEMAN_ID, applicationContext) ?: "",
@@ -314,4 +327,5 @@ class CustomerActivity : BaseActivity(), KodeinAware {
             startActivity(intent)
         }
     }
+
 }

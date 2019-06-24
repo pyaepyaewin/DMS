@@ -22,15 +22,21 @@ class SaleViewModel(
     private val customerVisitRepo: CustomerVisitRepo,
     private val schedulerProvider: SchedulerProvider
 ) : BaseViewModel() {
-    var productDataList = MutableLiveData<List<Product>>()
+    var productDataList = MutableLiveData<Pair<List<Product>, List<String>>>()
+    var soldProductList = MutableLiveData<List<Product>>()
 
     fun loadProductList() {
         launch {
             customerVisitRepo.getAllProductData()
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.mainThread())
-                .subscribe {
-                    productDataList.postValue(it)
+                .subscribe { it ->
+                    val productNameList = mutableListOf<String>()
+                    for (product in it) {
+                        productNameList.add(product.product_name!!)
+                    }
+                    productDataList.postValue(Pair(it, productNameList))
+
                 }
         }
     }

@@ -88,6 +88,7 @@ class CustomerViewModel(
                                     customerVisitRepo.saveSaleVisitRecord(selectedCustomer, gpsTracker)
 
                                     customerVisitRepo.updateDepartureTimeForSaleManRoute(
+                                        saleManId,
                                         selectedCustomer.id,
                                         Utils.getCurrentDate(true)
                                     )
@@ -98,4 +99,9 @@ class CustomerViewModel(
                 }
         }
     }
+
+    fun insertDataForTempSaleManRoute(selectedCustomer: Customer, currentDate: String) {
+        customerVisitRepo.saveDataForTempSaleManRoute(selectedCustomer, currentDate)
+    }
+
 }

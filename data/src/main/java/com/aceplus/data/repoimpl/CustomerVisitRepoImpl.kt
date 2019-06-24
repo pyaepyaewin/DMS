@@ -1,5 +1,6 @@
 package com.aceplus.data.repoimpl
 
+import android.content.ContentValues
 import android.content.SharedPreferences
 import com.aceplus.data.database.MyDatabase
 import com.aceplus.data.utils.Constant
@@ -7,6 +8,7 @@ import com.aceplus.domain.entity.customer.Customer
 import com.aceplus.domain.entity.customer.CustomerFeedback
 import com.aceplus.domain.entity.customer.DidCustomerFeedback
 import com.aceplus.domain.entity.product.Product
+import com.aceplus.domain.entity.route.TempForSaleManRoute
 import com.aceplus.domain.entity.sale.SaleMan
 import com.aceplus.domain.repo.CustomerVisitRepo
 import com.aceplus.shared.utils.GPSTracker
@@ -91,6 +93,27 @@ class CustomerVisitRepoImpl(
         return db.productDao().allProductData
     }
 
+    override fun saveDataForTempSaleManRoute(selectedCustomer: Customer, currentDate: String) {
+        val saleManId = AppUtils.getStringFromShp(Constant.SALEMAN_ID, shf)
+        if (db.tempForSaleManRouteDao().dataById(saleManId ?: "0", selectedCustomer.customer_id!!).isEmpty()) {
+            val tempForSaleManRoute = TempForSaleManRoute()
+            tempForSaleManRoute.sale_man_id = saleManId?.toInt() ?: 0
+            tempForSaleManRoute.customer_id = selectedCustomer.customer_id?.toInt() ?: 0
+            tempForSaleManRoute.latitude = selectedCustomer.latitude
+            tempForSaleManRoute.longitude = selectedCustomer.longitude
+            tempForSaleManRoute.arrival_time = currentDate
+            tempForSaleManRoute.departure_time = currentDate
+            tempForSaleManRoute.route_id = getRouteScheduleIDV2()
+            db.tempForSaleManRouteDao().insertData(tempForSaleManRoute)
+        } else {
+            db.tempForSaleManRouteDao().updateArrivalAndDepartureTime(
+                saleManId ?: "0",
+                selectedCustomer.customer_id?.toInt() ?: 0,
+                currentDate
+            )
+        }
+    }
+
     override fun saveCustomerFeedback(didCustomerFeedbackEntity: DidCustomerFeedback) {
         db.didCustomerFeedbackDao().insertData(didCustomerFeedbackEntity)
     }
@@ -102,8 +125,8 @@ class CustomerVisitRepoImpl(
         }
     }
 
-    override fun updateDepartureTimeForSaleManRoute(customerId: Int, currentDate: String) {
-        db.tempForSaleManRouteDao().updateDepartureTime(customerId, currentDate)
+    override fun updateDepartureTimeForSaleManRoute(saleManId: String, customerId: Int, currentDate: String) {
+        db.tempForSaleManRouteDao().updateDepartureTime(saleManId, customerId, currentDate)
     }
 
     private fun isSameCustomer(customerId: Int, gpsTracker: GPSTracker): Boolean {

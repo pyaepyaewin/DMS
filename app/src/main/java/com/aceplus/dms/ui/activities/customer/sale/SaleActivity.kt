@@ -65,6 +65,11 @@ class SaleActivity : BaseActivity(), KodeinAware {
     private val mPromotionItemListAdapter by lazy {
         //        PromotionPlanItemListAdapter()
     }
+    private val mSearchProductAdapter by lazy {
+        ArrayAdapter<String>(
+            this@SaleActivity, android.R.layout.simple_list_item_1, ArrayList<String>()
+        )
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -75,9 +80,17 @@ class SaleActivity : BaseActivity(), KodeinAware {
 
         catchEvents()
 
-
-        saleViewModel.productDataList.observe(this, Observer {
-            mProductListAdapter.setNewList(it as java.util.ArrayList<Product>)
+        saleViewModel.productDataList.observe(this, Observer { it ->
+            it?.let {
+                mProductListAdapter.setNewList(it.first as java.util.ArrayList<Product>)
+                mSearchProductAdapter.clear()
+                mSearchProductAdapter.addAll(it.second)
+                mSearchProductAdapter.notifyDataSetChanged()
+            }
+                ?: Utils.commonDialog("No issued product", this, 2)
+        })
+        saleViewModel.soldProductList.observe(this, Observer {
+            mSoldProductListAdapter.setNewList(it as ArrayList<Product>)
         })
 
         saleViewModel.loadProductList()
@@ -117,13 +130,7 @@ class SaleActivity : BaseActivity(), KodeinAware {
 //        rvPromotionPlanItemList.adapter = mPromotionItemPresentListAdapter
 //        rvPromotionPlanItemList.layoutManager = GridLayoutManager(applicationContext, 1)
 
-        searchAutoCompleteTextView.setAdapter(
-            ArrayAdapter<String>(
-                this@SaleActivity,
-                android.R.layout.simple_list_item_1,
-                ArrayList<String>()
-            )
-        )
+        searchAutoCompleteTextView.setAdapter(mSearchProductAdapter)
         searchAutoCompleteTextView.threshold = 1
 
         searchAutoCompleteTextView.onItemClickListener = AdapterView.OnItemClickListener { parent, view, position, id ->
@@ -138,7 +145,7 @@ class SaleActivity : BaseActivity(), KodeinAware {
             //            }
             //
             //            onSelectAtMostTwoSameProduct(tempProduct)
-            //            searchProductTextView.setText("")
+            searchAutoCompleteTextView.setText("")
         }
 
         cancelImg.setOnClickListener { onBackPressed() }
@@ -149,7 +156,7 @@ class SaleActivity : BaseActivity(), KodeinAware {
     private fun onClickProductListItem(product: Product) {
         val newSoldProductList = mSoldProductListAdapter.getDataList() as MutableList
         newSoldProductList.add(product)
-        mSoldProductListAdapter.setNewList(newSoldProductList as java.util.ArrayList<Product>)
+        saleViewModel.soldProductList.postValue(newSoldProductList)
 
 //        lpbreak = false
 //            var tempProduct: Product? = null
@@ -247,13 +254,11 @@ class SaleActivity : BaseActivity(), KodeinAware {
 
     private fun saveSaleData() {
         if (mSoldProductListAdapter.getDataList().isEmpty()) {
-
             AlertDialog.Builder(this@SaleActivity)
                 .setTitle("Alert")
                 .setMessage("You must specify at least one product.")
                 .setPositiveButton("OK", null)
                 .show()
-
             return
         }
 
