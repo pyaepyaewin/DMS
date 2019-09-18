@@ -78,7 +78,7 @@ class CustomerVisitRepoImpl(
     }
 
     override fun getAllCustomerData(): Observable<List<Customer>> {
-        return db.customerDao().allCustomerData
+        return Observable.just(db.customerDao().allCustomerData)
     }
 
     override fun getAllDidFeedback(): Observable<List<String>> {

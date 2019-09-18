@@ -1,5 +1,6 @@
 package com.aceplus.dms.ui.activities
 
+import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -27,7 +28,7 @@ class CustomerVisitActivity : BaseActivity(), KodeinAware {
             return Intent(context, CustomerVisitActivity::class.java)
         }
     }
-
+val vm = ViewModelProviders.
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 

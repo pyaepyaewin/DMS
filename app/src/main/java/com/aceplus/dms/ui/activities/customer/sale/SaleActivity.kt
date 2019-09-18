@@ -11,6 +11,7 @@ import android.view.View
 import android.view.WindowManager
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import com.aceplus.data.utils.Constant
 import com.aceplus.dms.R
 import com.aceplus.dms.ui.adapters.sale.ProductListAdapter
 import com.aceplus.dms.ui.adapters.sale.PromotionPlanGiftListAdapter
@@ -153,6 +154,51 @@ class SaleActivity : BaseActivity(), KodeinAware {
 
     }
 
+    private fun onSelectAtMostTwoSameProduct(tempProduct: Product){
+        val productDuplicateCheck = mutableListOf<Product>()
+            var sameProduct = false
+            for (tempSoldProduct in mSoldProductListAdapter.getDataList()) {
+                if (tempSoldProduct.product_id === tempProduct.product_id) {
+                    sameProduct = true
+                    if (productDuplicateCheck.contains(tempProduct))
+                        Constant.PRODUCT_COUNT = 2
+                    else
+                        Constant.PRODUCT_COUNT++
+                    break
+                } else {
+                    if (!productDuplicateCheck.contains(tempProduct)) {
+                        Constant.PRODUCT_COUNT = 0
+                    }
+                }
+            }
+
+            if (!sameProduct) {
+//                soldProductList.add(SoldProduct(tempProduct, false))
+                mSoldProductListAdapter.addNewItem(tempProduct)
+            } else {
+                if (Constant.PRODUCT_COUNT < 2 && !productDuplicateCheck.contains(tempProduct)) {
+                    //                    if (tempProduct.getRemainingQty() != 1) {
+
+//                    soldProductList.add(SoldProduct(tempProduct, false))
+//                    soldProductListRowAdapter.notifyDataSetChanged()
+
+                    mSoldProductListAdapter.addNewItem(tempProduct)
+
+                    if (Constant.PRODUCT_COUNT == 1) {
+                        Constant.PRODUCT_COUNT = 0
+                        productDuplicateCheck.add(tempProduct)
+//                        soldProductsCheck.add(SoldProduct(tempProduct, false))
+                    }
+                    //                    } else {
+                    //                        Constant.PRODUCT_COUNT = 0;
+                    //                        Utils.commonDialog("Your Quantity is just only 1", SaleActivity.this, 2);
+                    //                    }
+                } else {
+                    Constant.PRODUCT_COUNT = 0
+                    Utils.commonDialog("Already have this product", this@SaleActivity, 2)
+                }
+        }
+    }
     private fun onClickProductListItem(product: Product) {
         val newSoldProductList = mSoldProductListAdapter.getDataList() as MutableList
         newSoldProductList.add(product)
