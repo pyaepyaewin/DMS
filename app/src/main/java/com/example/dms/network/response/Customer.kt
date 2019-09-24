@@ -1,4 +1,6 @@
-package com.example.dms.network.network_response.customer
+package com.example.dms.network.response
+
+import java.io.Serializable
 
 data class Customer(
     val ADDRESS: String,
@@ -12,10 +14,10 @@ data class Customer(
     val DUE_AMT: String,
     val Fax: String,
     val IS_IN_ROUTE: String,
-    val LATITUDE: Int,
-    val LONGITUDE: Int,
+    val LATITUDE: Double,
+    val LONGITUDE: Double,
     val PAYMENT_TYPE: String,
-    val PH: Long,
+    val PH: String,
     val PREPAID_AMT: String,
     val SaleStatus: String,
     val StreetId: Int,
@@ -28,4 +30,4 @@ data class Customer(
     val shop_type_id: Int,
     val state_division_id: Int,
     val township_number: Int
-)
+):Serializable

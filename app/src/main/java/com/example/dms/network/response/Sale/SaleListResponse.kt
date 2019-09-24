@@ -1,6 +1,6 @@
-package com.example.dms.network.network_response.customer
+package com.example.dms.network.response.Sale
 
-data class CustomerResponse(
+data class SaleListResponse(
     val aceplusStatusCode: Int,
     val aceplusStatusMessage: String,
     val data: List<Data>,

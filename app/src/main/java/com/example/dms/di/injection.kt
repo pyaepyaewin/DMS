@@ -1,5 +1,7 @@
 package com.example.dms.di
 
+import android.content.Context
+import com.example.dms.data.repositories.*
 import com.example.dms.network.ApiService
 import com.example.dms.util.Appconstants
 import com.google.gson.Gson
@@ -24,6 +26,15 @@ object injection {
             .client(okHttpClient)
             .build()
         return retrofit.create(ApiService::class.java)
+    }
+    fun provideCustomerRepository(context: Context):CustomerRepository{
+        return CustomerRepositoryImpl(context,provideApiService())
+    }
+    fun provideSaleRepository(context: Context):SaleRepository{
+        return SaleRepositoryImpl(context,provideApiService())
+    }
+    fun provideCheckOutRepository(context: Context):CheckOutRepository{
+        return CheckOutRepositoryImpl(context)
     }
 
 }
