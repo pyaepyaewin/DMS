@@ -1,5 +1,8 @@
 package com.example.dms.network.response.Sale
 
+import androidx.room.Entity
+
+@Entity(tableName = "product")
 data class Product(
     val Id: String,
     val Product_id: String,

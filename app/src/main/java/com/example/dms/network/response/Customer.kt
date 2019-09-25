@@ -1,7 +1,8 @@
 package com.example.dms.network.response
 
+import androidx.room.Entity
 import java.io.Serializable
-
+@Entity(tableName = "customer")
 data class Customer(
     val ADDRESS: String,
     val CREDIT_AMT: String,
