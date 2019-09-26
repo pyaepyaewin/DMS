@@ -1,13 +1,6 @@
 package com.example.dms.viewmodels.Factory.api
 
-import androidx.lifecycle.MutableLiveData
 import com.example.dms.data.repositories.ApiRepository
-import com.example.dms.data.repositories.CustomerRepository
-import com.example.dms.network.response.Customer
-import com.example.dms.network.response.Sale.Product
-import com.example.dms.viewmodels.Factory.customer.CustomerBaseViewModel
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
 
 class ApiMainViewModel (
     private val repo: ApiRepository

@@ -4,12 +4,11 @@ import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import com.example.dms.data.database.MyDatabase
 import com.example.dms.network.ApiService
-import com.example.dms.network.response.Customer
+import com.example.dms.data.database.table.Customer
 import com.example.dms.network.response.CustomerListResponse
 import com.example.dms.network.response.Data
 import com.example.dms.util.Utils
 import io.reactivex.Observable
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 

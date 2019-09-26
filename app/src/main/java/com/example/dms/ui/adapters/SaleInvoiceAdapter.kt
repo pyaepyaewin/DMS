@@ -5,8 +5,6 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.dms.R
 import com.example.dms.network.request.saleInvoice
-import com.example.dms.network.request.saleRequest
-import com.example.dms.network.response.Sale.Product
 import com.example.dms.ui.viewholders.SaleInvoiceViewHolder
 
 class SaleInvoiceAdapter(private val onClickQty: (position: Int, currentQty: Int) -> Unit,

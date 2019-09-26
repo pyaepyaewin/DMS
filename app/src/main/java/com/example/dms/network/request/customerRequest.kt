@@ -1,8 +1,5 @@
 package com.example.dms.network.request
 
-import com.example.dms.network.response.Customer
-import com.google.gson.Gson
-
 data class customerRequest (
     var site_activation_key:String,
     var tablet_activation_key:String,

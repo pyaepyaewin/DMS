@@ -9,11 +9,11 @@ import android.widget.ImageButton
 import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
 import com.example.dms.R
+import com.example.dms.data.database.table.Date
 import com.example.dms.data.repositories.SaleRepository
 import com.example.dms.network.request.saleInvoice
-import com.example.dms.network.response.Sale.Product
+import com.example.dms.data.database.table.Product
 import com.example.dms.ui.adapters.SaleInvoiceAdapter
-import com.example.dms.viewmodels.Factory.sale.SaleBaseViewModel
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlin.math.roundToInt

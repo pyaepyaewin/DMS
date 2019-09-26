@@ -4,14 +4,14 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.example.dms.data.database.table.Product
+import com.example.dms.data.database.table.CheckOut
 import io.reactivex.Observable
 
 @Dao
-interface ProductDao {
-    @get:Query("select * from product")
-    val allProductData: Observable<List<Product>>
+interface CheckOutDao {
+    @get:Query("select * from checkOut")
+    val allCheckOutData: Observable<List<CheckOut>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertAll(list: List<Product>)
+    fun insertAll(list: List<CheckOut>)
 }

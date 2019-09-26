@@ -1,13 +1,5 @@
 package com.example.dms.ui.adapters
 
-import android.view.LayoutInflater
-import android.view.ViewGroup
-import androidx.recyclerview.widget.RecyclerView
-import com.example.dms.R
-import com.example.dms.network.response.Sale.Product
-import com.example.dms.ui.viewholders.ApiSaleViewHolder
-import com.example.dms.ui.viewholders.SaleViewHolder
-
 class ApiSaleAdapter()// RecyclerView.Adapter<ApiSaleViewHolder>()
 
 {

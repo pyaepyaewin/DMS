@@ -4,9 +4,9 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.example.dms.network.response.Customer
+import com.example.dms.data.database.table.Customer
 import io.reactivex.Observable
-import java.util.*
+
 @Dao
 interface CustomerDao {
     @get:Query("select * from customer")

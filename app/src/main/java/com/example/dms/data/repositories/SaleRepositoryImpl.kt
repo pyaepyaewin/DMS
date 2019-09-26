@@ -1,12 +1,11 @@
 package com.example.dms.data.repositories
 
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.example.dms.data.database.MyDatabase
 import com.example.dms.network.ApiService
 import com.example.dms.network.response.Sale.Data
-import com.example.dms.network.response.Sale.Product
+import com.example.dms.data.database.table.Product
 import com.example.dms.network.response.Sale.SaleListResponse
 import com.example.dms.util.Utils
 import io.reactivex.Observable

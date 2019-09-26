@@ -43,7 +43,7 @@ object injection {
         return SaleRepositoryImpl(context,provideApiService(), provideDatabase(context))
     }
     fun provideCheckOutRepository(context: Context):CheckOutRepository{
-        return CheckOutRepositoryImpl(context)
+        return CheckOutRepositoryImpl(context, provideDatabase(context))
     }
 
 }

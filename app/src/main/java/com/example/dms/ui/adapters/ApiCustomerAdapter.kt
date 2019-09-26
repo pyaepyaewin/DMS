@@ -1,13 +1,5 @@
 package com.example.dms.ui.adapters
 
-import android.view.LayoutInflater
-import android.view.ViewGroup
-import androidx.recyclerview.widget.RecyclerView
-import com.example.dms.R
-import com.example.dms.network.response.Customer
-import com.example.dms.ui.viewholders.ApiCustomerViewHolder
-import com.example.dms.ui.viewholders.CustomerViewHolder
-
 class ApiCustomerAdapter ()
 {
 //    private var customerDataList = emptyList<Customer>()

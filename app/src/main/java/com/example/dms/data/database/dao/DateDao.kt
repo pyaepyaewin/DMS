@@ -4,14 +4,14 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.example.dms.data.database.table.Product
+import com.example.dms.data.database.table.Date
 import io.reactivex.Observable
 
 @Dao
-interface ProductDao {
-    @get:Query("select * from product")
-    val allProductData: Observable<List<Product>>
+interface DateDao {
+    @get:Query("select * from date")
+    val allDateData: Observable<List<Date>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertAll(list: List<Product>)
+    fun insertAll(list: List<Date>)
 }

@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.dms.R
 import com.example.dms.di.injection
 import com.example.dms.network.request.customerRequest
-import com.example.dms.network.response.Customer
+import com.example.dms.data.database.table.Customer
 import com.example.dms.ui.adapters.CustomerAdapter
 import com.example.dms.viewmodels.Factory.customer.CustomerMainViewModel
 import com.example.dms.viewmodels.Factory.customer.CustomerMainViewModelFactory

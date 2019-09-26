@@ -1,4 +1,4 @@
-package com.example.dms.network.response
+package com.example.dms.data.database.table
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

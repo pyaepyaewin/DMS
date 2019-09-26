@@ -4,7 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.dms.R
-import com.example.dms.network.response.Sale.Product
+import com.example.dms.data.database.table.Product
 import com.example.dms.ui.viewholders.SaleViewHolder
 
 class SaleAdapter(private val onClick: (notice: Product) -> Unit) : RecyclerView.Adapter<SaleViewHolder>()

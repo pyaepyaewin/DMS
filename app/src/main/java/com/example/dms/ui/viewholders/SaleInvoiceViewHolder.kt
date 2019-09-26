@@ -3,7 +3,6 @@ package com.example.dms.ui.viewholders
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import com.example.dms.network.request.saleInvoice
-import com.example.dms.network.response.Sale.Product
 import kotlinx.android.synthetic.main.sales.view.*
 import kotlin.math.roundToInt
 

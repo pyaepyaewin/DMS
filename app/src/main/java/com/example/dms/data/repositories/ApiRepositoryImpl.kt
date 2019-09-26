@@ -1,18 +1,5 @@
 package com.example.dms.data.repositories
 
-import android.content.Context
-import androidx.lifecycle.MutableLiveData
-import com.example.dms.data.database.MyDatabase
-import com.example.dms.network.ApiService
-import com.example.dms.network.response.Customer
-import com.example.dms.network.response.CustomerListResponse
-import com.example.dms.network.response.Sale.Product
-import com.example.dms.network.response.Sale.SaleListResponse
-import com.example.dms.util.Utils
-import io.reactivex.Observable
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.schedulers.Schedulers
-
 class ApiRepositoryImpl(
 ) {}
 

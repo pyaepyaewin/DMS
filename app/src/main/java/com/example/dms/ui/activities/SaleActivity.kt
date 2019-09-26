@@ -5,18 +5,16 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
-import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.dms.R
 import com.example.dms.di.injection
-import com.example.dms.network.request.saleInvoice
 import com.example.dms.network.request.saleRequest
-import com.example.dms.network.response.Customer
-import com.example.dms.network.response.Sale.Product
+import com.example.dms.data.database.table.Customer
+import com.example.dms.data.database.table.Product
 import com.example.dms.ui.adapters.SaleAdapter
-import com.example.dms.ui.adapters.SaleInvoiceAdapter
+import com.example.dms.util.Utils
 import com.example.dms.viewmodels.Factory.sale.SaleMainViewModelFactory
 import com.example.dms.viewmodels.Factory.sale.SaleMainViewModel
 import com.google.gson.Gson
@@ -60,7 +58,7 @@ class SaleActivity : AppCompatActivity() {
 
         rvSale.adapter = saleAdapter
         rvSale.layoutManager = LinearLayoutManager(this)
-
+        saledate.text=Utils.getCurrentDate()
         val saleItemAdapter = saleViewModel.saleItemAdpter
         rvSaleInvoice.adapter = saleItemAdapter
         rvSaleInvoice.layoutManager = LinearLayoutManager(this)

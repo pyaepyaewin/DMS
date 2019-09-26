@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.dms.R
 import com.example.dms.network.request.saleInvoice
 import com.example.dms.ui.adapters.PrintAdapter
+import com.example.dms.util.Utils
 import com.example.dms.viewmodels.Factory.print.PrintMainViewModel
 import com.example.dms.viewmodels.Factory.print.PrintMainViewModelFactory
 import kotlinx.android.synthetic.main.activity_print.*
@@ -53,14 +54,12 @@ class PrintActivity : AppCompatActivity() {
 
         this.checkoutList = intent.getSerializableExtra("printList") as MutableList<saleInvoice>
 
-//        btnclose.setOnClickListener { finish() }
-//        btnCheck.setOnClickListener {
-//            Toast.makeText(this, "Error", Toast.LENGTH_LONG).show()
-//        }
+   //close.setOnClickListener { finish() }
+
 
         rvPrint.adapter = printListAdapter
         rvPrint.layoutManager = LinearLayoutManager(this)
-
+        date.text=Utils.getCurrentDate()
         totalAmount.text = intent.getStringExtra("totalAmt")
         netAmt.text = intent.getStringExtra("netAmt")
         receive.text = intent.getStringExtra("receive")

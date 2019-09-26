@@ -4,7 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.dms.R
-import com.example.dms.network.response.Customer
+import com.example.dms.data.database.table.Customer
 import com.example.dms.ui.viewholders.CustomerViewHolder
 
 class CustomerAdapter(private val onClick: (notice: Customer) -> Unit) : RecyclerView.Adapter<CustomerViewHolder>()

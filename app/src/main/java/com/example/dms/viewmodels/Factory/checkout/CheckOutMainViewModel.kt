@@ -10,6 +10,7 @@ import kotlin.math.roundToInt
 class CheckOutMainViewModel(
     private val checkOutRepo: CheckOutRepository,private val context: Context
 ):CheckOutBaseViewModel()  {
+
     var errorState = MutableLiveData<String>()
 var discPercent=MutableLiveData<Float>()
     var discAmount=MutableLiveData<Int>()
@@ -27,13 +28,13 @@ var discPercent=MutableLiveData<Float>()
         return totalAmount
     }
 
-    fun calculateDiscAmt(disc: Float){
-        discAmount.postValue((totalAmount * disc / 100).roundToInt())
-    }
-
-    fun calculateDiscPercent(disc: Int){
-        discPercent.postValue((disc * 100 / totalAmount).toFloat())
-    }
+//    fun calculateDiscAmt(disc: Float){
+//        discAmount.postValue((totalAmount * disc / 100).roundToInt())
+//    }
+//
+//    fun calculateDiscPercent(disc: Int){
+//        discPercent.postValue((disc * 100 / totalAmount).toFloat())
+//    }
 
     fun calculateNetAmount(discAmt: String){
         if (!discAmt.isNullOrEmpty()){
