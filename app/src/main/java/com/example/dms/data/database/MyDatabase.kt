@@ -9,6 +9,7 @@ import com.example.dms.data.database.dao.ProductDao
 import com.example.dms.network.response.Customer
 import com.example.dms.network.response.Sale.Product
 
+@Database(entities = [Customer::class,Product::class], version = 1, exportSchema = false)
 
 abstract class MyDatabase:RoomDatabase() {
     abstract fun customerDao(): CustomerDao

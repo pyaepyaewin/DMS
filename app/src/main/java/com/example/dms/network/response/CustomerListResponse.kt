@@ -1,8 +1,8 @@
 package com.example.dms.network.response
 
 data class CustomerListResponse(
-    val aceplusStatusCode: Int,
-    val aceplusStatusMessage: String,
+    val aceplusStatusCode: String?=null,
+    val aceplusStatusMessage: String?=null,
     val data: List<Data>,
-    val user_id: String
+    var user_id: String?=null
 )

@@ -12,7 +12,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ui.activities.ApiActivity"></activity>
+        <activity android:name=".ui.activities.ApiActivity">
+
+        </activity>
         <activity android:name=".ui.activities.PrintActivity" />
         <activity android:name=".ui.activities.CheckOutActivity" />
         <activity

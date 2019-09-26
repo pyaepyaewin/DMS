@@ -1,11 +1,11 @@
 package com.example.dms.data.database.dao
 
-import android.database.Observable
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.example.dms.network.response.Sale.Product
+import io.reactivex.Observable
 
 @Dao
 interface ProductDao {

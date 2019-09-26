@@ -60,11 +60,11 @@ class CheckOutActivity : AppCompatActivity() {
                 startActivity(PrintActivity.getIntent(
                     this,
                      checkoutList,
-                    txtTotalAmountCheckout.text.toString()!!,
-                    edtDiscPercentCheckout.text.toString()!!,
-                    edtDiscAmtCheckout.text.toString()!!,
-                    txtNetAmountCheckout.text.toString()!!,
-                    edtPayAmountCheckout.text.toString()!!))
+                    txtTotalAmountCheckout.text.toString(),
+                    edtDiscPercentCheckout.text.toString(),
+                    edtDiscAmtCheckout.text.toString(),
+                    txtNetAmountCheckout.text.toString(),
+                    edtPayAmountCheckout.text.toString()))
             } else{
                 Toast.makeText(this, "Empty", Toast.LENGTH_LONG).show()
             }

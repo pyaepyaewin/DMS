@@ -21,6 +21,9 @@ class CustomerMainViewModel(
                     it
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
+                        .doOnNext {
+                            customerRepo.saveDataIntoDatabase(it.data[0].Customer)
+                        }
                         .subscribe({ response ->
                             customerRepo.customerData = MutableLiveData()
                             successState.postValue(response.data[0].Customer)

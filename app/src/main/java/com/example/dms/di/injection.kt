@@ -1,6 +1,7 @@
 package com.example.dms.di
 
 import android.content.Context
+import com.example.dms.data.database.MyDatabase
 import com.example.dms.data.repositories.*
 import com.example.dms.network.ApiService
 import com.example.dms.util.Appconstants
@@ -27,11 +28,19 @@ object injection {
             .build()
         return retrofit.create(ApiService::class.java)
     }
+    private fun provideDatabase(context:Context):MyDatabase{
+        return MyDatabase.getInstance(context)
+    }
+
+//    f  un provideApiRepository(context: Context):ApiRepository
+//        {
+//        return ApiRepositoryImpl(context, provideApiService(), provideDatabase(context))
+//    }
     fun provideCustomerRepository(context: Context):CustomerRepository{
-        return CustomerRepositoryImpl(context,provideApiService())
+        return CustomerRepositoryImpl(context,provideApiService(), provideDatabase(context))
     }
     fun provideSaleRepository(context: Context):SaleRepository{
-        return SaleRepositoryImpl(context,provideApiService())
+        return SaleRepositoryImpl(context,provideApiService(), provideDatabase(context))
     }
     fun provideCheckOutRepository(context: Context):CheckOutRepository{
         return CheckOutRepositoryImpl(context)

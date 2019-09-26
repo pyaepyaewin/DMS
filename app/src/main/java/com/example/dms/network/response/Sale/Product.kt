@@ -1,9 +1,11 @@
 package com.example.dms.network.response.Sale
 
 import androidx.room.Entity
+import androidx.room.PrimaryKey
 
 @Entity(tableName = "product")
 data class Product(
+    @PrimaryKey
     val Id: String,
     val Product_id: String,
     val Product_name: String,

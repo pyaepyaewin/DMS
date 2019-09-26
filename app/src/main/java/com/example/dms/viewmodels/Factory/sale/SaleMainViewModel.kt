@@ -43,6 +43,9 @@ class SaleMainViewModel (
                     it
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
+                        .doOnNext {
+                            saleRepo.saveDataIntoDatabase(it.data[0].Product)
+                        }
                         .subscribe({ response ->
                             saleRepo.saleData = MutableLiveData()
                             successState.postValue(response.data[0].Product)
@@ -127,8 +130,6 @@ class SaleMainViewModel (
 
             val edtDisc = dialog.findViewById<EditText>(R.id.edtText)
             edtDisc.setText(currentDisc.toString())
-
-
 
             dialog.findViewById<Button>(R.id.btnCancel).setOnClickListener { dialog.dismiss() }
             dialog.findViewById<Button>(R.id.btnOK).setOnClickListener {

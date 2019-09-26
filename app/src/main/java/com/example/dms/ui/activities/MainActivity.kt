@@ -41,7 +41,7 @@ class MainActivity : AppCompatActivity() {
             adapter = customerAdapter
         }
         btnSale.setOnClickListener {
-            val intent= Intent(this,SaleActivity::class.java)
+            val intent = Intent(this, SaleActivity::class.java)
             startActivity(intent)
         }
 
@@ -76,7 +76,6 @@ class MainActivity : AppCompatActivity() {
 
 
 
-
     private fun onClickNoticeListItem(data: Customer) {
         Toast.makeText(
             applicationContext,
@@ -100,4 +99,4 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-}
+    }

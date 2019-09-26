@@ -1,6 +1,8 @@
 package com.example.dms.network.response
 
 import androidx.room.Entity
+import androidx.room.PrimaryKey
+import com.google.gson.annotations.SerializedName
 import java.io.Serializable
 @Entity(tableName = "customer")
 data class Customer(
@@ -8,10 +10,11 @@ data class Customer(
     val CREDIT_AMT: String,
     val CREDIT_LIMIT: Int,
     val CREDIT_TERM: Int,
+    @PrimaryKey
     val CUSTOMER_ID: String,
     val CUSTOMER_NAME: String,
     val CUSTOMER_TYPE_ID: Int,
-    val CUSTOMER_TYPE_NAME: Any,
+    val CUSTOMER_TYPE_NAME: String?="",
     val DUE_AMT: String,
     val Fax: String,
     val IS_IN_ROUTE: String,
