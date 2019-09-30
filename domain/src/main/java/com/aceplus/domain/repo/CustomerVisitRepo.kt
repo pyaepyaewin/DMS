@@ -5,6 +5,7 @@ import com.aceplus.domain.entity.customer.CustomerFeedback
 import com.aceplus.domain.entity.customer.DidCustomerFeedback
 import com.aceplus.domain.entity.product.Product
 import com.aceplus.domain.entity.sale.SaleMan
+import com.aceplus.domain.model.roomdb.StringObject
 import com.aceplus.shared.utils.GPSTracker
 import io.reactivex.Observable
 import io.reactivex.internal.operators.observable.ObservableLift

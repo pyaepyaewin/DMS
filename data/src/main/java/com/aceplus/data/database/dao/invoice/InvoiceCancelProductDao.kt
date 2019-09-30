@@ -22,7 +22,7 @@ interface InvoiceCancelProductDao {
     @Query("Delete from invoice_cancel_product")
     fun deleteAll()
 
-
+    @Query("select * from invoice_cancel_product where invoice_product_id=:id")
     fun allDataById(id: String?): List<InvoiceCancelProduct>
 
 }

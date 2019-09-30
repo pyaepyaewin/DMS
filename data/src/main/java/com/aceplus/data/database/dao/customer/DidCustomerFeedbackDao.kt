@@ -6,6 +6,7 @@ import android.arch.persistence.room.Dao
 import android.arch.persistence.room.Insert
 import android.arch.persistence.room.OnConflictStrategy
 import android.arch.persistence.room.Query
+import com.aceplus.domain.model.roomdb.StringObject
 import io.reactivex.Observable
 
 
@@ -18,8 +19,9 @@ interface DidCustomerFeedbackDao {
     @get:Query("select * from did_customer_feedback")
     val allData: List<DidCustomerFeedback>
 
-    @get:Query("select customer_no from did_customer_feedback")
-    val getAllCustomerIdList: Observable<List<String>>
+
+    @Query("select customer_no as data from did_customer_feedback")
+    fun getAllCustomerIdList(): List<StringObject>
 
     @get:Query("select COUNT(*) from did_customer_feedback")
     val dataCount: Int

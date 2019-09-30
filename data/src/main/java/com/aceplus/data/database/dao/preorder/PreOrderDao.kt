@@ -14,7 +14,10 @@ interface PreOrderDao {
     @get:Query("select * from pre_order")
     val allDataLD: LiveData<List<PreOrder>>
 
-    @get:Query("select count(*) from pre_order")
+//    @get:Query("select count(*) from pre_order")
+//    val allData: List<PreOrder>
+
+    @get:Query("select * from pre_order")
     val allData: List<PreOrder>
 
     @get:Query("select * from pre_order WHERE delete_flag = 0")

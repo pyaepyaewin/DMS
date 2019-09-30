@@ -10,6 +10,7 @@ import com.aceplus.domain.entity.customer.DidCustomerFeedback
 import com.aceplus.domain.entity.product.Product
 import com.aceplus.domain.entity.route.TempForSaleManRoute
 import com.aceplus.domain.entity.sale.SaleMan
+import com.aceplus.domain.model.roomdb.StringObject
 import com.aceplus.domain.repo.CustomerVisitRepo
 import com.aceplus.shared.utils.GPSTracker
 import com.aceplussolutions.rms.constants.AppUtils
@@ -82,15 +83,16 @@ class CustomerVisitRepoImpl(
     }
 
     override fun getAllDidFeedback(): Observable<List<String>> {
-        return db.didCustomerFeedbackDao().getAllCustomerIdList
+        val idList = db.didCustomerFeedbackDao().getAllCustomerIdList().map { it.data }
+        return Observable.just(idList)
     }
 
     override fun getAllDefaultFeedback(): Observable<List<CustomerFeedback>> {
-        return db.customerFeedbackDao().allObserableData
+        return Observable.just(db.customerFeedbackDao().allObservableData)
     }
 
     override fun getAllProductData(): Observable<List<Product>> {
-        return db.productDao().allProductData
+        return Observable.just(db.productDao().allProductData)
     }
 
     override fun saveDataForTempSaleManRoute(selectedCustomer: Customer, currentDate: String) {

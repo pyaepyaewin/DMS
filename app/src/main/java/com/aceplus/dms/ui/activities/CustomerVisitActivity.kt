@@ -28,7 +28,7 @@ class CustomerVisitActivity : BaseActivity(), KodeinAware {
             return Intent(context, CustomerVisitActivity::class.java)
         }
     }
-val vm = ViewModelProviders.
+//val vm = ViewModelProviders.
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 

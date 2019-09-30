@@ -8,6 +8,7 @@ ext {
     rxJavaAdapterVersion = "2.4.0"
 
     androidArchitectureVersion = "1.1.1"
+    roomDatabaseVersion = "1.1.1-rc1"
 
     googleServiceVersion = "15.0.1"
     firebaseVersion = "16.0.8"
@@ -71,9 +72,9 @@ ext {
             lifecycleCompiler   : "android.arch.lifecycle:compiler:${androidArchitectureVersion}",
 
             //Room
-            roomRuntime         : "android.arch.persistence.room:runtime:${androidArchitectureVersion}",
-            roomRxjava          : "android.arch.persistence.room:rxjava2:${androidArchitectureVersion}",
-            roomCompiler        : "android.arch.persistence.room:compiler:${androidArchitectureVersion}",
+            roomRuntime         : "android.arch.persistence.room:runtime:${roomDatabaseVersion}",
+            roomRxjava          : "android.arch.persistence.room:rxjava2:${roomDatabaseVersion}",
+            roomCompiler        : "android.arch.persistence.room:compiler:${roomDatabaseVersion}",
 
             //Dependency Injection
             kodeinJvm           : "org.kodein.di:kodein-di-generic-jvm:${kodeinVersion}",

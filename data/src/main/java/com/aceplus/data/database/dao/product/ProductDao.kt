@@ -18,8 +18,11 @@ interface ProductDao {
     @get:Query("select * from product")
     val allData: List<Product>
 
+//    @get:Query("select * from product")
+//    val allProductData: Observable<List<Product>>
+
     @get:Query("select * from product")
-    val allProductData: Observable<List<Product>>
+    val allProductData: List<Product>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(list: List<Product>)
