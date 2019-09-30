@@ -1,5 +1,6 @@
 package com.example.dms.ui.activities
 
+import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -10,7 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.dms.R
 import com.example.dms.di.injection
 import com.example.dms.network.request.customerRequest
-import com.example.dms.data.database.table.Customer
+import com.example.dms.network.response.Customer
 import com.example.dms.ui.adapters.CustomerAdapter
 import com.example.dms.viewmodels.Factory.customer.CustomerMainViewModel
 import com.example.dms.viewmodels.Factory.customer.CustomerMainViewModelFactory
@@ -20,6 +21,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
     private val customerAdapter: CustomerAdapter by lazy { CustomerAdapter(this::onClickNoticeListItem) }
+    private var selectedCustomer: Customer? = null
 
     private val customerViewModel: CustomerMainViewModel by lazy {
         ViewModelProvider(
@@ -41,10 +43,9 @@ class MainActivity : AppCompatActivity() {
             adapter = customerAdapter
         }
         btnSale.setOnClickListener {
-            val intent = Intent(this, SaleActivity::class.java)
-            startActivity(intent)
-        }
+            startActivity(SaleActivity.getIntent(this, selectedCustomer!!))
 
+        }
         customerViewModel.successState.observe(this, Observer {
             this.customerAdapter.setNewList(it)
         })
@@ -82,6 +83,8 @@ class MainActivity : AppCompatActivity() {
             "You clicked at ${data.CUSTOMER_NAME}",
             Toast.LENGTH_SHORT
         ).show()
+
+        selectedCustomer = data
 
         name.text = data.CUSTOMER_NAME
         address.text=data.ADDRESS

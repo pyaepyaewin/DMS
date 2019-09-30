@@ -11,9 +11,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.dms.R
 import com.example.dms.di.injection
 import com.example.dms.network.request.saleRequest
-import com.example.dms.data.database.table.Customer
-import com.example.dms.data.database.table.Product
+import com.example.dms.network.response.Customer
+import com.example.dms.network.response.Product
 import com.example.dms.ui.adapters.SaleAdapter
+import com.example.dms.ui.adapters.SaleInvoiceAdapter
 import com.example.dms.util.Utils
 import com.example.dms.viewmodels.Factory.sale.SaleMainViewModelFactory
 import com.example.dms.viewmodels.Factory.sale.SaleMainViewModel
@@ -37,12 +38,13 @@ class SaleActivity : AppCompatActivity() {
         }
 
     }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sale)
 
+        var customer : Customer? =intent.getSerializableExtra("Customer") as Customer
 
+saledate.text=Utils.getCurrentDate()
         btnclose.setOnClickListener { finish() }
 
         btnCheck.setOnClickListener {
@@ -50,7 +52,12 @@ class SaleActivity : AppCompatActivity() {
             if (filteredList.isNotEmpty()){
                 startActivity(CheckOutActivity.getIntent(
                     this,
-                    filteredList))
+                    filteredList,customer!!))
+
+//                startActivity(CheckOutActivity.getCustomerIntent(
+//                    this,customer!!
+//                ))
+
             } else{
                 Toast.makeText(this, "Empty", Toast.LENGTH_LONG).show()
             }

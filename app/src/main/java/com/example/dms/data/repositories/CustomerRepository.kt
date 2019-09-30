@@ -1,7 +1,7 @@
 package com.example.dms.data.repositories
 
 import androidx.lifecycle.MutableLiveData
-import com.example.dms.data.database.table.Customer
+import com.example.dms.network.response.Customer
 import com.example.dms.network.response.CustomerListResponse
 import io.reactivex.Observable
 

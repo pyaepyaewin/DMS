@@ -4,7 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.example.dms.data.database.table.Customer
+import com.example.dms.network.response.Customer
 import io.reactivex.Observable
 
 @Dao

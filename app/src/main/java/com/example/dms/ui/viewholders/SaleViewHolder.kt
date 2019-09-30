@@ -3,7 +3,7 @@ package com.example.dms.ui.viewholders
 import android.util.Log
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
-import com.example.dms.data.database.table.Product
+import com.example.dms.network.response.Product
 import kotlinx.android.synthetic.main.product.view.*
 
 class SaleViewHolder(private val view: View,

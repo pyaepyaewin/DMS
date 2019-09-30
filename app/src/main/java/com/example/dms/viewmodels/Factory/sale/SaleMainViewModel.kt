@@ -9,10 +9,9 @@ import android.widget.ImageButton
 import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
 import com.example.dms.R
-import com.example.dms.data.database.table.Date
+import com.example.dms.data.database.table.InvoiceItem
 import com.example.dms.data.repositories.SaleRepository
-import com.example.dms.network.request.saleInvoice
-import com.example.dms.data.database.table.Product
+import com.example.dms.network.response.Product
 import com.example.dms.ui.adapters.SaleInvoiceAdapter
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -25,7 +24,7 @@ class SaleMainViewModel (
     var successState = MutableLiveData<List<Product>>()
     var netAmount = MutableLiveData<Int>()
 
-    var selectedSaleItems: MutableList<saleInvoice> = mutableListOf()
+    var selectedInvoiceItems: MutableList<InvoiceItem> = mutableListOf()
 
     val saleItemAdpter: SaleInvoiceAdapter by lazy {
         SaleInvoiceAdapter(
@@ -60,27 +59,20 @@ class SaleMainViewModel (
 
     fun addItem(product: Product) {
         var found = false
-        for (i in selectedSaleItems.indices) {
-            if (product.Id == selectedSaleItems[i].id) {
-                selectedSaleItems[i].qty += 1
-                saleItemAdpter.updateRow(this.selectedSaleItems, i)
+        for (i in selectedInvoiceItems.indices) {
+            if (product.Id == selectedInvoiceItems[i].id) {
+                selectedInvoiceItems[i].qty += 1
+                saleItemAdpter.updateRow(this.selectedInvoiceItems, i)
                 found = true
                 break
             }
         }
         if (!found) {
-            selectedSaleItems.add(
-                saleInvoice(
-                    product.Id,
-                    product.Product_name,
-                    product.um_id,
-                    1,
-                    product.selling_price,
-                    false,
-                    0.0f
-                )
-            )
-            saleItemAdpter.addRow(this.selectedSaleItems)
+            selectedInvoiceItems.add(
+                InvoiceItem("0",
+                   product.Id,
+product.Product_id,product.um_id,product.total_qty,product.selling_price,false,0.0f))
+            saleItemAdpter.addRow(this.selectedInvoiceItems)
         }
     }
 
@@ -108,8 +100,8 @@ class SaleMainViewModel (
             dialog.findViewById<Button>(R.id.btnCancel).setOnClickListener { dialog.dismiss() }
 
             dialog.findViewById<Button>(R.id.btnOK).setOnClickListener {
-                selectedSaleItems[position].qty = edtQty.text.toString().toInt()
-                saleItemAdpter.updateRow(selectedSaleItems, position)
+                selectedInvoiceItems[position].qty = edtQty.text.toString().toInt()
+                saleItemAdpter.updateRow(selectedInvoiceItems, position)
                 dialog.dismiss()
             }
 
@@ -118,7 +110,7 @@ class SaleMainViewModel (
         }
 
     private fun onClickFoc(position: Int, currentFoc: Boolean) {
-            this.selectedSaleItems[position].foc = currentFoc
+            this.selectedInvoiceItems[position].foc = currentFoc
         }
 
     private fun onClickDisc(position: Int, currentDisc: Float) {
@@ -135,13 +127,13 @@ class SaleMainViewModel (
             dialog.findViewById<Button>(R.id.btnOK).setOnClickListener {
                 var updateDisc = edtDisc.text.toString().toFloat()
                 if (updateDisc > 100) {
-                    selectedSaleItems[position].discount = 100.0f
+                    selectedInvoiceItems[position].discount = 100.0f
                     Toast.makeText(context, "You can only give up to 100%", Toast.LENGTH_LONG)
                         .show()
                 } else {
-                    selectedSaleItems[position].discount = edtDisc.text.toString().toFloat()
+                    selectedInvoiceItems[position].discount = edtDisc.text.toString().toFloat()
                 }
-                saleItemAdpter.updateRow(selectedSaleItems, position)
+                saleItemAdpter.updateRow(selectedInvoiceItems, position)
                 dialog.dismiss()
             }
 
@@ -165,15 +157,15 @@ class SaleMainViewModel (
 
     private fun calculateNetAmount() {
             var totalAmount = 0
-            for (i in selectedSaleItems) {
+            for (i in selectedInvoiceItems) {
                 totalAmount += i.qty * ((i.price.toFloat().roundToInt() - ((i.price.toFloat().roundToInt() * i.discount) / 100)).roundToInt())
             }
             netAmount.postValue(totalAmount)
         }
 
-    fun nullCheckingSalesItem(): MutableList<saleInvoice>{
-        var filteredList: MutableList<saleInvoice> = mutableListOf()
-        for (i in selectedSaleItems){
+    fun nullCheckingSalesItem(): MutableList<InvoiceItem>{
+        var filteredList: MutableList<InvoiceItem> = mutableListOf()
+        for (i in selectedInvoiceItems){
             if (i.qty > 0){
                 filteredList.add(i)
             }

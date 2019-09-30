@@ -2,64 +2,81 @@ package com.example.dms.viewmodels.Factory.checkout
 
 import android.content.Context
 import androidx.lifecycle.MutableLiveData
+import com.example.dms.data.database.table.CheckOut
+import com.example.dms.data.database.table.Invoice
+import com.example.dms.data.database.table.InvoiceItem
 import com.example.dms.data.repositories.CheckOutRepository
-import com.example.dms.network.request.saleInvoice
-import com.example.dms.ui.adapters.CheckOutAdapter
 import kotlin.math.roundToInt
 
 class CheckOutMainViewModel(
-    private val checkOutRepo: CheckOutRepository,private val context: Context
-):CheckOutBaseViewModel()  {
+    private val checkOutRepo: CheckOutRepository
+) : CheckOutBaseViewModel() {
 
     var errorState = MutableLiveData<String>()
-var discPercent=MutableLiveData<Float>()
-    var discAmount=MutableLiveData<Int>()
+    var discPrice = MutableLiveData<Float>()
+    var discAmount = MutableLiveData<Int>()
     var netAmount = MutableLiveData<Int>()
-    var refund=MutableLiveData<Int>()
-    var tax=MutableLiveData<Int>()
-    var totalAmount=0
-    var successState = MutableLiveData<List<saleInvoice>>()
+    var refund = MutableLiveData<Int>()
+    var tax = MutableLiveData<Int>()
+    var totalAmount = 0
 
 
-    fun calculateTotal(checkoutList: MutableList<saleInvoice>): Int{
-        for (i in checkoutList){
+    fun calculateTotal(checkoutList: MutableList<InvoiceItem>): Int {
+        for (i in checkoutList) {
             totalAmount += i.qty * ((i.price.toFloat().roundToInt() - ((i.price.toFloat().roundToInt() * i.discount) / 100)).roundToInt())
         }
         return totalAmount
     }
 
-//    fun calculateDiscAmt(disc: Float){
-//        discAmount.postValue((totalAmount * disc / 100).roundToInt())
-//    }
-//
-//    fun calculateDiscPercent(disc: Int){
-//        discPercent.postValue((disc * 100 / totalAmount).toFloat())
-//    }
 
-    fun calculateNetAmount(discAmt: String){
-        if (!discAmt.isNullOrEmpty()){
+    fun calculateNetAmount(discAmt: String) {
+        if (!discAmt.isNullOrEmpty()) {
             netAmount.postValue(totalAmount - discAmt.toInt())
-        } else{
+        } else {
             netAmount.postValue(totalAmount - 0)
         }
     }
 
-    fun calculateRefund(payAmt: Int, netAmount: Int){
+    fun calculateRefund(payAmt: Int, netAmount: Int) {
         refund.postValue(payAmt - netAmount)
     }
 
-    fun calculateTax(netAmount: Int){
+    fun calculateTax(netAmount: Int) {
         tax.postValue((netAmount * 5 / 100))
     }
-//    var selectedSaleItems: MutableList<saleInvoice> = mutableListOf()
-//
-//    fun nullCheckingSalesItem(): MutableList<saleInvoice>{
-//        var filteredList: MutableList<saleInvoice> = mutableListOf()
-//        for (i in selectedSaleItems){
-//            if (i.qty > 0){
-//                filteredList.add(i)
-//            }
-//        }
-//        return filteredList
-//    }
+
+    fun saveData(
+        invoiceID: String,
+        cid: String,
+        saleDate: String,
+        netAmount: String,
+        discPercent: String,
+        discAmt: String,
+        checkoutList: MutableList<InvoiceItem>
+    ) {
+
+        var discPercent = discPercent
+        var discAmt = discAmt
+        discPercent = "0"
+        discAmt = "0"
+
+        val invoice = Invoice(invoiceID, cid, saleDate, netAmount, discPercent, discAmt)
+
+        var calculatedList: MutableList<InvoiceItem> = mutableListOf()
+
+        for (i in checkoutList) {
+            val salePrice = i.price.toFloat().roundToInt()
+            val promoPrice = (salePrice - ((salePrice * i.discount) / 100)).roundToInt()
+            val amount = i.qty * promoPrice
+            calculatedList.add(
+                InvoiceItem("0",i.invoiceId,i.productId,i.um,i.qty,salePrice.toString(),false,
+                    promoPrice.toFloat())
+
+            )
+        }
+
+        checkOutRepo.saveDataIntoDatabase(invoice, calculatedList)
+
+    }
+
 }

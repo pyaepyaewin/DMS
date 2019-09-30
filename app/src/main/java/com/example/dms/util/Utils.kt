@@ -19,7 +19,8 @@ object Utils {
     }
     fun getInvoiceId():String
     {
-        val currentDate=Calendar.getInstance().time.toString()
-        return currentDate
+        val currentDate = Calendar.getInstance().time
+        val format = SimpleDateFormat("mmMMddyyss")
+        return format.format(currentDate)
     }
 }

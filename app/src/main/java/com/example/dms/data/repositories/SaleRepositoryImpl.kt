@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import com.example.dms.data.database.MyDatabase
 import com.example.dms.network.ApiService
 import com.example.dms.network.response.Sale.Data
-import com.example.dms.data.database.table.Product
+import com.example.dms.network.response.Product
 import com.example.dms.network.response.Sale.SaleListResponse
 import com.example.dms.util.Utils
 import io.reactivex.Observable

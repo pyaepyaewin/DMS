@@ -2,7 +2,7 @@ package com.example.dms.viewmodels.Factory.customer
 
 import androidx.lifecycle.MutableLiveData
 import com.example.dms.data.repositories.CustomerRepository
-import com.example.dms.data.database.table.Customer
+import com.example.dms.network.response.Customer
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 

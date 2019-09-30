@@ -4,22 +4,19 @@ import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.dms.R
-import com.example.dms.network.request.saleInvoice
+import com.example.dms.data.database.table.InvoiceItem
 import com.example.dms.ui.adapters.PrintAdapter
 import com.example.dms.util.Utils
 import com.example.dms.viewmodels.Factory.print.PrintMainViewModel
 import com.example.dms.viewmodels.Factory.print.PrintMainViewModelFactory
 import kotlinx.android.synthetic.main.activity_print.*
-import kotlinx.android.synthetic.main.activity_sale.*
-import kotlinx.android.synthetic.main.print.*
 import java.io.Serializable
 
 class PrintActivity : AppCompatActivity() {
-    private lateinit var checkoutList: MutableList<saleInvoice>
+    private lateinit var checkoutList: MutableList<InvoiceItem>
 
     private val printViewModel: PrintMainViewModel by lazy {
         ViewModelProvider(this, PrintMainViewModelFactory()).get(PrintMainViewModel::class.java)
@@ -31,14 +28,18 @@ class PrintActivity : AppCompatActivity() {
 
     companion object{
         fun getIntent(context: Context,
-                      filteredSaleItemList: MutableList<saleInvoice>,
+                      invoiceID:String,
+                      saleDate:String,
+                      filteredInvoiceItemList: MutableList<InvoiceItem>,
                       totalAmt: String,
                       discPercent: String,
                       discAmt: String,
                       netAmt: String,
                       receive: String): Intent{
             val intent =  Intent(context, PrintActivity::class.java)
-            intent.putExtra("printList", filteredSaleItemList as Serializable)
+            intent.putExtra("invoiceID",invoiceID)
+            intent.putExtra("saleDate",saleDate)
+            intent.putExtra("printList", filteredInvoiceItemList as Serializable)
             intent.putExtra("totalAmt", totalAmt)
             intent.putExtra("discPercent", discPercent)
             intent.putExtra("discAmt", discAmt)
@@ -52,7 +53,7 @@ class PrintActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_print)
 
-        this.checkoutList = intent.getSerializableExtra("printList") as MutableList<saleInvoice>
+        this.checkoutList = intent.getSerializableExtra("print") as MutableList<InvoiceItem>
 
    //close.setOnClickListener { finish() }
 
