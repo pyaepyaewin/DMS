@@ -339,7 +339,7 @@ class SyncViewModel(private val syncRepo: SyncRepo, private val schedulerProvide
                         errorState.postValue(Pair(it.aceplusStatusMessage, "download"))
                     }
 
-                    val downloadConfirmParam = Utils.confirmRequestSuccessForProduct(saleMan.user_id, routeScheduleID)
+                    val downloadConfirmParam = Utils.confirmRequestSuccessForProduct(saleMan.id, routeScheduleID)
                     return@flatMap syncRepo.downloadConfirmSuccess(downloadConfirmParam)
                 }
                 .subscribeOn(schedulerProvider.io())

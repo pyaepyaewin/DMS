@@ -51,39 +51,56 @@
                 android:name=".ui.activities.LoginActivity"
                 android:screenOrientation="landscape">
         </activity>
-        <activity android:name=".ui.activities.SyncActivity">
+        <activity android:name=".ui.activities.SyncActivity"
+                  android:screenOrientation="landscape">
         </activity>
-        <activity android:name=".ui.activities.RouteActivity">
+        <activity android:name=".ui.activities.RouteActivity"
+                  android:screenOrientation="landscape">
         </activity>
-        <activity android:name=".ui.activities.CustomerVisitActivity">
+        <activity android:name=".ui.activities.CustomerVisitActivity"
+                  android:screenOrientation="landscape">
         </activity>
-        <activity android:name=".ui.activities.PromotionActivity">
+        <activity android:name=".ui.activities.PromotionActivity"
+                  android:screenOrientation="landscape">
         </activity>
-        <activity android:name=".ui.activities.VanIssueActivity">
+        <activity android:name=".ui.activities.VanIssueActivity"
+                  android:screenOrientation="landscape">
         </activity>
-        <activity android:name=".ui.activities.ReportActivity">
+        <activity android:name=".ui.activities.ReportActivity"
+                  android:screenOrientation="landscape">
         </activity>
-        <activity android:name=".ui.activities.customer.CustomerActivity">
+        <activity android:name=".ui.activities.customer.CustomerActivity"
+                  android:screenOrientation="landscape">
         </activity>
-        <activity android:name=".ui.activities.customer.AddNewCustomerActivity">
+        <activity android:name=".ui.activities.customer.AddNewCustomerActivity"
+                  android:screenOrientation="landscape">
         </activity>
-        <activity android:name=".ui.activities.customer.CreditCollectionActivity">
+        <activity android:name=".ui.activities.customer.CreditCollectionActivity"
+                  android:screenOrientation="landscape">
         </activity>
-        <activity android:name=".ui.activities.customer.DeliveryActivity">
+        <activity android:name=".ui.activities.customer.DeliveryActivity"
+                  android:screenOrientation="landscape">
         </activity>
-        <activity android:name=".ui.activities.customer.sale.SaleCancelActivity">
+        <activity android:name=".ui.activities.customer.sale.SaleCancelActivity"
+                  android:screenOrientation="landscape">
         </activity>
-        <activity android:name=".ui.activities.customer.CustomerLocationActivity">
+        <activity android:name=".ui.activities.customer.CustomerLocationActivity"
+                  android:screenOrientation="landscape">
         </activity>
-        <activity android:name=".ui.activities.customer.sale.SaleReturnActivity">
+        <activity android:name=".ui.activities.customer.sale.SaleReturnActivity"
+                  android:screenOrientation="landscape">
         </activity>
-        <activity android:name=".ui.activities.customer.AddNewCustomerLocationActivity">
+        <activity android:name=".ui.activities.customer.AddNewCustomerLocationActivity"
+                  android:screenOrientation="landscape">
         </activity>
-        <activity android:name=".ui.activities.customer.sale.SaleActivity">
+        <activity android:name=".ui.activities.customer.sale.SaleActivity"
+                  android:screenOrientation="landscape">
         </activity>
-        <activity android:name=".ui.activities.customer.SaleOrderActivity">
+        <activity android:name=".ui.activities.customer.SaleOrderActivity"
+                  android:screenOrientation="landscape">
         </activity>
-        <activity android:name=".ui.activities.customer.PosmActivity">
+        <activity android:name=".ui.activities.customer.PosmActivity"
+                  android:screenOrientation="landscape">
         </activity>
     </application>
 

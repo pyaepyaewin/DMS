@@ -92,7 +92,7 @@ class CustomerActivity : BaseActivity(), KodeinAware {
 
         if (intent != null) {
             val check = intent.getStringExtra(IE_SALE_EXCHANGE)
-            val customer_Id = intent.extras!!.getString("CUSTOMER_ID")
+            val customer_Id = intent.getStringExtra("CUSTOMER_ID")
 
             if (check.equals("yes", ignoreCase = true)) {
                 llCustomerButtonGp.visibility = View.GONE
