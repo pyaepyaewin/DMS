@@ -16,55 +16,71 @@ import kotlinx.android.synthetic.main.activity_print.*
 import java.io.Serializable
 
 class PrintActivity : AppCompatActivity() {
-    private lateinit var checkoutList: MutableList<InvoiceItem>
-
-    private val printViewModel: PrintMainViewModel by lazy {
-        ViewModelProvider(this, PrintMainViewModelFactory()).get(PrintMainViewModel::class.java)
-    }
-
-    private val printListAdapter: PrintAdapter by lazy {
-        PrintAdapter(checkoutList)
-    }
-
-    companion object{
-        fun getIntent(context: Context,
-                      invoiceID:String,
-                      saleDate:String,
-                      filteredInvoiceItemList: MutableList<InvoiceItem>,
-                      totalAmt: String,
-                      discPercent: String,
-                      discAmt: String,
-                      netAmt: String,
-                      receive: String): Intent{
-            val intent =  Intent(context, PrintActivity::class.java)
-            intent.putExtra("invoiceID",invoiceID)
-            intent.putExtra("saleDate",saleDate)
-            intent.putExtra("printList", filteredInvoiceItemList as Serializable)
-            intent.putExtra("totalAmt", totalAmt)
-            intent.putExtra("discPercent", discPercent)
-            intent.putExtra("discAmt", discAmt)
-            intent.putExtra("netAmt", netAmt)
-            intent.putExtra("receive", receive)
-            return intent
-        }
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_print)
-
-        this.checkoutList = intent.getSerializableExtra("print") as MutableList<InvoiceItem>
-
-   //close.setOnClickListener { finish() }
-
-
-        rvPrint.adapter = printListAdapter
-        rvPrint.layoutManager = LinearLayoutManager(this)
-        date.text=Utils.getCurrentDate()
-        totalAmount.text = intent.getStringExtra("totalAmt")
-        netAmt.text = intent.getStringExtra("netAmt")
-        receive.text = intent.getStringExtra("receive")
-        dis.text = "${intent.getStringExtra("discAmt")} (${intent.getStringExtra("discPercent")}%)"
-
-    }
+//    companion object{
+//        fun getIntent(context: Context,
+//                      filteredInvoiceItemList: MutableList<InvoiceItem>
+//        ): Intent{
+//            val intent =  Intent(context, PrintActivity::class.java)
+//            intent.putExtra("printList", filteredInvoiceItemList as Serializable)
+//
+//            return intent
+//        }
+//    }
+//    private lateinit var checkoutList: MutableList<InvoiceItem>
+//
+//    private val printListAdapter: PrintAdapter by lazy {
+//        PrintAdapter(checkoutList)
+//    }
+//    companion object{
+//        fun getIntent(context: Context,
+//                      invoiceID: String,
+//                      saleDate: String,
+//                      filteredSaleItemList: MutableList<InvoiceItem>,
+//                      totalAmt: String,
+//                      discPercent: String,
+//                      discAmt: String,
+//                      netAmt: String,
+//                      receive: String): Intent{
+//            val intent =  Intent(context, PrintActivity::class.java)
+//            intent.putExtra("invoiceID", invoiceID)
+//            intent.putExtra("saleDate", saleDate)
+//            intent.putExtra("printList", filteredSaleItemList as Serializable)
+//            intent.putExtra("totalAmt", totalAmt)
+//            intent.putExtra("discPercent", discPercent)
+//            intent.putExtra("discAmt", discAmt)
+//            intent.putExtra("netAmt", netAmt)
+//            intent.putExtra("receive", receive)
+//            return intent
+//        }
+//    }
+//
+//
+//    override fun onCreate(savedInstanceState: Bundle?) {
+//        super.onCreate(savedInstanceState)
+//        setContentView(R.layout.activity_print)
+//
+//        this.checkoutList = intent.getSerializableExtra("printList") as MutableList<InvoiceItem>
+////   close.setOnClickListener {
+////       finish()
+////   }
+//
+//
+//        rvPrint.adapter = printListAdapter
+//        rvPrint.layoutManager = LinearLayoutManager(this)
+//
+//        totalAmount.text = intent.getStringExtra("totalAmt")
+////        netAmt.text = intent.getStringExtra("netAmt")
+////        receive.text = intent.getStringExtra("receive")
+////        dis.text = "${intent.getStringExtra("discAmt")} (${intent.getStringExtra("discPercent")}%)"
+//
+//        invoiceId.text = intent.getStringExtra("invoiceID")
+//        date.text = intent.getStringExtra("saleDate")
+//
+//
+//
+//
+//
+//
+//
+//    }
 }

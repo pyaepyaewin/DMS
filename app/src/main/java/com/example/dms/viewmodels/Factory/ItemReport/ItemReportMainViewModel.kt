@@ -1,6 +1,7 @@
 package com.example.dms.viewmodels.Factory.ItemReport
 
 import androidx.lifecycle.MutableLiveData
+import com.example.dms.data.database.table.InvoiceItem
 import com.example.dms.data.database.table.InvoiceItemReport
 import com.example.dms.data.database.table.InvoiceReport
 import com.example.dms.data.repositories.ItemReportRepository

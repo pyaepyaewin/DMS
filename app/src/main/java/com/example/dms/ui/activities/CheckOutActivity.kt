@@ -63,6 +63,14 @@ class CheckOutActivity : AppCompatActivity() {
             intent.getSerializableExtra("CheckoutList") as MutableList<InvoiceItem>
 
         this.checkoutList = saleCheckoutList
+
+        txtSalesDateCheckout.text = Utils.getCurrentDate()
+        txtInvoiceIDCheckout.text = Utils.getInvoiceId()
+        txtTotalAmountCheckout.text = checkoutViewModel.calculateTotal(checkoutList).toString()
+
+        for (item in checkoutList){
+            item.invoiceId = txtInvoiceIDCheckout.text.toString()
+        }
         //txtNetAmountCheckout.text=amt.text
         imgbtnCheckoutCancel.setOnClickListener { finish() }
         imgbtnCheckoutSC.setOnClickListener {
@@ -78,36 +86,14 @@ class CheckOutActivity : AppCompatActivity() {
                     edtDiscAmtCheckout.text.toString(),
                     checkoutList
                 )
-                startActivity(
-                    PrintActivity.getIntent(
-                        this,
-                        txtInvoiceIDCheckout.text.toString(),
-                        txtSalesDateCheckout.text.toString(),
-                        checkoutList,
-                        txtTotalAmountCheckout.text.toString(),
-                        edtDiscPercentCheckout.text.toString(),
-                        edtDiscAmtCheckout.text.toString(),
-                        txtNetAmountCheckout.text.toString(),
-                        edtPayAmountCheckout.text.toString()
-                    )
-                )
-//                val amountPrice = txtNetAmountCheckout.text.toString()
-//
-//                val checkoutId = Utils.getInvoiceId()
-//                val productId = checkOutData[0].Product_id
-//                var qty = checkOutData[0].total_qty
-//                val um = checkOutData[0].um_id
-//
-//                var checkOutData =
-//                    CheckOut(checkoutId, productId, qty, um, amountPrice, "0", amountPrice)
-//                val checkOutDataList = mutableListOf<CheckOut>()
-//                checkOutDataList.add(checkOutData)
-//
-//                val customerId = invoiceData[0].CUSTOMER_ID
-//                var invoiceData = InvoiceReport(checkoutId, customerId, amountPrice, "0", "0")
-//                val invoiceDataList = mutableListOf<InvoiceReport>()
-//                invoiceDataList.add(invoiceData)
-//                checkOutRepo.saveDataIntoDatabase(invoiceDataList,checkOutDataList)
+                Toast.makeText(this,"checkout save",Toast.LENGTH_SHORT).show()
+//                startActivity(
+//                    PrintActivity.getIntent(
+//                        this,checkoutList
+//                    )
+//                )
+//                val intent=Intent(this,PrintActivity::class.java)
+//                startActivity(intent)
 
             } else {
                 Toast.makeText(this, "Empty", Toast.LENGTH_LONG).show()
@@ -150,9 +136,6 @@ class CheckOutActivity : AppCompatActivity() {
         rvCheckoutList.adapter = checkoutAdp
         rvCheckoutList.layoutManager = LinearLayoutManager(this)
 
-        txtSalesDateCheckout.text = Utils.getCurrentDate()
-        txtInvoiceIDCheckout.text = Utils.getInvoiceId()
-        txtTotalAmountCheckout.text = checkoutViewModel.calculateTotal(checkoutList).toString()
 
         checkoutViewModel.calculateNetAmount(edtDiscAmtCheckout.text.toString())
         checkoutViewModel.calculateTax(txtNetAmountCheckout.text.toString().toInt())

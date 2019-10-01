@@ -1,13 +1,16 @@
 package com.example.dms.data.database.table
 
+import androidx.annotation.NonNull
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import java.io.Serializable
 
 @Entity(tableName = "invoice_item")
 data class InvoiceItem(
-    @PrimaryKey val id: String,
-    val invoiceId: String,
+    @PrimaryKey(autoGenerate = true)
+    @NonNull
+    val id: Int,
+    var invoiceId: String,
     val productId: String,
     var um: String,
     var qty: Int,

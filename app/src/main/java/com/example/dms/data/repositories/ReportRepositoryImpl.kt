@@ -7,6 +7,7 @@ import io.reactivex.Observable
 
 class ReportRepositoryImpl(val database:MyDatabase):ReportRepository {
     override fun getReportData(): Observable<List<InvoiceReport>> {
+        val allInvoiceList = database.saleItemReportDao().allData()
         return database.saleReportDao().getInvoiceReport()
     }
 

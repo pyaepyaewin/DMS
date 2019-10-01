@@ -69,7 +69,7 @@ class CheckOutMainViewModel(
             val promoPrice = (salePrice - ((salePrice * i.discount) / 100)).roundToInt()
             val amount = i.qty * promoPrice
             calculatedList.add(
-                InvoiceItem("0",i.invoiceId,i.productId,i.um,i.qty,salePrice.toString(),false,
+                InvoiceItem(0,i.invoiceId,i.productId,i.um,i.qty,salePrice.toString(),false,
                     promoPrice.toFloat())
 
             )

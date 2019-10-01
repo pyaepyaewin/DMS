@@ -6,6 +6,9 @@ data class InvoiceItemReport(
     val Product_name: String,
     val um: String,
     val qty: Int,
-    val price: String,
-    val promo_price: String?,
-    val amount: String?)
+    val price: String
+
+
+//    val promo_price: String?,
+//    val amount: String?
+)

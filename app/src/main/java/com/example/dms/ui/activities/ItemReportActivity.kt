@@ -43,8 +43,8 @@ class ItemReportActivity : AppCompatActivity() {
         setContentView(R.layout.activity_item_report)
         btnClose.setOnClickListener { finish() }
 
-        itemReportViewModel.successState.observe(this, androidx.lifecycle.Observer
-        { saleItemAdapter.setData(it) } )
+        itemReportViewModel.successState.observe(this, Observer { saleItemAdapter.setData(it) }
+         )
 
 
         itemReportViewModel.errorState.observe(this, Observer

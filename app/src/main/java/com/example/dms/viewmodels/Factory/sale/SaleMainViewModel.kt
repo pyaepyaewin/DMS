@@ -60,7 +60,7 @@ class SaleMainViewModel (
     fun addItem(product: Product) {
         var found = false
         for (i in selectedInvoiceItems.indices) {
-            if (product.Id == selectedInvoiceItems[i].id) {
+            if (product.Id == selectedInvoiceItems[i].productId) {
                 selectedInvoiceItems[i].qty += 1
                 saleItemAdpter.updateRow(this.selectedInvoiceItems, i)
                 found = true
@@ -69,7 +69,7 @@ class SaleMainViewModel (
         }
         if (!found) {
             selectedInvoiceItems.add(
-                InvoiceItem("0",
+                InvoiceItem(0,
                    product.Id,
 product.Product_id,product.um_id,product.total_qty,product.selling_price,false,0.0f))
             saleItemAdpter.addRow(this.selectedInvoiceItems)
