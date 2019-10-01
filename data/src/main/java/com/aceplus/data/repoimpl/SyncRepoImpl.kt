@@ -138,15 +138,21 @@ class SyncRepoImpl(
     }
 
     override fun getCustomerIdList(): List<Int> {
-        return db.customerDao().allID
+//        return db.customerDao().allID.filter { it.data.toInt() }
+        val list = mutableListOf<Int>()
+        return list
     }
 
     override fun getCustomerList(): List<CustomerForApi> {
-        return db.customerDao().customerList
+//        return db.customerDao().customerList
+        val list = mutableListOf<CustomerForApi>()
+        return list
     }
 
     override fun getExistingCustomerList(): List<ExistingCustomerForApi> {
-        return db.customerDao().existingCustomerList
+//        return db.customerDao().existingCustomerList
+        val list = mutableListOf<ExistingCustomerForApi>()
+        return list
     }
 
     override fun getInvoiceDataList(): List<com.aceplus.domain.model.forApi.invoice.Invoice> {

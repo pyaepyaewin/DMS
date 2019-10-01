@@ -91,7 +91,7 @@ class CompanyInformation {
     @Expose
     var phone_number: String? = null
 
-    @ColumnInfo(name = "is_separator")
+    @ColumnInfo(name = "separator")
     @SerializedName("is_separator")
     @Expose
     var separator: Int? = 0
@@ -151,7 +151,7 @@ class CompanyInformation {
     @Expose
     var pos_voucher_footer2: String? = null
 
-    @ColumnInfo(name = "is_stock_auto_generate")
+    @ColumnInfo(name = "stock_auto_generate")
     @SerializedName("is_stock_auto_generate")
     @Expose
     var stock_auto_generate: Int? = 0

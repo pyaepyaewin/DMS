@@ -83,7 +83,7 @@ class Customer() : Parcelable {
     @Expose
     var payment_type: String? = null
 
-    @ColumnInfo(name = "is_in_route")
+    @ColumnInfo(name = "in_route")
     @SerializedName("is_in_route")
     @Expose
     var in_route: String? = null
