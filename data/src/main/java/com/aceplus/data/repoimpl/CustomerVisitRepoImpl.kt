@@ -41,10 +41,8 @@ class CustomerVisitRepoImpl(
         val routeSchedule = db.routeScheduleV2Dao().dataBySaleManId(saleManId!!)
         val routeScheduleItems =
             db.routeScheduleItemV2Dao().allDataByRouteScheduleId(routeSchedule.id.toString())
-        return if (routeScheduleItems.count() > 0)
-            routeScheduleItems[0].route_schedule_id
-        else
-            0
+        return if (routeScheduleItems.count() > 0) routeScheduleItems[0].route_schedule_id
+        else 0
     }
 
     override fun getLastCountForInvoiceNumber(mode: String): Int {
@@ -81,7 +79,7 @@ class CustomerVisitRepoImpl(
     }
 
     override fun getAllCustomerData(): Observable<List<Customer>> {
-        return Observable.just(db.customerDao().allCustomerData)
+        return Observable.just(db.customerDao().allCustomerData())
     }
 
     override fun getAllDidFeedback(): Observable<List<String>> {

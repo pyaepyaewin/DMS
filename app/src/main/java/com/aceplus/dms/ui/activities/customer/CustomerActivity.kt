@@ -188,13 +188,16 @@ class CustomerActivity : BaseActivity(), KodeinAware {
                 startActivity(intent)
             }
         }
+
         tvPhone.setOnClickListener {
             if (didCustomerSelected()) {
                 val phoneNo = tvPhone.text.toString()
                 startActivity(Intent(Intent.ACTION_DIAL, Uri.parse("tel:$phoneNo")))
             }
         }
+
         ivCancel.setOnClickListener { onBackPressed() }
+
         btnOk.setOnClickListener {
             if (didCustomerSelected()) {
                 //insert arrival & departure time for temp for sale man route

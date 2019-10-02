@@ -89,6 +89,7 @@ class SaleActivity : BaseActivity(), KodeinAware {
             }
                 ?: Utils.commonDialog("No issued product", this, 2)
         })
+
         saleViewModel.soldProductList.observe(this, Observer {
             mSoldProductListAdapter.setNewList(it as ArrayList<Product>)
         })
@@ -103,6 +104,7 @@ class SaleActivity : BaseActivity(), KodeinAware {
     }
 
     private fun setupUI() {
+
         val check = intent.getStringExtra(IE_SALE_EXCHANGE)
 
         if (check.equals("yes", ignoreCase = true)) {

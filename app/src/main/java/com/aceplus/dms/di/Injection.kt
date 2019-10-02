@@ -15,6 +15,7 @@ import com.aceplus.data.utils.Constant
 import com.aceplus.dms.viewmodel.LoginViewModel
 import com.aceplus.dms.viewmodel.SyncViewModel
 import com.aceplus.dms.viewmodel.customer.CustomerViewModel
+import com.aceplus.dms.viewmodel.customer.sale.SaleViewModel
 import com.aceplus.domain.repo.CustomerVisitRepo
 import com.aceplus.domain.repo.LoginRepo
 import com.aceplus.domain.repo.SyncRepo
@@ -26,7 +27,7 @@ import org.kodein.di.generic.instance
 import org.kodein.di.generic.provider
 import org.kodein.di.generic.singleton
 
-//Netowork Module
+//Network Module
 val networkModule = Kodein.Module {
     bind<OkHttpClient>() with singleton { createOkHttpClient() }
     bind<DownloadApiService>() with provider {
@@ -83,6 +84,7 @@ val vmModule = Kodein.Module {
     bind() from singleton { LoginViewModel(instance(), instance()) }
     bind() from singleton { SyncViewModel(instance(), instance()) }
     bind() from singleton { CustomerViewModel(instance(), instance()) }
+    bind() from singleton { SaleViewModel(instance(), instance()) }
 }
 
 
