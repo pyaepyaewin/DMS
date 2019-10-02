@@ -47,6 +47,7 @@ class CustomerActivity : BaseActivity(), KodeinAware {
     companion object {
         private const val IE_SALE_EXCHANGE = "IE_SALE_EXCHANGE"
         private const val IE_CUSTOMER_ID = "IE_CUSTOMER_ID"
+
         fun newIntent(context: Context): Intent {
             return Intent(context, CustomerActivity::class.java)
         }
@@ -57,7 +58,11 @@ class CustomerActivity : BaseActivity(), KodeinAware {
             return intent
         }
 
-        fun newIntentFromSaleExchange(context: Context, isSaleExchange: String, customerId: String): Intent {
+        fun newIntentFromSaleExchange(
+            context: Context,
+            isSaleExchange: String,
+            customerId: String
+        ): Intent {
             val intent = Intent(context, CustomerActivity::class.java)
             intent.putExtra(IE_SALE_EXCHANGE, isSaleExchange)
             intent.putExtra(IE_CUSTOMER_ID, customerId)
@@ -66,27 +71,29 @@ class CustomerActivity : BaseActivity(), KodeinAware {
     }
 
     private val customerViewModel: CustomerViewModel by viewModel()
+
     private val mCustomerListAdapter by lazy {
         CustomerListAdapter(::onClickCustomerListItem)
     }
+
     private var selectedCustomer: Customer? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // Hide keyboard on startup.
-        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
+
+        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN) // Hide keyboard on startup.
 
         setupUI()
         catchEvents()
 
-        customerViewModel.customerDataList.observe(this, Observer { it ->
+        customerViewModel.customerDataList.observe(this, Observer {
             mCustomerListAdapter.setNewList(it as ArrayList<Customer>)
         })
-
         customerViewModel.loadCustomer()
     }
 
     private fun setupUI() {
+
         rvCustomer.layoutManager = GridLayoutManager(applicationContext, 1)
         rvCustomer.adapter = mCustomerListAdapter
 
@@ -138,10 +145,15 @@ class CustomerActivity : BaseActivity(), KodeinAware {
     }
 
     private fun catchEvents() {
+
         edtSearch.addTextChangedListener(object : TextWatcher {
 
-            override fun onTextChanged(characterSequence: CharSequence, arg1: Int, arg2: Int, arg3: Int) {
-
+            override fun onTextChanged(
+                characterSequence: CharSequence,
+                arg1: Int,
+                arg2: Int,
+                arg3: Int
+            ) {
                 val customerList = mCustomerListAdapter.getDataList()
                 val newCustomerList = mutableListOf<Customer>()
                 mCustomerListAdapter.setNewList(ArrayList())
@@ -156,16 +168,13 @@ class CustomerActivity : BaseActivity(), KodeinAware {
                 }
             }
 
-            override fun beforeTextChanged(
-                arg0: CharSequence, arg1: Int, arg2: Int,
-                arg3: Int
-            ) {
-            }
+            override fun beforeTextChanged(arg0: CharSequence, arg1: Int, arg2: Int, arg3: Int) {}
 
             override fun afterTextChanged(arg0: Editable) {
                 mCustomerListAdapter.notifyDataSetChanged()
             }
         })
+
         tvAddress.setOnClickListener {
             if (didCustomerSelected()) {
                 val intent = CustomerLocationActivity.newIntent(
@@ -189,8 +198,15 @@ class CustomerActivity : BaseActivity(), KodeinAware {
         btnOk.setOnClickListener {
             if (didCustomerSelected()) {
                 //insert arrival & departure time for temp for sale man route
-                customerViewModel.insertDataForTempSaleManRoute(selectedCustomer!!, Utils.getCurrentDate(true))
-                val intent = SaleReturnActivity.newIntentFromCustomer(applicationContext, "yes", selectedCustomer!!)
+                customerViewModel.insertDataForTempSaleManRoute(
+                    selectedCustomer!!,
+                    Utils.getCurrentDate(true)
+                )
+                val intent = SaleReturnActivity.newIntentFromCustomer(
+                    applicationContext,
+                    "yes",
+                    selectedCustomer!!
+                )
                 startActivity(intent)
             }
         }
@@ -208,8 +224,12 @@ class CustomerActivity : BaseActivity(), KodeinAware {
     private fun onClickSaleButton() {
         if (didCustomerSelected()) {
             //insert arrival & departure time for temp for sale man route
-            customerViewModel.insertDataForTempSaleManRoute(selectedCustomer!!, Utils.getCurrentDate(true))
-            val intent = SaleActivity.newIntentFromCustomer(applicationContext, "no", selectedCustomer!!)
+            customerViewModel.insertDataForTempSaleManRoute(
+                selectedCustomer!!,
+                Utils.getCurrentDate(true)
+            )
+            val intent =
+                SaleActivity.newIntentFromCustomer(applicationContext, "no", selectedCustomer!!)
             startActivity(intent)
         }
     }
@@ -217,8 +237,15 @@ class CustomerActivity : BaseActivity(), KodeinAware {
     private fun onClickSaleOrderButton() {
         if (didCustomerSelected()) {
             //insert arrival & departure time for temp for sale man route
-            customerViewModel.insertDataForTempSaleManRoute(selectedCustomer!!, Utils.getCurrentDate(true))
-            val intent = SaleOrderActivity.newIntentFromCustomer(applicationContext, true, selectedCustomer!!)
+            customerViewModel.insertDataForTempSaleManRoute(
+                selectedCustomer!!,
+                Utils.getCurrentDate(true)
+            )
+            val intent = SaleOrderActivity.newIntentFromCustomer(
+                applicationContext,
+                true,
+                selectedCustomer!!
+            )
             startActivity(intent)
         }
     }
@@ -226,7 +253,10 @@ class CustomerActivity : BaseActivity(), KodeinAware {
     private fun onClickUnSellReasonButton() {
         if (didCustomerSelected()) {
             //insert arrival & departure time for temp for sale man route
-            customerViewModel.insertDataForTempSaleManRoute(selectedCustomer!!, Utils.getCurrentDate(true))
+            customerViewModel.insertDataForTempSaleManRoute(
+                selectedCustomer!!,
+                Utils.getCurrentDate(true)
+            )
             customerViewModel.loadDidCustomerFeedback(
                 selectedCustomer!!,
                 {
@@ -274,7 +304,11 @@ class CustomerActivity : BaseActivity(), KodeinAware {
                             descriptions.add(customerFeedback.remark.toString())
                         }
                         val descriptionsArrayAdapter =
-                            ArrayAdapter(this@CustomerActivity, android.R.layout.simple_spinner_item, descriptions)
+                            ArrayAdapter(
+                                this@CustomerActivity,
+                                android.R.layout.simple_spinner_item,
+                                descriptions
+                            )
                         descriptionsArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                         descriptionsSpinner.adapter = descriptionsArrayAdapter
                     }
@@ -286,8 +320,15 @@ class CustomerActivity : BaseActivity(), KodeinAware {
     private fun onClickSaleReturnButton() {
         if (didCustomerSelected()) {
             //insert arrival & departure time for temp for sale man route
-            customerViewModel.insertDataForTempSaleManRoute(selectedCustomer!!, Utils.getCurrentDate(true))
-            val intent = SaleReturnActivity.newIntentFromCustomer(applicationContext, "no", selectedCustomer!!)
+            customerViewModel.insertDataForTempSaleManRoute(
+                selectedCustomer!!,
+                Utils.getCurrentDate(true)
+            )
+            val intent = SaleReturnActivity.newIntentFromCustomer(
+                applicationContext,
+                "no",
+                selectedCustomer!!
+            )
             startActivity(intent)
         }
     }
@@ -295,7 +336,10 @@ class CustomerActivity : BaseActivity(), KodeinAware {
     private fun onClickPosmButton() {
         if (didCustomerSelected()) {
             //insert arrival & departure time for temp for sale man route
-            customerViewModel.insertDataForTempSaleManRoute(selectedCustomer!!, Utils.getCurrentDate(true))
+            customerViewModel.insertDataForTempSaleManRoute(
+                selectedCustomer!!,
+                Utils.getCurrentDate(true)
+            )
             val intent = PosmActivity.newIntentFromCustomer(applicationContext, selectedCustomer!!)
             startActivity(intent)
         }
@@ -304,10 +348,14 @@ class CustomerActivity : BaseActivity(), KodeinAware {
     private fun onClickBtnLocation() {
         if (didCustomerSelected()) {
             //insert arrival & departure time for temp for sale man route
-            customerViewModel.insertDataForTempSaleManRoute(selectedCustomer!!, Utils.getCurrentDate(true))
+            customerViewModel.insertDataForTempSaleManRoute(
+                selectedCustomer!!,
+                Utils.getCurrentDate(true)
+            )
             val intent = AddNewCustomerLocationActivity.newIntentFromCustomerActivity(
                 applicationContext,
-                salemanId = AppUtils.getStringFromShp(Constant.SALEMAN_ID, applicationContext) ?: "",
+                salemanId = AppUtils.getStringFromShp(Constant.SALEMAN_ID, applicationContext)
+                    ?: "",
                 customer = selectedCustomer!!
             )
 //            intent.putExtra("customerName", customer.getCustomerName())

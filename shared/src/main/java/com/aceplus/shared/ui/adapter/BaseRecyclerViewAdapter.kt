@@ -7,8 +7,9 @@ import android.view.LayoutInflater
 import android.support.v7.widget.RecyclerView
 import java.util.*
 
-abstract class BaseRecyclerViewAdapter<V : BaseViewHolder<O>,O> : RecyclerView.Adapter<V>() {
-    protected var mDataList: ArrayList<O>
+abstract class BaseRecyclerViewAdapter<V : BaseViewHolder<O>, O> : RecyclerView.Adapter<V>() {
+
+    private var mDataList: ArrayList<O>
 
     init {
         mDataList = ArrayList()
@@ -22,9 +23,9 @@ abstract class BaseRecyclerViewAdapter<V : BaseViewHolder<O>,O> : RecyclerView.A
         return mDataList.size
     }
 
-    fun addNewItem(myItem:O){
+    fun addNewItem(myItem: O) {
         mDataList.add(myItem)
-        notifyDataSetChanged()
+        notifyItemInserted(mDataList.size - 1)
     }
 
     fun setNewList(newList: ArrayList<O>) {
@@ -32,7 +33,8 @@ abstract class BaseRecyclerViewAdapter<V : BaseViewHolder<O>,O> : RecyclerView.A
         notifyDataSetChanged()
     }
 
-    fun getDataList():List<O>{
+    fun getDataList(): List<O> {
         return mDataList
     }
+
 }

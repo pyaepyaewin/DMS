@@ -10,8 +10,8 @@ class ProductViewHolder(itemView: View, val onClickProduct: (data: Product) -> U
     BaseViewHolder<Product>(itemView) {
 
     override fun setData(data: Product) {
-//        itemView.tvCustomerName.text = data.customer_name
-//        itemView.setOnClickListener { onClickCustomer(data) }
+        itemView.tvCustomerName.text = data.product_name
+        itemView.setOnClickListener { onClickProduct(data) }
     }
 
 }

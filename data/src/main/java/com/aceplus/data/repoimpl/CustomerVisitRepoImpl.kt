@@ -19,6 +19,7 @@ import io.reactivex.Observable
 class CustomerVisitRepoImpl(
     private val db: MyDatabase, private val shf: SharedPreferences
 ) : CustomerVisitRepo {
+
     override fun getLocationCode(): Int {
         val locationDataList = db.locationDao().allData
         if (locationDataList.isNotEmpty()) {
@@ -38,7 +39,8 @@ class CustomerVisitRepoImpl(
     override fun getRouteScheduleIDV2(): Int {
         val saleManId = AppUtils.getStringFromShp(Constant.SALEMAN_ID, shf)
         val routeSchedule = db.routeScheduleV2Dao().dataBySaleManId(saleManId!!)
-        val routeScheduleItems = db.routeScheduleItemV2Dao().allDataByRouteScheduleId(routeSchedule.id.toString())
+        val routeScheduleItems =
+            db.routeScheduleItemV2Dao().allDataByRouteScheduleId(routeSchedule.id.toString())
         return if (routeScheduleItems.count() > 0)
             routeScheduleItems[0].route_schedule_id
         else

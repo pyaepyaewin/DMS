@@ -1,6 +1,7 @@
 package com.aceplus.dms.viewmodel.customer
 
 import android.arch.lifecycle.MutableLiveData
+import android.util.Log
 import com.aceplus.data.utils.Constant
 import com.aceplus.dms.utils.Utils
 import com.aceplus.domain.entity.customer.Customer
@@ -17,6 +18,7 @@ class CustomerViewModel(
     private val customerVisitRepo: CustomerVisitRepo,
     private val schedulerProvider: SchedulerProvider
 ) : BaseViewModel() {
+
     var customerDataList = MutableLiveData<List<Customer>>()
 
     fun loadCustomer() {
@@ -26,6 +28,7 @@ class CustomerViewModel(
                 .observeOn(schedulerProvider.mainThread())
                 .subscribe {
                     customerDataList.postValue(it)
+                    Log.d("Testing", it.size.toString())
                 }
         }
     }

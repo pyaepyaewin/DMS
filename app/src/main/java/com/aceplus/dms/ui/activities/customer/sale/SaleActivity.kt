@@ -78,12 +78,11 @@ class SaleActivity : BaseActivity(), KodeinAware {
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
 
         setupUI()
-
         catchEvents()
 
         saleViewModel.productDataList.observe(this, Observer { it ->
             it?.let {
-                mProductListAdapter.setNewList(it.first as java.util.ArrayList<Product>)
+                mProductListAdapter.setNewList(it.first as ArrayList<Product>)
                 mSearchProductAdapter.clear()
                 mSearchProductAdapter.addAll(it.second)
                 mSearchProductAdapter.notifyDataSetChanged()
@@ -105,6 +104,7 @@ class SaleActivity : BaseActivity(), KodeinAware {
 
     private fun setupUI() {
         val check = intent.getStringExtra(IE_SALE_EXCHANGE)
+
         if (check.equals("yes", ignoreCase = true)) {
             tvTitle.text = getString(R.string.sale_exchange)
         }
@@ -151,7 +151,6 @@ class SaleActivity : BaseActivity(), KodeinAware {
 
         cancelImg.setOnClickListener { onBackPressed() }
         checkoutImg.setOnClickListener { saveSaleData() }
-
     }
 
     private fun onSelectAtMostTwoSameProduct(tempProduct: Product){
