@@ -133,7 +133,7 @@ class CustomerActivity : BaseActivity(), KodeinAware {
         tvCustomerNameCA.text = customer.customer_name
         tvPhone.apply {
             paintFlags = Paint.UNDERLINE_TEXT_FLAG
-            text = customer.phone
+            text = customer.phone?.trim()
         }
         tvAddress.apply {
             paintFlags = Paint.UNDERLINE_TEXT_FLAG
@@ -161,10 +161,7 @@ class CustomerActivity : BaseActivity(), KodeinAware {
         edtSearch.addTextChangedListener(object : TextWatcher {
 
             override fun onTextChanged(characterSequence: CharSequence, arg1: Int, arg2: Int, arg3: Int) {
-                //val customerList = mCustomerListAdapter.getDataList()
                 val newCustomerList = mutableListOf<Customer>()
-                //mCustomerListAdapter.setNewList(ArrayList())
-
                 for (customer in allCustomerDataList) {
                     if (customer.customer_name!!.toLowerCase().contains(characterSequence.toString().toLowerCase())) {
                         newCustomerList.add(customer)
@@ -172,12 +169,8 @@ class CustomerActivity : BaseActivity(), KodeinAware {
                 }
                 mCustomerListAdapter.setNewList(newCustomerList as ArrayList<Customer>)
             }
-
             override fun beforeTextChanged(arg0: CharSequence, arg1: Int, arg2: Int, arg3: Int) {}
-
-            override fun afterTextChanged(arg0: Editable) {
-                //mCustomerListAdapter.notifyDataSetChanged()
-            }
+            override fun afterTextChanged(arg0: Editable) {}
         })
 
         tvAddress.setOnClickListener {
@@ -204,7 +197,7 @@ class CustomerActivity : BaseActivity(), KodeinAware {
         ivCancel.setOnClickListener { onBackPressed() }
 
         btnOk.setOnClickListener {
-            if (didCustomerSelected()) {
+            /*if (didCustomerSelected()) {
                 //insert arrival & departure time for temp for sale man route
                 customerViewModel.insertDataForTempSaleManRoute(
                     selectedCustomer!!,
@@ -216,18 +209,19 @@ class CustomerActivity : BaseActivity(), KodeinAware {
                     selectedCustomer!!
                 )
                 startActivity(intent)
-            }
+            }*/
         }
 
         btnSale.setOnClickListener { onClickSaleButton() }
-        btnSaleOrder.setOnClickListener { onClickSaleOrderButton() }
-        btnUnsellReason.setOnClickListener { onClickUnSellReasonButton() }
-        btnSaleReturn.setOnClickListener { onClickSaleReturnButton() }
-        btnPosm.setOnClickListener { onClickPosmButton() }
-        btnLocation.setOnClickListener { onClickBtnLocation() }
+//        btnSaleOrder.setOnClickListener { onClickSaleOrderButton() }
+//        btnUnsellReason.setOnClickListener { onClickUnSellReasonButton() }
+//        btnSaleReturn.setOnClickListener { onClickSaleReturnButton() }
+//        btnPosm.setOnClickListener { onClickPosmButton() }
+//        btnLocation.setOnClickListener { onClickBtnLocation() }
     }
 
     private fun onClickSaleButton() {
+
         if (didCustomerSelected()) {
             //insert arrival & departure time for temp for sale man route
             customerViewModel.insertDataForTempSaleManRoute(
@@ -236,6 +230,7 @@ class CustomerActivity : BaseActivity(), KodeinAware {
             val intent = SaleActivity.newIntentFromCustomer(applicationContext, "no", selectedCustomer!!)
             startActivity(intent)
         }
+
     }
 
     private fun onClickSaleOrderButton() {

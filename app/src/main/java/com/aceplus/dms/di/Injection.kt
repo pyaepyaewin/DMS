@@ -57,7 +57,7 @@ val networkModule = Kodein.Module {
 //        }
 }
 
-//Repository Moduel
+//Repository Module
 val repoModule = Kodein.Module {
     bind<LoginRepo>() with singleton {
         LoginRepoImpl(

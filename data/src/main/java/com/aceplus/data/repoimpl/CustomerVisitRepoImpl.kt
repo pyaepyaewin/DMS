@@ -41,8 +41,7 @@ class CustomerVisitRepoImpl(
     override fun getRouteScheduleIDV2(): Int {
         val saleManId = AppUtils.getStringFromShp(Constant.SALEMAN_ID, shf)
         val routeSchedule = db.routeScheduleV2Dao().dataBySaleManId(saleManId!!)
-        val routeScheduleItems =
-            db.routeScheduleItemV2Dao().allDataByRouteScheduleId(routeSchedule.id.toString())
+        val routeScheduleItems = db.routeScheduleItemV2Dao().allDataByRouteScheduleId(routeSchedule.id.toString())
         return if (routeScheduleItems.count() > 0) routeScheduleItems[0].route_schedule_id
         else 0
     }
@@ -102,7 +101,7 @@ class CustomerVisitRepoImpl(
         if (db.tempForSaleManRouteDao().dataById(saleManId ?: "0", selectedCustomer.customer_id!!).isEmpty()) {
             val tempForSaleManRoute = TempForSaleManRoute()
             tempForSaleManRoute.sale_man_id = saleManId?.toInt() ?: 0
-            tempForSaleManRoute.customer_id = selectedCustomer.customer_id?.toInt() ?: 0
+            tempForSaleManRoute.customer_id = selectedCustomer.id
             tempForSaleManRoute.latitude = selectedCustomer.latitude
             tempForSaleManRoute.longitude = selectedCustomer.longitude
             tempForSaleManRoute.arrival_time = currentDate
@@ -112,7 +111,7 @@ class CustomerVisitRepoImpl(
         } else {
             db.tempForSaleManRouteDao().updateArrivalAndDepartureTime(
                 saleManId ?: "0",
-                selectedCustomer.customer_id?.toInt() ?: 0,
+                selectedCustomer.id,
                 currentDate
             )
         }
