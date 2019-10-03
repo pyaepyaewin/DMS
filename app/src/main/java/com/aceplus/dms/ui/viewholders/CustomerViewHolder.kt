@@ -9,14 +9,17 @@ class CustomerViewHolder(itemView: View, val onClickCustomer: (data: Customer) -
     BaseViewHolder<Customer>(itemView) {
 
     override fun setData(data: Customer) {
+
         var address = data.address ?: ""
         if (data.address!!.length >= 10) {
             address = address.substring(0, 10)
             address += "..."
         }
-        val customerInfo = data.customer_name + "(" + address + ")"
+
+        val customerInfo = data.customer_name + " (" + address + ")"
         itemView.tvCustomerName.text = customerInfo
         itemView.setOnClickListener { onClickCustomer(data) }
+
     }
 
 }

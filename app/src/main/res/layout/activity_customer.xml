@@ -81,10 +81,11 @@
                             android:text="@string/customer_name_label"/>
 
                     <TextView
-                            android:id="@+id/tvCustomerName"
-                            android:layout_width="wrap_content"
+                            android:id="@+id/tvCustomerNameCA"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginLeft="10dp"/>
+                            android:layout_marginLeft="10dp"
+                            android:layout_marginRight="10dp"/>
                 </LinearLayout>
 
                 <LinearLayout
@@ -100,9 +101,10 @@
 
                     <TextView
                             android:id="@+id/tvAddress"
-                            android:layout_width="350dp"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginLeft="10dp"/>
+                            android:layout_marginLeft="10dp"
+                            android:layout_marginRight="10dp"/>
                 </LinearLayout>
 
                 <LinearLayout
@@ -118,9 +120,10 @@
 
                     <TextView
                             android:id="@+id/tvPhone"
-                            android:layout_width="350dp"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginLeft="10dp"/>
+                            android:layout_marginLeft="10dp"
+                            android:layout_marginRight="10dp"/>
                 </LinearLayout>
 
                 <LinearLayout
@@ -136,9 +139,10 @@
 
                     <TextView
                             android:id="@+id/tvTownship"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginLeft="10dp"/>
+                            android:layout_marginLeft="10dp"
+                            android:layout_marginRight="10dp"/>
                 </LinearLayout>
 
                 <LinearLayout
@@ -154,9 +158,10 @@
 
                     <TextView
                             android:id="@+id/tvCreditTerms"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginLeft="10dp"/>
+                            android:layout_marginLeft="10dp"
+                            android:layout_marginRight="10dp"/>
                 </LinearLayout>
 
                 <LinearLayout
@@ -172,9 +177,10 @@
 
                     <TextView
                             android:id="@+id/tvCreditLimit"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginLeft="10dp"/>
+                            android:layout_marginLeft="10dp"
+                            android:layout_marginRight="10dp"/>
                 </LinearLayout>
 
                 <LinearLayout
@@ -190,9 +196,10 @@
 
                     <TextView
                             android:id="@+id/tvCreditAmount"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginLeft="10dp"/>
+                            android:layout_marginLeft="10dp"
+                            android:layout_marginRight="10dp"/>
                 </LinearLayout>
 
                 <LinearLayout
@@ -208,9 +215,10 @@
 
                     <TextView
                             android:id="@+id/tvDueAmount"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginLeft="10dp"/>
+                            android:layout_marginLeft="10dp"
+                            android:layout_marginRight="10dp"/>
                 </LinearLayout>
 
                 <LinearLayout
@@ -226,9 +234,10 @@
 
                     <TextView
                             android:id="@+id/tvPrepaidAmount"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginLeft="10dp"/>
+                            android:layout_marginLeft="10dp"
+                            android:layout_marginRight="10dp"/>
                 </LinearLayout>
 
                 <LinearLayout
@@ -244,9 +253,10 @@
 
                     <TextView
                             android:id="@+id/tvPaymentType"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginLeft="10dp"/>
+                            android:layout_marginLeft="10dp"
+                            android:layout_marginRight="10dp"/>
                 </LinearLayout>
 
                 <LinearLayout
@@ -262,9 +272,10 @@
 
                     <TextView
                             android:id="@+id/tvLatitude"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginLeft="10dp"/>
+                            android:layout_marginLeft="10dp"
+                            android:layout_marginRight="10dp"/>
                 </LinearLayout>
 
                 <LinearLayout
@@ -280,9 +291,10 @@
 
                     <TextView
                             android:id="@+id/tvLongitude"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginLeft="10dp"/>
+                            android:layout_marginLeft="10dp"
+                            android:layout_marginRight="10dp"/>
                 </LinearLayout>
 
                 <LinearLayout
@@ -298,9 +310,10 @@
 
                     <TextView
                             android:id="@+id/tvCustomerRemark"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginLeft="10dp"/>
+                            android:layout_marginLeft="10dp"
+                            />
                 </LinearLayout>
             </LinearLayout>
 

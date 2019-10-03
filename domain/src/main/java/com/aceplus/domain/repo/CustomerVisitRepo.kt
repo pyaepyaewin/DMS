@@ -3,6 +3,7 @@ package com.aceplus.domain.repo
 import com.aceplus.domain.entity.customer.Customer
 import com.aceplus.domain.entity.customer.CustomerFeedback
 import com.aceplus.domain.entity.customer.DidCustomerFeedback
+import com.aceplus.domain.entity.predefine.Township
 import com.aceplus.domain.entity.product.Product
 import com.aceplus.domain.entity.sale.SaleMan
 import com.aceplus.domain.model.roomdb.StringObject
@@ -29,4 +30,5 @@ interface CustomerVisitRepo {
     fun saveSaleVisitRecord(selectedCustomer: Customer, gpsTracker: GPSTracker)
 
     fun updateDepartureTimeForSaleManRoute(saleManId: String, customerId: Int, currentDate: String)
+
 }

@@ -1,6 +1,7 @@
 package com.aceplus.data.repoimpl
 
 import android.content.SharedPreferences
+import android.util.Log
 import com.aceplus.data.database.MyDatabase
 import com.aceplus.data.remote.DownloadApiService
 import com.aceplus.data.remote.UploadApiService
@@ -1278,7 +1279,6 @@ class SyncRepoImpl(
         db.customerFeedbackDao().insertAll(customerFeedbackEntityList)
         db.currencyDao().insertAll(currencyEntityList)
         db.productCategoryDao().insertAll(productCategoryEntityList)
-
 
     }
 

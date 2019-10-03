@@ -4,6 +4,7 @@ import android.app.AlertDialog
 import android.arch.lifecycle.Observer
 import android.content.Context
 import android.content.Intent
+import android.graphics.Paint
 import android.net.Uri
 import android.os.Bundle
 import android.support.v7.widget.GridLayoutManager
@@ -37,6 +38,7 @@ import org.kodein.di.android.kodein
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 
 class CustomerActivity : BaseActivity(), KodeinAware {
     override val kodein: Kodein by kodein()
@@ -77,6 +79,7 @@ class CustomerActivity : BaseActivity(), KodeinAware {
     }
 
     private var selectedCustomer: Customer? = null
+    private var allCustomerDataList: ArrayList<Customer> = ArrayList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -88,6 +91,7 @@ class CustomerActivity : BaseActivity(), KodeinAware {
 
         customerViewModel.customerDataList.observe(this, Observer {
             mCustomerListAdapter.setNewList(it as ArrayList<Customer>)
+            allCustomerDataList = it
         })
         customerViewModel.loadCustomer()
     }
@@ -124,11 +128,18 @@ class CustomerActivity : BaseActivity(), KodeinAware {
     }
 
     private fun onClickCustomerListItem(customer: Customer) {
+
         this.selectedCustomer = customer
-        tvCustomerName.text = customer.customer_name
-        tvPhone.text = customer.phone
-        tvAddress.text = customer.address
-        tvTownship.text = customer.township
+        tvCustomerNameCA.text = customer.customer_name
+        tvPhone.apply {
+            paintFlags = Paint.UNDERLINE_TEXT_FLAG
+            text = customer.phone
+        }
+        tvAddress.apply {
+            paintFlags = Paint.UNDERLINE_TEXT_FLAG
+            text = customer.address
+        }
+        tvTownship.text = customer.township_number
         tvCreditTerms.text = customer.credit_term
         tvCreditLimit.text = customer.credit_limit
         tvCreditAmount.text = customer.credit_amount
@@ -142,51 +153,45 @@ class CustomerActivity : BaseActivity(), KodeinAware {
         tvLongitude.text = nf.format(longitude)
         tvCustomerRemark.text = customer.fax
         btnLocation.isEnabled = customer.flag?.toInt() ?: 0 != 1
+
     }
 
     private fun catchEvents() {
 
         edtSearch.addTextChangedListener(object : TextWatcher {
 
-            override fun onTextChanged(
-                characterSequence: CharSequence,
-                arg1: Int,
-                arg2: Int,
-                arg3: Int
-            ) {
-                val customerList = mCustomerListAdapter.getDataList()
+            override fun onTextChanged(characterSequence: CharSequence, arg1: Int, arg2: Int, arg3: Int) {
+                //val customerList = mCustomerListAdapter.getDataList()
                 val newCustomerList = mutableListOf<Customer>()
-                mCustomerListAdapter.setNewList(ArrayList())
+                //mCustomerListAdapter.setNewList(ArrayList())
 
-                for (customer in customerList) {
-                    if (customer.customer_name!!.toLowerCase()
-                            .contains(characterSequence.toString().toLowerCase())
-                    ) {
+                for (customer in allCustomerDataList) {
+                    if (customer.customer_name!!.toLowerCase().contains(characterSequence.toString().toLowerCase())) {
                         newCustomerList.add(customer)
-                        mCustomerListAdapter.setNewList(newCustomerList as ArrayList<Customer>)
                     }
                 }
+                mCustomerListAdapter.setNewList(newCustomerList as ArrayList<Customer>)
             }
 
             override fun beforeTextChanged(arg0: CharSequence, arg1: Int, arg2: Int, arg3: Int) {}
 
             override fun afterTextChanged(arg0: Editable) {
-                mCustomerListAdapter.notifyDataSetChanged()
+                //mCustomerListAdapter.notifyDataSetChanged()
             }
         })
 
         tvAddress.setOnClickListener {
-            if (didCustomerSelected()) {
+            /*if (didCustomerSelected()) {
                 val intent = CustomerLocationActivity.newIntent(
                     applicationContext,
                     latitude = tvLatitude.text.toString(),
                     longitude = tvLongitude.text.toString(),
-                    customerName = tvCustomerName.text.toString(),
+                    customerName = tvCustomerNameCA.text.toString(),
                     address = tvAddress.text.toString(),
                     visitRecord = this.selectedCustomer!!.visit_record.toString()
                 )
                 startActivity(intent)
-            }
+            }*/
         }
 
         tvPhone.setOnClickListener {
@@ -218,9 +223,7 @@ class CustomerActivity : BaseActivity(), KodeinAware {
         btnSaleOrder.setOnClickListener { onClickSaleOrderButton() }
         btnUnsellReason.setOnClickListener { onClickUnSellReasonButton() }
         btnSaleReturn.setOnClickListener { onClickSaleReturnButton() }
-        btnPosm.setOnClickListener {
-            onClickPosmButton()
-        }
+        btnPosm.setOnClickListener { onClickPosmButton() }
         btnLocation.setOnClickListener { onClickBtnLocation() }
     }
 
@@ -228,11 +231,9 @@ class CustomerActivity : BaseActivity(), KodeinAware {
         if (didCustomerSelected()) {
             //insert arrival & departure time for temp for sale man route
             customerViewModel.insertDataForTempSaleManRoute(
-                selectedCustomer!!,
-                Utils.getCurrentDate(true)
+                selectedCustomer!!, Utils.getCurrentDate(true)
             )
-            val intent =
-                SaleActivity.newIntentFromCustomer(applicationContext, "no", selectedCustomer!!)
+            val intent = SaleActivity.newIntentFromCustomer(applicationContext, "no", selectedCustomer!!)
             startActivity(intent)
         }
     }

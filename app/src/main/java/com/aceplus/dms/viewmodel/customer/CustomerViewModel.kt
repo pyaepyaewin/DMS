@@ -28,7 +28,6 @@ class CustomerViewModel(
                 .observeOn(schedulerProvider.mainThread())
                 .subscribe {
                     customerDataList.postValue(it)
-                    Log.d("Testing", it.size.toString())
                 }
         }
     }

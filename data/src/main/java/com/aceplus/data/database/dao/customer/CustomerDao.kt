@@ -7,6 +7,7 @@ import android.arch.persistence.room.Dao
 import android.arch.persistence.room.Insert
 import android.arch.persistence.room.OnConflictStrategy
 import android.arch.persistence.room.Query
+import com.aceplus.domain.entity.predefine.Township
 import com.aceplus.domain.model.roomdb.StringObject
 import io.reactivex.Observable
 
@@ -19,18 +20,11 @@ interface CustomerDao {
     @get:Query("select * from customer")
     val allData: List<Customer>
 
-    //todo check
-//    @get:Query("select c.id,c.customer_id,c.customer_name,c.customer_type_id,c.customer_type_name,c.address,c.phone,c.township,c.credit_term,c.credit_limit,c.credit_amount,c.due_amount,c.prepaid_amount,c.payment_type,c.is_in_route,c.latitude,c.longitude,c.visit_record,c.district_id,c.state_division_id,c.shop_type_id,c.street_id,c.fax,t.township_name as township_number,c.customer_category_no,c.contact_person,c.route_schedule_status,c.created_user_id,c.created_date,c.flag  from customer as c,township as t where c.township_number == t.township_id")
-//    val allCustomerData: Observable<List<Customer>>
-
-    /*@get:Query("select c.id, c.customer_id, c.customer_name, c.customer_type_id, c.customer_type_name, c.address, c.phone, c.township, c.credit_term, c.credit_limit, c.credit_amount, c.due_amount, c.prepaid_amount, c.payment_type, c.in_route, c.latitude, c.longitude, c.visit_record, c.district_id, c.state_division_id, c.shop_type_id, c.street_id, c.fax, t.township_name as township_number, c.customer_category_no, c.contact_person, c.route_schedule_status, c.created_user_id, c.created_date, c.flag from customer as c,township as t where c.township_number == t.township_id")
-    val allCustomerData: List<Customer>*/
+    @Query("select c.id, c.customer_id, c.customer_name, c.customer_type_id, c.customer_type_name, c.address, c.phone, c.township, c.credit_term, c.credit_limit, c.credit_amount, c.due_amount, c.prepaid_amount, c.payment_type, c.in_route, c.latitude, c.longitude, c.visit_record, c.district_id, c.state_division_id, c.shop_type_id, c.street_id, c.fax, t.township_name as township_number, c.customer_category_no, c.contact_person, c.route_schedule_status, c.created_user_id, c.created_date, c.flag from customer as c,township as t where c.township_number = t.id")
+    fun allCustomerData(): List<Customer>
 
     /*@get:Query("select * from customer")
     val allCustomerData: List<Customer>*/
-
-    @Query("select c.id, c.customer_id, c.customer_name, c.customer_type_id, c.customer_type_name, c.address, c.phone, c.township, c.credit_term, c.credit_limit, c.credit_amount, c.due_amount, c.prepaid_amount, c.payment_type, c.in_route, c.latitude, c.longitude, c.visit_record, c.district_id, c.state_division_id, c.shop_type_id, c.street_id, c.fax, t.township_name as township_number, c.customer_category_no, c.contact_person, c.route_schedule_status, c.created_user_id, c.created_date, c.flag from customer as c inner join township as t where c.township_number == t.township_id")
-    fun allCustomerData(): List<Customer>
 
     @Query("select * from customer where id=:customerId")
     fun dataById(customerId: Int): Customer

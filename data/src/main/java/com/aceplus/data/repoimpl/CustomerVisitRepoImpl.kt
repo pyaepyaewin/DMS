@@ -2,11 +2,13 @@ package com.aceplus.data.repoimpl
 
 import android.content.ContentValues
 import android.content.SharedPreferences
+import android.util.Log
 import com.aceplus.data.database.MyDatabase
 import com.aceplus.data.utils.Constant
 import com.aceplus.domain.entity.customer.Customer
 import com.aceplus.domain.entity.customer.CustomerFeedback
 import com.aceplus.domain.entity.customer.DidCustomerFeedback
+import com.aceplus.domain.entity.predefine.Township
 import com.aceplus.domain.entity.product.Product
 import com.aceplus.domain.entity.route.TempForSaleManRoute
 import com.aceplus.domain.entity.sale.SaleMan
