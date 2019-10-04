@@ -12,6 +12,7 @@ class ProductViewHolder(itemView: View, val onClickProduct: (data: Product) -> U
     override fun setData(data: Product) {
         itemView.tvCustomerName.text = data.product_name
         itemView.setOnClickListener { onClickProduct(data) }
+        itemView.layCustomerList.setBackgroundResource(android.R.color.transparent)
     }
 
 }

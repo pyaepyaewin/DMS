@@ -54,15 +54,9 @@ class SaleActivity : BaseActivity(), KodeinAware {
 
     private val saleViewModel: SaleViewModel by viewModel()
 
-    private val mProductListAdapter by lazy {
-        ProductListAdapter(::onClickProductListItem)
-    }
-    private val mSoldProductListAdapter by lazy {
-        SoldProductListAdapter(::onLongClickSoldProductListItem)
-    }
-    private val mPromotionGiftPresentListAdapter by lazy {
-        PromotionPlanGiftListAdapter()
-    }
+    private val mProductListAdapter by lazy { ProductListAdapter(::onClickProductListItem) }
+    private val mSoldProductListAdapter by lazy { SoldProductListAdapter(::onLongClickSoldProductListItem) }
+    private val mPromotionGiftPresentListAdapter by lazy { PromotionPlanGiftListAdapter() }
     private val mPromotionItemListAdapter by lazy {
         //        PromotionPlanItemListAdapter()
     }
@@ -74,13 +68,14 @@ class SaleActivity : BaseActivity(), KodeinAware {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
 
         setupUI()
         catchEvents()
 
-        saleViewModel.productDataList.observe(this, Observer { it ->
+        saleViewModel.productDataList.observe(this, Observer {
             it?.let {
                 mProductListAdapter.setNewList(it.first as ArrayList<Product>)
                 mSearchProductAdapter.clear()
@@ -106,11 +101,7 @@ class SaleActivity : BaseActivity(), KodeinAware {
     private fun setupUI() {
 
         val check = intent.getStringExtra(IE_SALE_EXCHANGE)
-
-        if (check.equals("yes", ignoreCase = true)) {
-            tvTitle.text = getString(R.string.sale_exchange)
-        }
-
+        if (check.equals("yes", ignoreCase = true)) tvTitle.text = getString(R.string.sale_exchange)
         saleDateTextView.text = Utils.getCurrentDate(false)
 
         //todo
@@ -121,6 +112,7 @@ class SaleActivity : BaseActivity(), KodeinAware {
     }
 
     private fun catchEvents() {
+
         rvProductList.adapter = mProductListAdapter
         rvProductList.layoutManager = GridLayoutManager(applicationContext, 1)
 
@@ -156,22 +148,24 @@ class SaleActivity : BaseActivity(), KodeinAware {
     }
 
     private fun onSelectAtMostTwoSameProduct(tempProduct: Product){
+
         val productDuplicateCheck = mutableListOf<Product>()
-            var sameProduct = false
-            for (tempSoldProduct in mSoldProductListAdapter.getDataList()) {
-                if (tempSoldProduct.product_id === tempProduct.product_id) {
-                    sameProduct = true
-                    if (productDuplicateCheck.contains(tempProduct))
-                        Constant.PRODUCT_COUNT = 2
-                    else
-                        Constant.PRODUCT_COUNT++
-                    break
-                } else {
-                    if (!productDuplicateCheck.contains(tempProduct)) {
-                        Constant.PRODUCT_COUNT = 0
-                    }
+        var sameProduct = false
+
+        for (tempSoldProduct in mSoldProductListAdapter.getDataList()) {
+            if (tempSoldProduct.product_id === tempProduct.product_id) {
+                sameProduct = true
+                if (productDuplicateCheck.contains(tempProduct))
+                    Constant.PRODUCT_COUNT = 2
+                else
+                    Constant.PRODUCT_COUNT++
+                break
+            } else {
+                if (!productDuplicateCheck.contains(tempProduct)) {
+                    Constant.PRODUCT_COUNT = 0
                 }
             }
+        }
 
             if (!sameProduct) {
 //                soldProductList.add(SoldProduct(tempProduct, false))
@@ -201,6 +195,7 @@ class SaleActivity : BaseActivity(), KodeinAware {
         }
     }
     private fun onClickProductListItem(product: Product) {
+
         val newSoldProductList = mSoldProductListAdapter.getDataList() as MutableList
         newSoldProductList.add(product)
         saleViewModel.soldProductList.postValue(newSoldProductList)
@@ -213,6 +208,9 @@ class SaleActivity : BaseActivity(), KodeinAware {
 //                }
 //            }
 //            onSelectAtMostTwoSameProduct(tempProduct)
+
+        //onSelectAtMostTwoSameProduct(tempProduct = product)
+
     }
 
     private fun onLongClickSoldProductListItem(product: Product) {

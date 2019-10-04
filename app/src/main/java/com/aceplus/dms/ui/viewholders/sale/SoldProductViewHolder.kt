@@ -5,13 +5,15 @@ import com.aceplus.domain.entity.customer.Customer
 import com.aceplus.domain.entity.product.Product
 import com.aceplussolutions.rms.ui.viewholder.BaseViewHolder
 import kotlinx.android.synthetic.main.custom_simple_list_item_1.view.*
+import kotlinx.android.synthetic.main.list_row_sold_product_with_custom_discount.view.*
 
 class SoldProductViewHolder(itemView: View, val onLongClickProduct: (data: Product) -> Unit) :
     BaseViewHolder<Product>(itemView) {
 
     override fun setData(data: Product) {
-//        itemView.tvCustomerName.text = data.customer_name
-//        itemView.setOnClickListener { onClickCustomer(data) }
+        itemView.apply {
+
+        }
     }
 
 }
