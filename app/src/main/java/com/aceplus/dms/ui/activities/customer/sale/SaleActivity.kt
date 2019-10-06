@@ -20,6 +20,7 @@ import com.aceplus.dms.utils.Utils
 import com.aceplus.dms.viewmodel.customer.sale.SaleViewModel
 import com.aceplus.domain.entity.customer.Customer
 import com.aceplus.domain.entity.product.Product
+import com.aceplus.domain.model.SoldProduct
 import com.aceplussolutions.rms.ui.activities.BaseActivity
 import kotlinx.android.synthetic.main.activity_sale1.*
 import org.kodein.di.Kodein
@@ -86,7 +87,7 @@ class SaleActivity : BaseActivity(), KodeinAware {
         })
 
         saleViewModel.soldProductList.observe(this, Observer {
-            mSoldProductListAdapter.setNewList(it as ArrayList<Product>)
+            mSoldProductListAdapter.setNewList(it as ArrayList<Product>) // add adp
         })
 
         saleViewModel.loadProductList()
@@ -167,33 +168,35 @@ class SaleActivity : BaseActivity(), KodeinAware {
             }
         }
 
-            if (!sameProduct) {
-//                soldProductList.add(SoldProduct(tempProduct, false))
-                mSoldProductListAdapter.addNewItem(tempProduct)
-            } else {
-                if (Constant.PRODUCT_COUNT < 2 && !productDuplicateCheck.contains(tempProduct)) {
-                    //                    if (tempProduct.getRemainingQty() != 1) {
+        if (!sameProduct) {
+            //soldProductList.add(SoldProduct(tempProduct, false))
+            //mSoldProductListAdapter.addNewItem(SoldProduct(tempProduct, false))
+        } else {
+            if (Constant.PRODUCT_COUNT < 2 && !productDuplicateCheck.contains(tempProduct)) {
+                //                    if (tempProduct.getRemainingQty() != 1) {
 
 //                    soldProductList.add(SoldProduct(tempProduct, false))
 //                    soldProductListRowAdapter.notifyDataSetChanged()
 
-                    mSoldProductListAdapter.addNewItem(tempProduct)
+                //mSoldProductListAdapter.addNewItem(tempProduct) //adding
 
-                    if (Constant.PRODUCT_COUNT == 1) {
-                        Constant.PRODUCT_COUNT = 0
-                        productDuplicateCheck.add(tempProduct)
-//                        soldProductsCheck.add(SoldProduct(tempProduct, false))
-                    }
-                    //                    } else {
-                    //                        Constant.PRODUCT_COUNT = 0;
-                    //                        Utils.commonDialog("Your Quantity is just only 1", SaleActivity.this, 2);
-                    //                    }
-                } else {
+                if (Constant.PRODUCT_COUNT == 1) {
                     Constant.PRODUCT_COUNT = 0
-                    Utils.commonDialog("Already have this product", this@SaleActivity, 2)
+                    productDuplicateCheck.add(tempProduct)
+//                        soldProductsCheck.add(SoldProduct(tempProduct, false))
                 }
+                //                    } else {
+                //                        Constant.PRODUCT_COUNT = 0;
+                //                        Utils.commonDialog("Your Quantity is just only 1", SaleActivity.this, 2);
+                //                    }
+            } else {
+                Constant.PRODUCT_COUNT = 0
+                Utils.commonDialog("Already have this product", this@SaleActivity, 2)
+            }
         }
+
     }
+
     private fun onClickProductListItem(product: Product) {
 
         val newSoldProductList = mSoldProductListAdapter.getDataList() as MutableList
@@ -213,10 +216,10 @@ class SaleActivity : BaseActivity(), KodeinAware {
 
     }
 
-    private fun onLongClickSoldProductListItem(product: Product) {
+    private fun onLongClickSoldProductListItem(product: SoldProduct) {
         AlertDialog.Builder(this@SaleActivity)
             .setTitle("Delete sold product")
-            .setMessage("Are you sure you want to delete " + product.product_name + "?")
+            .setMessage("Are you sure you want to delete " + product.product.name + "?")
             .setPositiveButton("Yes") { arg0, arg1 ->
                 //                val quantity = soldProductList.get(position).getQuantity()
 //                val product = soldProductList.get(position).getProduct()

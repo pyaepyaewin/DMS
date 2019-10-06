@@ -639,59 +639,45 @@ object Utils {
 //        return invoiceNo + String.format("%0" + (idLength - invoiceNo.length) + "d", next)
 //    }
 
-    fun getInvoiceNo(saleManId:String, locationCode:String, mode:String,nextCount:String):String {
+    fun getInvoiceNo(saleManId: String, locationCode: String, mode: String, nextCount: String): String {
 
         val idLength = 18
-
         var invoiceNo = String()
+
         if (mode == Constant.FOR_PACKAGE_SALE)
         {
-
             invoiceNo += "P"
         }
-        else if (mode == Constant.FOR_PRE_ORDER_SALE)
-        {
-
+        else if (mode == Constant.FOR_PRE_ORDER_SALE) {
             invoiceNo += "SO"
         }
         else if (mode == Constant.FOR_DELIVERY)
         {
-
             invoiceNo += "OS"
         }
         else if (mode == Constant.FOR_SALE_RETURN)
         {
-
             invoiceNo += "SR"
         }
         else if (mode == Constant.FOR_SALE_EXCHANGE || mode == Constant.FOR_SALE_RETURN_EXCHANGE)
         {
-
             invoiceNo += "SX"
-
         }
         else if (mode == Constant.FOR_DISPLAY_ASSESSMENT)
         {
-
             invoiceNo += "DA"
         }
         else if (mode == Constant.FOR_OUTLET_STOCK_AVAILABILITY)
         {
-
             invoiceNo += "OSA"
-
         }
         else if (mode == Constant.FOR_SIZE_IN_STORE_SHARE)
         {
-
             invoiceNo += "SIS"
-
         }
         else if (mode == Constant.FOR_COMPETITORACTIVITY)
         {
-
             invoiceNo += "CA"
-
         }
         else if (mode == Constant.FOR_VAN_ISSUE)
         {
@@ -702,7 +688,7 @@ object Utils {
         invoiceNo += saleManId
         invoiceNo += SimpleDateFormat("yyMMdd").format(Date())
 
-        return invoiceNo + String.format("%0" + (idLength - invoiceNo.length) + "d", nextCount)
+        return invoiceNo + String.format("%0" + (idLength - invoiceNo.length) + "d", nextCount) //To Check
     }
 
 //    fun getInvoiceNoForPOSM(context: Context, saleManId:String, locationCode:String):String {

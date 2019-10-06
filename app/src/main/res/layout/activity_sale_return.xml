@@ -125,11 +125,11 @@
                             android:paddingLeft="10dp"
                             android:paddingRight="10dp" />
 
-                        <ListView
-                            android:id="@+id/productsListView"
+                        <android.support.v7.widget.RecyclerView
+                            android:id="@+id/rvProductListSalesReturn"
                             android:layout_width="match_parent"
                             android:layout_height="fill_parent"
-                            android:divider="#000000"></ListView>
+                            android:divider="#000000"></android.support.v7.widget.RecyclerView>
 
                     </LinearLayout>
 
@@ -337,15 +337,14 @@
                                 android:textStyle="bold" />
                         </LinearLayout>
 
-                        <ListView
+                        <android.support.v7.widget.RecyclerView
                             android:id="@+id/soldProductList"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_above="@id/netAmountLayout"
                             android:layout_below="@id/headerLayout"
                             android:layout_margin="10dp"
-                            android:descendantFocusability="blocksDescendants"
-                            android:padding="10dp" />
+                            android:descendantFocusability="blocksDescendants"/>
 
                     </RelativeLayout>
 

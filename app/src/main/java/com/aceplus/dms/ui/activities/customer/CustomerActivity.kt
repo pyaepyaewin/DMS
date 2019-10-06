@@ -32,6 +32,7 @@ import com.aceplus.shared.utils.GPSTracker
 import com.aceplussolutions.rms.constants.AppUtils
 import com.aceplussolutions.rms.ui.activities.BaseActivity
 import kotlinx.android.synthetic.main.activity_customer.*
+import kotlinx.android.synthetic.main.dialog_box_customer_feedback.*
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.kodein
@@ -214,8 +215,8 @@ class CustomerActivity : BaseActivity(), KodeinAware {
 
         btnSale.setOnClickListener { onClickSaleButton() }
 //        btnSaleOrder.setOnClickListener { onClickSaleOrderButton() }
-//        btnUnsellReason.setOnClickListener { onClickUnSellReasonButton() }
-//        btnSaleReturn.setOnClickListener { onClickSaleReturnButton() }
+        btnUnsellReason.setOnClickListener { onClickUnSellReasonButton() }
+        btnSaleReturn.setOnClickListener { onClickSaleReturnButton() }
 //        btnPosm.setOnClickListener { onClickPosmButton() }
 //        btnLocation.setOnClickListener { onClickBtnLocation() }
     }
@@ -250,24 +251,23 @@ class CustomerActivity : BaseActivity(), KodeinAware {
     }
 
     private fun onClickUnSellReasonButton() {
+
         if (didCustomerSelected()) {
+
             //insert arrival & departure time for temp for sale man route
-            customerViewModel.insertDataForTempSaleManRoute(
-                selectedCustomer!!,
-                Utils.getCurrentDate(true)
-            )
-            customerViewModel.loadDidCustomerFeedback(
-                selectedCustomer!!,
+            customerViewModel.insertDataForTempSaleManRoute(selectedCustomer!!, Utils.getCurrentDate(true))
+
+            customerViewModel.loadDidCustomerFeedback(selectedCustomer!!,
                 {
                     AlertDialog.Builder(this@CustomerActivity)
-                        .setTitle("General sale")
+                        .setTitle("General Sale")
                         .setMessage("This customer already have customer feedback report. Please check!")
                         .setPositiveButton("OK", null)
                         .show()
                 },
                 { customerFeedbackList: List<CustomerFeedback>, makeFeedbackAction: (deviceId: String, descriptionPosition: Int, remark: String, gpsTracker: GPSTracker) -> Unit ->
-                    val layoutInflater =
-                        this@CustomerActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+
+                    val layoutInflater = this@CustomerActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
                     val view = layoutInflater.inflate(R.layout.dialog_box_customer_feedback, null)
 
                     val descriptionsSpinner = view.findViewById(R.id.description) as Spinner
@@ -275,7 +275,7 @@ class CustomerActivity : BaseActivity(), KodeinAware {
 
                     if (customerFeedbackList.isEmpty()) {
                         AlertDialog.Builder(this@CustomerActivity)
-                            .setTitle("No Feedbacks")
+                            .setTitle("No Feedback")
                             .setMessage("You need to download feedback data.")
                             .setPositiveButton("OK", null)
                             .show()
@@ -297,7 +297,7 @@ class CustomerActivity : BaseActivity(), KodeinAware {
                         .setNegativeButton("Cancel", null)
                         .create()
 
-                    alertDialog.setOnShowListener { _ ->
+                    alertDialog.setOnShowListener {
                         val descriptions = ArrayList<String>()
                         for (customerFeedback in customerFeedbackList) {
                             descriptions.add(customerFeedback.remark.toString())
@@ -314,15 +314,14 @@ class CustomerActivity : BaseActivity(), KodeinAware {
                     alertDialog.show()
                 })
         }
+
     }
 
     private fun onClickSaleReturnButton() {
+
         if (didCustomerSelected()) {
             //insert arrival & departure time for temp for sale man route
-            customerViewModel.insertDataForTempSaleManRoute(
-                selectedCustomer!!,
-                Utils.getCurrentDate(true)
-            )
+            customerViewModel.insertDataForTempSaleManRoute(selectedCustomer!!, Utils.getCurrentDate(true))
             val intent = SaleReturnActivity.newIntentFromCustomer(
                 applicationContext,
                 "no",
@@ -330,6 +329,7 @@ class CustomerActivity : BaseActivity(), KodeinAware {
             )
             startActivity(intent)
         }
+
     }
 
     private fun onClickPosmButton() {

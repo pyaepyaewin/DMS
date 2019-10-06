@@ -183,7 +183,6 @@ class CustomerVisitRepoImpl(
                 return true
             }
         }
-
         return false
     }
 

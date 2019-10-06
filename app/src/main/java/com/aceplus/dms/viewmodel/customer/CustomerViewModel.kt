@@ -57,8 +57,7 @@ class CustomerViewModel(
                                     val invoiceDate = SimpleDateFormat("yyyy-MM-dd hh:mm:ss.sss").format(Date())
                                     val customerNumber = selectedCustomer.id
                                     val locationNumber = customerVisitRepo.getLocationCode()
-                                    val feedbackNumber =
-                                        Integer.parseInt(customerFeedbackList[descriptionPosition].invoice_no!!)
+                                    val feedbackNumber = customerFeedbackList[descriptionPosition].id!!.toInt() //To Check..Invoice_No
                                     val feedbackDate = customerFeedbackList[descriptionPosition].invoice_date
                                     val serialNumber = ""
                                     val description = customerFeedbackList[descriptionPosition].remark
