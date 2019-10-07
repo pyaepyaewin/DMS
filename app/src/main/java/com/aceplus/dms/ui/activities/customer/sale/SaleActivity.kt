@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.widget.GridLayoutManager
+import android.util.Log
 import android.view.WindowManager
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
@@ -18,7 +19,6 @@ import com.aceplus.dms.utils.Utils
 import com.aceplus.dms.viewmodel.customer.sale.SaleViewModel
 import com.aceplus.domain.entity.customer.Customer
 import com.aceplus.domain.entity.product.Product
-import com.aceplus.domain.model.SoldProduct
 import com.aceplus.domain.model.SoldProductInfo
 import com.aceplussolutions.rms.ui.activities.BaseActivity
 import kotlinx.android.synthetic.main.activity_sale1.*
@@ -55,7 +55,7 @@ class SaleActivity : BaseActivity(), KodeinAware {
     private val saleViewModel: SaleViewModel by viewModel()
 
     private val mProductListAdapter by lazy { ProductListAdapter(::onClickProductListItem) }
-    private val mSoldProductListAdapter by lazy { SoldProductListAdapter(::onLongClickSoldProductListItem) }
+    private val mSoldProductListAdapter by lazy { SoldProductListAdapter(::onLongClickSoldProductListItem, ::onFocCheckChange) }
     private val mPromotionGiftPresentListAdapter by lazy { PromotionPlanGiftListAdapter() }
     private val mPromotionItemListAdapter by lazy {
         //        PromotionPlanItemListAdapter()
@@ -181,12 +181,30 @@ class SaleActivity : BaseActivity(), KodeinAware {
 
     }
 
-    private fun onLongClickSoldProductListItem(product: SoldProduct) {
+    private fun onFocCheckChange(data: SoldProductInfo, isChecked: Boolean, position: Int){
+
+        data.isFocIsChecked = isChecked
+        mSoldProductListAdapter.updateList(data, position)
+
+    }
+
+    private fun onLongClickSoldProductListItem(soldProduct: SoldProductInfo, position: Int) {
+
         AlertDialog.Builder(this@SaleActivity)
             .setTitle("Delete sold product")
-            .setMessage("Are you sure you want to delete " + product.product.name + "?")
+            .setMessage("Are you sure you want to delete ${soldProduct.product.product_name}?")
             .setPositiveButton("Yes") { arg0, arg1 ->
-                //                val quantity = soldProductList.get(position).getQuantity()
+
+                for (i in duplicateProductList.indices){
+                    if (duplicateProductList[i].product_id == soldProduct.product.product_id){
+                        duplicateProductList.removeAt(i)
+                        break
+                    }
+                }
+
+                mSoldProductListAdapter.removeItem(position)
+
+//                val quantity = soldProductList.get(position).getQuantity()
 //                val product = soldProductList.get(position).getProduct()
 //                for (i in duplicateProductList.indices) {
 //                    val tempProduct = duplicateProductList.get(i)

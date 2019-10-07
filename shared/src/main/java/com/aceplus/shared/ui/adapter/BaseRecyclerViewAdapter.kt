@@ -1,15 +1,13 @@
 package com.aceplus.shared.ui.adapter
 
-import android.content.Context
 import android.support.annotation.NonNull
 import com.aceplussolutions.rms.ui.viewholder.BaseViewHolder
-import android.view.LayoutInflater
 import android.support.v7.widget.RecyclerView
-import java.util.*
+import kotlin.collections.ArrayList
 
 abstract class BaseRecyclerViewAdapter<V : BaseViewHolder<O>, O> : RecyclerView.Adapter<V>() {
 
-    private var mDataList: ArrayList<O>
+    protected var mDataList: ArrayList<O>
 
     init {
         mDataList = ArrayList()
@@ -35,6 +33,16 @@ abstract class BaseRecyclerViewAdapter<V : BaseViewHolder<O>, O> : RecyclerView.
 
     fun getDataList(): List<O> {
         return mDataList
+    }
+
+    fun updateList(updatedData: O, position: Int){
+        mDataList[position] = updatedData
+        notifyItemChanged(position)
+    }
+
+    fun removeItem(position: Int){
+        mDataList.removeAt(position)
+        notifyItemRemoved(position)
     }
 
 }

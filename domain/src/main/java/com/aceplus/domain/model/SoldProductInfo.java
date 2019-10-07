@@ -70,9 +70,7 @@ public class SoldProductInfo implements Serializable {
         this.itemDiscountAmount = itemDiscount;
     }
 
-    public boolean isFocIsChecked() {
-        return focIsChecked;
-    }
+    public boolean isFocIsChecked() { return focIsChecked; }
 
     public void setFocIsChecked(boolean focIsChecked) { this.focIsChecked = focIsChecked; }
 
