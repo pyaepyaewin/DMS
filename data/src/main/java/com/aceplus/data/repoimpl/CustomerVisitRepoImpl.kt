@@ -101,7 +101,7 @@ class CustomerVisitRepoImpl(
         if (db.tempForSaleManRouteDao().dataById(saleManId ?: "0", selectedCustomer.customer_id!!).isEmpty()) {
             val tempForSaleManRoute = TempForSaleManRoute()
             tempForSaleManRoute.sale_man_id = saleManId?.toInt() ?: 0
-            tempForSaleManRoute.customer_id = selectedCustomer.id
+            tempForSaleManRoute.customer_id = selectedCustomer.customer_id //To Check
             tempForSaleManRoute.latitude = selectedCustomer.latitude
             tempForSaleManRoute.longitude = selectedCustomer.longitude
             tempForSaleManRoute.arrival_time = currentDate
@@ -111,7 +111,7 @@ class CustomerVisitRepoImpl(
         } else {
             db.tempForSaleManRouteDao().updateArrivalAndDepartureTime(
                 saleManId ?: "0",
-                selectedCustomer.id,
+                selectedCustomer.customer_id!!,
                 currentDate
             )
         }
@@ -128,7 +128,7 @@ class CustomerVisitRepoImpl(
         }
     }
 
-    override fun updateDepartureTimeForSaleManRoute(saleManId: String, customerId: Int, currentDate: String) {
+    override fun updateDepartureTimeForSaleManRoute(saleManId: String, customerId: String, currentDate: String) {
         db.tempForSaleManRouteDao().updateDepartureTime(saleManId, customerId, currentDate)
     }
 

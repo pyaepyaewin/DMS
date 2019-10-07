@@ -3,11 +3,9 @@ package com.aceplus.dms.ui.activities.customer.sale
 import android.app.AlertDialog
 import android.arch.lifecycle.Observer
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.widget.GridLayoutManager
-import android.view.View
 import android.view.WindowManager
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
@@ -21,6 +19,7 @@ import com.aceplus.dms.viewmodel.customer.sale.SaleViewModel
 import com.aceplus.domain.entity.customer.Customer
 import com.aceplus.domain.entity.product.Product
 import com.aceplus.domain.model.SoldProduct
+import com.aceplus.domain.model.SoldProductInfo
 import com.aceplussolutions.rms.ui.activities.BaseActivity
 import kotlinx.android.synthetic.main.activity_sale1.*
 import org.kodein.di.Kodein
@@ -67,6 +66,8 @@ class SaleActivity : BaseActivity(), KodeinAware {
         )
     }
 
+    private val duplicateProductList = mutableListOf<Product>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -87,7 +88,7 @@ class SaleActivity : BaseActivity(), KodeinAware {
         })
 
         saleViewModel.soldProductList.observe(this, Observer {
-            mSoldProductListAdapter.setNewList(it as ArrayList<Product>) // add adp
+            mSoldProductListAdapter.setNewList(it as ArrayList<SoldProductInfo>) // add adp
         })
 
         saleViewModel.loadProductList()
@@ -102,17 +103,10 @@ class SaleActivity : BaseActivity(), KodeinAware {
     private fun setupUI() {
 
         val check = intent.getStringExtra(IE_SALE_EXCHANGE)
-        if (check.equals("yes", ignoreCase = true)) tvTitle.text = getString(R.string.sale_exchange)
+        if (check.equals("yes", ignoreCase = true))
+            tvTitle.text = getString(R.string.sale_exchange)
+
         saleDateTextView.text = Utils.getCurrentDate(false)
-
-        //todo
-//        searchAndSelectProductsLayout.visibility = if (this.isDelivery) View.GONE else View.VISIBLE
-//        tableHeaderOrderedQty.visibility = if (this.isDelivery) View.VISIBLE else View.GONE
-//        tableHeaderDiscount.visibility = if (this.isPreOrder) View.GONE else View.VISIBLE
-
-    }
-
-    private fun catchEvents() {
 
         rvProductList.adapter = mProductListAdapter
         rvProductList.layoutManager = GridLayoutManager(applicationContext, 1)
@@ -129,18 +123,17 @@ class SaleActivity : BaseActivity(), KodeinAware {
         searchAutoCompleteTextView.setAdapter(mSearchProductAdapter)
         searchAutoCompleteTextView.threshold = 1
 
+        //todo
+//        searchAndSelectProductsLayout.visibility = if (this.isDelivery) View.GONE else View.VISIBLE
+//        tableHeaderOrderedQty.visibility = if (this.isDelivery) View.VISIBLE else View.GONE
+//        tableHeaderDiscount.visibility = if (this.isPreOrder) View.GONE else View.VISIBLE
+
+    }
+
+    private fun catchEvents() {
+
         searchAutoCompleteTextView.onItemClickListener = AdapterView.OnItemClickListener { parent, view, position, id ->
-            //            var tempProduct: Product? = null
-            //
-            //            for (product in products) {
-            //
-            //                if (product.getName().equals(parent.getItemAtPosition(position).toString())) {
-            //
-            //                    tempProduct = product
-            //                }
-            //            }
-            //
-            //            onSelectAtMostTwoSameProduct(tempProduct)
+            onSelectAtMostTwoSameProduct(mProductListAdapter.getDataList()[position])
             searchAutoCompleteTextView.setText("")
         }
 
@@ -148,71 +141,43 @@ class SaleActivity : BaseActivity(), KodeinAware {
         checkoutImg.setOnClickListener { saveSaleData() }
     }
 
+    private fun onClickProductListItem(product: Product) {
+        onSelectAtMostTwoSameProduct(tempProduct = product)
+    }
+
     private fun onSelectAtMostTwoSameProduct(tempProduct: Product){
 
-        val productDuplicateCheck = mutableListOf<Product>()
         var sameProduct = false
 
         for (tempSoldProduct in mSoldProductListAdapter.getDataList()) {
-            if (tempSoldProduct.product_id === tempProduct.product_id) {
+            if (tempSoldProduct.product.product_id === tempProduct.product_id) {
                 sameProduct = true
-                if (productDuplicateCheck.contains(tempProduct))
+                if (duplicateProductList.contains(tempProduct))
                     Constant.PRODUCT_COUNT = 2
                 else
                     Constant.PRODUCT_COUNT++
                 break
             } else {
-                if (!productDuplicateCheck.contains(tempProduct)) {
+                if (!duplicateProductList.contains(tempProduct)) {
                     Constant.PRODUCT_COUNT = 0
                 }
             }
         }
 
         if (!sameProduct) {
-            //soldProductList.add(SoldProduct(tempProduct, false))
-            //mSoldProductListAdapter.addNewItem(SoldProduct(tempProduct, false))
+            mSoldProductListAdapter.addNewItem(SoldProductInfo(tempProduct, false))
         } else {
-            if (Constant.PRODUCT_COUNT < 2 && !productDuplicateCheck.contains(tempProduct)) {
-                //                    if (tempProduct.getRemainingQty() != 1) {
-
-//                    soldProductList.add(SoldProduct(tempProduct, false))
-//                    soldProductListRowAdapter.notifyDataSetChanged()
-
-                //mSoldProductListAdapter.addNewItem(tempProduct) //adding
-
+            if (Constant.PRODUCT_COUNT < 2 && !duplicateProductList.contains(tempProduct)) {
                 if (Constant.PRODUCT_COUNT == 1) {
                     Constant.PRODUCT_COUNT = 0
-                    productDuplicateCheck.add(tempProduct)
-//                        soldProductsCheck.add(SoldProduct(tempProduct, false))
+                    duplicateProductList.add(tempProduct)
+                    mSoldProductListAdapter.addNewItem(SoldProductInfo(tempProduct, false))
                 }
-                //                    } else {
-                //                        Constant.PRODUCT_COUNT = 0;
-                //                        Utils.commonDialog("Your Quantity is just only 1", SaleActivity.this, 2);
-                //                    }
             } else {
                 Constant.PRODUCT_COUNT = 0
                 Utils.commonDialog("Already have this product", this@SaleActivity, 2)
             }
         }
-
-    }
-
-    private fun onClickProductListItem(product: Product) {
-
-        val newSoldProductList = mSoldProductListAdapter.getDataList() as MutableList
-        newSoldProductList.add(product)
-        saleViewModel.soldProductList.postValue(newSoldProductList)
-
-//        lpbreak = false
-//            var tempProduct: Product? = null
-//            for (product in products) {
-//                if (product.getName().equals(parent.getItemAtPosition(position).toString())) {
-//                    tempProduct = product
-//                }
-//            }
-//            onSelectAtMostTwoSameProduct(tempProduct)
-
-        //onSelectAtMostTwoSameProduct(tempProduct = product)
 
     }
 
@@ -223,10 +188,10 @@ class SaleActivity : BaseActivity(), KodeinAware {
             .setPositiveButton("Yes") { arg0, arg1 ->
                 //                val quantity = soldProductList.get(position).getQuantity()
 //                val product = soldProductList.get(position).getProduct()
-//                for (i in productDuplicateCheck.indices) {
-//                    val tempProduct = productDuplicateCheck.get(i)
+//                for (i in duplicateProductList.indices) {
+//                    val tempProduct = duplicateProductList.get(i)
 //                    if (tempProduct.getStockId() === product.getStockId()) {
-//                        productDuplicateCheck.remove(tempProduct)
+//                        duplicateProductList.remove(tempProduct)
 //                    }
 //                }
 //
@@ -301,6 +266,7 @@ class SaleActivity : BaseActivity(), KodeinAware {
     }
 
     private fun saveSaleData() {
+
         if (mSoldProductListAdapter.getDataList().isEmpty()) {
             AlertDialog.Builder(this@SaleActivity)
                 .setTitle("Alert")
@@ -313,7 +279,7 @@ class SaleActivity : BaseActivity(), KodeinAware {
         if (tvNetAmount.text == "0" || tvNetAmount.text == "0.0") {
             AlertDialog.Builder(this@SaleActivity)
                 .setTitle("Alert")
-                .setMessage("Net Amount should be more than zero.")
+                .setMessage("Net amount should be more than zero.")
                 .setPositiveButton("OK", null)
                 .show()
 
@@ -329,7 +295,7 @@ class SaleActivity : BaseActivity(), KodeinAware {
 //            intent.putExtra(SaleCheckoutActivity.CUSTOMER_INFO_KEY, this@SaleActivity.customer)
 //            intent.putExtra(SaleCheckoutActivity.SOLD_PROUDCT_LIST_KEY, this@SaleActivity.soldProductList)
 //            intent.putExtra(SaleCheckoutActivity.PRESENT_PROUDCT_LIST_KEY, this@SaleActivity.promotionArrayList)
-//            intent.putExtra(SaleCheckoutActivity.DUPLICATE_PRODUCT_LIST_KEY, this@SaleActivity.productDuplicateCheck)
+//            intent.putExtra(SaleCheckoutActivity.DUPLICATE_PRODUCT_LIST_KEY, this@SaleActivity.duplicateProductList)
 //            intent.putExtra(
 //                SaleCheckoutActivity.DUPLICATE_PROMOTION_LIST_KEY,
 //                this@SaleActivity.promotionGiftByClassDis
@@ -356,6 +322,7 @@ class SaleActivity : BaseActivity(), KodeinAware {
 //            }
 //            startActivity(intent)
 //        }
+
     }
 
     private fun getIntentData() {
@@ -371,7 +338,7 @@ class SaleActivity : BaseActivity(), KodeinAware {
 //        }
 //
 //        if (intent.getSerializableExtra(SaleCheckoutActivity.DUPLICATE_PRODUCT_LIST_KEY) != null) {
-//            productDuplicateCheck =
+//            duplicateProductList =
 //                    intent.getSerializableExtra(SaleCheckoutActivity.DUPLICATE_PRODUCT_LIST_KEY) as ArrayList<Product>
 //        }
 //

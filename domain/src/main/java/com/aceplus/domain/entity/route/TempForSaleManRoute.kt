@@ -29,7 +29,7 @@ class TempForSaleManRoute {
     @ColumnInfo(name = "customer_id")
     @SerializedName("customer_id")
     @Expose
-    var customer_id: Int = 0
+    var customer_id: String? = null
 
     @ColumnInfo(name = "latitude")
     @SerializedName("latitude")

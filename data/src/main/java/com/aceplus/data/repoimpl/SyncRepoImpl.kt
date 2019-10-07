@@ -655,7 +655,7 @@ class SyncRepoImpl(
         saleManRouteDataList.map {
             val eRouteReport = ERouteReport()
             eRouteReport.customerId = it.customer_id
-            eRouteReport.saleManId = it.sale_man_id
+            eRouteReport.saleManId = it.sale_man_id // Changed Int to String by YLA
             eRouteReport.routeId = it.route_id
             eRouteReport.arrivalTime = it.arrival_time
             eRouteReport.departureTime = it.departure_time

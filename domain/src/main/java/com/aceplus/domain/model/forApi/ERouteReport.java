@@ -12,7 +12,7 @@ public class ERouteReport {
     private Integer routeId;
     @SerializedName("CustomerId")
     @Expose
-    private Integer customerId;
+    private String customerId;
     @SerializedName("SaleManId")
     @Expose
     private Integer saleManId;
@@ -37,11 +37,11 @@ public class ERouteReport {
         this.routeId = routeId;
     }
 
-    public Integer getCustomerId() {
+    public String getCustomerId() {
         return customerId;
     }
 
-    public void setCustomerId(Integer customerId) {
+    public void setCustomerId(String customerId) {
         this.customerId = customerId;
     }
 

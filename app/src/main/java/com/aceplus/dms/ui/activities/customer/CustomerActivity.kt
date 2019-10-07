@@ -353,8 +353,7 @@ class CustomerActivity : BaseActivity(), KodeinAware {
             )
             val intent = AddNewCustomerLocationActivity.newIntentFromCustomerActivity(
                 applicationContext,
-                salemanId = AppUtils.getStringFromShp(Constant.SALEMAN_ID, applicationContext)
-                    ?: "",
+                salemanId = AppUtils.getStringFromShp(Constant.SALEMAN_ID, applicationContext) ?: "",
                 customer = selectedCustomer!!
             )
 //            intent.putExtra("customerName", customer.getCustomerName())

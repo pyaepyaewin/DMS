@@ -29,6 +29,6 @@ interface CustomerVisitRepo {
     fun saveCustomerFeedback(didCustomerFeedbackEntity: DidCustomerFeedback)
     fun saveSaleVisitRecord(selectedCustomer: Customer, gpsTracker: GPSTracker)
 
-    fun updateDepartureTimeForSaleManRoute(saleManId: String, customerId: Int, currentDate: String)
+    fun updateDepartureTimeForSaleManRoute(saleManId: String, customerId: String, currentDate: String)
 
 }

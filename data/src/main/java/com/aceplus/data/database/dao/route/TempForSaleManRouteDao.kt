@@ -30,10 +30,10 @@ interface TempForSaleManRouteDao {
     fun deleteAll()
 
     @Query("Update temp_for_sale_man_route set  arrival_time=:currentDate and departure_time=:currentDate where customer_id=:customerId and sale_man_id=:saleManId")
-    fun updateArrivalAndDepartureTime(saleManId: String, customerId: Int, currentDate: String)
+    fun updateArrivalAndDepartureTime(saleManId: String, customerId: String, currentDate: String)
 
     @Query("Update temp_for_sale_man_route set  departure_time=:currentDate where customer_id=:customerId and sale_man_id=:saleManId")
-    fun updateDepartureTime(saleManId: String, customerId: Int, currentDate: String)
+    fun updateDepartureTime(saleManId: String, customerId: String, currentDate: String)
 
 
 }

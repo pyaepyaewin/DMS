@@ -11,6 +11,7 @@ import com.aceplus.domain.entity.customer.Customer
 import com.aceplus.domain.entity.customer.CustomerFeedback
 import com.aceplus.domain.entity.customer.DidCustomerFeedback
 import com.aceplus.domain.entity.product.Product
+import com.aceplus.domain.model.SoldProductInfo
 import com.aceplus.domain.repo.CustomerVisitRepo
 import com.aceplus.shared.utils.GPSTracker
 import com.aceplus.shared.viewmodel.BaseViewModel
@@ -24,7 +25,7 @@ class SaleViewModel(
 ) : BaseViewModel() {
 
     var productDataList = MutableLiveData<Pair<List<Product>, List<String>>>()
-    var soldProductList = MutableLiveData<List<Product>>()
+    var soldProductList = MutableLiveData<List<SoldProductInfo>>()
 
     fun loadProductList() {
         launch {

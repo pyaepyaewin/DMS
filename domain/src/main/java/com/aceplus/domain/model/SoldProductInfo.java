@@ -1,54 +1,58 @@
 package com.aceplus.domain.model;
 
+import android.app.Activity;
+
+import com.aceplus.domain.entity.product.Product;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 
-public class SoldProduct implements Serializable {
+public class SoldProductInfo implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     private Product product;
     private int quantity;
     private double discount;
-
     private boolean isForPackage;
     private double extraDiscount;
     private double discountPercent;
     private double discountAmount;
     private ArrayList<String> serialList;
     private double discountWithCategoryItem;
-
     private int orderedQuantity;
-
     private int size_in_store_share;
     private String remark;
+    public boolean tf = false;
 
     double promotionPrice;
-
     double totalAmt;
-
     boolean focStatus;
-
     String promotionPlanId;
-
     Integer exclude;
-
     int focQuantity;
-
     double focPercent;
-
     double itemDiscountAmount;
-
     double promoPriceByDiscount;
-
     double focAmount;
-
     int currentProductQty;
-
     int priceByClassDiscount;
-
     int cancelQty;
-    public boolean tf=false;
+    boolean focIsChecked;
+
+    public SoldProductInfo(){}
+
+    public SoldProductInfo(Product product, Boolean isForPackage) {
+
+        this.product = product;
+        quantity = 0;
+        discount = 0;
+
+        this.isForPackage = isForPackage;
+        extraDiscount = 0;
+        orderedQuantity = 0;
+
+    }
 
     public double getPromoPriceByDiscount() {
         return promoPriceByDiscount;
@@ -66,58 +70,29 @@ public class SoldProduct implements Serializable {
         this.itemDiscountAmount = itemDiscount;
     }
 
-    public boolean isFocisChecked() {
-        return focisChecked;
+    public boolean isFocIsChecked() {
+        return focIsChecked;
     }
 
-    public void setFocisChecked(boolean focisChecked) {
-        this.focisChecked = focisChecked;
-    }
-
-    boolean focisChecked;
-
-
-    public SoldProduct(){}
-
-    public SoldProduct(Product product, Boolean isForPackage) {
-
-        this.product = product;
-        quantity = 0;
-        discount = 0;
-
-        this.isForPackage = isForPackage;
-        extraDiscount = 0;
-
-        orderedQuantity = 0;
-    }
+    public void setFocIsChecked(boolean focIsChecked) { this.focIsChecked = focIsChecked; }
 
     public void setProduct(Product product) {
         this.product = product;
     }
 
-    public Product getProduct() {
+    public Product getProduct() { return product; }
 
-        return product;
-    }
-
-    public int getQuantity() {
-
-        return quantity;
-    }
+    public int getQuantity() { return quantity; }
 
     public boolean setQuantity(int quantity) {
 
         if (quantity > 0) {
-
-            product.setSoldQty(-this.quantity);
+            product.setSold_quantity(-this.quantity);
         }
-
-        product.setSoldQty(quantity);
-//		if (!product.setSoldQty(quantity)) {
-//
-//			return false;
-//		}
-
+        /*if (!product.setSoldQty(quantity)) {
+            return false;
+        }*/
+        product.setSold_quantity(quantity);
         this.quantity = quantity;
 
         return true;
@@ -125,8 +100,7 @@ public class SoldProduct implements Serializable {
 
     public boolean setQuantityForVanIssue(int quantity) {
 
-        if (quantity > 0) {
-
+        /*if (quantity > 0) {
             product.setSoldQty(-this.quantity);
         }
 
@@ -136,33 +110,32 @@ public class SoldProduct implements Serializable {
 //			return false;
 //		}
 
-        this.quantity = quantity;
+        this.quantity = quantity;*/
 
         return true;
     }
 
-    public int getSize_in_store_share() {
+    public int getSizeInStoreShare() {
         return size_in_store_share;
     }
 
-    public void setSize_in_store_share(int size_in_store_share) {
+    public void setSizeInStoreShare(int size_in_store_share) {
         this.size_in_store_share = size_in_store_share;
     }
 
     public void setDiscount(double discount) {
 
         if (discount >= 0 && discount <= 100) {
-
             this.discount = discount;
         }
     }
 
-//    public double getDiscount(Activity context) {
-//
-//        if (discount != 0) {
-//
-//            return discount;
-//        }
+    public double getDiscount(Activity context) {
+
+        if (discount != 0) {
+
+            return discount;
+        }
 
 //        SQLiteDatabase db = new Database(context).getDataBase();
 //
@@ -184,54 +157,40 @@ public class SoldProduct implements Serializable {
 //            }
 //        }
 
-//        return 0;
-//    }
-
-    public boolean isForPackage() {
-
-        return isForPackage;
+        return 0;
     }
 
-    public void setForPackage(boolean isForPackage) {
+    public boolean isForPackage() { return isForPackage; }
 
+    public void setForPackage(boolean isForPackage) {
         this.isForPackage = isForPackage;
     }
 
     public void setSerialList(ArrayList<String> serialList) {
-
         this.serialList = serialList;
     }
 
     public ArrayList<String> getSerialList() {
-
         if (serialList == null) {
-
-            serialList = new ArrayList<String>();
+            serialList = new ArrayList<>();
         }
-
         return serialList;
     }
 
     public void setExtraDiscount(double extraDiscount) {
-
         if (extraDiscount >= 0) {
-
             this.extraDiscount = extraDiscount;
         }
     }
 
-    public double getExtraDiscount() {
-
-        return extraDiscount;
-    }
+    public double getExtraDiscount() { return extraDiscount; }
 
     public double getTotalAmount() {
 
         if (totalAmt==0) {
             return 0;
-        }
-         else if(getPromotionPrice() == 0) {
-           // return product.getPrice() * quantity;
+        } else if(getPromotionPrice() == 0) {
+            // return product.getPrice() * quantity;
             return totalAmt;
         } else if(getPromoPriceByDiscount() != 0) {
             return totalAmt;
@@ -239,51 +198,40 @@ public class SoldProduct implements Serializable {
             return getPromotionPrice() * quantity;
         }
 
-
     }
-    public double getTotalAmount_() {
+
+    /*public double getTotalAmount_() {
 
         if(getPromotionPrice() == 0) {
-            return product.getPrice() * quantity;
-
+            return product.getSelling_price() * quantity;
         }
         else {
             return getPromotionPrice() * quantity;
         }
 
+    }*/
 
-
-
+    public double getDiscountAmount(Activity context) {
+        return getTotalAmount() * getDiscount(context) / 100;
     }
 
-//    public double getDiscountAmount(Activity context) {
-//
-//        return getTotalAmount() * getDiscount(context) / 100;
-//    }
-
     public double getExtraDiscountAmount() {
-
         return getTotalAmount() * extraDiscount / 100;
     }
 
-//    public double getNetAmount(Activity context) {
-//
-//        return getTotalAmount() - getDiscountAmount(context) - getExtraDiscountAmount();
-//    }
-//    public double getNetAmount_(Activity context) {
-//
-//        return getTotalAmount_() - getDiscountAmount(context) - getExtraDiscountAmount();
-//    }
+    /*public double getNetAmount(Activity context) {
+        return getTotalAmount() - getDiscountAmount(context) - getExtraDiscountAmount();
+    }
+
+    public double getNetAmount_(Activity context) {
+        return getTotalAmount_() - getDiscountAmount(context) - getExtraDiscountAmount();
+    }*/
 
     public void setOrderedQuantity(int orderedQuantity) {
-
         this.orderedQuantity = orderedQuantity;
     }
 
-    public int getOrderedQuantity() {
-
-        return this.orderedQuantity;
-    }
+    public int getOrderedQuantity() { return this.orderedQuantity; }
 
     public String getRemark() {
         return remark;
@@ -317,9 +265,7 @@ public class SoldProduct implements Serializable {
         return focStatus;
     }
 
-    public void setFocStatus(boolean focStatus) {
-        this.focStatus = focStatus;
-    }
+    public void setFocStatus(boolean focStatus) { this.focStatus = focStatus; }
 
     public double getDiscountPercent() {
         return discountPercent;
@@ -409,9 +355,7 @@ public class SoldProduct implements Serializable {
         this.cancelQty = cancelQty;
     }
 
-    public void set_db_fetch(boolean tf){
-        this.tf = tf;
-    }
+    public void set_db_fetch(boolean tf){ this.tf = tf; }
 
     public boolean get_db_fetch(){
         return tf;
@@ -420,4 +364,5 @@ public class SoldProduct implements Serializable {
     public double get_db_totalamt(){
         return totalAmt;
     }
+
 }
