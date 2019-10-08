@@ -6,6 +6,7 @@ import android.arch.persistence.room.Dao
 import android.arch.persistence.room.Insert
 import android.arch.persistence.room.OnConflictStrategy
 import android.arch.persistence.room.Query
+import com.aceplus.domain.model.promotionDataClass.ClassDiscountByPriceDataClass
 
 @Dao
 interface ClassDiscountByPriceDao {
@@ -21,5 +22,7 @@ interface ClassDiscountByPriceDao {
 
     @Query("Delete from class_discount_by_price")
     fun deleteAll()
+    @Query("select class_discount_by_price_item.class_id,class_discount_by_price_item.from_quantity,class_discount_by_price_item.to_quantity,class_discount_by_price_item.from_amount,class_discount_by_price_item.to_amount,class_discount_by_price_item.discount_percent from class_discount_by_price_item")
+    fun getClassDiscountByPriceList():List<ClassDiscountByPriceDataClass>
 
 }

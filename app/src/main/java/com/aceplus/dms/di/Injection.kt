@@ -94,6 +94,18 @@ val repoModule = Kodein.Module {
     bind<CategoryDiscountRepo>() with singleton {
         CategoryDiscountRepoImpl(instance())
     }
+    bind<ClassDiscountByPriceRepo>() with singleton {
+        ClassDiscountByPriceRepoImpl(instance())
+    }
+    bind<ClassDiscountByGiftRepo>() with singleton {
+        ClassDiscountByGiftRepoImpl(instance())
+    }
+    bind<ClassDiscountForShowPriceRepo>() with singleton {
+        ClassDiscountForShowPriceRepoImpl(instance())
+    }
+    bind<ClassDiscountForShowGiftRepo>() with singleton {
+        ClassDiscountForShowGiftRepoImpl(instance())
+    }
 }
 
 //ViewModel Module
@@ -106,6 +118,12 @@ val vmModule = Kodein.Module {
     bind() from singleton { VolumeDiscountViewModel(instance(),instance()) }
     bind() from singleton { VolumeDiscountFilterViewModel(instance(),instance()) }
     bind() from singleton { CategoryDiscountViewModel(instance(),instance()) }
+    bind() from singleton { ClassDiscountByPriceViewModel(instance(),instance()) }
+    bind() from singleton { ClassDiscountByGiftViewModel(instance(),instance()) }
+    bind() from singleton { ClassDiscountForShowPriceViewModel(instance(),instance()) }
+    bind() from singleton { ClassDiscountForShowGiftViewModel(instance(),instance()) }
+
+
 
 
 

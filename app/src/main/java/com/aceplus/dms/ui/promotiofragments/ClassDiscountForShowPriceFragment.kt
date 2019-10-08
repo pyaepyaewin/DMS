@@ -1,17 +1,36 @@
 package com.aceplus.dms.ui.promotiofragments
 
+import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import com.aceplus.dms.R
 import com.aceplus.dms.ui.activities.MainActivity
+import com.aceplus.dms.ui.adapters.promotionadapters.ClassDiscountForShowPriceAdapter
+import com.aceplus.dms.viewmodel.factory.KodeinViewModelFactory
+import com.aceplus.dms.viewmodel.promotionviewmodels.ClassDiscountForShowPriceViewModel
+import com.aceplus.domain.model.promotionDataClass.ClassDiscountForShowPriceDataClass
 import kotlinx.android.synthetic.main.tab_fragment_category_discount_quantity.*
+import org.kodein.di.Kodein
+import org.kodein.di.KodeinAware
+import org.kodein.di.android.support.kodein
 
-class ClassDiscountForShowPriceFragment:Fragment() {
+class ClassDiscountForShowPriceFragment:Fragment(),KodeinAware {
+    override val kodein: Kodein by kodein()
+    private val classDiscountForShowPriceAdapter: ClassDiscountForShowPriceAdapter by lazy {
+        ClassDiscountForShowPriceAdapter()
+    }
+
+    private val classDiscountForShowPriceViewModel: ClassDiscountForShowPriceViewModel by lazy {
+        ViewModelProviders.of(this, KodeinViewModelFactory((kodein)))
+            .get(ClassDiscountForShowPriceViewModel::class.java)
+    }
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -28,6 +47,20 @@ class ClassDiscountForShowPriceFragment:Fragment() {
             startActivity(intent)
 
         }
+        product_name.setText("CLASS ID")
+        category_discount_title.setText("CLASS DISCOUNT FOR SHOW PRICE")
+        classDiscountForShowPriceViewModel.classDiscountForShowPriceSuccessState.observe(this, android.arch.lifecycle.Observer {
+            classDiscountForShowPriceAdapter.setNewList(it as ArrayList<ClassDiscountForShowPriceDataClass>)
+        })
+
+        classDiscountForShowPriceViewModel.classDiscountForShowPriceErrorState.observe(this,android.arch.lifecycle.Observer {
+            Toast.makeText(activity, it, Toast.LENGTH_LONG).show()
+        })
+        rvCategoryDiscount.apply {
+            layoutManager = LinearLayoutManager(activity)
+            adapter = classDiscountForShowPriceAdapter
+        }
+        classDiscountForShowPriceViewModel.loadClassDiscountByPrice()
+    }
     }
 
-}
