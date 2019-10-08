@@ -7,9 +7,10 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.v7.widget.GridLayoutManager
 import android.util.Log
+import android.view.LayoutInflater
+import android.view.View
 import android.view.WindowManager
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
+import android.widget.*
 import com.aceplus.data.utils.Constant
 import com.aceplus.dms.R
 import com.aceplus.dms.ui.adapters.sale.ProductListAdapter
@@ -19,6 +20,7 @@ import com.aceplus.dms.utils.Utils
 import com.aceplus.dms.viewmodel.customer.sale.SaleViewModel
 import com.aceplus.domain.entity.customer.Customer
 import com.aceplus.domain.entity.product.Product
+import com.aceplus.domain.entity.promotion.Promotion
 import com.aceplus.domain.model.SoldProductInfo
 import com.aceplussolutions.rms.ui.activities.BaseActivity
 import kotlinx.android.synthetic.main.activity_sale1.*
@@ -26,6 +28,8 @@ import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.kodein
 import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 class SaleActivity : BaseActivity(), KodeinAware {
     override val kodein: Kodein by kodein()
@@ -36,6 +40,18 @@ class SaleActivity : BaseActivity(), KodeinAware {
     companion object {
         private const val IE_SALE_EXCHANGE = "IE_SALE_EXCHANGE"
         private const val IE_CUSTOMER_DATA = "IE_CUSTOMER_DATA"
+        // For pre order
+        private const val IE_IS_PRE_ORDER = "IS_PRE_ORDER"
+        // For delivery
+        private const val IE_IS_DELIVERY = "IS_DELIVERY"
+        private const val IE_REMAINING_AMOUNT_KEY = "REMAINING_AMOUNT_KEY"
+
+        private const val IE_USER_INFO_KEY = "USER_INFO_KEY"
+        private const val IE_CUSTOMER_INFO_KEY = "CUSTOMER_INFO_KEY"
+        private const val IE_SOLD_PRODUCT_LIST_KEY = "SOLD_PRODUCT_LIST_KEY"
+        private const val IE_ORDERED_INVOICE_KEY = "ORDERED_INVOICE_KEY"
+
+        private const val IE_SALE_RETURN_INVOICE_ID_KEY = "SALE_RETURN_INVOICE_ID_KEY"
 
         fun newIntentFromCustomer(context: Context, isSaleExchange: String, customerData: Customer): Intent {
             val intent = Intent(context, SaleActivity::class.java)
@@ -53,9 +69,8 @@ class SaleActivity : BaseActivity(), KodeinAware {
     }
 
     private val saleViewModel: SaleViewModel by viewModel()
-
     private val mProductListAdapter by lazy { ProductListAdapter(::onClickProductListItem) }
-    private val mSoldProductListAdapter by lazy { SoldProductListAdapter(::onLongClickSoldProductListItem, ::onFocCheckChange) }
+    private val mSoldProductListAdapter by lazy { SoldProductListAdapter(this::onLongClickSoldProductListItem, this::onFocCheckChange, this::onClickQtyButton, this::onClickFocButton) }
     private val mPromotionGiftPresentListAdapter by lazy { PromotionPlanGiftListAdapter() }
     private val mPromotionItemListAdapter by lazy {
         //        PromotionPlanItemListAdapter()
@@ -67,6 +82,16 @@ class SaleActivity : BaseActivity(), KodeinAware {
     }
 
     private val duplicateProductList = mutableListOf<Product>()
+    private val customer: Customer? = null
+    private val soldProductList: ArrayList<SoldProductInfo> = ArrayList()
+    private val promotionList: ArrayList<Promotion> = ArrayList()
+    private val promotionGiftByClassDis: ArrayList<Int> = ArrayList()
+    private val percentTotalCount: ArrayList<String> = ArrayList()
+    private val giftTotalCount: ArrayList<String> = ArrayList()
+    private val percentCategoryClassId: HashMap<String, Integer> = HashMap()
+    private val giftCategoryClassId: HashMap<String, Integer> = HashMap()
+    private val percentAmount: HashMap<String, Double> = HashMap()
+    private val giftAmount: HashMap<String, Double> = HashMap()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -74,6 +99,7 @@ class SaleActivity : BaseActivity(), KodeinAware {
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
 
+        getIntentData() // ToDo
         setupUI()
         catchEvents()
 
@@ -87,17 +113,9 @@ class SaleActivity : BaseActivity(), KodeinAware {
                 ?: Utils.commonDialog("No issued product", this, 2)
         })
 
-        saleViewModel.soldProductList.observe(this, Observer {
-            mSoldProductListAdapter.setNewList(it as ArrayList<SoldProductInfo>) // add adp
-        })
-
         saleViewModel.loadProductList()
+        //calculateClassDiscountByPrice() // ToDo
 
-        //todo
-//        products = getProducts("")
-//        calculateClassDiscountByPrice()
-
-        getIntentData()
     }
 
     private fun setupUI() {
@@ -283,6 +301,102 @@ class SaleActivity : BaseActivity(), KodeinAware {
             .show()
     }
 
+    private fun onClickQtyButton(soldProduct: SoldProductInfo, position: Int){
+
+        val layoutInflater = this@SaleActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        val view = layoutInflater.inflate(R.layout.dialog_box_sale_quantity, null)
+
+        val remainingQtyTextView = view.findViewById(R.id.availableQuantity) as TextView
+        val quantityEditText = view.findViewById(R.id.quantity) as EditText
+        val messageTextView = view.findViewById(R.id.message) as TextView
+
+        val alertDialog = AlertDialog.Builder(this@SaleActivity)
+            .setView(view)
+            .setTitle("Sale Quantity")
+            .setPositiveButton("Confirm") { arg0, arg1 ->
+
+                if (quantityEditText.text.toString().isEmpty()) {
+                    messageTextView.text = "You must specify quantity."
+                } else{
+
+                    val quantity = quantityEditText.text.toString().toInt()
+
+                    if (soldProduct.quantity != 0 && soldProduct.quantity < quantity){
+//                        updatedQtyForGift = true
+//                        updatedQtyForPercent = true
+                        soldProduct.currentProductQty = soldProduct.quantity
+                    }
+
+                    soldProduct.quantity = quantity
+
+                    //To Do
+
+                    mSoldProductListAdapter.updateList(soldProduct, position)
+
+                }
+
+            }
+            .setNegativeButton("Cancel", null)
+            .create()
+
+        alertDialog.setOnShowListener {
+
+            //view.findViewById<LinearLayout>(R.id.availableQuantityLayout).visibility = View.GONE // If it's a pre-order activity
+
+            remainingQtyTextView.text = soldProduct.product.remaining_quantity.toString() // If it's not a pre-order activity
+
+        }
+
+        alertDialog.show()
+
+    }
+
+    private fun onClickFocButton(soldProduct: SoldProductInfo, position: Int){
+
+        val layoutInflater = this@SaleActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        val view = layoutInflater.inflate(R.layout.dialog_box_sale_foc, null)
+
+        val radioFocPercent: RadioButton = view.findViewById(R.id.radioPrecent)
+        val radioFocAmount: RadioButton = view.findViewById(R.id.radioAmount)
+        val focVolume: EditText = view.findViewById(R.id.focPercent)
+
+        val alertDialog = AlertDialog.Builder(this@SaleActivity)
+            .setView(view)
+            .setTitle("FOC percent or Amount")
+            .setPositiveButton("Confirm") { arg0, arg1 ->
+
+                if (radioFocPercent.isChecked){
+                    soldProduct.focPercent = focVolume.text.toString().toDouble()
+                    soldProduct.setFocType(true)
+                } else{
+                    soldProduct.focAmount = focVolume.text.toString().toDouble()
+                    soldProduct.setFocType(false)
+                }
+
+                mSoldProductListAdapter.updateList(soldProduct, position)
+
+            }
+            .setNegativeButton("Cancel", null)
+            .create()
+
+        alertDialog.setOnShowListener {
+
+            if (soldProduct.isFocTypePercent){
+                radioFocPercent.isChecked = true
+                focVolume.setText(soldProduct.focPercent.toString())
+
+            } else{
+                radioFocAmount.isChecked = true
+                focVolume.setText(soldProduct.focAmount.toString())
+            }
+            focVolume.selectAll()
+
+        }
+
+        alertDialog.show()
+
+    }
+
     private fun saveSaleData() {
 
         if (mSoldProductListAdapter.getDataList().isEmpty()) {
@@ -344,6 +458,7 @@ class SaleActivity : BaseActivity(), KodeinAware {
     }
 
     private fun getIntentData() {
+
 //        customer = intent.getSerializableExtra(CUSTOMER_INFO_KEY) as Customer
 //        if (intent.getSerializableExtra(SOLD_PROUDCT_LIST_KEY) != null) {
 //
@@ -389,4 +504,5 @@ class SaleActivity : BaseActivity(), KodeinAware {
 //            giftAmount = intent.getSerializableExtra(SaleCheckoutActivity.GIFT_AMT) as HashMap<String, Double>
 //        }
     }
+
 }

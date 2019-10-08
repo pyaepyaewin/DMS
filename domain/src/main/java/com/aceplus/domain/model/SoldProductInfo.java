@@ -39,6 +39,7 @@ public class SoldProductInfo implements Serializable {
     int priceByClassDiscount;
     int cancelQty;
     boolean focIsChecked;
+    boolean isFocTypePercent;
 
     public SoldProductInfo(){}
 
@@ -52,11 +53,19 @@ public class SoldProductInfo implements Serializable {
         extraDiscount = 0;
         orderedQuantity = 0;
 
+        isFocTypePercent = true;
+
     }
 
     public double getPromoPriceByDiscount() {
         return promoPriceByDiscount;
     }
+
+    public void setFocType(boolean focTypeIsPercent){
+        this.isFocTypePercent = focTypeIsPercent;
+    }
+
+    public boolean isFocTypePercent(){ return isFocTypePercent; }
 
     public void setPromoPriceByDiscount(double promoPriceByDiscount) {
         this.promoPriceByDiscount = promoPriceByDiscount;
@@ -84,13 +93,14 @@ public class SoldProductInfo implements Serializable {
 
     public boolean setQuantity(int quantity) {
 
-        if (quantity > 0) {
+        /*if (quantity > 0) {
             product.setSold_quantity(-this.quantity);
-        }
+        }*/
         /*if (!product.setSoldQty(quantity)) {
             return false;
         }*/
         product.setSold_quantity(quantity);
+        product.setRemaining_quantity(-quantity);
         this.quantity = quantity;
 
         return true;
