@@ -6,7 +6,7 @@ import android.arch.persistence.room.Dao
 import android.arch.persistence.room.Insert
 import android.arch.persistence.room.OnConflictStrategy
 import android.arch.persistence.room.Query
-
+import com.aceplus.domain.model.report.SaleInvoiceReport
 
 @Dao
 interface InvoiceDao {
@@ -28,5 +28,8 @@ interface InvoiceDao {
 
     @Query("Delete from invoice")
     fun deleteAll()
+
+    @Query("select invoice.invoice_id,customer_name,address,total_amount,total_discount_amount from invoice inner join customer on customer.id = invoice.customer_id")
+    fun getSaleInvoiceReport(): List<SaleInvoiceReport>
 
 }

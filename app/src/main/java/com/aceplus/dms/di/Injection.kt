@@ -11,13 +11,16 @@ import com.aceplus.data.remote.UploadApiService
 import com.aceplus.data.repoimpl.CustomerVisitRepoImpl
 import com.aceplus.data.repoimpl.LoginRepoImpl
 import com.aceplus.data.repoimpl.SyncRepoImpl
+import com.aceplus.data.repoimpl.report.*
 import com.aceplus.data.utils.Constant
 import com.aceplus.dms.viewmodel.LoginViewModel
 import com.aceplus.dms.viewmodel.SyncViewModel
 import com.aceplus.dms.viewmodel.customer.CustomerViewModel
+import com.aceplus.dms.viewmodel.report.*
 import com.aceplus.domain.repo.CustomerVisitRepo
 import com.aceplus.domain.repo.LoginRepo
 import com.aceplus.domain.repo.SyncRepo
+import com.aceplus.domain.repo.report.*
 import com.aceplussolutions.rms.constants.SharedConstants
 import okhttp3.OkHttpClient
 import org.kodein.di.Kodein
@@ -76,6 +79,43 @@ val repoModule = Kodein.Module {
     bind<CustomerVisitRepo>() with singleton {
         CustomerVisitRepoImpl(db = instance(), shf = instance())
     }
+
+    bind<SaleInvoiceReportRepo>() with singleton {
+        SaleInvoiceReportRepoImpl(instance())
+    }
+
+    bind<SalesCancelReportRepo>() with singleton {
+        SalesCancelReportRepoImpl(instance())
+    }
+
+    bind<UnsellReasonReportRepo>() with singleton {
+        UnsellReasonReportRepoImpl(instance())
+    }
+
+    bind<SalesReturnReportRepo>() with singleton {
+        SalesReturnReportRepoImpl(instance())
+    }
+
+    bind<DeliverReportRepo>() with singleton {
+        DeliverReportRepoImpl(instance())
+    }
+
+    bind<SalesOrderHistoryReportRepo>() with singleton {
+        SalesOrderHistoryReportRepoImpl(instance())
+    }
+
+    bind<SalesVisitHistoryReportRepo>() with singleton {
+        SalesVisitHistoryReportRepoImpl(instance())
+    }
+
+    bind<PreOrderReportRepo>() with singleton {
+        PreOrderReportRepoImpl(instance())
+    }
+
+    bind<ProductBalanceReportRepo>() with singleton {
+        ProductBalanceReportRepoImpl(instance())
+    }
+
 }
 
 //ViewModel Module
@@ -83,6 +123,15 @@ val vmModule = Kodein.Module {
     bind() from singleton { LoginViewModel(instance(), instance()) }
     bind() from singleton { SyncViewModel(instance(), instance()) }
     bind() from singleton { CustomerViewModel(instance(), instance()) }
+    bind() from singleton { SaleInvoiceReportViewModel(instance(), instance()) }
+    bind() from singleton { SalesCancelReportViewModel(instance(), instance()) }
+    bind() from singleton { UnsellReasonReportViewModel(instance(), instance()) }
+    bind() from singleton { SalesReturnReportViewModel(instance(), instance()) }
+    bind() from singleton { DeliverReportViewModel(instance(), instance()) }
+    bind() from singleton { SalesOrderHistoryReportViewModel(instance(), instance()) }
+    bind() from singleton { SalesVisitHistoryReportViewModel(instance(), instance()) }
+    bind() from singleton { PreOrderReportViewModel(instance(), instance()) }
+    bind() from singleton { ProductBalanceReportViewModel(instance(), instance()) }
 }
 
 

@@ -6,6 +6,7 @@ import android.arch.persistence.room.Dao
 import android.arch.persistence.room.Insert
 import android.arch.persistence.room.OnConflictStrategy
 import android.arch.persistence.room.Query
+import com.aceplus.domain.model.report.UnsellReasonReport
 import io.reactivex.Observable
 
 
@@ -29,5 +30,8 @@ interface CustomerFeedbackDao {
 
     @Query("Delete from customer_feedback")
     fun deleteAll()
+
+    @Query("select customer_name,description,remark from customer inner join did_customer_feedback on customer.customer_id = did_customer_feedback.customer_no")
+    fun getUnSellReasonReport(): List<UnsellReasonReport>
 
 }

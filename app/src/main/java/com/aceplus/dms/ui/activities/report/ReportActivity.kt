@@ -28,19 +28,13 @@ class ReportActivity : BaseActivity() {
         , "Unsell Reason Report"
         , "Sales Return Report"
         , "Sales Exchange Report"
-//                , "POSM Report"
         , "Deliver Report"
-        , "Sales Order Report"
-        , "Indirect Sales Report"
+        , "Pre-order Report"
         , "Target & Actual Sales For Customer Report"
         , "Target & Actual Sales For SalesMan Report"
         , "Target & Actual Sales Product Report"
-//                , "Display Program Report"
-//                , "Incentive Program Report"
-//                , "Size And Stock Report"
         , "Sales History Report"
         , "Sales Order History Report"
-        , "Indirect Sales History Report"
         , "Sales Visit History Report"
         , "End of Day Report"
 
@@ -52,10 +46,6 @@ class ReportActivity : BaseActivity() {
         reportsSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         reports.adapter = reportsSpinnerAdapter
         reports.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onNothingSelected(p0: AdapterView<*>?) {
-
-            }
-
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
                 var fragment = when (p2) {
                     0 -> ProductBalanceReportFragment()
@@ -63,12 +53,24 @@ class ReportActivity : BaseActivity() {
                     2 -> SalesCancelReportFragment()
                     3 -> UnsellReasonReportFragment()
                     4 -> SalesReturnReportFragment()
-                    else -> ProductBalanceReportFragment()
+                    5 -> SalesExchangeReportFragment()
+                    6 -> DeliverReportFragment()
+                    7 -> PreOrderReportFragment()
+                    8 -> TargetAndActualSalesForCustomerReportFragment()
+                    9 -> TargetAndActualSalesForSalesManReportFragment()
+                    10 -> TargetAndActualSalesForProductReportFragment()
+                    11 -> SalesHistoryReportFragment()
+                    12 -> SalesOrderHistoryReportFragment()
+                    13 -> SalesVisitHistoryReportFragment()
+                    else -> EndOfDayReportFragment()
                 }
                 val transaction = supportFragmentManager.beginTransaction()
-                transaction.replace(R.id.fragment_report, fragment!!)
+                transaction.replace(R.id.fragment_report, fragment)
                 transaction.addToBackStack(null)
                 transaction.commit()
+            }
+            override fun onNothingSelected(p0: AdapterView<*>?) {
+
             }
 
         }
