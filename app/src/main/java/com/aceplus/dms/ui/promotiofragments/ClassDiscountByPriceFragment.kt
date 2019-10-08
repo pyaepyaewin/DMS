@@ -27,5 +27,8 @@ class ClassDiscountByPriceFragment:Fragment() {
             startActivity(intent)
             category_discount_title.setText(R.string.class_discount_by_price)
         }
+        category_discount_title.setText("CLASS DISCOUNT BY PRICE")
+        product_name.setText("CLASS ID")
+
     }
 }

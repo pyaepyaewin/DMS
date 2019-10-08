@@ -11,16 +11,16 @@ import com.aceplus.data.remote.UploadApiService
 import com.aceplus.data.repoimpl.CustomerVisitRepoImpl
 import com.aceplus.data.repoimpl.LoginRepoImpl
 import com.aceplus.data.repoimpl.SyncRepoImpl
-import com.aceplus.data.repoimpl.promotionrepoImpl.PromotionPriceRepoImpl
+import com.aceplus.data.repoimpl.promotionrepoImpl.*
 import com.aceplus.data.utils.Constant
 import com.aceplus.dms.viewmodel.LoginViewModel
 import com.aceplus.dms.viewmodel.SyncViewModel
 import com.aceplus.dms.viewmodel.customer.CustomerViewModel
-import com.aceplus.dms.viewmodel.promotionviewmodels.PromotionPriceViewModel
+import com.aceplus.dms.viewmodel.promotionviewmodels.*
 import com.aceplus.domain.repo.CustomerVisitRepo
 import com.aceplus.domain.repo.LoginRepo
 import com.aceplus.domain.repo.SyncRepo
-import com.aceplus.domain.repo.promotionrepo.PromotionPriceRepo
+import com.aceplus.domain.repo.promotionrepo.*
 import com.aceplussolutions.rms.constants.SharedConstants
 import okhttp3.OkHttpClient
 import org.kodein.di.Kodein
@@ -82,6 +82,18 @@ val repoModule = Kodein.Module {
     bind<PromotionPriceRepo>() with singleton {
         PromotionPriceRepoImpl(instance())
     }
+    bind<PromotionGiftRepo>() with singleton {
+        PromotionGiftRepoImpl(instance())
+    }
+    bind<VolumeDiscountRepo>() with singleton {
+        VolumeDiscountRepoImpl(instance())
+    }
+    bind<VolumeDiscountFilterRepo>() with singleton {
+        VolumeDiscountFilterRepoImpl(instance())
+    }
+    bind<CategoryDiscountRepo>() with singleton {
+        CategoryDiscountRepoImpl(instance())
+    }
 }
 
 //ViewModel Module
@@ -90,6 +102,14 @@ val vmModule = Kodein.Module {
     bind() from singleton { SyncViewModel(instance(), instance()) }
     bind() from singleton { CustomerViewModel(instance(), instance()) }
     bind() from singleton { PromotionPriceViewModel(instance(),instance()) }
+    bind() from singleton { PromotionGiftViewModel(instance(),instance()) }
+    bind() from singleton { VolumeDiscountViewModel(instance(),instance()) }
+    bind() from singleton { VolumeDiscountFilterViewModel(instance(),instance()) }
+    bind() from singleton { CategoryDiscountViewModel(instance(),instance()) }
+
+
+
+
 }
 
 

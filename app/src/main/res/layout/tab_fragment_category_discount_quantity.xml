@@ -117,8 +117,8 @@
 
     </LinearLayout>
 
-    <ListView
-        android:id="@+id/listViewPromotionGift"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rvCategoryDiscount"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
