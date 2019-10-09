@@ -2,6 +2,7 @@ package com.aceplus.dms.viewmodel.report
 
 import android.arch.lifecycle.MutableLiveData
 import android.util.Log
+import com.aceplus.domain.model.report.SaleInvoiceDetailReport
 import com.aceplus.domain.model.report.SalesCancelReport
 import com.aceplus.domain.repo.report.SalesCancelReportRepo
 import com.aceplus.shared.viewmodel.BaseViewModel
@@ -13,7 +14,9 @@ class SalesCancelReportViewModel(
 ) : BaseViewModel() {
     var salesCancelReportErrorState = MutableLiveData<String>()
     var salesCancelReportSuccessState = MutableLiveData<List<SalesCancelReport>>()
-    fun salesCancelReport(){
+    var saleCancelDetailReportSuccessState = MutableLiveData<List<SaleInvoiceDetailReport>>()
+
+    fun salesCancelReport() {
 
         launch {
             salesCancelReportRepo.salesCancelReport()
@@ -21,8 +24,23 @@ class SalesCancelReportViewModel(
                 .observeOn(schedulerProvider.mainThread())
                 .subscribe({
                     salesCancelReportSuccessState.postValue(it)
-                    Log.d("Testing","$it")
-                },{
+                    Log.d("Testing", "$it")
+                }, {
+                    salesCancelReportErrorState.value = it.localizedMessage
+                })
+        }
+
+    }
+
+    fun saleCancelDetailReport(invoiceId: String) {
+        launch {
+            salesCancelReportRepo.salesCancelDetailReport(invoiceId)
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.mainThread())
+                .subscribe({
+                    saleCancelDetailReportSuccessState.postValue(it)
+                    Log.d("Testing", "$it")
+                }, {
                     salesCancelReportErrorState.value = it.localizedMessage
                 })
         }

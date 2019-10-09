@@ -7,9 +7,9 @@ import com.aceplus.dms.ui.viewholders.report.SalesCancelReportViewHolder
 import com.aceplus.domain.model.report.SalesCancelReport
 import com.aceplus.shared.ui.adapter.BaseRecyclerViewAdapter
 
-class SalesCancelReportAdapter:BaseRecyclerViewAdapter<SalesCancelReportViewHolder,SalesCancelReport>() {
+class SalesCancelReportAdapter(private val onClick: (invoiceId: String) -> Unit):BaseRecyclerViewAdapter<SalesCancelReportViewHolder,SalesCancelReport>() {
     override fun onCreateViewHolder(p0: ViewGroup, p1: Int): SalesCancelReportViewHolder {
         val view = LayoutInflater.from(p0.context).inflate(R.layout.list_row_sale_cancel_report,p0,false)
-    return SalesCancelReportViewHolder(view)
+    return SalesCancelReportViewHolder(view,onClick)
     }
 }

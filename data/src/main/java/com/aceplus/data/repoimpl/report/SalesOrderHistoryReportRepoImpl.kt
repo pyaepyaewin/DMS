@@ -7,6 +7,6 @@ import io.reactivex.Observable
 
 class SalesOrderHistoryReportRepoImpl(private val db:MyDatabase): SalesOrderHistoryReportRepo {
     override fun salesOrderHistoryReport(): Observable<List<SalesOrderHistoryReport>> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return Observable.just(db.preOrderDao().getSalesOrderHistoryReport())
     }
 }

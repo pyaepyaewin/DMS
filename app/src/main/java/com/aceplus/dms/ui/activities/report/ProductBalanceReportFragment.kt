@@ -2,6 +2,7 @@ package com.aceplus.dms.ui.activities.report
 
 import android.arch.lifecycle.Observer
 import android.os.Bundle
+import android.support.v4.content.res.ResourcesCompat.getColor
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
@@ -13,6 +14,7 @@ import com.aceplus.dms.ui.adapters.report.ProductBalanceReportAdapter
 import com.aceplus.dms.viewmodel.report.ProductBalanceReportViewModel
 import com.aceplus.domain.entity.product.Product
 import com.aceplus.shared.ui.activities.BaseFragment
+import kotlinx.android.synthetic.main.list_row_product_balance_report.*
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.support.kodein

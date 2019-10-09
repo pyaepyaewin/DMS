@@ -37,6 +37,6 @@ interface SaleReturnDao {
     fun updateAllInactiveData()
 
     @Query("select invoice.invoice_id,customer_name,address,return_date,total_quantity,total_amount from invoice left join customer on customer.customer_id = invoice.customer_id left join sale_return on sale_return.customer_id = customer.customer_id")
-    fun getsalesReturnReport(): List<SalesReturnReport>
+    fun getSalesReturnReport(): List<SalesReturnReport>
 
 }

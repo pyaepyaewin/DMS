@@ -5,7 +5,10 @@ import com.aceplus.domain.model.report.SalesReturnReport
 import com.aceplussolutions.rms.ui.viewholder.BaseViewHolder
 import kotlinx.android.synthetic.main.list_row_sale_return_report.view.*
 
-class SalesReturnReportViewHolder(private val view: View) :
+class SalesReturnReportViewHolder(
+    private val view: View,
+    private val onClick: (invoiceId: String) -> Unit
+) :
     BaseViewHolder<SalesReturnReport>(view) {
     override fun setData(data: SalesReturnReport) {
         view.apply {
@@ -15,6 +18,7 @@ class SalesReturnReportViewHolder(private val view: View) :
             date.text = data.return_date
             sale_return_total_qty.text = data.total_quantity.toString()
             sale_return_total_amt.text = data.total_amount
+            setOnClickListener { onClick(data.invoice_id) }
         }
     }
 }

@@ -11,7 +11,7 @@ class SalesVisitHistoryReport(
     @ColumnInfo(name = "status")
     val status: String,
 
-    @ColumnInfo(name = "task")
+    @ColumnInfo(name = "sale_status")
     val task: String
 
 )

@@ -5,14 +5,12 @@ import android.arch.lifecycle.Observer
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
-import android.widget.ArrayAdapter
-import android.widget.Button
-import android.widget.Spinner
-import android.widget.Toast
+import android.widget.*
 import com.aceplus.dms.R
 import com.aceplus.dms.ui.adapters.report.SaleInvoiceDetailReportAdapter
 import com.aceplus.dms.ui.adapters.report.SaleInvoiceReportAdapter
@@ -59,7 +57,7 @@ class SaleInvoiceReportFragment : BaseFragment(), KodeinAware {
         saleInvoiceReportViewModel.saleInvoiceReportErrorState.observe(this, Observer {
             Toast.makeText(activity, it, Toast.LENGTH_LONG).show()
         })
-
+        //select customer name list in db
         saleInvoiceReportViewModel.customerDataList.observe(this, Observer {
             if (it != null) {
                 customerNameList.add("All")
@@ -68,12 +66,32 @@ class SaleInvoiceReportFragment : BaseFragment(), KodeinAware {
                 }
 
             }
-            //Bind customer name in fragment spinner
+            //Add customer name in spinner in this fragment
             val spinner = view.findViewById<Spinner>(R.id.customer_spinner_fragment_invoice_report)
             val customerNameSpinnerAdapter =
-                ArrayAdapter(context,android.R.layout.simple_spinner_item,customerNameList)
+                ArrayAdapter(context, android.R.layout.simple_spinner_item, customerNameList)
             customerNameSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             spinner.adapter = customerNameSpinnerAdapter
+            spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
+                    val filterList: ArrayList<SaleInvoiceReport> = ArrayList()
+                    for (c in allItems) {
+                        if (c.customer_name == customerNameList[p2]) {
+                            filterList.add(c)
+                        }
+                        if (c.customer_name == "All"){
+                            filterList.add(c)
+                        }
+                    }
+                    Log.d("Filter List:", "$filterList")
+                    saleInvoiceReportAdapter.setNewList(filterList)
+                }
+
+                override fun onNothingSelected(p0: AdapterView<*>?) {
+
+                }
+
+            }
 
         })
 

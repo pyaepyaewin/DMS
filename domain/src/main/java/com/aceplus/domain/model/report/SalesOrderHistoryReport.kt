@@ -13,6 +13,16 @@ class SalesOrderHistoryReport (
     var address:String,
 
     @ColumnInfo(name = "total_amount")
-    var total_amount:String
+    var total_amount:String,
+
+    @ColumnInfo(name = "discount")
+    var discount: String,
+
+    @ColumnInfo(name = "advance_payment_amount")
+    var advance_payment_amount: String,
+
+    @ColumnInfo(name = "net_amount")
+    var net_amount: String
+
 
 )

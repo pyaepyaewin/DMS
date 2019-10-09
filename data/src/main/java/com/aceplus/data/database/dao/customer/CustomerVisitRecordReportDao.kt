@@ -6,6 +6,7 @@ import android.arch.persistence.room.Dao
 import android.arch.persistence.room.Insert
 import android.arch.persistence.room.OnConflictStrategy
 import android.arch.persistence.room.Query
+import com.aceplus.domain.model.report.SalesVisitHistoryReport
 
 
 @Dao
@@ -23,4 +24,6 @@ interface CustomerVisitRecordReportDao {
     @Query("Delete from customer_visit_record_report")
     fun deleteAll()
 
+    @Query("select customer_name,address,status,sale_status from customer inner join credit on credit.customer_id = customer.id inner join pre_order_present")
+    fun getSalesVisitHistoryReport():List<SalesVisitHistoryReport>
 }
