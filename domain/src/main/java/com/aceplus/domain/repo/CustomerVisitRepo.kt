@@ -1,5 +1,7 @@
 package com.aceplus.domain.repo
 
+import com.aceplus.domain.entity.classdiscount.ClassDiscountByPrice
+import com.aceplus.domain.entity.classdiscount.ClassDiscountByPriceItem
 import com.aceplus.domain.entity.customer.Customer
 import com.aceplus.domain.entity.customer.CustomerFeedback
 import com.aceplus.domain.entity.customer.DidCustomerFeedback
@@ -30,5 +32,8 @@ interface CustomerVisitRepo {
     fun saveSaleVisitRecord(selectedCustomer: Customer, gpsTracker: GPSTracker)
 
     fun updateDepartureTimeForSaleManRoute(saleManId: String, customerId: String, currentDate: String)
+
+    fun getClassDiscountByPrice(currentDate: String): Observable<List<ClassDiscountByPrice>>
+    fun getClassDiscountByPriceItem(classDiscountId: Int): Observable<List<ClassDiscountByPriceItem>>
 
 }

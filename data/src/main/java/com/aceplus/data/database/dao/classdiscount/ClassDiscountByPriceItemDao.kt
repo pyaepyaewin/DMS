@@ -23,4 +23,7 @@ interface ClassDiscountByPriceItemDao {
     @Query("Delete from class_discount_by_price_item")
     fun deleteAll()
 
+    @Query("SELECT * FROM class_discount_by_price_item WHERE class_discount_id = :classDiscountId")
+    fun getClassDiscountByPriceItem(classDiscountId: Int): List<ClassDiscountByPriceItem>
+
 }

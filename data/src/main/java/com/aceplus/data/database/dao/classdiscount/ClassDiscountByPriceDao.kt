@@ -22,4 +22,7 @@ interface ClassDiscountByPriceDao {
     @Query("Delete from class_discount_by_price")
     fun deleteAll()
 
+    @Query("SELECT * FROM class_discount_by_price WHERE date(:currentDate) BETWEEN date(start_date) AND date(end_date)")
+    fun getClassDiscountByPrice(currentDate: String): List<ClassDiscountByPrice>
+
 }

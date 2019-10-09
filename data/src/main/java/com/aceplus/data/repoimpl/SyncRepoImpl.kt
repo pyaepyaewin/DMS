@@ -839,7 +839,7 @@ class SyncRepoImpl(
             it.classDiscountByPriceItems.map { items ->
                 val classDiscountByPriceItem = ClassDiscountByPriceItem()
                 classDiscountByPriceItem.id = it.id.toInt()
-                classDiscountByPriceItem.class_discount_id = items.classDiscountId
+                classDiscountByPriceItem.class_discount_id = items.classDiscountId.toInt()
                 classDiscountByPriceItem.class_id = items.classId
                 classDiscountByPriceItem.from_quantity = items.fromQuantity
                 classDiscountByPriceItem.to_quantity = items.toQuantity

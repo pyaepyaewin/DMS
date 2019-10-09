@@ -72,17 +72,11 @@ class SaleActivity : BaseActivity(), KodeinAware {
     private val mProductListAdapter by lazy { ProductListAdapter(::onClickProductListItem) }
     private val mSoldProductListAdapter by lazy { SoldProductListAdapter(this::onLongClickSoldProductListItem, this::onFocCheckChange, this::onClickQtyButton, this::onClickFocButton) }
     private val mPromotionGiftPresentListAdapter by lazy { PromotionPlanGiftListAdapter() }
-    private val mPromotionItemListAdapter by lazy {
-        //        PromotionPlanItemListAdapter()
-    }
-    private val mSearchProductAdapter by lazy {
-        ArrayAdapter<String>(
-            this@SaleActivity, android.R.layout.simple_list_item_1, ArrayList<String>()
-        )
-    }
+    /*private val mPromotionItemListAdapter by lazy { PromotionPlanItemListAdapter() }*/
+    private val mSearchProductAdapter by lazy { ArrayAdapter<String>(this@SaleActivity, android.R.layout.simple_list_item_1, ArrayList<String>()) }
 
     private val duplicateProductList = mutableListOf<Product>()
-    private val customer: Customer? = null
+    private var customer: Customer? = null
     private val soldProductList: ArrayList<SoldProductInfo> = ArrayList()
     private val promotionList: ArrayList<Promotion> = ArrayList()
     private val promotionGiftByClassDis: ArrayList<Int> = ArrayList()
@@ -99,7 +93,8 @@ class SaleActivity : BaseActivity(), KodeinAware {
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
 
-        getIntentData() // ToDo
+        //onClearArrayList()
+        getIntentData()
         setupUI()
         catchEvents()
 
@@ -114,15 +109,15 @@ class SaleActivity : BaseActivity(), KodeinAware {
         })
 
         saleViewModel.loadProductList()
-        //calculateClassDiscountByPrice() // ToDo
+        saleViewModel.calculateClassDiscountByPrice()
+        updatePromotionProductList()
 
     }
 
     private fun setupUI() {
 
         val check = intent.getStringExtra(IE_SALE_EXCHANGE)
-        if (check.equals("yes", ignoreCase = true))
-            tvTitle.text = getString(R.string.sale_exchange)
+        if (check.equals("yes", ignoreCase = true)) tvTitle.text = getString(R.string.sale_exchange)
 
         saleDateTextView.text = Utils.getCurrentDate(false)
 
@@ -157,6 +152,7 @@ class SaleActivity : BaseActivity(), KodeinAware {
 
         cancelImg.setOnClickListener { onBackPressed() }
         checkoutImg.setOnClickListener { saveSaleData() }
+
     }
 
     private fun onClickProductListItem(product: Product) {
@@ -218,6 +214,10 @@ class SaleActivity : BaseActivity(), KodeinAware {
                         duplicateProductList.removeAt(i)
                         break
                     }
+                }
+
+                if (soldProduct.quantity != 0){
+                    // ToDo change or remove promotion list
                 }
 
                 mSoldProductListAdapter.removeItem(position)
@@ -459,7 +459,8 @@ class SaleActivity : BaseActivity(), KodeinAware {
 
     private fun getIntentData() {
 
-//        customer = intent.getSerializableExtra(CUSTOMER_INFO_KEY) as Customer
+        customer = intent.getParcelableExtra(IE_CUSTOMER_DATA)
+
 //        if (intent.getSerializableExtra(SOLD_PROUDCT_LIST_KEY) != null) {
 //
 //            soldProductList = intent.getSerializableExtra(SOLD_PROUDCT_LIST_KEY) as ArrayList<SoldProduct>
@@ -503,6 +504,10 @@ class SaleActivity : BaseActivity(), KodeinAware {
 //        if (intent.getSerializableExtra(SaleCheckoutActivity.GIFT_AMT) != null) {
 //            giftAmount = intent.getSerializableExtra(SaleCheckoutActivity.GIFT_AMT) as HashMap<String, Double>
 //        }
+    }
+
+    private fun updatePromotionProductList(){
+        mPromotionGiftPresentListAdapter.setNewList(promotionList)
     }
 
 }
