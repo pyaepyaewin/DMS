@@ -6,9 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.widget.GridLayoutManager
-import android.util.Log
 import android.view.LayoutInflater
-import android.view.View
 import android.view.WindowManager
 import android.widget.*
 import com.aceplus.data.utils.Constant
@@ -21,13 +19,12 @@ import com.aceplus.dms.viewmodel.customer.sale.SaleViewModel
 import com.aceplus.domain.entity.customer.Customer
 import com.aceplus.domain.entity.product.Product
 import com.aceplus.domain.entity.promotion.Promotion
-import com.aceplus.domain.model.SoldProductInfo
+import com.aceplus.domain.VO.SoldProductInfo
 import com.aceplussolutions.rms.ui.activities.BaseActivity
 import kotlinx.android.synthetic.main.activity_sale1.*
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.kodein
-import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
@@ -93,7 +90,7 @@ class SaleActivity : BaseActivity(), KodeinAware {
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
 
-        //onClearArrayList()
+        onClearArrayList()
         getIntentData()
         setupUI()
         catchEvents()
@@ -179,13 +176,23 @@ class SaleActivity : BaseActivity(), KodeinAware {
         }
 
         if (!sameProduct) {
-            mSoldProductListAdapter.addNewItem(SoldProductInfo(tempProduct, false))
+            mSoldProductListAdapter.addNewItem(
+                SoldProductInfo(
+                    tempProduct,
+                    false
+                )
+            )
         } else {
             if (Constant.PRODUCT_COUNT < 2 && !duplicateProductList.contains(tempProduct)) {
                 if (Constant.PRODUCT_COUNT == 1) {
                     Constant.PRODUCT_COUNT = 0
                     duplicateProductList.add(tempProduct)
-                    mSoldProductListAdapter.addNewItem(SoldProductInfo(tempProduct, false))
+                    mSoldProductListAdapter.addNewItem(
+                        SoldProductInfo(
+                            tempProduct,
+                            false
+                        )
+                    )
                 }
             } else {
                 Constant.PRODUCT_COUNT = 0
@@ -329,7 +336,9 @@ class SaleActivity : BaseActivity(), KodeinAware {
 
                     soldProduct.quantity = quantity
 
-                    //To Do
+                    //To Change Promo Price ToDo
+
+                    saleViewModel.calculatePromotionPriceAndGift(soldProduct) // To test promo price - stock id
 
                     mSoldProductListAdapter.updateList(soldProduct, position)
 
@@ -504,6 +513,10 @@ class SaleActivity : BaseActivity(), KodeinAware {
 //        if (intent.getSerializableExtra(SaleCheckoutActivity.GIFT_AMT) != null) {
 //            giftAmount = intent.getSerializableExtra(SaleCheckoutActivity.GIFT_AMT) as HashMap<String, Double>
 //        }
+    }
+
+    private fun onClearArrayList(){
+
     }
 
     private fun updatePromotionProductList(){

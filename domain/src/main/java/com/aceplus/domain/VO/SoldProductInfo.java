@@ -1,4 +1,4 @@
-package com.aceplus.domain.model;
+package com.aceplus.domain.VO;
 
 import android.app.Activity;
 

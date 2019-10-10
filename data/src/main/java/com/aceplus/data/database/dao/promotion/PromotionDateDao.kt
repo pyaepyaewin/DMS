@@ -23,4 +23,7 @@ interface PromotionDateDao{
     @Query("Delete from promotion_date")
     fun deleteAll()
 
+    @Query("SELECT * FROM promotion_date WHERE DATE(promotion_date) = DATE(:currentDate)")
+    fun getCurrentDatePromotion(currentDate: String): List<PromotionDate>
+
 }

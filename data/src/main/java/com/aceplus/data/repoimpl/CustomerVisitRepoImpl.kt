@@ -9,6 +9,8 @@ import com.aceplus.domain.entity.customer.Customer
 import com.aceplus.domain.entity.customer.CustomerFeedback
 import com.aceplus.domain.entity.customer.DidCustomerFeedback
 import com.aceplus.domain.entity.product.Product
+import com.aceplus.domain.entity.promotion.PromotionDate
+import com.aceplus.domain.entity.promotion.PromotionPrice
 import com.aceplus.domain.entity.route.TempForSaleManRoute
 import com.aceplus.domain.entity.sale.SaleMan
 import com.aceplus.domain.repo.CustomerVisitRepo
@@ -92,6 +94,10 @@ class CustomerVisitRepoImpl(
 
     override fun getAllProductData(): Observable<List<Product>> {
         return Observable.just(db.productDao().allProductData)
+    }
+
+    override fun getProductByID(productID: Int): Observable<List<Product>> {
+        return Observable.just(db.productDao().getProductByID(productID))
     }
 
     override fun saveDataForTempSaleManRoute(selectedCustomer: Customer, currentDate: String) {
@@ -190,6 +196,19 @@ class CustomerVisitRepoImpl(
 
     override fun getClassDiscountByPriceItem(classDiscountId: Int): Observable<List<ClassDiscountByPriceItem>> {
         return Observable.just(db.classDiscountByPriceItemDao().getClassDiscountByPriceItem(classDiscountId))
+    }
+
+    override fun getCurrentDatePromotion(currentDate: String): Observable<List<PromotionDate>> {
+        return Observable.just(db.promotionDateDao().getCurrentDatePromotion(currentDate))
+    }
+
+    override fun getPromotionPriceByID(promotionPlanId: String, buy_qty: Int, stockID: String): Observable<List<PromotionPrice>> {
+        return Observable.just(db.promotionPriceDao().getPromotionPriceByID(promotionPlanId, buy_qty)) // Need to add stockid
+    }
+
+    // Testing
+    override fun getAllPromoPrice(): Observable<List<PromotionPrice>> {
+        return Observable.just(db.promotionPriceDao().allData)
     }
 
 }
