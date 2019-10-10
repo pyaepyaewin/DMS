@@ -292,13 +292,13 @@ class ReportViewModel(
     //testing invoice list
     var invoiceDataList = MutableLiveData<List<Invoice>>()
     fun loadInvoiceList() {
-        launch {
-            reportRepo.getAllInvoiceData()
-                .subscribeOn(schedulerProvider.io())
-                .observeOn(schedulerProvider.mainThread())
-                .subscribe {
-                    invoiceDataList.postValue(it)
-                }
-        }
+//        launch {
+//            reportRepo.getAllInvoiceData()
+//                .subscribeOn(schedulerProvider.io())
+//                .observeOn(schedulerProvider.mainThread())
+//                .subscribe {
+//                    invoiceDataList.postValue(it)
+//                }
+//        }
     }
 }
