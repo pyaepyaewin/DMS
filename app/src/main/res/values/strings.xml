@@ -114,8 +114,7 @@
     <string name="title_activity_sale_exchange">SaleExchangeActivity</string>
     <string name="promotion_customer_item">Promotion Item By Customer</string>
     <string name="promotion_customer_discount">Volume Discount By Customer</string>
-    <string name="promotion_price">PROMOTION PRICE</string>
-    <string name="promotion_gift">PROMOTION GIFT</string>
+
 
     <string name="sale_channel_name">SALE CHANNEL</string>
     <string name="customer_name">CUSTOMER NAME</string>
@@ -124,7 +123,7 @@
     <string name="product_discount">PRODUCT DISCOUNT</string>
     <string name="delivery_discount">DELIVERY DISCOUNT</string>
 
-    <string name="categorydiscount">CATEGORY DISCOUNT</string>
+
     <string name="date">DATE</string>
     <string name="product_name">PRODUCT NAME</string>
     <string name="category_name">CATEGORY NAME</string>
@@ -164,6 +163,21 @@
     <string name="str_scan">scanning equipment</string>
     <string name="str_device">device</string>
     <string name="str_scaning">scanning</string>
+
+
+<!--    promotion-->
+    <string name="promotion_price">PROMOTION PRICE</string>
+    <string name="promotion_gift">PROMOTION GIFT</string>
+    <string name="promotion_volume_discount">Volume Discount</string>
+    <string name="promotion_volume_discount_filter">Volume Discount Filter</string>
+    <string name="categorydiscount">CATEGORY DISCOUNT</string>
+    <string name="class_discount_by_price">Class Discount By Price</string>
+    <string name="class_discount_by_gift">Class Discount By Gift</string>
+    <string name="class_discount_for_show_price">Class Discount For Show Price</string>
+    <string name="class_discount_for_show_gift">Class Discount For Show Gift</string>
+
+
+
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

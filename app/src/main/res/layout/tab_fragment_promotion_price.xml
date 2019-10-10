@@ -10,7 +10,7 @@
         android:background="@color/colorAccent">
 
         <ImageView
-            android:id="@+id/cancel_img"
+            android:id="@+id/cancel_imgPromotionPrice"
             android:layout_width="@dimen/btn_appbar_width"
             android:layout_height="@dimen/btn_appbar_height"
             android:layout_alignParentLeft="true"
@@ -84,8 +84,8 @@
             android:textStyle="bold" />
     </LinearLayout>
 
-    <ListView
-        android:id="@+id/listViewPromotionPrice"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rvPromotionPrice"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 

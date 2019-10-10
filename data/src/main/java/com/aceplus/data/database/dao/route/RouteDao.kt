@@ -6,6 +6,8 @@ import android.arch.persistence.room.Dao
 import android.arch.persistence.room.Insert
 import android.arch.persistence.room.OnConflictStrategy
 import android.arch.persistence.room.Query
+import com.aceplus.domain.model.route.Route_Township
+import com.aceplus.domain.model.routedataclass.TownshipDataClass
 
 
 @Dao
@@ -22,5 +24,8 @@ interface RouteDao{
 
     @Query("Delete from route")
     fun deleteAll()
+
+    @Query("select township.id,township.township_name from township")
+    fun getTownShipList():List<TownshipDataClass>
 
 }

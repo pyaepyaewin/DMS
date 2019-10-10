@@ -12,6 +12,8 @@ import com.aceplus.data.repoimpl.CustomerVisitRepoImpl
 import com.aceplus.data.repoimpl.LoginRepoImpl
 import com.aceplus.data.repoimpl.SyncRepoImpl
 import com.aceplus.data.repoimpl.report.ReportRepoImpl
+import com.aceplus.data.repoimpl.promotionrepoImpl.*
+import com.aceplus.data.repoimpl.routrepoimpl.ViewByListRepoImpl
 import com.aceplus.data.utils.Constant
 import com.aceplus.dms.viewmodel.LoginViewModel
 import com.aceplus.dms.viewmodel.SyncViewModel
@@ -23,6 +25,10 @@ import com.aceplus.domain.repo.CustomerVisitRepo
 import com.aceplus.domain.repo.LoginRepo
 import com.aceplus.domain.repo.SyncRepo
 import com.aceplus.domain.repo.report.ReportRepo
+import com.aceplus.dms.viewmodel.promotionviewmodels.*
+import com.aceplus.dms.viewmodel.routeviewmodels.ViewByListViewModel
+import com.aceplus.domain.repo.promotionrepo.*
+import com.aceplus.domain.repo.routerepo.ViewByListRepo
 import com.aceplussolutions.rms.constants.SharedConstants
 import okhttp3.OkHttpClient
 import org.kodein.di.Kodein
@@ -81,12 +87,40 @@ val repoModule = Kodein.Module {
     bind<CustomerVisitRepo>() with singleton {
         CustomerVisitRepoImpl(db = instance(), shf = instance())
     }
-
     bind<ReportRepo>() with singleton {
         ReportRepoImpl(instance())
     }
 
-
+    bind<PromotionPriceRepo>() with singleton {
+        PromotionPriceRepoImpl(instance())
+    }
+    bind<PromotionGiftRepo>() with singleton {
+        PromotionGiftRepoImpl(instance())
+    }
+    bind<VolumeDiscountRepo>() with singleton {
+        VolumeDiscountRepoImpl(instance())
+    }
+    bind<VolumeDiscountFilterRepo>() with singleton {
+        VolumeDiscountFilterRepoImpl(instance())
+    }
+    bind<CategoryDiscountRepo>() with singleton {
+        CategoryDiscountRepoImpl(instance())
+    }
+    bind<ClassDiscountByPriceRepo>() with singleton {
+        ClassDiscountByPriceRepoImpl(instance())
+    }
+    bind<ClassDiscountByGiftRepo>() with singleton {
+        ClassDiscountByGiftRepoImpl(instance())
+    }
+    bind<ClassDiscountForShowPriceRepo>() with singleton {
+        ClassDiscountForShowPriceRepoImpl(instance())
+    }
+    bind<ClassDiscountForShowGiftRepo>() with singleton {
+        ClassDiscountForShowGiftRepoImpl(instance())
+    }
+    bind<ViewByListRepo>() with singleton {
+        ViewByListRepoImpl(instance())
+    }
 }
 
 //ViewModel Module
@@ -94,9 +128,24 @@ val vmModule = Kodein.Module {
     bind() from singleton { LoginViewModel(instance(), instance()) }
     bind() from singleton { SyncViewModel(instance(), instance()) }
     bind() from singleton { CustomerViewModel(instance(), instance()) }
+
     bind() from singleton { SaleViewModel(instance(), instance()) }
     bind() from singleton { SalesReturnViewModel(instance(), instance()) }
     bind() from singleton { ReportViewModel(instance(), instance()) }
+
+    bind() from singleton { PromotionPriceViewModel(instance(),instance()) }
+    bind() from singleton { PromotionGiftViewModel(instance(),instance()) }
+    bind() from singleton { VolumeDiscountViewModel(instance(),instance()) }
+    bind() from singleton { VolumeDiscountFilterViewModel(instance(),instance()) }
+    bind() from singleton { CategoryDiscountViewModel(instance(),instance()) }
+    bind() from singleton { ClassDiscountByPriceViewModel(instance(),instance()) }
+    bind() from singleton { ClassDiscountByGiftViewModel(instance(),instance()) }
+    bind() from singleton { ClassDiscountForShowPriceViewModel(instance(),instance()) }
+    bind() from singleton { ClassDiscountForShowGiftViewModel(instance(),instance()) }
+    bind() from singleton { ViewByListViewModel(instance(),instance()) }
+
+
+
 }
 
 
