@@ -49,4 +49,7 @@ interface CustomerDao {
     @Query("Delete from customer")
     fun deleteAll()
 
+//    @Query("select customer.customer_id,customer.customer_name,customer.phone,customer.address from customer")
+//    fun getCustomerDetail():List<>
+
 }

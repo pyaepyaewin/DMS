@@ -1,4 +1,4 @@
-package com.aceplus.dms.ui.promotiofragments
+package com.aceplus.dms.ui.fragments.promotiofragments
 
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
@@ -12,25 +12,25 @@ import android.view.ViewGroup
 import android.widget.Toast
 import com.aceplus.dms.R
 import com.aceplus.dms.ui.activities.MainActivity
-import com.aceplus.dms.ui.adapters.promotionadapters.PromotionPriceAdapter
+import com.aceplus.dms.ui.adapters.promotionadapters.PromotionGiftAdapter
 import com.aceplus.dms.viewmodel.factory.KodeinViewModelFactory
-import com.aceplus.dms.viewmodel.promotionviewmodels.PromotionPriceViewModel
-import com.aceplus.domain.model.promotionDataClass.PromotionPriceDataClass
-import kotlinx.android.synthetic.main.fragment_tab_promotion_by_customer_item.*
-import kotlinx.android.synthetic.main.tab_fragment_promotion_price.*
+import com.aceplus.dms.viewmodel.promotionviewmodels.PromotionGiftViewModel
+import com.aceplus.domain.model.promotionDataClass.PromotionGiftDataClass
+import kotlinx.android.synthetic.main.tab_fragment_promotion_gift.*
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.support.kodein
+import java.util.ArrayList
 
-class PromotionPriceFragment: Fragment() , KodeinAware {
+class PromotionGiftFragment:Fragment() ,KodeinAware{
     override val kodein: Kodein by kodein()
-    private val promotionPriceAdapter: PromotionPriceAdapter by lazy {
-        PromotionPriceAdapter()
+    private val promotionGiftAdapter: PromotionGiftAdapter by lazy {
+        PromotionGiftAdapter()
     }
 
-    private val promotionPriceViewModel: PromotionPriceViewModel by lazy {
+    private val promotionGiftViewModel: PromotionGiftViewModel by lazy {
         ViewModelProviders.of(this, KodeinViewModelFactory((kodein)))
-            .get(PromotionPriceViewModel::class.java)
+            .get(PromotionGiftViewModel::class.java)
     }
 
     override fun onCreateView(
@@ -38,27 +38,28 @@ class PromotionPriceFragment: Fragment() , KodeinAware {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.tab_fragment_promotion_price, container, false)
+        return inflater.inflate(R.layout.tab_fragment_promotion_gift, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        cancel_imgPromotionPrice.setOnClickListener {
+        cancel_img.setOnClickListener {
             val intent = Intent(context, MainActivity::class.java)
             startActivity(intent)
 
         }
-
-        promotionPriceViewModel.promotionPriceSuccessState.observe(this, Observer {
-            promotionPriceAdapter.setNewList(it as ArrayList<PromotionPriceDataClass>)
+        promotionGiftViewModel.promotionGiftSuccessState.observe(this, Observer {
+            promotionGiftAdapter.setNewList(it as ArrayList<PromotionGiftDataClass>)
         })
-        promotionPriceViewModel.promotionPriceErrorState.observe(this,android.arch.lifecycle.Observer {
+
+        promotionGiftViewModel.promotionGiftErrorState.observe(this,android.arch.lifecycle.Observer {
             Toast.makeText(activity, it, Toast.LENGTH_LONG).show()
         })
-        rvPromotionPrice.apply {
+        rvPromotionGift.apply {
             layoutManager = LinearLayoutManager(activity)
-            adapter = promotionPriceAdapter
+            adapter = promotionGiftAdapter
         }
-        promotionPriceViewModel.loadPromotionPrice()
+        promotionGiftViewModel.loadPromotionGift()
     }
-    }
+}
+

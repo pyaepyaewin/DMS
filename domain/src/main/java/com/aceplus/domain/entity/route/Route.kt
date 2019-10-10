@@ -3,6 +3,7 @@ package com.aceplus.domain.entity.route
 import android.arch.persistence.room.ColumnInfo
 import android.arch.persistence.room.Entity
 import android.arch.persistence.room.PrimaryKey
+import android.arch.persistence.room.Query
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 
@@ -55,4 +56,6 @@ class Route {
     @SerializedName("timestamp")
     @Expose
     var timestamp: String? = null
+
+
 }

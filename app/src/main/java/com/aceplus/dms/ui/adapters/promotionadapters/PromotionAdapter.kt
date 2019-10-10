@@ -3,7 +3,7 @@ package com.aceplus.dms.ui.adapters.promotionadapters
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentStatePagerAdapter
-import com.aceplus.dms.ui.promotiofragments.*
+import com.aceplus.dms.ui.fragments.promotiofragments.*
 
 class PromotionAdapter(fm: FragmentManager, var mNumOfTabs: Int) :
     FragmentStatePagerAdapter(fm) {

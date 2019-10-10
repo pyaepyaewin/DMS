@@ -1,4 +1,4 @@
-package com.aceplus.dms.ui.promotiofragments
+package com.aceplus.dms.ui.fragments.promotiofragments
 
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
@@ -8,7 +8,6 @@ import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import android.widget.Toast
 import com.aceplus.dms.R
 import com.aceplus.dms.ui.activities.MainActivity

@@ -1,4 +1,4 @@
-package com.aceplus.dms.ui.promotiofragments
+package com.aceplus.dms.ui.fragments.promotiofragments
 
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
