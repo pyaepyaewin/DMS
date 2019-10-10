@@ -3,6 +3,7 @@ package com.aceplus.dms.viewmodel.report
 import android.arch.lifecycle.MutableLiveData
 import android.util.Log
 import com.aceplus.domain.entity.customer.Customer
+import com.aceplus.domain.entity.invoice.Invoice
 import com.aceplus.domain.entity.product.Product
 import com.aceplus.domain.entity.product.ProductCategory
 import com.aceplus.domain.entity.product.ProductGroup
@@ -285,6 +286,18 @@ class ReportViewModel(
                 .observeOn(schedulerProvider.mainThread())
                 .subscribe {
                     categoryDataList.postValue(it)
+                }
+        }
+    }
+    //testing invoice list
+    var invoiceDataList = MutableLiveData<List<Invoice>>()
+    fun loadInvoiceList() {
+        launch {
+            reportRepo.getAllInvoiceData()
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.mainThread())
+                .subscribe {
+                    invoiceDataList.postValue(it)
                 }
         }
     }

@@ -4,6 +4,7 @@ import android.app.Dialog
 import android.arch.lifecycle.Observer
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -33,13 +34,13 @@ class SalesHistoryReportFragment : BaseFragment(), KodeinAware {
     var netAmount = 0.0
     var allItems: MutableList<SaleInvoiceReport> = mutableListOf()
     var customerNameList = mutableListOf<String>()
-    private val saleInvoiceReportAdapter: SaleInvoiceReportAdapter by lazy {
+    private val saleHistoryReportAdapter: SaleInvoiceReportAdapter by lazy {
         SaleInvoiceReportAdapter(
             this::onClickItem
         )
     }
-    private val saleInvoiceDetailReportAdapter: SaleInvoiceDetailReportAdapter by lazy { SaleInvoiceDetailReportAdapter() }
-    private val saleInvoiceReportViewModel: ReportViewModel by viewModel()
+    private val saleHistoryDetailReportAdapter: SaleInvoiceDetailReportAdapter by lazy { SaleInvoiceDetailReportAdapter() }
+    private val saleHistoryReportViewModel: ReportViewModel by viewModel()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -50,15 +51,19 @@ class SalesHistoryReportFragment : BaseFragment(), KodeinAware {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        saleInvoiceReportViewModel.saleInvoiceReportSuccessState.observe(this, Observer {
-            saleInvoiceReportAdapter.setNewList(it as ArrayList<SaleInvoiceReport>)
+        saleHistoryReportViewModel.saleInvoiceReportSuccessState.observe(this, Observer {
+            saleHistoryReportAdapter.setNewList(it as ArrayList<SaleInvoiceReport>)
         })
 
-        saleInvoiceReportViewModel.reportErrorState.observe(this, Observer {
+        saleHistoryReportViewModel.reportErrorState.observe(this, Observer {
             Toast.makeText(activity, it, Toast.LENGTH_LONG).show()
         })
 
-        saleInvoiceReportViewModel.customerDataList.observe(this, Observer {
+//        saleHistoryReportViewModel.invoiceDataList.observe(this, Observer {
+//            Log.d("Total Size is","${it!!.size}")
+//        })
+
+        saleHistoryReportViewModel.customerDataList.observe(this, Observer {
             if (it != null) {
                 customerNameList.add("All")
                 for (customer in it) {
@@ -83,7 +88,7 @@ class SalesHistoryReportFragment : BaseFragment(), KodeinAware {
                                 filterList.add(c)
                             }
                         }
-                        saleInvoiceReportAdapter.setNewList(filterList)
+                        saleHistoryReportAdapter.setNewList(filterList)
                     }
 
                     override fun onNothingSelected(p0: AdapterView<*>?) {
@@ -100,10 +105,10 @@ class SalesHistoryReportFragment : BaseFragment(), KodeinAware {
         sale_report_net_amt.text = netAmount.toString()
         saleInvoceReports.apply {
             layoutManager = LinearLayoutManager(activity)
-            adapter = saleInvoiceReportAdapter
+            adapter = saleHistoryReportAdapter
         }
-        saleInvoiceReportViewModel.loadSaleInvoiceReport()
-        saleInvoiceReportViewModel.loadCustomer()
+        saleHistoryReportViewModel.loadSaleInvoiceReport()
+        saleHistoryReportViewModel.loadCustomer()
     }
 
     private fun onClickItem(invoiceId: String) {
@@ -114,18 +119,18 @@ class SalesHistoryReportFragment : BaseFragment(), KodeinAware {
         dialog.setContentView(R.layout.dialog_box_sale_invoice_report)
 
         //Dialog sale history report of invoice detail recycler view
-        saleInvoiceReportViewModel.saleInvoiceDetailReportSuccessState.observe(this, Observer {
-            saleInvoiceDetailReportAdapter.setNewList(it as ArrayList<SaleInvoiceDetailReport>)
+        saleHistoryReportViewModel.saleInvoiceDetailReportSuccessState.observe(this, Observer {
+            saleHistoryDetailReportAdapter.setNewList(it as ArrayList<SaleInvoiceDetailReport>)
         })
 
-        saleInvoiceReportViewModel.reportErrorState.observe(this, Observer {
+        saleHistoryReportViewModel.reportErrorState.observe(this, Observer {
             Toast.makeText(activity, it, Toast.LENGTH_LONG).show()
         })
         saleInvoiceDialog.apply {
             layoutManager = LinearLayoutManager(activity)
-            adapter = saleInvoiceDetailReportAdapter
+            adapter = saleHistoryDetailReportAdapter
         }
-        saleInvoiceReportViewModel.loadSaleInvoiceDetailReport(invoiceId = invoiceId)
+        saleHistoryReportViewModel.loadSaleInvoiceDetailReport(invoiceId = invoiceId)
 
         //Action of dialog button
         dialog.findViewById<Button>(R.id.btn_print).setOnClickListener {

@@ -2,6 +2,7 @@ package com.aceplus.data.repoimpl.report
 
 import com.aceplus.data.database.MyDatabase
 import com.aceplus.domain.entity.customer.Customer
+import com.aceplus.domain.entity.invoice.Invoice
 import com.aceplus.domain.entity.product.Product
 import com.aceplus.domain.entity.product.ProductCategory
 import com.aceplus.domain.entity.product.ProductGroup
@@ -10,6 +11,11 @@ import com.aceplus.domain.repo.report.ReportRepo
 import io.reactivex.Observable
 
 class ReportRepoImpl(private val db: MyDatabase) : ReportRepo {
+//    //testing invoice
+//    override fun getAllInvoiceData(): Observable<List<Invoice>> {
+//        return Observable.just(db.invoiceDao().allData)
+//    }
+
     //deliver report
     override fun deliverReport(): Observable<List<DeliverReport>> {
         return Observable.just(db.deliveryDao().getDeliverReport())
