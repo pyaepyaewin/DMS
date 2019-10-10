@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:orientation="vertical">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -130,12 +131,13 @@
         </LinearLayout>
 
         <android.support.v7.widget.RecyclerView
-            android:id="@+id/recyclersalecancel"
+            android:id="@+id/recyclerSaleCancel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_above="@+id/sale_report_amount_layout"
             android:layout_below="@+id/sale_invoice_report_header_layout"
-            android:paddingBottom="20dp" />
+            android:paddingBottom="20dp"
+                tools:listitem="@layout/list_row_sale_cancel_report"/>
 
         <TableLayout
             android:id="@+id/sale_report_amount_layout"

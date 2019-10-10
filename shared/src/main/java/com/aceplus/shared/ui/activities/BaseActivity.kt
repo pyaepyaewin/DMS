@@ -13,7 +13,6 @@ import org.kodein.di.direct
 import org.kodein.di.generic.instance
 
 abstract class BaseActivity : AppCompatActivity() {
-
     abstract val layoutId:Int
     var pd: ProgressDialog? = null
 

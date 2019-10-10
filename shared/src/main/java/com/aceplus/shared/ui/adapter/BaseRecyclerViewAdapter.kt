@@ -3,6 +3,7 @@ package com.aceplus.shared.ui.adapter
 import android.support.annotation.NonNull
 import com.aceplussolutions.rms.ui.viewholder.BaseViewHolder
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import kotlin.collections.ArrayList
 
 abstract class BaseRecyclerViewAdapter<V : BaseViewHolder<O>, O> : RecyclerView.Adapter<V>() {
@@ -18,6 +19,7 @@ abstract class BaseRecyclerViewAdapter<V : BaseViewHolder<O>, O> : RecyclerView.
     }
 
     override fun getItemCount(): Int {
+        Log.d("Name Size","${mDataList.size}")
         return mDataList.size
     }
 

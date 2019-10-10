@@ -6,6 +6,7 @@ import android.arch.persistence.room.Dao
 import android.arch.persistence.room.Insert
 import android.arch.persistence.room.OnConflictStrategy
 import android.arch.persistence.room.Query
+import com.aceplus.domain.vo.report.SalesOrderHistoryReport
 
 
 @Dao
@@ -34,5 +35,8 @@ interface PreOrderDao {
 
     @Query("update pre_order set delete_flag = 1 WHERE delete_flag = 0")
     fun updateAllInactiveData()
+
+    @Query("select invoice.invoice_id,customer_name,address,total_amount,discount,advance_payment_amount,net_amount from invoice inner join pre_order on invoice.invoice_id = pre_order.invoice_id inner join customer on customer.id =  invoice.customer_id ")
+    fun getSalesOrderHistoryReport(): List<SalesOrderHistoryReport>
 
 }

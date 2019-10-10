@@ -66,7 +66,7 @@
         <activity android:name=".ui.activities.VanIssueActivity"
                   android:screenOrientation="landscape">
         </activity>
-        <activity android:name=".ui.activities.ReportActivity"
+        <activity android:name="com.aceplus.dms.ui.activities.ReportActivity"
                   android:screenOrientation="landscape">
         </activity>
         <activity android:name=".ui.activities.customer.CustomerActivity"

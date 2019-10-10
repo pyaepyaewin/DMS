@@ -49,7 +49,7 @@ dependencies {
     implementation rootProject.ext.libraries.roomRuntime
     implementation rootProject.ext.libraries.roomRxjava
     kapt rootProject.ext.libraries.roomCompiler
-//    annotationProcessor rootProject.ext.libraries.roomCompiler
+    annotationProcessor rootProject.ext.libraries.roomCompiler
 
     // Dependency Injection
     implementation rootProject.ext.libraries.kodeinJvm
