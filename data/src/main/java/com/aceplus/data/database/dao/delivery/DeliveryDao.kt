@@ -6,8 +6,8 @@ import android.arch.persistence.room.Insert
 import android.arch.persistence.room.OnConflictStrategy
 import android.arch.persistence.room.Query
 import com.aceplus.domain.entity.delivery.Delivery
-import com.aceplus.domain.model.report.DeliverDetailReport
-import com.aceplus.domain.model.report.DeliverReport
+import com.aceplus.domain.vo.report.DeliverDetailReport
+import com.aceplus.domain.vo.report.DeliverReport
 
 
 @Dao

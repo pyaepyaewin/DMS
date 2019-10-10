@@ -1,7 +1,7 @@
 package com.aceplus.dms.ui.viewholders.report
 
 import android.view.View
-import com.aceplus.domain.model.report.SaleInvoiceReport
+import com.aceplus.domain.vo.report.SaleInvoiceReport
 import com.aceplussolutions.rms.ui.viewholder.BaseViewHolder
 import kotlinx.android.synthetic.main.list_row_sale_invoice_report.view.*
 
@@ -11,15 +11,15 @@ class SaleInvoiceReportViewHolder(
 ) : BaseViewHolder<SaleInvoiceReport>(view) {
     override fun setData(data: SaleInvoiceReport) {
         view.apply {
-            invoiceId.text = data.invoice_id
-            tvCustomerName.text = data.customer_name
+            invoiceId.text = data.invoiceId
+            tvCustomerName.text = data.customerName
             tvAddress.text = data.address
-            val amount = data.total_amount.toDouble()
+            val amount = data.totalAmount.toDouble()
             totalAmount.text = amount.toString()
-            val discountAmount = data.total_discount_amount
+            val discountAmount = data.totalDiscountAmount
             discount.text = discountAmount.toString()
             netAmount.text = (amount - discountAmount).toString()
-            view.setOnClickListener { onClick(data.invoice_id) }
+            view.setOnClickListener { onClick(data.invoiceId) }
         }
     }
 }

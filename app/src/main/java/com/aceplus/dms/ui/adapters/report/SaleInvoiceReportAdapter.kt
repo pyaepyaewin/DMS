@@ -4,7 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.aceplus.dms.R
 import com.aceplus.dms.ui.viewholders.report.SaleInvoiceReportViewHolder
-import com.aceplus.domain.model.report.SaleInvoiceReport
+import com.aceplus.domain.vo.report.SaleInvoiceReport
 import com.aceplus.shared.ui.adapter.BaseRecyclerViewAdapter
 
 class SaleInvoiceReportAdapter(private val onClick: (invoiceId: String) -> Unit) :

@@ -4,7 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.aceplus.dms.R
 import com.aceplus.dms.ui.viewholders.report.SalesReturnDetailReportViewHolder
-import com.aceplus.domain.model.report.SalesReturnDetailReport
+import com.aceplus.domain.vo.report.SalesReturnDetailReport
 import com.aceplus.shared.ui.adapter.BaseRecyclerViewAdapter
 
 class SalesReturnDetailReportAdapter:BaseRecyclerViewAdapter<SalesReturnDetailReportViewHolder, SalesReturnDetailReport>() {

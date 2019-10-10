@@ -4,7 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.aceplus.dms.R
 import com.aceplus.dms.ui.viewholders.report.SalesOrderHistoryReportViewHolder
-import com.aceplus.domain.model.report.SalesOrderHistoryReport
+import com.aceplus.domain.vo.report.SalesOrderHistoryReport
 import com.aceplus.shared.ui.adapter.BaseRecyclerViewAdapter
 
 class SalesOrderHistoryReportAdapter :

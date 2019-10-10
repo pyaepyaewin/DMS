@@ -6,7 +6,7 @@ import android.arch.persistence.room.Insert
 import android.arch.persistence.room.OnConflictStrategy
 import android.arch.persistence.room.Query
 import com.aceplus.domain.entity.sale.salereturn.SaleReturn
-import com.aceplus.domain.model.report.SalesReturnReport
+import com.aceplus.domain.vo.report.SalesReturnReport
 
 
 @Dao

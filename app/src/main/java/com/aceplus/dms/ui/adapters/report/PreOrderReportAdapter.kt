@@ -4,7 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.aceplus.dms.R
 import com.aceplus.dms.ui.viewholders.report.PreOrderReportViewHolder
-import com.aceplus.domain.model.report.PreOrderReport
+import com.aceplus.domain.vo.report.PreOrderReport
 import com.aceplus.shared.ui.adapter.BaseRecyclerViewAdapter
 
 class PreOrderReportAdapter(private val onClick: (invoiceId: String) -> Unit):BaseRecyclerViewAdapter<PreOrderReportViewHolder, PreOrderReport>() {

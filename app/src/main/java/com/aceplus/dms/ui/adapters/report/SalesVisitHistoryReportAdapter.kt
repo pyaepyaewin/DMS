@@ -4,7 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.aceplus.dms.R
 import com.aceplus.dms.ui.viewholders.report.SalesVisitHistoryReportViewHolder
-import com.aceplus.domain.model.report.SalesVisitHistoryReport
+import com.aceplus.domain.vo.report.SalesVisitHistoryReport
 import com.aceplus.shared.ui.adapter.BaseRecyclerViewAdapter
 
 class SalesVisitHistoryReportAdapter:BaseRecyclerViewAdapter<SalesVisitHistoryReportViewHolder, SalesVisitHistoryReport>() {

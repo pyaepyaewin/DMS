@@ -4,7 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.aceplus.dms.R
 import com.aceplus.dms.ui.viewholders.report.DeliverDetailReportViewHolder
-import com.aceplus.domain.model.report.DeliverDetailReport
+import com.aceplus.domain.vo.report.DeliverDetailReport
 import com.aceplus.shared.ui.adapter.BaseRecyclerViewAdapter
 
 class DeliverDetailReportAdapter:BaseRecyclerViewAdapter<DeliverDetailReportViewHolder,DeliverDetailReport>() {

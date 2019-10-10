@@ -4,8 +4,6 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.aceplus.dms.R
 import com.aceplus.dms.ui.viewholders.report.ProductBalanceReportViewHolder
-import com.aceplus.domain.model.Product
-import com.aceplus.domain.model.report.ProductBalanceReport
 import com.aceplus.shared.ui.adapter.BaseRecyclerViewAdapter
 
 class ProductBalanceReportAdapter:BaseRecyclerViewAdapter<ProductBalanceReportViewHolder, com.aceplus.domain.entity.product.Product>() {

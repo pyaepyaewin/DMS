@@ -4,7 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.aceplus.dms.R
 import com.aceplus.dms.ui.viewholders.report.UnsellReasonReportViewHolder
-import com.aceplus.domain.model.report.UnsellReasonReport
+import com.aceplus.domain.vo.report.UnsellReasonReport
 import com.aceplus.shared.ui.adapter.BaseRecyclerViewAdapter
 
 class UnsellReasonReportAdapter:BaseRecyclerViewAdapter<UnsellReasonReportViewHolder,UnsellReasonReport>() {

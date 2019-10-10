@@ -4,8 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.aceplus.dms.R
 import com.aceplus.dms.ui.viewholders.report.SaleCancelDetailReportViewHolder
-import com.aceplus.domain.model.report.SaleInvoiceDetailReport
-import com.aceplus.domain.model.report.SalesCancelReport
+import com.aceplus.domain.vo.report.SaleInvoiceDetailReport
 import com.aceplus.shared.ui.adapter.BaseRecyclerViewAdapter
 
 class SaleCancelDetailReportAdapter :
