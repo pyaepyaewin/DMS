@@ -10,6 +10,7 @@ import com.aceplus.domain.entity.customer.CustomerFeedback
 import com.aceplus.domain.entity.customer.DidCustomerFeedback
 import com.aceplus.domain.entity.product.Product
 import com.aceplus.domain.entity.promotion.PromotionDate
+import com.aceplus.domain.entity.promotion.PromotionGift
 import com.aceplus.domain.entity.promotion.PromotionPrice
 import com.aceplus.domain.entity.route.TempForSaleManRoute
 import com.aceplus.domain.entity.sale.SaleMan
@@ -203,12 +204,16 @@ class CustomerVisitRepoImpl(
     }
 
     override fun getPromotionPriceByID(promotionPlanId: String, buy_qty: Int, stockID: String): Observable<List<PromotionPrice>> {
-        return Observable.just(db.promotionPriceDao().getPromotionPriceByID(promotionPlanId, buy_qty)) // Need to add stockid
+        return Observable.just(db.promotionPriceDao().getPromotionPriceByID(promotionPlanId, buy_qty, stockID))
     }
 
-    // Testing
+    // Testing for promotion exist or not
     override fun getAllPromoPrice(): Observable<List<PromotionPrice>> {
         return Observable.just(db.promotionPriceDao().allData)
+    }
+
+    override fun getPromotionGiftByPlanID(promotionPlanId: String): Observable<List<PromotionGift>> {
+        return Observable.just(db.promotionGiftDao().getPromotionGiftByPlanID(promotionPlanId))
     }
 
 }

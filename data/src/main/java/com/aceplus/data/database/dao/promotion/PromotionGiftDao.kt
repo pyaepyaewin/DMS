@@ -18,11 +18,15 @@ interface PromotionGiftDao{
     @get:Query("select * from promotion_gift")
     val allData: List<PromotionGift>
 
+    @Query("select * from promotion_gift where promotion_plan_id = :promotionPlanId")
+    fun getPromotionGiftByPlanID(promotionPlanId: String): List<PromotionGift>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(list: List<PromotionGift>)
 
     @Query("Delete from promotion_gift")
     fun deleteAll()
+
     @Query("select product.product_name,promotion_gift.from_quantity,promotion_gift.to_quantity,promotion_gift_item.stock_id,promotion_gift_item.quantity from product, promotion_gift, promotion_gift_item where product.product_id=promotion_gift.stock_id and promotion_gift_item.stock_id=product.product_id")
     fun getPromotionGiftForReport(): List<PromotionGiftDataClass>
 

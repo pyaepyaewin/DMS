@@ -61,9 +61,9 @@ class SaleViewModel(
         }
     }
 
-    fun calculatePromotionPriceAndGift(soldProductInfo: SoldProductInfo){
+    fun calculatePromotionPriceAndGift(soldProductInfo: SoldProductInfo, soldProductList: ArrayList<SoldProductInfo>){
 
-        var promotion_price = 0.0
+        var promotionPrice = 0.0
 
         soldProductInfo.promotionPlanId = null
 
@@ -72,37 +72,37 @@ class SaleViewModel(
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.mainThread())
                 .subscribe{ promoDateList ->
-                    if (promoDateList.isNotEmpty()){
-                        var stock_id_new = 0
-                        for (promoDate in promoDateList){
-                            val promotionPlanId = promoDate.promotion_plan_id
+                    for (promoDate in promoDateList){
+                        val promotionPlanId = promoDate.promotion_plan_id
+                        launch {
+                            customerVisitRepo.getPromotionPriceByID(promotionPlanId!!, soldProductInfo.product.sold_quantity, soldProductInfo.product.id.toString())
+                                .subscribeOn(schedulerProvider.io())
+                                .observeOn(schedulerProvider.mainThread())
+                                .subscribe{ promoPriceList ->
+                                    for (promoPrice in promoPriceList){
+                                        promotionPrice = promoPrice.promotion_price!!.toDouble()
+                                        soldProductInfo.promotionPrice = promotionPrice
+                                    }
+                                }
+                        }
+                        if (promotionPrice == 0.0){
                             launch {
-                                customerVisitRepo.getProductByID(soldProductInfo.product.id)
+                                customerVisitRepo.getPromotionGiftByPlanID(promotionPlanId!!)
                                     .subscribeOn(schedulerProvider.io())
                                     .observeOn(schedulerProvider.mainThread())
-                                    .subscribe{
-                                        if (it.isNotEmpty()){
-                                            for (i in it){
-                                                stock_id_new = i.id
-                                            }
+                                    .subscribe{ promoGiftList ->
+                                        val productToBuy = ArrayList<String>()
+                                        for (promoGift in promoGiftList){
+                                            promoGift.stock_id?.let { productToBuy.add(it) }
                                         }
                                     }
-                            }
-                            launch {
-                                // Wrong - Stock_id and product_id
-                                customerVisitRepo.getPromotionPriceByID(promotionPlanId!!, soldProductInfo.product.sold_quantity, soldProductInfo.product.product_id!!)
-                                    .subscribeOn(schedulerProvider.io())
-                                    .observeOn(schedulerProvider.mainThread())
-                                    .subscribe{
-                                    }
-                                //Need to add getting promo price
                             }
                         }
                     }
                 }
         }
         // Testing promo price table - stock_id type
-        launch {
+        /*launch {
             customerVisitRepo.getAllPromoPrice()
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.mainThread())
@@ -112,7 +112,7 @@ class SaleViewModel(
                         Log.i("Testing", "Stock ID - ${i.stock_id}")
                     }
                 }
-        }
+        }*/
 
     }
 

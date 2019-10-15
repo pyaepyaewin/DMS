@@ -7,6 +7,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.v7.widget.GridLayoutManager
 import android.view.LayoutInflater
+import android.view.View
 import android.view.WindowManager
 import android.widget.*
 import com.aceplus.data.utils.Constant
@@ -67,7 +68,7 @@ class SaleActivity : BaseActivity(), KodeinAware {
 
     private val saleViewModel: SaleViewModel by viewModel()
     private val mProductListAdapter by lazy { ProductListAdapter(::onClickProductListItem) }
-    private val mSoldProductListAdapter by lazy { SoldProductListAdapter(this::onLongClickSoldProductListItem, this::onFocCheckChange, this::onClickQtyButton, this::onClickFocButton) }
+    private val mSoldProductListAdapter by lazy { SoldProductListAdapter(this::onLongClickSoldProductListItem, this::onFocCheckChange, this::onClickQtyButton, this::onClickFocButton, this.isDelivery) }
     private val mPromotionGiftPresentListAdapter by lazy { PromotionPlanGiftListAdapter() }
     /*private val mPromotionItemListAdapter by lazy { PromotionPlanItemListAdapter() }*/
     private val mSearchProductAdapter by lazy { ArrayAdapter<String>(this@SaleActivity, android.R.layout.simple_list_item_1, ArrayList<String>()) }
@@ -83,6 +84,9 @@ class SaleActivity : BaseActivity(), KodeinAware {
     private val giftCategoryClassId: HashMap<String, Integer> = HashMap()
     private val percentAmount: HashMap<String, Double> = HashMap()
     private val giftAmount: HashMap<String, Double> = HashMap()
+
+    private var isDelivery: Boolean = false // Need to update by getIntentData
+    private var isPreOrder: Boolean = false // Need to update by getIntentData
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -133,10 +137,9 @@ class SaleActivity : BaseActivity(), KodeinAware {
         searchAutoCompleteTextView.setAdapter(mSearchProductAdapter)
         searchAutoCompleteTextView.threshold = 1
 
-        //todo
-//        searchAndSelectProductsLayout.visibility = if (this.isDelivery) View.GONE else View.VISIBLE
-//        tableHeaderOrderedQty.visibility = if (this.isDelivery) View.VISIBLE else View.GONE
-//        tableHeaderDiscount.visibility = if (this.isPreOrder) View.GONE else View.VISIBLE
+        searchAndSelectProductsLayout.visibility = if (this.isDelivery) View.GONE else View.VISIBLE
+        tableHeaderOrderedQty.visibility = if (this.isDelivery) View.VISIBLE else View.GONE
+        tableHeaderDiscount.visibility = if (this.isPreOrder) View.GONE else View.VISIBLE
 
     }
 
@@ -228,6 +231,12 @@ class SaleActivity : BaseActivity(), KodeinAware {
                 }
 
                 mSoldProductListAdapter.removeItem(position)
+
+                if (mSoldProductListAdapter.getDataList().isNotEmpty()){
+                    // ToDo calculate Promotion Price And Gift
+                } else{
+                    // ToDo clear lists and update promotion list
+                }
 
 //                val quantity = soldProductList.get(position).getQuantity()
 //                val product = soldProductList.get(position).getProduct()
@@ -338,7 +347,7 @@ class SaleActivity : BaseActivity(), KodeinAware {
 
                     //To Change Promo Price ToDo
 
-                    saleViewModel.calculatePromotionPriceAndGift(soldProduct) // To test promo price - stock id
+                    saleViewModel.calculatePromotionPriceAndGift(soldProduct, this.soldProductList) // To test promo price - stock id
 
                     mSoldProductListAdapter.updateList(soldProduct, position)
 
@@ -426,6 +435,8 @@ class SaleActivity : BaseActivity(), KodeinAware {
 
             return
         }
+
+        // ToDo - Go to checkout page if one of the two same products is selected for foc
 
 //        val boo = toEnableFocSameProduct()
 //        if (boo) {
@@ -516,7 +527,7 @@ class SaleActivity : BaseActivity(), KodeinAware {
     }
 
     private fun onClearArrayList(){
-
+        // To clear all the list
     }
 
     private fun updatePromotionProductList(){

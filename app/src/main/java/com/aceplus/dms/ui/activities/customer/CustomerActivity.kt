@@ -10,7 +10,6 @@ import android.os.Bundle
 import android.support.v7.widget.GridLayoutManager
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
@@ -19,8 +18,6 @@ import android.widget.EditText
 import android.widget.Spinner
 import com.aceplus.data.utils.Constant
 import com.aceplus.dms.R
-import com.aceplus.dms.R.drawable.customer
-import com.aceplus.dms.ui.activities.LoginActivity
 import com.aceplus.dms.ui.activities.customer.sale.SaleActivity
 import com.aceplus.dms.ui.activities.customer.sale.SaleReturnActivity
 import com.aceplus.dms.ui.adapters.CustomerListAdapter
@@ -32,13 +29,10 @@ import com.aceplus.shared.utils.GPSTracker
 import com.aceplussolutions.rms.constants.AppUtils
 import com.aceplussolutions.rms.ui.activities.BaseActivity
 import kotlinx.android.synthetic.main.activity_customer.*
-import kotlinx.android.synthetic.main.dialog_box_customer_feedback.*
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.kodein
 import java.text.DecimalFormat
-import java.text.SimpleDateFormat
-import java.util.*
 import kotlin.collections.ArrayList
 
 class CustomerActivity : BaseActivity(), KodeinAware {
@@ -175,6 +169,7 @@ class CustomerActivity : BaseActivity(), KodeinAware {
         })
 
         tvAddress.setOnClickListener {
+            // ToDo
             /*if (didCustomerSelected()) {
                 val intent = CustomerLocationActivity.newIntent(
                     applicationContext,
@@ -218,7 +213,7 @@ class CustomerActivity : BaseActivity(), KodeinAware {
         btnUnsellReason.setOnClickListener { onClickUnSellReasonButton() }
         btnSaleReturn.setOnClickListener { onClickSaleReturnButton() }
 //        btnPosm.setOnClickListener { onClickPosmButton() }
-//        btnLocation.setOnClickListener { onClickBtnLocation() }
+        btnLocation.setOnClickListener { onClickBtnLocation() }
     }
 
     private fun onClickSaleButton() {
@@ -345,33 +340,18 @@ class CustomerActivity : BaseActivity(), KodeinAware {
     }
 
     private fun onClickBtnLocation() {
+
         if (didCustomerSelected()) {
             //insert arrival & departure time for temp for sale man route
-            customerViewModel.insertDataForTempSaleManRoute(
-                selectedCustomer!!,
-                Utils.getCurrentDate(true)
-            )
+            customerViewModel.insertDataForTempSaleManRoute(selectedCustomer!!, Utils.getCurrentDate(true))
             val intent = AddNewCustomerLocationActivity.newIntentFromCustomerActivity(
                 applicationContext,
-                salemanId = AppUtils.getStringFromShp(Constant.SALEMAN_ID, applicationContext) ?: "",
+                salesmanId = AppUtils.getStringFromShp(Constant.SALEMAN_ID, applicationContext) ?: "",
                 customer = selectedCustomer!!
             )
-//            intent.putExtra("customerName", customer.getCustomerName())
-//            intent.putExtra("phoneNumber", customer.getPhone())
-//            intent.putExtra("customerAddress", customer.getAddress())
-//            intent.putExtra("contactPerson", customer.getContact_person())
-//            intent.putExtra("zonePosition", "")
-//            intent.putExtra("townshipPosition", customer.getTownship())
-//            //intent.putExtra("customerCategoryPosition", String.valueOf(customerCategorySpinner.getSelectedItemPosition()));
-//            intent.putExtra("customerLat", customer.getLatitude())
-//            intent.putExtra("customerLng", customer.getLongitude())
-//            intent.putExtra("customerId", customer.getCustomerId())
-//            intent.putExtra("cusId", customer.getId())
-//            intent.putExtra("saleman_id", saleManId)
-
-//            intent.putExtra("From", "customerActivity")
             startActivity(intent)
         }
+
     }
 
 }

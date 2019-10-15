@@ -11,14 +11,15 @@ class SoldProductListAdapter(
     private val onLongClickCustomer: (data: SoldProductInfo, position: Int) -> Unit,
     private val onFocCheckChange: (data: SoldProductInfo, isChecked: Boolean, position: Int) -> Unit,
     private val onClickQtyButton: (data: SoldProductInfo, position: Int) -> Unit,
-    private val onClickFocButton: (soldProduct: SoldProductInfo, position: Int) -> Unit
+    private val onClickFocButton: (soldProduct: SoldProductInfo, position: Int) -> Unit,
+    private val isDelivery: Boolean
 ) : BaseRecyclerViewAdapter<SoldProductViewHolder, SoldProductInfo>() {
 
     override fun onCreateViewHolder(p0: ViewGroup, p1: Int): SoldProductViewHolder {
 
         val view = LayoutInflater.from(p0.context)
             .inflate(R.layout.list_row_sold_product_with_custom_discount, p0, false)
-        return SoldProductViewHolder(view, onLongClickCustomer, onFocCheckChange, onClickQtyButton, onClickFocButton)
+        return SoldProductViewHolder(view, onLongClickCustomer, onFocCheckChange, onClickQtyButton, onClickFocButton, isDelivery)
 
     }
 
