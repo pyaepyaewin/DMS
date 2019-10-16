@@ -8,8 +8,8 @@ import io.reactivex.Observable
 
 class ViewByListRepoImpl(val database: MyDatabase): ViewByListRepo
  {
-    override fun getTownShipDetail(township_id:String): Observable<List<ViewByListDataClass>> {
-        return Observable.just(database.routeDao().getCustomerDetail(township_id))
+    override fun getTownShipDetail(): Observable<List<ViewByListDataClass>> {
+        return Observable.just(database.routeDao().getCustomerDetail())
 
     }
 

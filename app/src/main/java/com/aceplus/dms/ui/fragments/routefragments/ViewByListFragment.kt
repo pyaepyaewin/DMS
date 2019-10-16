@@ -1,8 +1,10 @@
 package com.aceplus.dms.ui.fragments.routefragments
 
+import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -25,6 +27,8 @@ import java.util.ArrayList
 
 class ViewByListFragment : Fragment(), KodeinAware {
     override val kodein: Kodein by kodein()
+    private val  viewByListAdapter: ViewByListAdapter by lazy { ViewByListAdapter() }
+
 
     private val viewByListViewModel: ViewByListViewModel by lazy {
         ViewModelProviders.of(this, KodeinViewModelFactory((kodein)))
@@ -32,7 +36,7 @@ class ViewByListFragment : Fragment(), KodeinAware {
     }
 
     var route_townships = ArrayList<TownshipDataClass>()
-    //var routedataArrayList= ArrayList<ViewByListDataClass>()
+   var routedataArrayList= mutableListOf<ViewByListDataClass>()
 
 
     var townshiplist: MutableList<String> = ArrayList()
@@ -44,7 +48,7 @@ class ViewByListFragment : Fragment(), KodeinAware {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_e_route_listview, container, false)
-        townshiplist.add("All")
+        townshiplist.add("All Township")
         townshipAdapter =
             ArrayAdapter(activity!!, android.R.layout.simple_spinner_item, townshiplist)
         townshipAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
@@ -63,6 +67,13 @@ class ViewByListFragment : Fragment(), KodeinAware {
             Toast.makeText(activity, it, Toast.LENGTH_LONG).show()
         })
         viewByListViewModel.loadTownShipData()
+        viewByListViewModel.townShipDetailListSuccessState.observe(this, Observer {
+            viewByListAdapter.setNewList(it as ArrayList<ViewByListDataClass>)
+           // this.routedataArrayList = it as ArrayList<ViewByListDataClass>
+        })
+        viewByListViewModel.townShipDetailErrorState.observe(this, android.arch.lifecycle.Observer {
+            Toast.makeText(activity, it, Toast.LENGTH_LONG).show()
+        })
 
         return view
     }
@@ -70,6 +81,14 @@ class ViewByListFragment : Fragment(), KodeinAware {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+
+        rvViewByList.apply {
+            layoutManager = LinearLayoutManager(activity)
+            adapter = viewByListAdapter
+        }
+        viewByListViewModel.loadTownShipDetail()
+
         townshipspinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onNothingSelected(parent: AdapterView<*>?) {
 
@@ -81,11 +100,6 @@ class ViewByListFragment : Fragment(), KodeinAware {
                 position: Int,
                 id: Long
             ) {
-                var selectedTownshipId = route_townships[position].id
-               viewByListViewModel.loadTownShipDetail(selectedTownshipId)
-
-
-
 
 
 

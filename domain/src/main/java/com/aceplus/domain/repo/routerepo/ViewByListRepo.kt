@@ -6,6 +6,6 @@ import io.reactivex.Observable
 
 interface ViewByListRepo {
     fun getTownShipList(): Observable<List<TownshipDataClass>>
-    fun getTownShipDetail(township_id:String):Observable<List<ViewByListDataClass>>
+    fun getTownShipDetail():Observable<List<ViewByListDataClass>>
 
 }

@@ -28,10 +28,10 @@ class ViewByListViewModel(private val viewByListRepo: ViewByListRepo, private va
                 })
         }
     }
-    fun loadTownShipDetail(township_id:String)
+    fun loadTownShipDetail()
     {
         launch {
-            viewByListRepo.getTownShipDetail(township_id)
+            viewByListRepo.getTownShipDetail()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
