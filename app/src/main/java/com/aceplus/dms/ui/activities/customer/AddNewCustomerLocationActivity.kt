@@ -30,6 +30,7 @@ import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.kodein
 import java.io.IOException
+import java.text.DecimalFormat
 
 class AddNewCustomerLocationActivity : BaseActivity(), KodeinAware {
     override val kodein: Kodein by kodein()
@@ -123,8 +124,11 @@ class AddNewCustomerLocationActivity : BaseActivity(), KodeinAware {
                 map?.setOnMapClickListener { location ->
                     if (markerCount == 0){
                         drawMarker(location)
-                        customer?.latitude = location.latitude.toString()
-                        customer?.longitude = location.longitude.toString()
+                        val latDouble = location.latitude
+                        val lonDouble = location.longitude
+                        val nf = DecimalFormat("#.##########")
+                        customer?.latitude = nf.format(latDouble)
+                        customer?.longitude = nf.format(lonDouble)
                         markerCount++
                     }
                 }
@@ -147,17 +151,7 @@ class AddNewCustomerLocationActivity : BaseActivity(), KodeinAware {
     private fun catchEvents(){
 
         back_img.setOnClickListener {
-            if (from.equals("AddNewCustomerActivity", true)){
-                // ToDo go to AddNewCustomerActivity with data
-                finish()
-            } else{
-                customer!!.flag = "2"
-                customerViewModel.updateCustomerData(customer!!)
-                if (customer!!.latitude != null){
-                    // ToDo updateDepartureTimeForSalemanRoute
-                    finish()
-                }
-            }
+            onBackPressed()
         }
 
         search_img.setOnClickListener {
@@ -232,6 +226,22 @@ class AddNewCustomerLocationActivity : BaseActivity(), KodeinAware {
             // permissions this app might request
         }
 
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+
+        if (from.equals("AddNewCustomerActivity", true)){
+            // ToDo go to AddNewCustomerActivity with data
+            finish()
+        } else{
+            customer!!.flag = "2"
+            customerViewModel.updateCustomerData(customer!!)
+            if (customer!!.latitude != null){
+                // ToDo updateDepartureTimeForSalemanRoute
+                finish()
+            }
+        }
     }
 
     private fun drawMarker(point: LatLng) {
