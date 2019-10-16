@@ -36,9 +36,9 @@ class ViewByListFragment : Fragment(), KodeinAware {
     }
 
     var route_townships = ArrayList<TownshipDataClass>()
-   var routedataArrayList= mutableListOf<ViewByListDataClass>()
+   //var routedataArrayList= mutableListOf<ViewByListDataClass>()
 
-
+    var allList: MutableList<ViewByListDataClass> = mutableListOf()
     var townshiplist: MutableList<String> = ArrayList()
     lateinit var townshipAdapter: ArrayAdapter<String>
 
@@ -69,6 +69,7 @@ class ViewByListFragment : Fragment(), KodeinAware {
         viewByListViewModel.loadTownShipData()
         viewByListViewModel.townShipDetailListSuccessState.observe(this, Observer {
             viewByListAdapter.setNewList(it as ArrayList<ViewByListDataClass>)
+            allList=it
            // this.routedataArrayList = it as ArrayList<ViewByListDataClass>
         })
         viewByListViewModel.townShipDetailErrorState.observe(this, android.arch.lifecycle.Observer {
@@ -100,7 +101,23 @@ class ViewByListFragment : Fragment(), KodeinAware {
                 position: Int,
                 id: Long
             ) {
+                val filterList: ArrayList<ViewByListDataClass> = ArrayList()
 
+                if (townshiplist[position] != townshiplist[0]){
+                    for (c in allList) {
+                        if (c.township_name == townshiplist[position]) {
+                            filterList.add(c)
+                        }
+                    }
+                }else{
+                    for (c in allList) {
+                            filterList.add(c)
+                    }
+                }
+
+
+
+                viewByListAdapter.setNewList(filterList)
 
 
             }
