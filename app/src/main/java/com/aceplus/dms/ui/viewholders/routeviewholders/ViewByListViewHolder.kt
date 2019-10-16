@@ -8,8 +8,8 @@ import kotlinx.android.synthetic.main.list_row_route.view.*
 class ViewByListViewHolder(itemView: View): BaseViewHolder<ViewByListDataClass>(itemView) {
     override fun setData(data: ViewByListDataClass) {
         itemView.customer_Name.text=data.customer_name
-        itemView.township_name.text=data.township
-        itemView.tvPhone.text=data.phone_no
+        itemView.township_name.text=data.township_name
+        itemView.tvPhone.text=data.phone
         itemView.tvAddress.text=data.address
     }
 }

@@ -6,15 +6,15 @@ import com.aceplus.domain.model.routedataclass.ViewByListDataClass
 import com.aceplus.domain.repo.routerepo.ViewByListRepo
 import io.reactivex.Observable
 
-class ViewByListRepoImpl(val database: MyDatabase)//: ViewByListRepo
+class ViewByListRepoImpl(val database: MyDatabase): ViewByListRepo
  {
-//    override fun getTownShipDetail(): Observable<List<ViewByListDataClass>> {
-//        return Observable.just(database.)
-//
-//    }
-//
-//    override fun getTownShipList(): Observable<List<TownshipDataClass>> {
-//        return Observable.just(database.routeDao().getTownShipList())
-//
-//    }
+    override fun getTownShipDetail(township_id:String): Observable<List<ViewByListDataClass>> {
+        return Observable.just(database.routeDao().getCustomerDetail(township_id))
+
+    }
+
+    override fun getTownShipList(): Observable<List<TownshipDataClass>> {
+        return Observable.just(database.routeDao().getTownShipList())
+
+    }
 }

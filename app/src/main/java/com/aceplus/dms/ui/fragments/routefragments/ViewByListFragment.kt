@@ -7,12 +7,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import com.aceplus.data.database.dao.route.RouteDao
 import com.aceplus.dms.R
+import com.aceplus.dms.ui.adapters.routeadapters.ViewByListAdapter
 import com.aceplus.dms.viewmodel.factory.KodeinViewModelFactory
 import com.aceplus.dms.viewmodel.routeviewmodels.ViewByListViewModel
 import com.aceplus.domain.model.route.Route_Township
 import com.aceplus.domain.model.route.Routedata
 import com.aceplus.domain.model.routedataclass.TownshipDataClass
+import com.aceplus.domain.model.routedataclass.ViewByListDataClass
 import kotlinx.android.synthetic.main.fragment_e_route_listview.*
 import kotlinx.android.synthetic.main.fragment_e_route_listview.view.*
 import org.kodein.di.Kodein
@@ -29,6 +32,9 @@ class ViewByListFragment : Fragment(), KodeinAware {
     }
 
     var route_townships = ArrayList<TownshipDataClass>()
+    //var routedataArrayList= ArrayList<ViewByListDataClass>()
+
+
     var townshiplist: MutableList<String> = ArrayList()
     lateinit var townshipAdapter: ArrayAdapter<String>
 
@@ -64,7 +70,7 @@ class ViewByListFragment : Fragment(), KodeinAware {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        townshipspinner.onItemSelectedListener=object : AdapterView.OnItemSelectedListener{
+        townshipspinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onNothingSelected(parent: AdapterView<*>?) {
 
             }
@@ -75,6 +81,13 @@ class ViewByListFragment : Fragment(), KodeinAware {
                 position: Int,
                 id: Long
             ) {
+                var selectedTownshipId = route_townships[position].id
+               viewByListViewModel.loadTownShipDetail(selectedTownshipId)
+
+
+
+
+
 
             }
 
