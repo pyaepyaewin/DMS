@@ -5,15 +5,17 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.location.Address
+import android.location.Geocoder
 import android.os.Build
 import android.os.Bundle
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
-import android.util.Log
 import android.view.WindowManager
 import android.widget.Toast
 import com.aceplus.dms.R
+import com.aceplus.dms.viewmodel.customer.CustomerViewModel
 import com.aceplus.domain.entity.customer.Customer
 import com.aceplus.shared.utils.GPSTracker
 import com.aceplussolutions.rms.ui.activities.BaseActivity
@@ -21,12 +23,13 @@ import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GooglePlayServicesUtil
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
 import kotlinx.android.synthetic.main.activity_add_new_customer_location.*
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.kodein
+import java.io.IOException
 
 class AddNewCustomerLocationActivity : BaseActivity(), KodeinAware {
     override val kodein: Kodein by kodein()
@@ -48,14 +51,18 @@ class AddNewCustomerLocationActivity : BaseActivity(), KodeinAware {
         }
     }
 
+    private val customerViewModel: CustomerViewModel by viewModel()
+
     private var customer: Customer? = null
     private var from: String? = null
     private var salesmanId: String? = null
     private var map: GoogleMap? = null
+    private var markerCount: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        mapView.onCreate(savedInstanceState) //Error
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
 
@@ -77,7 +84,7 @@ class AddNewCustomerLocationActivity : BaseActivity(), KodeinAware {
             val requestCode = 10
             GooglePlayServicesUtil.getErrorDialog(status, this, requestCode).show()
         } else{
-            mapView.getMapAsync{
+            mapView.getMapAsync {
                 this.map = it
                 map!!.uiSettings.isMyLocationButtonEnabled = true
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
@@ -95,7 +102,7 @@ class AddNewCustomerLocationActivity : BaseActivity(), KodeinAware {
                         }
 
                         map!!.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(lat, lon), 15f))
-                        
+
                     } else{
                         checkLocationPermission() //Request Location Permission
                     }
@@ -112,43 +119,65 @@ class AddNewCustomerLocationActivity : BaseActivity(), KodeinAware {
 
                     map!!.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(lat, lon), 15f))
                 }
-                mapView.onStart()
-            }
-            /*val fm: SupportMapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
-            fm.getMapAsync {
-                this.map = it
-                map!!.uiSettings.isMyLocationButtonEnabled = true
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
-                    if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                        == PackageManager.PERMISSION_GRANTED) {
 
-                        map!!.isMyLocationEnabled = true
-                        val gpsTracker = GPSTracker(this)
-                        var lat = 0.0
-                        var lon = 0.0
-
-                        if (gpsTracker.canGetLocation()){
-                            lat = gpsTracker.getLatitude()
-                            lon = gpsTracker.getLongitude()
-                        }
-
-                        map!!.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(lat, lon), 15f))
-
-                    } else{
-                        checkLocationPermission() //Request Location Permission
+                map?.setOnMapClickListener { location ->
+                    if (markerCount == 0){
+                        drawMarker(location)
+                        customer?.latitude = location.latitude.toString()
+                        customer?.longitude = location.longitude.toString()
+                        markerCount++
                     }
                 }
-            }*/
+
+                map?.setOnMapLongClickListener {
+                    map?.clear()
+                    markerCount = 0
+                    customer?.latitude = null
+                    customer?.longitude = null
+                }
+
+                if (customer!!.latitude != null){
+                    drawMarker(LatLng(customer!!.latitude!!.toDouble(), customer!!.longitude!!.toDouble()))
+                }
+            }
         }
 
     }
 
     private fun catchEvents(){
 
-        back_img.setOnClickListener { onBackPressed() }
+        back_img.setOnClickListener {
+            if (from.equals("AddNewCustomerActivity", true)){
+                // ToDo go to AddNewCustomerActivity with data
+                finish()
+            } else{
+                customer!!.flag = "2"
+                customerViewModel.updateCustomerData(customer!!)
+                if (customer!!.latitude != null){
+                    // ToDo updateDepartureTimeForSalemanRoute
+                    finish()
+                }
+            }
+        }
 
-        map?.setOnMapClickListener {
-            Toast.makeText(this, it.toString(), Toast.LENGTH_LONG).show()
+        search_img.setOnClickListener {
+            val location = address_txt.text.toString()
+            if (!location.isNullOrBlank()){
+                var addressList: List<Address> = listOf()
+                val geoCoder = Geocoder(this)
+                try {
+                    addressList = geoCoder.getFromLocationName(location, 1)
+                } catch (e: IOException){
+                    e.printStackTrace()
+                }
+                try {
+                    val address = addressList[0]
+                    val latLng = LatLng(address.latitude, address.longitude)
+                    map!!.animateCamera(CameraUpdateFactory.newLatLng(latLng))
+                } catch (e: IOException){
+                    e.printStackTrace()
+                }
+            }
         }
 
     }
@@ -160,12 +189,8 @@ class AddNewCustomerLocationActivity : BaseActivity(), KodeinAware {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
             != PackageManager.PERMISSION_GRANTED){
 
-            // Should we show an explanation?
             if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)){
 
-                // Show an explanation to the user *asynchronously* -- don't block
-                // this thread waiting for the user's response! After the user
-                // sees the explanation, try again to request the permission.
                 AlertDialog.Builder(this)
                     .setTitle("Location Permission Needed")
                     .setMessage("This app needs the Location permission, please accept to use location functionality")
@@ -178,12 +203,7 @@ class AddNewCustomerLocationActivity : BaseActivity(), KodeinAware {
                     .show()
 
             } else{
-
-                // No explanation needed, we can request the permission.
-                ActivityCompat.requestPermissions(
-                    this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), MY_PERMISSIONS_REQUEST_LOCATION
-                )
-
+                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), MY_PERMISSIONS_REQUEST_LOCATION)
             }
 
         }
@@ -198,9 +218,7 @@ class AddNewCustomerLocationActivity : BaseActivity(), KodeinAware {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED){
                     // permission was granted, yay! Do the
                     // location-related task you need to do.
-                    if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                        == PackageManager.PERMISSION_GRANTED
-                    ) {
+                    if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                         map!!.isMyLocationEnabled = true
                     }
                 } else{
@@ -214,6 +232,12 @@ class AddNewCustomerLocationActivity : BaseActivity(), KodeinAware {
             // permissions this app might request
         }
 
+    }
+
+    private fun drawMarker(point: LatLng) {
+        val markerOptions = MarkerOptions()
+        markerOptions.position(point)
+        map!!.addMarker(markerOptions)
     }
 
 }

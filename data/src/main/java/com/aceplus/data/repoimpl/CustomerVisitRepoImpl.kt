@@ -84,6 +84,10 @@ class CustomerVisitRepoImpl(
         return Observable.just(db.customerDao().allCustomerData())
     }
 
+    override fun updateCustomerData(customer: Customer) {
+        db.customerDao().updateCustomerData(customer.id, customer.latitude, customer.longitude)
+    }
+
     override fun getAllDidFeedback(): Observable<List<String>> {
         val idList = db.didCustomerFeedbackDao().getAllCustomerIdList().map { it.data }
         return Observable.just(idList)

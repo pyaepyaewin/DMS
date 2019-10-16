@@ -25,6 +25,7 @@ interface CustomerVisitRepo {
     fun getLastCountForInvoiceNumber(mode: String): Int
 
     fun getAllCustomerData(): Observable<List<Customer>>
+    fun updateCustomerData(customer: Customer)
     fun getAllDidFeedback(): Observable<List<String>>
     fun getAllDefaultFeedback(): Observable<List<CustomerFeedback>>
 

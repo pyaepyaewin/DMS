@@ -35,14 +35,13 @@ interface CustomerDao {
     @get:Query("select * from customer where flag =2")
     val existingCustomerList: List<Customer>
 
-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(list: List<Customer>)
 
     @Query("Delete from customer")
     fun deleteAll()
 
-//    @Query("select customer.customer_id,customer.customer_name,customer.phone,customer.address from customer")
-//    fun getCustomerDetail():List<>
+    @Query("update customer set latitude = :latitude, longitude = :longitude where id = :customerID")
+    fun updateCustomerData(customerID: Int, latitude: String?, longitude: String?)
 
 }

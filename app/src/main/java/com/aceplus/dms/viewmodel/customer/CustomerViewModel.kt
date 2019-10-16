@@ -105,4 +105,8 @@ class CustomerViewModel(
         customerVisitRepo.saveDataForTempSaleManRoute(selectedCustomer, currentDate)
     }
 
+    fun updateCustomerData(customer: Customer){
+        customerVisitRepo.updateCustomerData(customer)
+    }
+
 }
