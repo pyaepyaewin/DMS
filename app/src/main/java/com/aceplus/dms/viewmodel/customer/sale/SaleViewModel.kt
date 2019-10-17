@@ -19,11 +19,12 @@ class SaleViewModel(
 
     var productDataList = MutableLiveData<Pair<List<Product>, List<String>>>()
     var soldProductList = MutableLiveData<List<SoldProductInfo>>()
+    var updatedData = MutableLiveData<Pair<SoldProductInfo, List<Promotion>>>()
 
     var mapGift: HashMap<Int, ArrayList<Int>> = HashMap()
     var mapPercent: HashMap<Int, ArrayList<Int>> = HashMap()
-    var tempSoldProductList: List<SoldProductInfo> = listOf()
-    var tempPromotionList: ArrayList<Promotion> = ArrayList()
+    private var tempSoldProductList: List<SoldProductInfo> = listOf()
+    private var tempPromotionList: ArrayList<Promotion> = ArrayList()
 
     fun loadProductList() {
         launch {
@@ -92,12 +93,12 @@ class SaleViewModel(
                                 }
                         }
                         if (promotionPrice == 0.0){
+                            val productToBuy = ArrayList<String>()
                             launch {
                                 customerVisitRepo.getPromotionGiftByPlanID(promotionPlanId!!)
                                     .subscribeOn(schedulerProvider.io())
                                     .observeOn(schedulerProvider.mainThread())
                                     .subscribe{ promoGiftList ->
-                                        val productToBuy = ArrayList<String>()
                                         for (promoGift in promoGiftList){
                                             promoGift.stock_id?.let { productToBuy.add(it) }
                                         }
@@ -110,8 +111,29 @@ class SaleViewModel(
                                         .subscribeOn(schedulerProvider.io())
                                         .observeOn(schedulerProvider.mainThread())
                                         .subscribe{
-
+                                            count += it.size
                                         }
+                                }
+                            }
+                            if (count == productToBuy.size){
+                                var flag = false
+                                for (promotion in tempPromotionList){
+                                    // If promotion.planID == planID
+                                    // flag = true
+                                    // break
+                                }
+                                if (!flag){
+                                    // addPromotionProduct(soldProduct, promotionPlanId)
+                                }
+                            } else{
+                                var flag = false
+                                for (promotion in tempPromotionList){
+                                    // If promotion.planID == planID
+                                    // flag = true
+                                    // break
+                                }
+                                if (flag) {
+                                    // removePromotionProduct(promotionPlanId)
                                 }
                             }
                         }
@@ -119,18 +141,7 @@ class SaleViewModel(
                 }
         }
 
-        // Testing promo price table - stock_id type
-        /*launch {
-            customerVisitRepo.getAllPromoPrice()
-                .subscribeOn(schedulerProvider.io())
-                .observeOn(schedulerProvider.mainThread())
-                .subscribe{
-                    Log.i("Testing", "Row - ${it.size}")
-                    for (i in it){
-                        Log.i("Testing", "Stock ID - ${i.stock_id}")
-                    }
-                }
-        }*/
+        updatedData.postValue(Pair(soldProductInfo, this.tempPromotionList))
 
     }
 

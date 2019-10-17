@@ -65,7 +65,6 @@ class AddNewCustomerLocationActivity : BaseActivity(), KodeinAware {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-//        mapView.onCreate(savedInstanceState) //Error
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
 
@@ -211,7 +210,6 @@ class AddNewCustomerLocationActivity : BaseActivity(), KodeinAware {
 
         when(requestCode){
             MY_PERMISSIONS_REQUEST_LOCATION -> {
-                // If request is cancelled, the result arrays are empty.
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED){
                     if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                         map!!.isMyLocationEnabled = true
@@ -221,8 +219,7 @@ class AddNewCustomerLocationActivity : BaseActivity(), KodeinAware {
                 }
                 return
             }
-            // other 'case' lines to check for other
-            // permissions this app might request
+            // Other condition can be added here
         }
 
     }
