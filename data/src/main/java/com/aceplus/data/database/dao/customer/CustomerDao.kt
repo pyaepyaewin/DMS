@@ -8,6 +8,7 @@ import android.arch.persistence.room.Insert
 import android.arch.persistence.room.OnConflictStrategy
 import android.arch.persistence.room.Query
 import com.aceplus.domain.model.roomdb.StringObject
+import com.aceplus.domain.model.routedataclass.CustomerLocationDataClass
 import io.reactivex.Observable
 
 @Dao
@@ -49,7 +50,7 @@ interface CustomerDao {
     @Query("Delete from customer")
     fun deleteAll()
 
-//    @Query("select customer.customer_id,customer.customer_name,customer.phone,customer.address from customer")
-//    fun getCustomerDetail():List<>
+    @Query("select customer.latitude,customer.longitude from customer where customer.route_schedule_status=1")
+    fun getCustomerLocation():List<CustomerLocationDataClass>
 
 }

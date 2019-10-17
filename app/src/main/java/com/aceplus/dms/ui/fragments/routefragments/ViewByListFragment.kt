@@ -50,7 +50,7 @@ class ViewByListFragment : Fragment(), KodeinAware {
         val view = inflater.inflate(R.layout.fragment_e_route_listview, container, false)
         townshiplist.add("All Township")
         townshipAdapter =
-            ArrayAdapter(activity!!, android.R.layout.simple_spinner_item, townshiplist)
+            ArrayAdapter(context!!, android.R.layout.simple_spinner_item, townshiplist)
         townshipAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         view.townshipspinner.adapter = townshipAdapter
 
@@ -64,7 +64,7 @@ class ViewByListFragment : Fragment(), KodeinAware {
         })
 
         viewByListViewModel.townshipErrorState.observe(this, android.arch.lifecycle.Observer {
-            Toast.makeText(activity, it, Toast.LENGTH_LONG).show()
+            Toast.makeText(context, it, Toast.LENGTH_LONG).show()
         })
         viewByListViewModel.loadTownShipData()
         viewByListViewModel.townShipDetailListSuccessState.observe(this, Observer {
@@ -73,7 +73,7 @@ class ViewByListFragment : Fragment(), KodeinAware {
            // this.routedataArrayList = it as ArrayList<ViewByListDataClass>
         })
         viewByListViewModel.townShipDetailErrorState.observe(this, android.arch.lifecycle.Observer {
-            Toast.makeText(activity, it, Toast.LENGTH_LONG).show()
+            Toast.makeText(context, it, Toast.LENGTH_LONG).show()
         })
 
         return view
@@ -85,7 +85,7 @@ class ViewByListFragment : Fragment(), KodeinAware {
 
 
         rvViewByList.apply {
-            layoutManager = LinearLayoutManager(activity)
+            layoutManager = LinearLayoutManager(context)
             adapter = viewByListAdapter
         }
         viewByListViewModel.loadTownShipDetail()
