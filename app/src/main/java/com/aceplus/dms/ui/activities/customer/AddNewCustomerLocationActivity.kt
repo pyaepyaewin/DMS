@@ -12,6 +12,7 @@ import android.os.Bundle
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
+import android.util.Log
 import android.view.WindowManager
 import android.widget.Toast
 import com.aceplus.dms.R
@@ -23,6 +24,7 @@ import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GooglePlayServicesUtil
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import kotlinx.android.synthetic.main.activity_add_new_customer_location.*
@@ -63,7 +65,7 @@ class AddNewCustomerLocationActivity : BaseActivity(), KodeinAware {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        mapView.onCreate(savedInstanceState) //Error
+//        mapView.onCreate(savedInstanceState) //Error
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
 
@@ -85,6 +87,7 @@ class AddNewCustomerLocationActivity : BaseActivity(), KodeinAware {
             val requestCode = 10
             GooglePlayServicesUtil.getErrorDialog(status, this, requestCode).show()
         } else{
+            val mapView = supportFragmentManager.findFragmentById(R.id.mapView) as SupportMapFragment
             mapView.getMapAsync {
                 this.map = it
                 map!!.uiSettings.isMyLocationButtonEnabled = true
@@ -210,14 +213,10 @@ class AddNewCustomerLocationActivity : BaseActivity(), KodeinAware {
             MY_PERMISSIONS_REQUEST_LOCATION -> {
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                    // permission was granted, yay! Do the
-                    // location-related task you need to do.
                     if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                         map!!.isMyLocationEnabled = true
                     }
                 } else{
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
                     Toast.makeText(this, "permission denied", Toast.LENGTH_LONG).show()
                 }
                 return

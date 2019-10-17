@@ -1,5 +1,6 @@
 package com.aceplus.domain.repo
 
+import com.aceplus.domain.VO.SoldProductInfo
 import com.aceplus.domain.entity.classdiscount.ClassDiscountByPrice
 import com.aceplus.domain.entity.classdiscount.ClassDiscountByPriceItem
 import com.aceplus.domain.entity.customer.Customer
@@ -46,5 +47,6 @@ interface CustomerVisitRepo {
     fun getAllPromoPrice(): Observable<List<PromotionPrice>> // For Testing
 
     fun getPromotionGiftByPlanID(promotionPlanId: String): Observable<List<PromotionGift>>
+    fun getPromotionToBuyProduct(promotionPlanId: String, soldProductInfo: SoldProductInfo): Observable<List<PromotionGift>>
 
 }

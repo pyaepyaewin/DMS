@@ -21,6 +21,9 @@ interface PromotionGiftDao{
     @Query("select * from promotion_gift where promotion_plan_id = :promotionPlanId")
     fun getPromotionGiftByPlanID(promotionPlanId: String): List<PromotionGift>
 
+    @Query("select * from promotion_gift where promotion_plan_id = :promotionPlanId and from_quantity <= :qtyRange and to_quantity >= :qtyRange and stock_id = :stockID")
+    fun getPromotionToBuyProduct(promotionPlanId: String, qtyRange: Int, stockID: String): List<PromotionGift>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(list: List<PromotionGift>)
 

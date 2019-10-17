@@ -347,7 +347,7 @@ class SaleActivity : BaseActivity(), KodeinAware {
 
                     //To Change Promo Price ToDo
 
-                    saleViewModel.calculatePromotionPriceAndGift(soldProduct, this.soldProductList) // To test promo price - stock id
+                    saleViewModel.calculatePromotionPriceAndGift(soldProduct, this.soldProductList, this.promotionList) // To test promo price - stock id
 
                     mSoldProductListAdapter.updateList(soldProduct, position)
 

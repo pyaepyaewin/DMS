@@ -5,6 +5,7 @@ import android.util.Log
 import com.aceplus.dms.utils.Utils
 import com.aceplus.domain.entity.product.Product
 import com.aceplus.domain.VO.SoldProductInfo
+import com.aceplus.domain.entity.promotion.Promotion
 import com.aceplus.domain.repo.CustomerVisitRepo
 import com.aceplus.shared.viewmodel.BaseViewModel
 import com.kkk.githubpaging.network.rx.SchedulerProvider
@@ -21,6 +22,8 @@ class SaleViewModel(
 
     var mapGift: HashMap<Int, ArrayList<Int>> = HashMap()
     var mapPercent: HashMap<Int, ArrayList<Int>> = HashMap()
+    var tempSoldProductList: List<SoldProductInfo> = listOf()
+    var tempPromotionList: ArrayList<Promotion> = ArrayList()
 
     fun loadProductList() {
         launch {
@@ -61,7 +64,10 @@ class SaleViewModel(
         }
     }
 
-    fun calculatePromotionPriceAndGift(soldProductInfo: SoldProductInfo, soldProductList: ArrayList<SoldProductInfo>){
+    fun calculatePromotionPriceAndGift(soldProductInfo: SoldProductInfo, soldProductList: ArrayList<SoldProductInfo>, promotionList: ArrayList<Promotion>){
+
+        this.tempSoldProductList = soldProductList
+        this.tempPromotionList = promotionList
 
         var promotionPrice = 0.0
 
@@ -97,10 +103,22 @@ class SaleViewModel(
                                         }
                                     }
                             }
+                            var count = 0
+                            for(soldProduct in tempSoldProductList){
+                                launch {
+                                    customerVisitRepo.getPromotionToBuyProduct(promotionPlanId!!, soldProductInfo)
+                                        .subscribeOn(schedulerProvider.io())
+                                        .observeOn(schedulerProvider.mainThread())
+                                        .subscribe{
+
+                                        }
+                                }
+                            }
                         }
                     }
                 }
         }
+
         // Testing promo price table - stock_id type
         /*launch {
             customerVisitRepo.getAllPromoPrice()

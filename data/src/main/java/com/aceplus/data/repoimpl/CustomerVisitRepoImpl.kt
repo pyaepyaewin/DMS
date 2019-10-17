@@ -3,6 +3,7 @@ package com.aceplus.data.repoimpl
 import android.content.SharedPreferences
 import com.aceplus.data.database.MyDatabase
 import com.aceplus.data.utils.Constant
+import com.aceplus.domain.VO.SoldProductInfo
 import com.aceplus.domain.entity.classdiscount.ClassDiscountByPrice
 import com.aceplus.domain.entity.classdiscount.ClassDiscountByPriceItem
 import com.aceplus.domain.entity.customer.Customer
@@ -218,6 +219,10 @@ class CustomerVisitRepoImpl(
 
     override fun getPromotionGiftByPlanID(promotionPlanId: String): Observable<List<PromotionGift>> {
         return Observable.just(db.promotionGiftDao().getPromotionGiftByPlanID(promotionPlanId))
+    }
+
+    override fun getPromotionToBuyProduct(promotionPlanId: String, soldProductInfo: SoldProductInfo): Observable<List<PromotionGift>> {
+        return Observable.just(db.promotionGiftDao().getPromotionToBuyProduct(promotionPlanId, soldProductInfo.product.sold_quantity, soldProductInfo.product.id.toString()))
     }
 
 }
