@@ -61,6 +61,7 @@ dependencies {
     implementation rootProject.ext.libraries.materialCalendarView
     implementation rootProject.ext.libraries.customCalendarView
     implementation rootProject.ext.libraries.mpChart
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.0.3'
 
     //other
     implementation rootProject.ext.libraries.multiDex

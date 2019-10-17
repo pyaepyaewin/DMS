@@ -2,7 +2,6 @@ package com.aceplus.dms.ui.fragments.report
 
 import android.os.Bundle
 import android.support.design.widget.TabLayout
-import android.support.v4.view.ViewPager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,17 +17,25 @@ class SalesExchangeReportFragment : BaseFragment() {
     ): View? {
         // Inflate the layout for this fragment
         var view: View = inflater.inflate(R.layout.activity_saleexchange_report, container, false)
+        return view
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         saleExchangeTab_layout.addTab(saleExchangeTab_layout.newTab().setText("Sale Return"))
         saleExchangeTab_layout.addTab(saleExchangeTab_layout.newTab().setText("Sale"))
-        val adapter = SaleExchangePagerAdapter(childFragmentManager, saleExchangeTab_layout.tabCount)
+        val adapter =
+            SaleExchangePagerAdapter(childFragmentManager, saleExchangeTab_layout.tabCount)
         saleExchangePager.adapter = adapter
-        saleExchangePager.addOnPageChangeListener(TabLayout.TabLayoutOnPageChangeListener(saleExchangeTab_layout))
+        saleExchangePager.addOnPageChangeListener(
+            TabLayout.TabLayoutOnPageChangeListener(
+                saleExchangeTab_layout
+            )
+        )
 
         saleExchangeTab_layout.setOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab) {
                 saleExchangePager.currentItem = tab.position
             }
-
 
             override fun onTabUnselected(tab: TabLayout.Tab) {
 
@@ -38,6 +45,5 @@ class SalesExchangeReportFragment : BaseFragment() {
 
             }
         })
-        return view
     }
 }

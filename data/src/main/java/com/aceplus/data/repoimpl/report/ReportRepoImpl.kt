@@ -6,16 +6,13 @@ import com.aceplus.domain.entity.invoice.Invoice
 import com.aceplus.domain.entity.product.Product
 import com.aceplus.domain.entity.product.ProductCategory
 import com.aceplus.domain.entity.product.ProductGroup
-import com.aceplus.domain.vo.report.*
+import com.aceplus.domain.entity.sale.saletarget.SaleTargetCustomer
+import com.aceplus.domain.entity.sale.saletarget.SaleTargetSaleMan
 import com.aceplus.domain.repo.report.ReportRepo
+import com.aceplus.domain.vo.report.*
 import io.reactivex.Observable
 
 class ReportRepoImpl(private val db: MyDatabase) : ReportRepo {
-//    //testing invoice
-//    override fun getAllInvoiceData(): Observable<List<Invoice>> {
-//        return Observable.just(db.invoiceDao().allData)
-//    }
-
     //deliver report
     override fun deliverReport(): Observable<List<DeliverReport>> {
         return Observable.just(db.deliveryDao().getDeliverReport())
@@ -27,11 +24,11 @@ class ReportRepoImpl(private val db: MyDatabase) : ReportRepo {
 
     //preOrder report
     override fun preOrderReport(): Observable<List<PreOrderReport>> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return Observable.just(db.preOrderDao().getPreOrderReport())
     }
 
     override fun preOrderDetailReport(invoiceId: String): Observable<List<PreOrderDetailReport>> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return Observable.just(db.preOrderProductDao().getPreOrderDetailReport(invoiceId))
     }
 
     //product balance report
@@ -52,6 +49,7 @@ class ReportRepoImpl(private val db: MyDatabase) : ReportRepo {
     override fun getAllCustomerData(): Observable<List<Customer>> {
         return Observable.just(db.customerDao().allData)
     }
+
     override fun getAllGroupData(): Observable<List<ProductGroup>> {
         return Observable.just(db.productGroupDao().allData)
     }
@@ -65,7 +63,7 @@ class ReportRepoImpl(private val db: MyDatabase) : ReportRepo {
         return Observable.just(db.invoiceCancelDao().getSalesCancelReport())
     }
 
-    override fun salesCancelDetailReport(invoiceId: String): Observable<List<SaleInvoiceDetailReport>> {
+    override fun salesCancelDetailReport(invoiceId: String): Observable<List<SaleCancelInvoiceDetailReport>> {
         return Observable.just(db.invoiceCancelProductDao().getSaleCancelDetailReport(invoiceId))
     }
 
@@ -91,6 +89,17 @@ class ReportRepoImpl(private val db: MyDatabase) : ReportRepo {
     //unSell reason report
     override fun unSellReasonReport(): Observable<List<UnsellReasonReport>> {
         return Observable.just(db.customerFeedbackDao().getUnSellReasonReport())
+    }
+
+    //sale target and sale man report
+    override fun saleTargetSaleManReport(): Observable<List<SaleTargetSaleMan>> {
+       return Observable.just(db.saleTargetSaleManDao().allData)
+    }
+        override fun getAllInvoiceData(): Observable<List<Invoice>> {
+        return Observable.just(db.invoiceDao().allData)
+    }
+    override fun saleTargetCustomerReport(): Observable<List<SaleTargetCustomer>> {
+        return Observable.just(db.saleTargetCustomerDao().allData)
     }
 
 }

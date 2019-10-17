@@ -27,7 +27,7 @@ interface InvoiceProductDao {
     @Query("select * from invoice_product WHERE invoice_product_id = :invoice_id")
     fun allDataById(invoice_id: String): List<InvoiceProduct>
 
-    @Query("select product.product_name,invoice_product.sale_quantity as sold_quantity,invoice_product.discount_amount,invoice_product.total_amount from invoice_product inner join product on product.id = invoice_product.product_id where invoice_product.invoice_product_id == :invoiceId")
+    @Query("select product.product_name,invoice_product.sale_quantity,invoice_product.discount_amount,invoice_product.total_amount from invoice_product inner join product on product.id = invoice_product.product_id where invoice_product.invoice_product_id == :invoiceId")
     fun getSaleInvoiceDetailReport(invoiceId:String): List<SaleInvoiceDetailReport>
 
 }

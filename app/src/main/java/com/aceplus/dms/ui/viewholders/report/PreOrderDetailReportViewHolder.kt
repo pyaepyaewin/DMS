@@ -9,7 +9,7 @@ class PreOrderDetailReportViewHolder(private val view: View):BaseViewHolder<PreO
     override fun setData(data: PreOrderDetailReport) {
         view.apply {
             productName.text = data.productName
-            quantity.text = data.totalQuantity.toString()
+            quantity.text = data.orderQuantity
             totalAmount.text = data.totalAmount
 
         }

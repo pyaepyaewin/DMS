@@ -1,11 +1,12 @@
 package com.aceplus.data.database.dao.preorder
 
-import com.aceplus.domain.entity.preorder.PreOrderProduct
 import android.arch.lifecycle.LiveData
 import android.arch.persistence.room.Dao
 import android.arch.persistence.room.Insert
 import android.arch.persistence.room.OnConflictStrategy
 import android.arch.persistence.room.Query
+import com.aceplus.domain.entity.preorder.PreOrderProduct
+import com.aceplus.domain.vo.report.PreOrderDetailReport
 
 
 @Dao
@@ -28,6 +29,9 @@ interface PreOrderProductDao {
 
     @Query("update pre_order_product set delete_flag = 1 WHERE delete_flag = 0")
     fun updateAllInactiveData()
+
+    @Query("select product.product_name,pre_order_product.order_quantity,pre_order_product.total_amount from pre_order_product inner join product on product.id = pre_order_product.product_id where pre_order_product.sale_order_id = :invoiceId ")
+    fun getPreOrderDetailReport(invoiceId: String): List<PreOrderDetailReport>
 
 
 }

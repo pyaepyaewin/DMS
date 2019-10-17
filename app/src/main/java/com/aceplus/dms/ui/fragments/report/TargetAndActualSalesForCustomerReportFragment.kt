@@ -1,7 +1,9 @@
 package com.aceplus.dms.ui.fragments.report
 
 import android.arch.lifecycle.Observer
+import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,6 +11,11 @@ import android.widget.ArrayAdapter
 import com.aceplus.dms.R
 import com.aceplus.dms.viewmodel.report.ReportViewModel
 import com.aceplus.shared.ui.activities.BaseFragment
+import com.github.mikephil.charting.components.Legend
+import com.github.mikephil.charting.data.PieData
+import com.github.mikephil.charting.data.PieDataSet
+import com.github.mikephil.charting.data.PieEntry
+import com.github.mikephil.charting.formatter.PercentFormatter
 import kotlinx.android.synthetic.main.fragment_sale_comparison_report.*
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
@@ -29,6 +36,57 @@ class TargetAndActualSalesForCustomerReportFragment : BaseFragment(), KodeinAwar
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        var targetAmount = 0.0
+        var saleAmount = 0.0
+        var sumAmount :Double
+        var tAmount:Int
+        var value = mutableListOf<Float>()
+        targetAndActualSalesForCustomerReportViewModel.saleTargetCustomerSuccessState.observe(
+            this,
+            Observer {
+                for (target in it!!.first) {
+                    targetAmount += target.target_amount!!.toDouble()
+                }
+                sale_target_txt.text = targetAmount.toString()
+
+                for (sale in it.second) {
+                    saleAmount += sale.total_amount!!.toDouble()
+                }
+                sale_txt.text = saleAmount.toString()
+
+                sumAmount = targetAmount + saleAmount
+                Log.d("Sum Amount", "$sumAmount")
+                tAmount = (targetAmount.toInt() / sumAmount.toInt()) * 100
+                Log.d("Multiply Amount", "$tAmount")
+                // sAmount = (saleAmount / sumAmount) * 100
+                //pie chart show
+                pieChart?.setUsePercentValues(true)
+                val legend: Legend? = pieChart?.legend
+                legend?.horizontalAlignment = Legend.LegendHorizontalAlignment.LEFT
+                value = mutableListOf(tAmount.toFloat(), 0.toFloat())
+                Log.d("All Amount", "${value[0]}")
+                val label = mutableListOf("Sale Target $targetAmount", "Sale $saleAmount")
+
+                val entry = ArrayList<PieEntry>()
+                for (i in value.indices) {
+                    entry.add(PieEntry(value[i], label[i]))
+                }
+                val dataSet = PieDataSet(entry, "Result")
+                dataSet.setColors(Color.GREEN, Color.RED)
+                dataSet.setDrawValues(true)
+                val pieData = PieData(dataSet)
+                dataSet.yValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
+                dataSet.valueLinePart1OffsetPercentage = 10f
+                dataSet.valueLinePart1Length = 0.43f
+                dataSet.valueLinePart2Length = .1f
+                dataSet.valueTextColor = Color.BLACK
+                dataSet.xValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
+                pieChart.setEntryLabelColor(Color.BLUE)
+                pieData.setValueFormatter(PercentFormatter())
+                pieData.setValueTextSize(10f)
+                pieData.setValueTextColor(Color.WHITE)
+                pieChart?.data = pieData
+            })
         targetAndActualSalesForCustomerReportViewModel.customerDataList.observe(
             this, Observer {
                 if (it != null) {
@@ -70,5 +128,6 @@ class TargetAndActualSalesForCustomerReportFragment : BaseFragment(), KodeinAwar
         targetAndActualSalesForCustomerReportViewModel.loadCustomer()
         targetAndActualSalesForCustomerReportViewModel.loadProductGroup()
         targetAndActualSalesForCustomerReportViewModel.loadProductCategory()
+        targetAndActualSalesForCustomerReportViewModel.loadSaleTargetAndActualForCustomerReport()
     }
 }

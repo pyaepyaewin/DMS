@@ -7,8 +7,10 @@ import com.aceplus.domain.entity.invoice.Invoice
 import com.aceplus.domain.entity.product.Product
 import com.aceplus.domain.entity.product.ProductCategory
 import com.aceplus.domain.entity.product.ProductGroup
-import com.aceplus.domain.vo.report.*
+import com.aceplus.domain.entity.sale.saletarget.SaleTargetCustomer
+import com.aceplus.domain.entity.sale.saletarget.SaleTargetSaleMan
 import com.aceplus.domain.repo.report.ReportRepo
+import com.aceplus.domain.vo.report.*
 import com.aceplus.shared.viewmodel.BaseViewModel
 import com.kkk.githubpaging.network.rx.SchedulerProvider
 
@@ -137,7 +139,7 @@ class ReportViewModel(
 
     //sale cancel report
     var salesCancelReportSuccessState = MutableLiveData<List<SalesCancelReport>>()
-    var saleCancelDetailReportSuccessState = MutableLiveData<List<SaleInvoiceDetailReport>>()
+    var saleCancelDetailReportSuccessState = MutableLiveData<List<SaleCancelInvoiceDetailReport>>()
     fun loadSalesCancelReport() {
         launch {
             reportRepo.salesCancelReport()
@@ -255,6 +257,70 @@ class ReportViewModel(
         }
 
     }
+
+    //sale target and sale man
+    var saleTargetAndSaleManReportSuccessState =
+        MutableLiveData<Pair<List<SaleTargetSaleMan>, List<Invoice>>>()
+
+    fun loadSaleTargetAndSaleManReport() {
+        var saleTargetAndSaleManReportList = listOf<SaleTargetSaleMan>()
+        var invoiceDataList = listOf<Invoice>()
+        launch {
+            reportRepo.saleTargetSaleManReport()
+                .doOnNext {
+                    saleTargetAndSaleManReportList = it
+                    // Log.d("Testing", "${saleTargetAndSaleManReportList.size}")
+                }
+                .flatMap { reportRepo.getAllInvoiceData() }
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.mainThread())
+                .subscribe({
+                    invoiceDataList = it
+                    // Log.d("Testing", "${invoiceDataList.size}")
+                }, {
+                    reportErrorState.value = it.localizedMessage
+                })
+        }
+        saleTargetAndSaleManReportSuccessState.postValue(
+            Pair(
+                saleTargetAndSaleManReportList,
+                invoiceDataList
+            )
+        )
+
+    }
+
+    //sale target and actual for customer
+    var saleTargetCustomerSuccessState =
+        MutableLiveData<Pair<List<SaleTargetCustomer>, List<Invoice>>>()
+
+    fun loadSaleTargetAndActualForCustomerReport() {
+        var saleTargetAndActualForCustomerReportList = listOf<SaleTargetCustomer>()
+        var invoiceDataList = listOf<Invoice>()
+        launch {
+            reportRepo.saleTargetCustomerReport()
+                .doOnNext {
+                    saleTargetAndActualForCustomerReportList = it
+                }
+                .flatMap { reportRepo.getAllInvoiceData() }
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.mainThread())
+                .subscribe({
+                    invoiceDataList = it
+                }, {
+                    reportErrorState.value = it.localizedMessage
+                })
+        }
+        saleTargetCustomerSuccessState.postValue(
+            Pair(
+                saleTargetAndActualForCustomerReportList,
+                invoiceDataList
+            )
+        )
+
+
+    }
+
     //spinner data
     var customerDataList = MutableLiveData<List<Customer>>()
     var groupDataList = MutableLiveData<List<ProductGroup>>()
@@ -269,6 +335,7 @@ class ReportViewModel(
                 }
         }
     }
+
     fun loadProductGroup() {
         launch {
             reportRepo.getAllGroupData()
@@ -279,6 +346,7 @@ class ReportViewModel(
                 }
         }
     }
+
     fun loadProductCategory() {
         launch {
             reportRepo.getAllCategoryData()
@@ -289,16 +357,6 @@ class ReportViewModel(
                 }
         }
     }
-    //testing invoice list
-    var invoiceDataList = MutableLiveData<List<Invoice>>()
-    fun loadInvoiceList() {
-//        launch {
-//            reportRepo.getAllInvoiceData()
-//                .subscribeOn(schedulerProvider.io())
-//                .observeOn(schedulerProvider.mainThread())
-//                .subscribe {
-//                    invoiceDataList.postValue(it)
-//                }
-//        }
-    }
+
+
 }

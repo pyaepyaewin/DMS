@@ -59,10 +59,6 @@ class SalesHistoryReportFragment : BaseFragment(), KodeinAware {
             Toast.makeText(activity, it, Toast.LENGTH_LONG).show()
         })
 
-//        saleHistoryReportViewModel.invoiceDataList.observe(this, Observer {
-//            Log.d("Total Size is","${it!!.size}")
-//        })
-
         saleHistoryReportViewModel.customerDataList.observe(this, Observer {
             if (it != null) {
                 customerNameList.add("All")
