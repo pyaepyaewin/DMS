@@ -31,6 +31,7 @@ class SoldProductViewHolder(
             qty.setOnClickListener { onClickQtyButton(data, position) }
 
             price.text = data.product.selling_price
+            promotionPrice.text = data.promotionPrice.toString() // Actually from promoPriceByDisc
 
             FocCheck.isChecked = data.isFocIsChecked
             FocCheck.setOnClickListener { onFocCheckChange(data, FocCheck.isChecked, position) }

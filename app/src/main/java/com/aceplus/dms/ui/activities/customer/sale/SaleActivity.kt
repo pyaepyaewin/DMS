@@ -153,6 +153,12 @@ class SaleActivity : BaseActivity(), KodeinAware {
         cancelImg.setOnClickListener { onBackPressed() }
         checkoutImg.setOnClickListener { saveSaleData() }
 
+        /*saleViewModel.promotedSoldProduct.observe(this, Observer {
+            if (it != null) {
+                mSoldProductListAdapter.updateList(it.soldProductInfo, it.position)
+            }
+        })*/
+
     }
 
     private fun onClickProductListItem(product: Product) {
@@ -345,11 +351,9 @@ class SaleActivity : BaseActivity(), KodeinAware {
 
                     soldProduct.quantity = quantity
 
-                    //To Change Promo Price ToDo
+                    saleViewModel.calculatePromotionPriceAndGift(soldProduct, mSoldProductListAdapter.getDataList() as ArrayList, this.promotionList, position)
 
-                    saleViewModel.calculatePromotionPriceAndGift(soldProduct, this.soldProductList, this.promotionList) // To test promo price - stock id
-
-                    mSoldProductListAdapter.updateList(soldProduct, position)
+                    //mSoldProductListAdapter.updateList(soldProduct, position) // Update list on observe from livedata
 
                 }
 

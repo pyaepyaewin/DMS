@@ -3,6 +3,7 @@ package com.aceplus.dms.viewmodel.customer.sale
 import android.arch.lifecycle.MutableLiveData
 import android.util.Log
 import com.aceplus.dms.utils.Utils
+import com.aceplus.domain.VO.CalculatedSoldProduct
 import com.aceplus.domain.entity.product.Product
 import com.aceplus.domain.VO.SoldProductInfo
 import com.aceplus.domain.entity.promotion.Promotion
@@ -19,11 +20,11 @@ class SaleViewModel(
 
     var productDataList = MutableLiveData<Pair<List<Product>, List<String>>>()
     var soldProductList = MutableLiveData<List<SoldProductInfo>>()
-    var updatedData = MutableLiveData<Pair<SoldProductInfo, List<Promotion>>>()
+    var promotedSoldProduct = MutableLiveData<CalculatedSoldProduct>()
 
     var mapGift: HashMap<Int, ArrayList<Int>> = HashMap()
     var mapPercent: HashMap<Int, ArrayList<Int>> = HashMap()
-    private var tempSoldProductList: List<SoldProductInfo> = listOf()
+    private var tempSoldProductList: ArrayList<SoldProductInfo> = ArrayList()
     private var tempPromotionList: ArrayList<Promotion> = ArrayList()
 
     fun loadProductList() {
@@ -65,10 +66,12 @@ class SaleViewModel(
         }
     }
 
-    fun calculatePromotionPriceAndGift(soldProductInfo: SoldProductInfo, soldProductList: ArrayList<SoldProductInfo>, promotionList: ArrayList<Promotion>){
+    fun calculatePromotionPriceAndGift(soldProductInfo: SoldProductInfo, soldProductList: ArrayList<SoldProductInfo>, promotionList: ArrayList<Promotion>, position: Int){
 
         this.tempSoldProductList = soldProductList
         this.tempPromotionList = promotionList
+
+        this.tempSoldProductList[position] = soldProductInfo
 
         var promotionPrice = 0.0
 
@@ -89,6 +92,7 @@ class SaleViewModel(
                                     for (promoPrice in promoPriceList){
                                         promotionPrice = promoPrice.promotion_price!!.toDouble()
                                         soldProductInfo.promotionPrice = promotionPrice
+                                        soldProductInfo.promotionPlanId = promotionPlanId
                                     }
                                 }
                         }
@@ -141,7 +145,7 @@ class SaleViewModel(
                 }
         }
 
-        updatedData.postValue(Pair(soldProductInfo, this.tempPromotionList))
+        promotedSoldProduct.postValue(CalculatedSoldProduct(soldProductInfo, this.tempPromotionList, position))
 
     }
 
