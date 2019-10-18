@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.TableRow
 import android.widget.Toast
 import com.aceplus.dms.R
 import com.aceplus.dms.ui.adapters.report.SalesOrderHistoryReportAdapter
@@ -35,14 +36,14 @@ class SalesOrderHistoryReportFragment : BaseFragment(), KodeinAware {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        var view: View = inflater.inflate(R.layout.fragment_sale_invoice_report, container, false)
-        table_row_advance_amt.visibility = View.VISIBLE
-        sale_order_report_advanced_amount_label.setVisibility(View.VISIBLE)
+        val view: View = inflater.inflate(R.layout.fragment_sale_invoice_report, container, false)
         // Inflate the layout for this fragment
         return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        table_row_advance_amt.visibility = View.VISIBLE
+        sale_order_report_advanced_amount_label.visibility = View.VISIBLE
         var saleInvoiceReports = view.findViewById(R.id.saleInvoceReports) as RecyclerView
         salesOrderHistoryReportViewModel.salesOrderHistoryReportSuccessState.observe(
             this,

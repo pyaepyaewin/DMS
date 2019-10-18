@@ -6,6 +6,7 @@ import android.arch.persistence.room.Dao
 import android.arch.persistence.room.Insert
 import android.arch.persistence.room.OnConflictStrategy
 import android.arch.persistence.room.Query
+import com.aceplus.domain.model.Product
 
 
 @Dao
@@ -22,5 +23,7 @@ interface SaleTargetSaleManDao{
 
     @Query("Delete from sale_target_sale_man")
     fun deleteAll()
+
+
 
 }

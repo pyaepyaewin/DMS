@@ -9,7 +9,7 @@ class SaleInvoiceDetailReportViewHolder(private val view: View):BaseViewHolder<S
     override fun setData(data: SaleInvoiceDetailReport) {
         view.apply {
             sidProductName.text = data.productName
-            sidQuantity.text = data.soldQuantity.toString()
+            sidQuantity.text = data.saleQuantity.toString()
             sidDiscount.text = data.discountAmount
             sidAmount.text = data.totalAmount.toString()
         }

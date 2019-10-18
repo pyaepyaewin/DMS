@@ -15,7 +15,7 @@ import com.aceplus.dms.R
 import com.aceplus.dms.ui.adapters.report.SaleCancelDetailReportAdapter
 import com.aceplus.dms.ui.adapters.report.SalesCancelReportAdapter
 import com.aceplus.dms.viewmodel.report.ReportViewModel
-import com.aceplus.domain.vo.report.SaleInvoiceDetailReport
+import com.aceplus.domain.vo.report.SaleCancelInvoiceDetailReport
 import com.aceplus.domain.vo.report.SalesCancelReport
 import com.aceplus.shared.ui.activities.BaseFragment
 import kotlinx.android.synthetic.main.dialog_box_sale_cancel_report.*
@@ -23,7 +23,6 @@ import kotlinx.android.synthetic.main.fragment_sale_cancel_report.*
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.support.kodein
-import java.util.*
 
 class SalesCancelReportFragment : BaseFragment(), KodeinAware {
     override val kodein: Kodein by kodein()
@@ -126,7 +125,7 @@ class SalesCancelReportFragment : BaseFragment(), KodeinAware {
         salesCancelReportViewModel.saleCancelDetailReportSuccessState.observe(
             this,
             android.arch.lifecycle.Observer {
-                saleCancelDetailReportAdapter.setNewList(it as ArrayList<SaleInvoiceDetailReport>)
+                saleCancelDetailReportAdapter.setNewList(it as ArrayList<SaleCancelInvoiceDetailReport>)
             })
 
         salesCancelReportViewModel.reportErrorState.observe(

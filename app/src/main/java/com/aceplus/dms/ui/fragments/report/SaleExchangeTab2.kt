@@ -39,22 +39,20 @@ class SaleExchangeTab2 : BaseFragment(), KodeinAware {
     ): View? {
         // Inflate the layout for this fragment
         var view: View = inflater.inflate(R.layout.fragment_sale_invoice_report, container, false)
-        table_row_advance_amt.setVisibility(View.GONE)
-        tb_2.setVisibility(View.GONE)
-        tb_1.setVisibility(View.GONE)
-        tb_3.setVisibility(View.GONE)
-        customer_spinner_fragment_invoice_report.setVisibility(View.GONE)
-        edit_text_sale_report_from_date.setVisibility(View.GONE)
-        edit_text_sale_report_to_date.setVisibility(View.GONE)
-        txt_view_from_date.setVisibility(View.GONE)
-        txt_view_to_date.setVisibility(View.GONE)
-        btn_sale_report_search.setVisibility(View.GONE)
-        btn_sale_report_clear.setVisibility(View.GONE)
-
         return view
     }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        table_row_advance_amt.visibility = View.GONE
+        tb_2.visibility = View.GONE
+        tb_1.visibility = View.GONE
+        tb_3.visibility = View.GONE
+        customer_spinner_fragment_invoice_report.visibility = View.GONE
+        edit_text_sale_report_from_date.visibility = View.GONE
+        edit_text_sale_report_to_date.visibility = View.GONE
+        txt_view_from_date.visibility = View.GONE
+        txt_view_to_date.visibility = View.GONE
+        btn_sale_report_search.visibility = View.GONE
+        btn_sale_report_clear.visibility = View.GONE
         saleInvoiceReportViewModel.saleInvoiceReportSuccessState.observe(this, Observer {
             saleInvoiceReportAdapter.setNewList(it as ArrayList<SaleInvoiceReport>)
         })
