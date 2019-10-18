@@ -49,7 +49,7 @@ class VolumeDiscountFilterItem {
     @ColumnInfo(name = "discount_amount")
     @SerializedName("discount_amount")
     @Expose
-    var discount_amount: Double = 0.0
+    var discount_amount: Double? = 0.0
 
     @ColumnInfo(name = "discount_price")
     @SerializedName("discount_price")
