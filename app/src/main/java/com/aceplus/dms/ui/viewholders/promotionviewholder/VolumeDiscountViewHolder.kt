@@ -15,6 +15,12 @@ class VolumeDiscountViewHolder (itemView: View): BaseViewHolder<VolumeDiscountDa
         itemView.row_vd_item_discount_percent.text=data.discount_percent
         itemView.row_vd_item_discount_amount.text=data.discount_amount
         itemView.row_vd_item_discount_price.text=data.discount_price
-        itemView.row_vd_volume_discount_exclude.text=data.exclude
+        if (data.exclude.equals("0")) {
+            itemView.row_vd_volume_discount_exclude.setText("No")
+        } else {
+            itemView.row_vd_volume_discount_exclude.setText("Yes")
+
+        }
+
     }
 }

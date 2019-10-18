@@ -27,7 +27,7 @@ interface PromotionPriceDao{
     @Query("Delete from promotion_price")
     fun deleteAll()
 
-    @Query("select product.product_name,promotion_price.from_quantity,promotion_price.to_quantity,promotion_price.promotion_price from product,promotion_price where product.product_id=promotion_price.stock_id")
+    @Query("select product.product_name,promotion_price.from_quantity,promotion_price.to_quantity,promotion_price.promotion_price from product,promotion_price where product.id=promotion_price.stock_id")
     fun getPromotionPriceForReport(): List<PromotionPriceDataClass>
 
 }

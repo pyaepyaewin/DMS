@@ -110,6 +110,10 @@
         <activity android:name=".ui.activities.customer.PosmActivity"
                   android:screenOrientation="landscape">
         </activity>
+
     </application>
+
+
+
 
 </manifest>

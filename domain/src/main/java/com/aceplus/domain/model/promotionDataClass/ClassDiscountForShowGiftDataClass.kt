@@ -1,6 +1,6 @@
 package com.aceplus.domain.model.promotionDataClass
 
-class ClassDiscountForShowGiftDataClass(val class_id:Int,
+class ClassDiscountForShowGiftDataClass(val discount_type: String,
                                         val from_quantity:String,
                                         val to_quantity:String,
                                         val from_amount:String,

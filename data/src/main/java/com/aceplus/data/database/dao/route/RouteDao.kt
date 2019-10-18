@@ -8,10 +8,11 @@ import android.arch.persistence.room.OnConflictStrategy
 import android.arch.persistence.room.Query
 import com.aceplus.domain.model.route.Route_Township
 import com.aceplus.domain.model.routedataclass.TownshipDataClass
+import com.aceplus.domain.model.routedataclass.ViewByListDataClass
 
 
 @Dao
-interface RouteDao{
+interface RouteDao {
 
     @get:Query("select * from route")
     val allDataLD: LiveData<List<Route>>
@@ -26,6 +27,13 @@ interface RouteDao{
     fun deleteAll()
 
     @Query("select township.id,township.township_name from township")
-    fun getTownShipList():List<TownshipDataClass>
+    fun getTownShipList(): List<TownshipDataClass>
 
+    @Query(
+        "select C.customer_name,T.township_name,C.phone,C.address from customer as C,township as T where C.township_number=T.id")
+        fun getCustomerDetail(): List<ViewByListDataClass>
+
+
+//    @Query("select C.customer_name,T.township_name,C.phone,C.address from customer as C,township as T where C.township_number=T.id and C.township_number=:id")
+//    fun getCustomerFilterDetail(id:String): List<ViewByListDataClass>
 }

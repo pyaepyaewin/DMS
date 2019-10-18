@@ -9,6 +9,7 @@ import android.arch.persistence.room.OnConflictStrategy
 import android.arch.persistence.room.Query
 import com.aceplus.domain.entity.predefine.Township
 import com.aceplus.domain.model.roomdb.StringObject
+import com.aceplus.domain.model.routedataclass.CustomerLocationDataClass
 import io.reactivex.Observable
 
 @Dao
@@ -43,5 +44,9 @@ interface CustomerDao {
 
     @Query("update customer set latitude = :latitude, longitude = :longitude where id = :customerID")
     fun updateCustomerData(customerID: Int, latitude: String?, longitude: String?)
+
+    @Query("select customer.latitude,customer.longitude from customer where customer.route_schedule_status=1")
+    fun getCustomerLocation():List<CustomerLocationDataClass>
+
 
 }
