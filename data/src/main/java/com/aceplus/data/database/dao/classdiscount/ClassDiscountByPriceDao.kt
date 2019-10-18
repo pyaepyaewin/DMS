@@ -22,7 +22,8 @@ interface ClassDiscountByPriceDao {
 
     @Query("Delete from class_discount_by_price")
     fun deleteAll()
-    @Query("select class_discount_by_price_item.class_id,class_discount_by_price_item.from_quantity,class_discount_by_price_item.to_quantity,class_discount_by_price_item.from_amount,class_discount_by_price_item.to_amount,class_discount_by_price_item.discount_percent from class_discount_by_price_item")
+
+    @Query("select class.name,class_discount_by_price_item.from_quantity,class_discount_by_price_item.to_quantity,class_discount_by_price_item.from_amount,class_discount_by_price_item.to_amount,class_discount_by_price_item.discount_percent from class_discount_by_price_item,class where class_discount_by_price_item.class_id=class.class_id")
     fun getClassDiscountByPriceList():List<ClassDiscountByPriceDataClass>
 
 }
