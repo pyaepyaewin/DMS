@@ -6,6 +6,7 @@ import com.aceplus.domain.entity.product.ProductCategory
 import com.aceplus.domain.entity.product.ProductGroup
 import com.aceplus.domain.entity.sale.saletarget.SaleTargetCustomer
 import com.aceplus.domain.entity.sale.saletarget.SaleTargetSaleMan
+import com.aceplus.domain.model.Product
 import com.aceplus.domain.model.forApi.sale.saletarget.SaleTargetForCustomer
 import com.aceplus.domain.model.sale.SaleTarget
 import com.aceplus.domain.vo.report.*
@@ -61,4 +62,6 @@ interface ReportRepo {
     //sale target and customer
     fun saleTargetCustomerReport():Observable<List<SaleTargetCustomer>>
 
+    //target and actual sale for product
+    fun saleTargetProductReport(stockId:Int):Observable<List<com.aceplus.domain.entity.product.Product>>
 }

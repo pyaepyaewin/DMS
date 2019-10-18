@@ -13,6 +13,7 @@ import com.aceplus.domain.vo.report.*
 import io.reactivex.Observable
 
 class ReportRepoImpl(private val db: MyDatabase) : ReportRepo {
+
     //deliver report
     override fun deliverReport(): Observable<List<DeliverReport>> {
         return Observable.just(db.deliveryDao().getDeliverReport())
@@ -98,8 +99,15 @@ class ReportRepoImpl(private val db: MyDatabase) : ReportRepo {
         override fun getAllInvoiceData(): Observable<List<Invoice>> {
         return Observable.just(db.invoiceDao().allData)
     }
+
+    //sale target and actual sale for customer
     override fun saleTargetCustomerReport(): Observable<List<SaleTargetCustomer>> {
         return Observable.just(db.saleTargetCustomerDao().allData)
+    }
+
+    //sale target and actual sale for product
+    override fun saleTargetProductReport(stockId:Int): Observable<List<Product>> {
+        return Observable.just(db.productDao().selectProductName(stockId))
     }
 
 }

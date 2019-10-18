@@ -321,6 +321,21 @@ class ReportViewModel(
 
     }
 
+    //sale target and actual sale for product
+    var loadProductNameDataList = MutableLiveData<List<Product>>()
+    fun loadProductNameList(stockId:Int) {
+        launch {
+            reportRepo.saleTargetProductReport(stockId)
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.mainThread())
+                .subscribe {
+                    loadProductNameDataList.postValue(it)
+                }
+        }
+    }
+
+
+
     //spinner data
     var customerDataList = MutableLiveData<List<Customer>>()
     var groupDataList = MutableLiveData<List<ProductGroup>>()

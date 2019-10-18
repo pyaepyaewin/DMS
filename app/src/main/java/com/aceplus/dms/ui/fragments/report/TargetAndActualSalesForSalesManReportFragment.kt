@@ -15,6 +15,7 @@ import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
 import com.github.mikephil.charting.formatter.PercentFormatter
+import com.github.mikephil.charting.formatter.ValueFormatter
 import kotlinx.android.synthetic.main.fragment_sale_comparison_report.*
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
@@ -86,10 +87,13 @@ class TargetAndActualSalesForSalesManReportFragment : BaseFragment(), KodeinAwar
                 dataSet.valueTextColor = Color.BLACK
                 dataSet.xValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
                 pieChart.setEntryLabelColor(Color.BLUE)
-                pieData.setValueFormatter(PercentFormatter())
+                pieData.setValueFormatter(PercentFormatter() as ValueFormatter?)
                 pieData.setValueTextSize(10f)
                 pieData.setValueTextColor(Color.WHITE)
                 pieChart?.data = pieData
+                chart.canScrollHorizontally(20)
+                pieChart.animateXY(2000, 2000)
+                pieChart.invalidate()
             })
 
         targetAndActualSalesForSalesManReportViewModel.groupDataList.observe(this, Observer {
