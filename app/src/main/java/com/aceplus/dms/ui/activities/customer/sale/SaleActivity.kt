@@ -76,7 +76,7 @@ class SaleActivity : BaseActivity(), KodeinAware {
     private val duplicateProductList = mutableListOf<Product>()
     private var customer: Customer? = null
     private val soldProductList: ArrayList<SoldProductInfo> = ArrayList()
-    private val promotionList: ArrayList<Promotion> = ArrayList()
+    private var promotionList: ArrayList<Promotion> = ArrayList()
     private val promotionGiftByClassDis: ArrayList<Int> = ArrayList()
     private val percentTotalCount: ArrayList<String> = ArrayList()
     private val giftTotalCount: ArrayList<String> = ArrayList()
@@ -153,11 +153,13 @@ class SaleActivity : BaseActivity(), KodeinAware {
         cancelImg.setOnClickListener { onBackPressed() }
         checkoutImg.setOnClickListener { saveSaleData() }
 
-        /*saleViewModel.promotedSoldProduct.observe(this, Observer {
+        saleViewModel.promotedSoldProduct.observe(this, Observer {
             if (it != null) {
                 mSoldProductListAdapter.updateList(it.soldProductInfo, it.position)
+                this.promotionList = it.promotionList
+                updatePromotionProductList()
             }
-        })*/
+        })
 
     }
 
@@ -185,12 +187,7 @@ class SaleActivity : BaseActivity(), KodeinAware {
         }
 
         if (!sameProduct) {
-            mSoldProductListAdapter.addNewItem(
-                SoldProductInfo(
-                    tempProduct,
-                    false
-                )
-            )
+            mSoldProductListAdapter.addNewItem(SoldProductInfo(tempProduct, false))
         } else {
             if (Constant.PRODUCT_COUNT < 2 && !duplicateProductList.contains(tempProduct)) {
                 if (Constant.PRODUCT_COUNT == 1) {
@@ -353,8 +350,6 @@ class SaleActivity : BaseActivity(), KodeinAware {
 
                     saleViewModel.calculatePromotionPriceAndGift(soldProduct, mSoldProductListAdapter.getDataList() as ArrayList, this.promotionList, position)
 
-                    //mSoldProductListAdapter.updateList(soldProduct, position) // Update list on observe from livedata
-
                 }
 
             }
@@ -362,11 +357,8 @@ class SaleActivity : BaseActivity(), KodeinAware {
             .create()
 
         alertDialog.setOnShowListener {
-
             //view.findViewById<LinearLayout>(R.id.availableQuantityLayout).visibility = View.GONE // If it's a pre-order activity
-
             remainingQtyTextView.text = soldProduct.product.remaining_quantity.toString() // If it's not a pre-order activity
-
         }
 
         alertDialog.show()

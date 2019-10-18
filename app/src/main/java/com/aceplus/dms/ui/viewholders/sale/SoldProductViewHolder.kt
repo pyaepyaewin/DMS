@@ -1,6 +1,7 @@
 package com.aceplus.dms.ui.viewholders.sale
 
 import android.view.View
+import com.aceplus.dms.utils.Utils
 import com.aceplus.domain.VO.SoldProductInfo
 import com.aceplussolutions.rms.ui.viewholder.BaseViewHolder
 import kotlinx.android.synthetic.main.list_row_sold_product_with_custom_discount.view.*
@@ -30,8 +31,13 @@ class SoldProductViewHolder(
             qty.text = data.quantity.toString()
             qty.setOnClickListener { onClickQtyButton(data, position) }
 
-            price.text = data.product.selling_price
-            promotionPrice.text = data.promotionPrice.toString() // Actually from promoPriceByDisc
+            val sellingPrice = data.product.selling_price?.toDouble()
+            price.text = Utils.formatAmount(sellingPrice)
+
+            var promoPrice = data.product.selling_price?.toDouble()
+            if (data.promotionPrice != 0.0) promoPrice = data.promotionPrice
+            if (data.promoPriceByDiscount != 0.0) promoPrice = data.promoPriceByDiscount
+            promotionPrice.text = Utils.formatAmount(promoPrice)
 
             FocCheck.isChecked = data.isFocIsChecked
             FocCheck.setOnClickListener { onFocCheckChange(data, FocCheck.isChecked, position) }

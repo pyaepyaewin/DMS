@@ -1,9 +1,8 @@
 package com.aceplus.dms.viewmodel.customer.sale
 
 import android.arch.lifecycle.MutableLiveData
-import android.util.Log
 import com.aceplus.dms.utils.Utils
-import com.aceplus.domain.VO.CalculatedSoldProduct
+import com.aceplus.domain.VO.CalculateSoldProduct
 import com.aceplus.domain.entity.product.Product
 import com.aceplus.domain.VO.SoldProductInfo
 import com.aceplus.domain.entity.promotion.Promotion
@@ -20,7 +19,7 @@ class SaleViewModel(
 
     var productDataList = MutableLiveData<Pair<List<Product>, List<String>>>()
     var soldProductList = MutableLiveData<List<SoldProductInfo>>()
-    var promotedSoldProduct = MutableLiveData<CalculatedSoldProduct>()
+    var promotedSoldProduct = MutableLiveData<CalculateSoldProduct>()
 
     var mapGift: HashMap<Int, ArrayList<Int>> = HashMap()
     var mapPercent: HashMap<Int, ArrayList<Int>> = HashMap()
@@ -145,8 +144,8 @@ class SaleViewModel(
                 }
         }
 
-        promotedSoldProduct.postValue(CalculatedSoldProduct(soldProductInfo, this.tempPromotionList, position))
+        promotedSoldProduct.postValue(CalculateSoldProduct(soldProductInfo, this.tempPromotionList, position))
 
-    }
+ }
 
 }
