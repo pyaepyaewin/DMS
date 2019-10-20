@@ -38,17 +38,13 @@ class SaleActivity : BaseActivity(), KodeinAware {
     companion object {
         private const val IE_SALE_EXCHANGE = "IE_SALE_EXCHANGE"
         private const val IE_CUSTOMER_DATA = "IE_CUSTOMER_DATA"
-        // For pre order
         private const val IE_IS_PRE_ORDER = "IS_PRE_ORDER"
-        // For delivery
         private const val IE_IS_DELIVERY = "IS_DELIVERY"
         private const val IE_REMAINING_AMOUNT_KEY = "REMAINING_AMOUNT_KEY"
-
         private const val IE_USER_INFO_KEY = "USER_INFO_KEY"
         private const val IE_CUSTOMER_INFO_KEY = "CUSTOMER_INFO_KEY"
         private const val IE_SOLD_PRODUCT_LIST_KEY = "SOLD_PRODUCT_LIST_KEY"
         private const val IE_ORDERED_INVOICE_KEY = "ORDERED_INVOICE_KEY"
-
         private const val IE_SALE_RETURN_INVOICE_ID_KEY = "SALE_RETURN_INVOICE_ID_KEY"
 
         fun newIntentFromCustomer(context: Context, isSaleExchange: String, customerData: Customer): Intent {
@@ -75,7 +71,6 @@ class SaleActivity : BaseActivity(), KodeinAware {
 
     private val duplicateProductList = mutableListOf<Product>()
     private var customer: Customer? = null
-    private val soldProductList: ArrayList<SoldProductInfo> = ArrayList()
     private var promotionList: ArrayList<Promotion> = ArrayList()
     private val promotionGiftByClassDis: ArrayList<Int> = ArrayList()
     private val percentTotalCount: ArrayList<String> = ArrayList()
@@ -131,8 +126,8 @@ class SaleActivity : BaseActivity(), KodeinAware {
         rvPromotionPlanGiftList.adapter = mPromotionGiftPresentListAdapter
         rvPromotionPlanGiftList.layoutManager = GridLayoutManager(applicationContext, 1)
 
-//        rvPromotionPlanItemList.adapter = mPromotionItemPresentListAdapter
-//        rvPromotionPlanItemList.layoutManager = GridLayoutManager(applicationContext, 1)
+        /*rvPromotionPlanItemList.adapter = mPromotionItemPresentListAdapter
+        rvPromotionPlanItemList.layoutManager = GridLayoutManager(applicationContext, 1)*/
 
         searchAutoCompleteTextView.setAdapter(mSearchProductAdapter)
         searchAutoCompleteTextView.threshold = 1
@@ -153,10 +148,15 @@ class SaleActivity : BaseActivity(), KodeinAware {
         cancelImg.setOnClickListener { onBackPressed() }
         checkoutImg.setOnClickListener { saveSaleData() }
 
-        saleViewModel.promotedSoldProduct.observe(this, Observer {
-            if (it != null) {
-                mSoldProductListAdapter.updateList(it.soldProductInfo, it.position)
-                this.promotionList = it.promotionList
+        saleViewModel.updatedSoldProduct.observe(this, Observer {
+            if (it != null){
+                mSoldProductListAdapter.updateList(it.first, it.second)
+            }
+        })
+
+        saleViewModel.promotionList.observe(this, Observer {
+            if (it != null){
+                this.promotionList = it
                 updatePromotionProductList()
             }
         })
@@ -186,19 +186,17 @@ class SaleActivity : BaseActivity(), KodeinAware {
             }
         }
 
+        val newSoldProduct = SoldProductInfo(tempProduct, false)
+        newSoldProduct.promoPriceByDiscount = tempProduct.selling_price!!.toDouble()
+
         if (!sameProduct) {
-            mSoldProductListAdapter.addNewItem(SoldProductInfo(tempProduct, false))
+            mSoldProductListAdapter.addNewItem(newSoldProduct)
         } else {
             if (Constant.PRODUCT_COUNT < 2 && !duplicateProductList.contains(tempProduct)) {
                 if (Constant.PRODUCT_COUNT == 1) {
                     Constant.PRODUCT_COUNT = 0
                     duplicateProductList.add(tempProduct)
-                    mSoldProductListAdapter.addNewItem(
-                        SoldProductInfo(
-                            tempProduct,
-                            false
-                        )
-                    )
+                    mSoldProductListAdapter.addNewItem(newSoldProduct)
                 }
             } else {
                 Constant.PRODUCT_COUNT = 0
@@ -211,7 +209,7 @@ class SaleActivity : BaseActivity(), KodeinAware {
     private fun onFocCheckChange(data: SoldProductInfo, isChecked: Boolean, position: Int){
 
         data.isFocIsChecked = isChecked
-        mSoldProductListAdapter.updateList(data, position)
+        saleViewModel.calculateSoldProductData(false, data, mSoldProductListAdapter.getDataList() as ArrayList, this.promotionList, position)
 
     }
 
@@ -241,80 +239,6 @@ class SaleActivity : BaseActivity(), KodeinAware {
                     // ToDo clear lists and update promotion list
                 }
 
-//                val quantity = soldProductList.get(position).getQuantity()
-//                val product = soldProductList.get(position).getProduct()
-//                for (i in duplicateProductList.indices) {
-//                    val tempProduct = duplicateProductList.get(i)
-//                    if (tempProduct.getStockId() === product.getStockId()) {
-//                        duplicateProductList.remove(tempProduct)
-//                    }
-//                }
-//
-//                if (quantity != 0) {
-//                    if (totalQtyForGiftWithProudct1.containsKey(String.valueOf(product.getClassId()))) {
-//                        val tempQty = totalQtyForGiftWithProudct1.get(String.valueOf(product.getClassId()))
-//                        totalQtyForGiftWithProudct1.put(String.valueOf(product.getClassId()), (tempQty!! - quantity))
-//                        val amt = totalAmtForGiftWithProudct1.get(String.valueOf(product.getClassId()))
-//                        totalAmtForGiftWithProudct1.put(
-//                            String.valueOf(product.getClassId()),
-//                            amt!! - product.getPrice()
-//                        )
-//                        totalQtyForGiftWithProudct1.remove(String.valueOf(product.getClassId()))
-//                        totalAmtForGiftWithProudct1.remove(String.valueOf(product.getClassId()))
-//
-//                    }
-//                    if (totalQtyForGiftWithProudct.containsKey(String.valueOf(product.getClassId()))) {
-//                        val tempQty = totalQtyForGiftWithProudct.get(String.valueOf(product.getClassId()))
-//                        totalQtyForGiftWithProudct.put(String.valueOf(product.getClassId()), (tempQty!! - quantity))
-//                        deletedItem = true
-//                    }
-//
-//                    if (productItemForGift.contains(product.getName())) {
-//                        productItemForGift.remove(product.getName())
-//                    }
-//
-//                    if (promotionArrayList.size > 0) {
-//                        try {
-//                            for (promo in promotionArrayList) {
-//                                if (promo.getClassId().equalsIgnoreCase(String.valueOf(product.getClassId()))) {
-//                                    promotionGiftByClassDis.remove(Integer.valueOf(promo.getPromotionProductId()))
-//                                    promotionArrayList.remove(promo)
-//
-//                                }
-//                                //                                                promotionGiftByClassDis.clear();
-//                            }
-//                        } catch (exception: ConcurrentModificationException) {
-//                            exception.printStackTrace()
-//                        }
-//
-//                        updatePromotionProductList()
-//
-//                    }
-//                }
-//
-//                soldProductList.removeAt(position)
-//                soldProductListRowAdapter.notifyDataSetChanged()
-//                if (soldProductList.size != 0) {
-//                    calculatePromotinPriceAndGift(soldProductList.get(soldProductList.size - 1))
-//                } else {
-//                    promotionArrayList.clear()
-//                    promotionGiftByClassDis.clear()
-//                    totalQtyForGiftWithProudct.clear()
-//                    totalQtyForGiftWithProudct1.clear()
-//                    totalAmtForGiftWithProudct1.clear()
-//                    totalQtyForPercentWithProudct1.clear()
-//                    totalAmtForPercentWithProudct1.clear()
-//                    totalQtyForPercentWithProudct.clear()
-//                    giftCategoryClassId.clear()
-//                    PercentCategoryClassId.clear()
-//                    productItemForGift.clear()
-//                    productItemForPercent.clear()
-//                    countForGiftItem = 0
-//                    giftTotalCount.clear()
-//                    //tempPromoListByClassId.clear();
-//
-//                    updatePromotionProductList()
-//                }
             }
             .setNegativeButton("No", null)
             .show()
@@ -341,14 +265,13 @@ class SaleActivity : BaseActivity(), KodeinAware {
                     val quantity = quantityEditText.text.toString().toInt()
 
                     if (soldProduct.quantity != 0 && soldProduct.quantity < quantity){
-//                        updatedQtyForGift = true
-//                        updatedQtyForPercent = true
+                        /*updatedQtyForGift = true
+                        updatedQtyForPercent = true*/
                         soldProduct.currentProductQty = soldProduct.quantity
                     }
 
                     soldProduct.quantity = quantity
-
-                    saleViewModel.calculatePromotionPriceAndGift(soldProduct, mSoldProductListAdapter.getDataList() as ArrayList, this.promotionList, position)
+                    saleViewModel.calculateSoldProductData(true, soldProduct, mSoldProductListAdapter.getDataList() as ArrayList, this.promotionList, position)
 
                 }
 
@@ -387,7 +310,7 @@ class SaleActivity : BaseActivity(), KodeinAware {
                     soldProduct.setFocType(false)
                 }
 
-                mSoldProductListAdapter.updateList(soldProduct, position)
+                saleViewModel.calculateSoldProductData(false, soldProduct, mSoldProductListAdapter.getDataList() as ArrayList, this.promotionList, position)
 
             }
             .setNegativeButton("Cancel", null)
@@ -433,43 +356,6 @@ class SaleActivity : BaseActivity(), KodeinAware {
         }
 
         // ToDo - Go to checkout page if one of the two same products is selected for foc
-
-//        val boo = toEnableFocSameProduct()
-//        if (boo) {
-//            val intent = Intent(this@SaleActivity, SaleCheckoutActivity::class.java)
-//            intent.putExtra(SaleCheckoutActivity.REMAINING_AMOUNT_KEY, this@SaleActivity.remainingAmount)/*
-//                intent.putExtra(SaleCheckoutActivity.USER_INFO_KEY
-//                        , SaleActivity.this.salemanInfo.toString());*/
-//            intent.putExtra(SaleCheckoutActivity.CUSTOMER_INFO_KEY, this@SaleActivity.customer)
-//            intent.putExtra(SaleCheckoutActivity.SOLD_PROUDCT_LIST_KEY, this@SaleActivity.soldProductList)
-//            intent.putExtra(SaleCheckoutActivity.PRESENT_PROUDCT_LIST_KEY, this@SaleActivity.promotionArrayList)
-//            intent.putExtra(SaleCheckoutActivity.DUPLICATE_PRODUCT_LIST_KEY, this@SaleActivity.duplicateProductList)
-//            intent.putExtra(
-//                SaleCheckoutActivity.DUPLICATE_PROMOTION_LIST_KEY,
-//                this@SaleActivity.promotionGiftByClassDis
-//            )
-//            intent.putExtra(SaleCheckoutActivity.PERCENT_TOTAL_COUNT, this@SaleActivity.PercentTotalCount)
-//            intent.putExtra(SaleCheckoutActivity.GIFT_TOTAL_COUNT, this@SaleActivity.giftTotalCount)
-//            intent.putExtra(SaleCheckoutActivity.PERCENT_CLASS_CAT_ID, this@SaleActivity.PercentCategoryClassId)
-//            intent.putExtra(SaleCheckoutActivity.GIFT_CLASS_CAT_ID, this@SaleActivity.giftCategoryClassId)
-//            intent.putExtra(SaleCheckoutActivity.PERCENT_AMT, this@SaleActivity.PercentAmount)
-//            intent.putExtra(SaleCheckoutActivity.GIFT_AMT, this@SaleActivity.giftAmount)
-//            if (this@SaleActivity.orderedInvoice != null) {
-//                intent.putExtra(SaleCheckoutActivity.ORDERED_INVOICE_KEY, this@SaleActivity.orderedInvoice.toString())
-//            }
-//
-//            if (check.equals("yes", ignoreCase = true)) {
-//                intent.putExtra("SaleExchange", "yes")
-//                intent.putExtra(SALE_RETURN_INVOICEID_KEY, getIntent().getStringExtra(SALE_RETURN_INVOICEID_KEY))
-//                intent.putExtra(
-//                    Constant.KEY_SALE_RETURN_AMOUNT,
-//                    getIntent().getDoubleExtra(Constant.KEY_SALE_RETURN_AMOUNT, 0.0)
-//                )
-//            } else {
-//                intent.putExtra("SaleExchange", "no")
-//            }
-//            startActivity(intent)
-//        }
 
     }
 
@@ -523,7 +409,7 @@ class SaleActivity : BaseActivity(), KodeinAware {
     }
 
     private fun onClearArrayList(){
-        // To clear all the list
+        // ToDo - To clear all the list
     }
 
     private fun updatePromotionProductList(){

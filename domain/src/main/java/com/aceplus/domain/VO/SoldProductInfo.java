@@ -69,6 +69,8 @@ public class SoldProductInfo implements Serializable {
 
     public void setFocType(boolean focTypeIsPercent){
         this.isFocTypePercent = focTypeIsPercent;
+        if (focTypeIsPercent) this.focAmount = 0.0;
+        else this.focPercent = 0.0;
     }
 
     public boolean isFocTypePercent(){ return isFocTypePercent; }

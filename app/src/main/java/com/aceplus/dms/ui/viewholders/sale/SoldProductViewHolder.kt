@@ -34,10 +34,9 @@ class SoldProductViewHolder(
             val sellingPrice = data.product.selling_price?.toDouble()
             price.text = Utils.formatAmount(sellingPrice)
 
-            var promoPrice = data.product.selling_price?.toDouble()
-            if (data.promotionPrice != 0.0) promoPrice = data.promotionPrice
-            if (data.promoPriceByDiscount != 0.0) promoPrice = data.promoPriceByDiscount
-            promotionPrice.text = Utils.formatAmount(promoPrice)
+            promotionPrice.text = Utils.formatAmount(data.promoPriceByDiscount)
+
+            amount.text = Utils.formatAmount(data.totalAmt)
 
             FocCheck.isChecked = data.isFocIsChecked
             FocCheck.setOnClickListener { onFocCheckChange(data, FocCheck.isChecked, position) }

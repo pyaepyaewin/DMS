@@ -2,7 +2,6 @@ package com.aceplus.dms.viewmodel.customer.sale
 
 import android.arch.lifecycle.MutableLiveData
 import com.aceplus.dms.utils.Utils
-import com.aceplus.domain.VO.CalculateSoldProduct
 import com.aceplus.domain.entity.product.Product
 import com.aceplus.domain.VO.SoldProductInfo
 import com.aceplus.domain.entity.promotion.Promotion
@@ -19,12 +18,14 @@ class SaleViewModel(
 
     var productDataList = MutableLiveData<Pair<List<Product>, List<String>>>()
     var soldProductList = MutableLiveData<List<SoldProductInfo>>()
-    var promotedSoldProduct = MutableLiveData<CalculateSoldProduct>()
+    var promotionList = MutableLiveData<ArrayList<Promotion>>()
+    var updatedSoldProduct = MutableLiveData<Pair<SoldProductInfo, Int>>()
 
-    var mapGift: HashMap<Int, ArrayList<Int>> = HashMap()
-    var mapPercent: HashMap<Int, ArrayList<Int>> = HashMap()
+    private var mapGift: HashMap<Int, ArrayList<Int>> = HashMap()
+    private var mapPercent: HashMap<Int, ArrayList<Int>> = HashMap()
     private var tempSoldProductList: ArrayList<SoldProductInfo> = ArrayList()
     private var tempPromotionList: ArrayList<Promotion> = ArrayList()
+    private var totalQuantityByCategoryItem = 0
 
     fun loadProductList() {
         launch {
@@ -65,87 +66,152 @@ class SaleViewModel(
         }
     }
 
-    fun calculatePromotionPriceAndGift(soldProductInfo: SoldProductInfo, soldProductList: ArrayList<SoldProductInfo>, promotionList: ArrayList<Promotion>, position: Int){
+    fun calculateSoldProductData( isQtyChange: Boolean, soldProductInfo: SoldProductInfo, soldProductList: ArrayList<SoldProductInfo>, promotionList: ArrayList<Promotion>, position: Int){
 
         this.tempSoldProductList = soldProductList
         this.tempPromotionList = promotionList
 
-        this.tempSoldProductList[position] = soldProductInfo
+        var currentStockId: String? = null
 
-        var promotionPrice = 0.0
+        if (isQtyChange){
 
-        soldProductInfo.promotionPlanId = null
+            this.tempSoldProductList[position] = soldProductInfo
 
-        launch {
-            customerVisitRepo.getCurrentDatePromotion(Utils.getCurrentDate(true))
-                .subscribeOn(schedulerProvider.io())
-                .observeOn(schedulerProvider.mainThread())
-                .subscribe{ promoDateList ->
-                    for (promoDate in promoDateList){
-                        val promotionPlanId = promoDate.promotion_plan_id
-                        launch {
-                            customerVisitRepo.getPromotionPriceByID(promotionPlanId!!, soldProductInfo.product.sold_quantity, soldProductInfo.product.id.toString())
-                                .subscribeOn(schedulerProvider.io())
-                                .observeOn(schedulerProvider.mainThread())
-                                .subscribe{ promoPriceList ->
-                                    for (promoPrice in promoPriceList){
-                                        promotionPrice = promoPrice.promotion_price!!.toDouble()
-                                        soldProductInfo.promotionPrice = promotionPrice
-                                        soldProductInfo.promotionPlanId = promotionPlanId
-                                    }
-                                }
-                        }
-                        if (promotionPrice == 0.0){
-                            val productToBuy = ArrayList<String>()
+            var promotionPrice = 0.0
+
+            soldProductInfo.promotionPlanId = null
+
+            launch {
+                customerVisitRepo.getCurrentDatePromotion(Utils.getCurrentDate(true))
+                    .subscribeOn(schedulerProvider.io())
+                    .observeOn(schedulerProvider.mainThread())
+                    .subscribe{ promoDateList ->
+                        for (promoDate in promoDateList){
+                            val promotionPlanId = promoDate.promotion_plan_id
                             launch {
-                                customerVisitRepo.getPromotionGiftByPlanID(promotionPlanId!!)
+                                customerVisitRepo.getPromotionPriceByID(promotionPlanId!!, soldProductInfo.product.sold_quantity, soldProductInfo.product.id.toString())
                                     .subscribeOn(schedulerProvider.io())
                                     .observeOn(schedulerProvider.mainThread())
-                                    .subscribe{ promoGiftList ->
-                                        for (promoGift in promoGiftList){
-                                            promoGift.stock_id?.let { productToBuy.add(it) }
+                                    .subscribe{ promoPriceList ->
+                                        for (promoPrice in promoPriceList){
+                                            promotionPrice = promoPrice.promotion_price!!.toDouble()
+                                            soldProductInfo.promotionPrice = promotionPrice
+                                            soldProductInfo.promotionPlanId = promotionPlanId
                                         }
                                     }
                             }
-                            var count = 0
-                            for(soldProduct in tempSoldProductList){
+                            if (promotionPrice == 0.0){
+                                val productToBuy = ArrayList<String>()
                                 launch {
-                                    customerVisitRepo.getPromotionToBuyProduct(promotionPlanId!!, soldProductInfo)
+                                    customerVisitRepo.getPromotionGiftByPlanID(promotionPlanId!!)
                                         .subscribeOn(schedulerProvider.io())
                                         .observeOn(schedulerProvider.mainThread())
-                                        .subscribe{
-                                            count += it.size
+                                        .subscribe{ promoGiftList ->
+                                            for (promoGift in promoGiftList){
+                                                promoGift.stock_id?.let { productToBuy.add(it) }
+                                            }
                                         }
                                 }
-                            }
-                            if (count == productToBuy.size){
-                                var flag = false
-                                for (promotion in tempPromotionList){
-                                    // If promotion.planID == planID
-                                    // flag = true
-                                    // break
+                                var count = 0
+                                for(soldProduct in tempSoldProductList){
+                                    launch {
+                                        customerVisitRepo.getPromotionToBuyProduct(promotionPlanId!!, soldProductInfo)
+                                            .subscribeOn(schedulerProvider.io())
+                                            .observeOn(schedulerProvider.mainThread())
+                                            .subscribe{
+                                                count += it.size
+                                            }
+                                    }
                                 }
-                                if (!flag){
-                                    // addPromotionProduct(soldProduct, promotionPlanId)
-                                }
-                            } else{
-                                var flag = false
-                                for (promotion in tempPromotionList){
-                                    // If promotion.planID == planID
-                                    // flag = true
-                                    // break
-                                }
-                                if (flag) {
-                                    // removePromotionProduct(promotionPlanId)
+                                if (count == productToBuy.size){
+                                    var flag = false
+                                    for (promotion in tempPromotionList){
+                                        // If promotion.planID == planID
+                                        // flag = true
+                                        // break
+                                    }
+                                    if (!flag){
+                                        // addPromotionProduct(soldProduct, promotionPlanId)
+                                    }
+                                } else{
+                                    var flag = false
+                                    for (promotion in tempPromotionList){
+                                        // If promotion.planID == planID
+                                        // flag = true
+                                        // break
+                                    }
+                                    if (flag) {
+                                        // removePromotionProduct(promotionPlanId)
+                                    }
                                 }
                             }
                         }
                     }
-                }
+            }
+
+            totalQuantityByCategoryItem += soldProductInfo.quantity
+            currentStockId = soldProductInfo.product.class_id // Need to check class_id or stock_id
+
+            // ToDo - gift or percent
+
         }
 
-        promotedSoldProduct.postValue(CalculateSoldProduct(soldProductInfo, this.tempPromotionList, position))
+        var promoPrice = soldProductInfo.product.selling_price!!.toDouble()
+        if (soldProductInfo.promotionPrice != 0.0) promoPrice = soldProductInfo.promotionPrice
 
- }
+        var  priceByCategoryQTY = 0.0
+        var priceByClassDiscount = 0.0
+
+        if (totalQuantityByCategoryItem != 0 && soldProductInfo.quantity != 0){
+
+            val categoryId = soldProductInfo.product.category_id
+
+            // ToDo - Find discount by category QTY
+
+            if (priceByCategoryQTY != 0.0){
+                promoPrice = priceByCategoryQTY
+                soldProductInfo.discountWithCategoryItem = priceByCategoryQTY  // Not sure to add this
+            }
+
+            soldProductInfo.promoPriceByDiscount = promoPrice
+
+            if (isQtyChange){
+
+                // ToDo - Find discount by class
+
+                if (priceByClassDiscount != 0.0){
+                    promoPrice = priceByClassDiscount
+                    soldProductInfo.priceByClassDiscount = priceByClassDiscount.toInt()
+                    soldProductInfo.promoPriceByDiscount = promoPrice
+                }
+
+            }
+
+        }
+
+        if (soldProductInfo.focPercent != 0.0 || soldProductInfo.focAmount != 0.0){
+            if (soldProductInfo.isFocTypePercent){
+                val itemDiscount = promoPrice * soldProductInfo.focPercent / 100
+                promoPrice -= itemDiscount
+                soldProductInfo.itemDiscountAmount = itemDiscount
+            } else{
+                promoPrice -= soldProductInfo.focAmount
+                soldProductInfo.itemDiscountAmount = soldProductInfo.focAmount
+            }
+            soldProductInfo.promoPriceByDiscount = promoPrice
+        }
+
+        var totalAmount = promoPrice * soldProductInfo.quantity
+
+        if (soldProductInfo.isFocIsChecked){
+            totalAmount = 0.0
+            soldProductInfo.focQuantity = soldProductInfo.quantity
+        }
+
+        soldProductInfo.totalAmt = totalAmount
+
+        updatedSoldProduct.postValue(Pair(soldProductInfo, position))
+
+    }
 
 }
