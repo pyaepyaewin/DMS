@@ -2,9 +2,9 @@ package com.aceplus.dms.viewmodel.customer.sale
 
 import android.arch.lifecycle.MutableLiveData
 import com.aceplus.dms.utils.Utils
-import com.aceplus.domain.VO.CalculateSoldProduct
+import com.aceplus.domain.vo.CalculateSoldProduct
 import com.aceplus.domain.entity.product.Product
-import com.aceplus.domain.VO.SoldProductInfo
+import com.aceplus.domain.vo.SoldProductInfo
 import com.aceplus.domain.entity.promotion.Promotion
 import com.aceplus.domain.repo.CustomerVisitRepo
 import com.aceplus.shared.viewmodel.BaseViewModel
