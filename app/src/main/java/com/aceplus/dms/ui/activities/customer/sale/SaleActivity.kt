@@ -151,6 +151,7 @@ class SaleActivity : BaseActivity(), KodeinAware {
         saleViewModel.updatedSoldProduct.observe(this, Observer {
             if (it != null){
                 mSoldProductListAdapter.updateList(it.first, it.second)
+                Toast.makeText(this, it.second.toString(), Toast.LENGTH_LONG).show()
             }
         })
 
