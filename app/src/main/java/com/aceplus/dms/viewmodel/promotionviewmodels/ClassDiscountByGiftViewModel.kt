@@ -4,6 +4,7 @@ import android.arch.lifecycle.MutableLiveData
 import com.aceplus.domain.model.promotionDataClass.ClassDiscountByGiftDataClass
 import com.aceplus.domain.repo.promotionrepo.ClassDiscountByGiftRepo
 import com.aceplus.shared.viewmodel.BaseViewModel
+import com.github.mikephil.charting.utils.Utils
 import com.kkk.githubpaging.network.rx.SchedulerProvider
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers

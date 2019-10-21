@@ -140,18 +140,17 @@ val vmModule = Kodein.Module {
     bind() from singleton { SalesReturnViewModel(instance(), instance()) }
     bind() from singleton { ReportViewModel(instance(), instance()) }
 
-    bind() from singleton { PromotionPriceViewModel(instance(),instance()) }
-    bind() from singleton { PromotionGiftViewModel(instance(),instance()) }
-    bind() from singleton { VolumeDiscountViewModel(instance(),instance()) }
-    bind() from singleton { VolumeDiscountFilterViewModel(instance(),instance()) }
-    bind() from singleton { CategoryDiscountViewModel(instance(),instance()) }
-    bind() from singleton { ClassDiscountByPriceViewModel(instance(),instance()) }
-    bind() from singleton { ClassDiscountByGiftViewModel(instance(),instance()) }
-    bind() from singleton { ClassDiscountForShowPriceViewModel(instance(),instance()) }
-    bind() from singleton { ClassDiscountForShowGiftViewModel(instance(),instance()) }
-    bind() from singleton { ViewByListViewModel(instance(),instance()) }
-    bind() from singleton { CustomerLocationViewModel(instance(),instance()) }
-
+    bind() from singleton { PromotionPriceViewModel(instance(), instance()) }
+    bind() from singleton { PromotionGiftViewModel(instance(), instance()) }
+    bind() from singleton { VolumeDiscountViewModel(instance(), instance()) }
+    bind() from singleton { VolumeDiscountFilterViewModel(instance(), instance()) }
+    bind() from singleton { CategoryDiscountViewModel(instance(), instance()) }
+    bind() from singleton { ClassDiscountByPriceViewModel(instance(), instance()) }
+    bind() from singleton { ClassDiscountByGiftViewModel(instance(), instance()) }
+    bind() from singleton { ClassDiscountForShowPriceViewModel(instance(), instance()) }
+    bind() from singleton { ClassDiscountForShowGiftViewModel(instance(), instance()) }
+    bind() from singleton { ViewByListViewModel(instance(), instance()) }
+    bind() from singleton { CustomerLocationViewModel(instance(), instance()) }
 
 
 }

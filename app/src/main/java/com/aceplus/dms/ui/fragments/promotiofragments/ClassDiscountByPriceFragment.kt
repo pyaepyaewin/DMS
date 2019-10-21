@@ -12,6 +12,7 @@ import android.widget.Toast
 import com.aceplus.dms.R
 import com.aceplus.dms.ui.activities.MainActivity
 import com.aceplus.dms.ui.adapters.promotionadapters.ClassDiscountByPriceAdapter
+import com.aceplus.dms.utils.Utils
 import com.aceplus.dms.viewmodel.factory.KodeinViewModelFactory
 import com.aceplus.dms.viewmodel.promotionviewmodels.ClassDiscountByPriceViewModel
 import com.aceplus.domain.model.promotionDataClass.ClassDiscountByPriceDataClass
@@ -60,7 +61,8 @@ class ClassDiscountByPriceFragment:Fragment(),KodeinAware {
             layoutManager = LinearLayoutManager(activity)
             adapter = classDiscountByPriceAdapter
         }
-        classDiscountByPriceViewModel.loadClassDiscountByPrice()
+        classDiscountByPriceViewModel.loadClassDiscountByPrice(Utils.getCurrentDate(true))
+//        classDiscountByPriceViewModel.loadClassDiscountByPrice("2019-10-02 14:56:35")
     }
 
 

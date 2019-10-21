@@ -4,6 +4,6 @@ import com.aceplus.domain.model.promotionDataClass.ClassDiscountByPriceDataClass
 import io.reactivex.Observable
 
 interface ClassDiscountByPriceRepo {
-    fun getClassDiscountByPrice(): Observable<List<ClassDiscountByPriceDataClass>>
+    fun getClassDiscountByPrice(currentDate:String): Observable<List<ClassDiscountByPriceDataClass>>
 
 }

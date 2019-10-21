@@ -6,8 +6,9 @@ import com.aceplus.domain.repo.promotionrepo.ClassDiscountByPriceRepo
 import io.reactivex.Observable
 
 class ClassDiscountByPriceRepoImpl(val database: MyDatabase): ClassDiscountByPriceRepo {
-    override fun getClassDiscountByPrice(): Observable<List<ClassDiscountByPriceDataClass>> {
-        return Observable.just(database.classDiscountByPriceDao().getClassDiscountByPriceList())
-
+    override fun getClassDiscountByPrice(currentDate: String): Observable<List<ClassDiscountByPriceDataClass>> {
+        return Observable.just(database.classDiscountByPriceDao().getClassDiscountByPriceList(currentDate))
     }
+
+
 }
