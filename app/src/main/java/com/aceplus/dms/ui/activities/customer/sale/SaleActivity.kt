@@ -20,7 +20,7 @@ import com.aceplus.dms.viewmodel.customer.sale.SaleViewModel
 import com.aceplus.domain.entity.customer.Customer
 import com.aceplus.domain.entity.product.Product
 import com.aceplus.domain.entity.promotion.Promotion
-import com.aceplus.domain.VO.SoldProductInfo
+import com.aceplus.domain.vo.SoldProductInfo
 import com.aceplussolutions.rms.ui.activities.BaseActivity
 import kotlinx.android.synthetic.main.activity_sale1.*
 import org.kodein.di.Kodein
