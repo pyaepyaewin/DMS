@@ -26,4 +26,7 @@ interface ClassDiscountByPriceItemDao {
     @Query("SELECT * FROM class_discount_by_price_item WHERE class_discount_id = :classDiscountId")
     fun getClassDiscountByPriceItem(classDiscountId: Int): List<ClassDiscountByPriceItem>
 
+    @Query("select count(*) from class_discount_by_price_item where class_discount_id = (select class_discount_id from class_discount_by_price_item where class_id = :classID)")
+    fun getClassDiscountByPriceItemCountOnClassID(classID: String): Int
+
 }

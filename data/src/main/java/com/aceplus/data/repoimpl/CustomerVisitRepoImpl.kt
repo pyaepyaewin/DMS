@@ -3,7 +3,7 @@ package com.aceplus.data.repoimpl
 import android.content.SharedPreferences
 import com.aceplus.data.database.MyDatabase
 import com.aceplus.data.utils.Constant
-import com.aceplus.domain.VO.SoldProductInfo
+import com.aceplus.domain.vo.SoldProductInfo
 import com.aceplus.domain.entity.classdiscount.ClassDiscountByPrice
 import com.aceplus.domain.entity.classdiscount.ClassDiscountByPriceItem
 import com.aceplus.domain.entity.customer.Customer
@@ -200,8 +200,16 @@ class CustomerVisitRepoImpl(
         return Observable.just(db.classDiscountByPriceDao().getClassDiscountByPrice(currentDate))
     }
 
+    override fun getClassDiscountByPriceOnClassID(currentClassId: String): Observable<List<ClassDiscountByPrice>> {
+        return Observable.just(db.classDiscountByPriceDao().getClassDiscountByPriceOnClassID(currentClassId))
+    }
+
     override fun getClassDiscountByPriceItem(classDiscountId: Int): Observable<List<ClassDiscountByPriceItem>> {
         return Observable.just(db.classDiscountByPriceItemDao().getClassDiscountByPriceItem(classDiscountId))
+    }
+
+    override fun getClassDiscountByPriceItemCountOnClassID(classID: String): Observable<Int> {
+        return Observable.just(db.classDiscountByPriceItemDao().getClassDiscountByPriceItemCountOnClassID(classID))
     }
 
     override fun getCurrentDatePromotion(currentDate: String): Observable<List<PromotionDate>> {

@@ -26,7 +26,10 @@ interface ClassDiscountByPriceDao {
     @Query("select class.name,class_discount_by_price_item.from_quantity,class_discount_by_price_item.to_quantity,class_discount_by_price_item.from_amount,class_discount_by_price_item.to_amount,class_discount_by_price_item.discount_percent from class_discount_by_price_item,class where class_discount_by_price_item.class_id=class.class_id")
     fun getClassDiscountByPriceList():List<ClassDiscountByPriceDataClass>
 
-    @Query("SELECT * FROM class_discount_by_price WHERE date(:currentDate) BETWEEN date(start_date) AND date(end_date)")
+    @Query("select * from class_discount_by_price where date(:currentDate) between date(start_date) and date(end_date)")
     fun getClassDiscountByPrice(currentDate: String): List<ClassDiscountByPrice>
+
+    @Query("select * from class_discount_by_price where id = (select class_discount_id from class_discount_by_price_item where class_id = :currentClassId) ")
+    fun getClassDiscountByPriceOnClassID(currentClassId: String): List<ClassDiscountByPrice>
 
 }

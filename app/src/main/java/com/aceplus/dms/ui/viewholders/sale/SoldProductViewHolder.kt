@@ -2,7 +2,7 @@ package com.aceplus.dms.ui.viewholders.sale
 
 import android.view.View
 import com.aceplus.dms.utils.Utils
-import com.aceplus.domain.VO.SoldProductInfo
+import com.aceplus.domain.vo.SoldProductInfo
 import com.aceplussolutions.rms.ui.viewholder.BaseViewHolder
 import kotlinx.android.synthetic.main.list_row_sold_product_with_custom_discount.view.*
 

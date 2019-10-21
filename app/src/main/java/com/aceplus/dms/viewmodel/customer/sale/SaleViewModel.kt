@@ -3,7 +3,7 @@ package com.aceplus.dms.viewmodel.customer.sale
 import android.arch.lifecycle.MutableLiveData
 import com.aceplus.dms.utils.Utils
 import com.aceplus.domain.entity.product.Product
-import com.aceplus.domain.VO.SoldProductInfo
+import com.aceplus.domain.vo.SoldProductInfo
 import com.aceplus.domain.entity.promotion.Promotion
 import com.aceplus.domain.repo.CustomerVisitRepo
 import com.aceplus.shared.viewmodel.BaseViewModel
@@ -17,15 +17,26 @@ class SaleViewModel(
 ) : BaseViewModel() {
 
     var productDataList = MutableLiveData<Pair<List<Product>, List<String>>>()
-    var soldProductList = MutableLiveData<List<SoldProductInfo>>()
     var promotionList = MutableLiveData<ArrayList<Promotion>>()
     var updatedSoldProduct = MutableLiveData<Pair<SoldProductInfo, Int>>()
+    var netAmount = MutableLiveData<Double>()
 
     private var mapGift: HashMap<Int, ArrayList<Int>> = HashMap()
     private var mapPercent: HashMap<Int, ArrayList<Int>> = HashMap()
     private var tempSoldProductList: ArrayList<SoldProductInfo> = ArrayList()
     private var tempPromotionList: ArrayList<Promotion> = ArrayList()
     private var totalQuantityByCategoryItem = 0
+    var percentTotalCount: ArrayList<String> = ArrayList()
+    var giftTotalCount: ArrayList<String> = ArrayList()
+    var productItemForGift = ArrayList<String>()
+    var productItemForPercent = ArrayList<String>()
+
+    var totalQtyForPercentWithProduct = HashMap<String, Int>()
+    var totalQtyForPercentWithProduct1 = HashMap<String, Int>()
+    var totalAmtForPercentWithProduct1 = HashMap<String, Double>()
+    var totalQtyForGiftWithProduct = HashMap<String, Int>()
+    var totalQtyForGiftWithProduct1 = HashMap<String, Int>()
+    var totalAmtForGiftWithProduct1 = HashMap<String, Double>()
 
     fun loadProductList() {
         launch {
@@ -71,7 +82,7 @@ class SaleViewModel(
         this.tempSoldProductList = soldProductList
         this.tempPromotionList = promotionList
 
-        var currentStockId: String? = null
+        var currentClassId: String?
 
         if (isQtyChange){
 
@@ -131,7 +142,7 @@ class SaleViewModel(
                                         // break
                                     }
                                     if (!flag){
-                                        // addPromotionProduct(soldProduct, promotionPlanId)
+                                        // ToDo - addPromotionProduct(soldProduct, promotionPlanId)
                                     }
                                 } else{
                                     var flag = false
@@ -141,7 +152,7 @@ class SaleViewModel(
                                         // break
                                     }
                                     if (flag) {
-                                        // removePromotionProduct(promotionPlanId)
+                                        // ToDo - removePromotionProduct(promotionPlanId)
                                     }
                                 }
                             }
@@ -150,9 +161,129 @@ class SaleViewModel(
             }
 
             totalQuantityByCategoryItem += soldProductInfo.quantity
-            currentStockId = soldProductInfo.product.class_id // Need to check class_id or stock_id
+            currentClassId = soldProductInfo.product.class_id // Need to check class_id or stock_id
 
-            // ToDo - gift or percent
+            launch {
+                customerVisitRepo.getClassDiscountByPriceOnClassID(currentClassId!!)
+                    .subscribeOn(schedulerProvider.io())
+                    .observeOn(schedulerProvider.mainThread())
+                    .subscribe{
+                        if (it.isNotEmpty()){
+                            for (classDiscountByPrice in it){
+
+                                val discountType = classDiscountByPrice.discount_type
+                                val id = classDiscountByPrice.id
+
+                                if (discountType.equals("P", true)){
+
+                                    val tempList = mapPercent[id]
+                                    if (tempList != null){
+
+                                        if (!percentTotalCount.contains(currentClassId) && tempList.size > 1){
+
+                                            if (totalQtyForPercentWithProduct1.containsKey(soldProductInfo.product.class_id)){
+                                                val value = totalQtyForPercentWithProduct1[soldProductInfo.product.class_id]
+                                                val amt = totalAmtForPercentWithProduct1[soldProductInfo.product.class_id]
+                                                totalQtyForPercentWithProduct1[soldProductInfo.product.class_id!!] = soldProductInfo.quantity + value!!
+                                                totalAmtForPercentWithProduct1[soldProductInfo.product.class_id!!] = amt!! + soldProductInfo.product.selling_price!!.toDouble()
+                                            } else{
+                                                totalQtyForPercentWithProduct1[soldProductInfo.product.class_id!!] = soldProductInfo.quantity
+                                                totalAmtForPercentWithProduct1[soldProductInfo.product.class_id!!] = soldProductInfo.product.selling_price!!.toDouble()
+                                            }
+
+                                        } else if (tempList.size == 1 && !productItemForPercent.contains(soldProductInfo.product.product_name)){
+
+                                            productItemForPercent.add(soldProductInfo.product.product_name!!)
+                                            if (totalQtyForPercentWithProduct.containsKey(soldProductInfo.product.class_id)){
+                                                val value = totalQtyForPercentWithProduct[soldProductInfo.product.class_id]
+                                                totalQtyForPercentWithProduct[soldProductInfo.product.class_id!!] = soldProductInfo.quantity + value!!
+                                            } else{
+                                                totalQtyForPercentWithProduct[soldProductInfo.product.class_id!!] = soldProductInfo.quantity
+                                            }
+
+                                        } else if (percentTotalCount.contains(currentClassId)){
+
+                                            launch {
+                                                customerVisitRepo.getClassDiscountByPriceItemCountOnClassID(soldProductInfo.product.class_id!!)
+                                                    .subscribeOn(schedulerProvider.io())
+                                                    .observeOn(schedulerProvider.mainThread())
+                                                    .subscribe{ count ->
+                                                        if (count >= 2){
+                                                            if (totalQtyForPercentWithProduct1.containsKey(soldProductInfo.product.class_id!!)){
+                                                                val value = totalQtyForPercentWithProduct1[soldProductInfo.product.class_id!!]
+                                                                val amt = totalAmtForPercentWithProduct1[soldProductInfo.product.class_id!!]
+                                                                totalQtyForPercentWithProduct1[soldProductInfo.product.class_id!!] = soldProductInfo.quantity + value!!
+                                                                totalAmtForPercentWithProduct1[soldProductInfo.product.class_id!!] = amt!! + soldProductInfo.product.selling_price!!.toDouble()
+                                                            } else{
+                                                                totalQtyForPercentWithProduct1[soldProductInfo.product.class_id!!] = soldProductInfo.quantity
+                                                                totalAmtForPercentWithProduct1[soldProductInfo.product.class_id!!] = soldProductInfo.product.selling_price!!.toDouble()
+                                                            }
+                                                        }
+                                                    }
+                                            }
+
+                                        }
+
+                                    }
+
+                                } else if (discountType.equals("G", true)){
+
+                                    val tempList = mapGift[id]
+                                    if (tempList != null){
+
+                                        if (!giftTotalCount.contains(currentClassId) && tempList.size > 1){
+
+                                            if (totalQtyForGiftWithProduct1.containsKey(soldProductInfo.product.class_id)){
+                                                val value = totalQtyForGiftWithProduct1[soldProductInfo.product.class_id]
+                                                val amt = totalAmtForGiftWithProduct1[soldProductInfo.product.class_id]
+                                                totalQtyForGiftWithProduct1[soldProductInfo.product.class_id!!] = soldProductInfo.quantity + value!!
+                                                totalAmtForGiftWithProduct1[soldProductInfo.product.class_id!!] = amt!! + soldProductInfo.product.selling_price!!.toDouble()
+                                            } else{
+                                                totalQtyForGiftWithProduct1[soldProductInfo.product.class_id!!] = soldProductInfo.quantity
+                                                totalAmtForGiftWithProduct1[soldProductInfo.product.class_id!!] = soldProductInfo.product.selling_price!!.toDouble()
+                                            }
+
+                                        } else if (tempList.size == 1 && !productItemForGift.contains(soldProductInfo.product.product_name)){
+
+                                            productItemForGift.add(soldProductInfo.product.product_name!!)
+                                            if (totalQtyForGiftWithProduct.containsKey(soldProductInfo.product.class_id)){
+                                                val value = totalQtyForGiftWithProduct[soldProductInfo.product.class_id]
+                                                totalQtyForGiftWithProduct[soldProductInfo.product.class_id!!] = soldProductInfo.quantity + value!!
+                                            } else{
+                                                totalQtyForGiftWithProduct[soldProductInfo.product.class_id!!] = soldProductInfo.quantity
+                                            }
+
+                                        } else if (giftTotalCount.contains(currentClassId)){
+
+                                            launch {
+                                                customerVisitRepo.getClassDiscountByPriceItemCountOnClassID(soldProductInfo.product.class_id!!)
+                                                    .subscribeOn(schedulerProvider.io())
+                                                    .observeOn(schedulerProvider.mainThread())
+                                                    .subscribe{ count ->
+                                                        if (count >= 2){
+                                                            if (totalQtyForGiftWithProduct1.containsKey(soldProductInfo.product.class_id!!)){
+                                                                val value = totalQtyForGiftWithProduct1[soldProductInfo.product.class_id!!]
+                                                                val amt = totalAmtForGiftWithProduct1[soldProductInfo.product.class_id!!]
+                                                                totalQtyForGiftWithProduct1[soldProductInfo.product.class_id!!] = soldProductInfo.quantity + value!!
+                                                                totalAmtForGiftWithProduct1[soldProductInfo.product.class_id!!] = amt!! + soldProductInfo.product.selling_price!!.toDouble()
+                                                            } else{
+                                                                totalQtyForGiftWithProduct1[soldProductInfo.product.class_id!!] = soldProductInfo.quantity
+                                                                totalAmtForGiftWithProduct1[soldProductInfo.product.class_id!!] = soldProductInfo.product.selling_price!!.toDouble()
+                                                            }
+                                                        }
+                                                    }
+                                            }
+
+                                        }
+
+                                    }
+
+                                }
+
+                            }
+                        }
+                    }
+            }
 
         }
 
@@ -212,6 +343,17 @@ class SaleViewModel(
 
         updatedSoldProduct.postValue(Pair(soldProductInfo, position))
 
+        soldProductList[position] = soldProductInfo
+        calculateNetAmount(soldProductList)
+
+    }
+
+    fun calculateNetAmount(soldProductList: ArrayList<SoldProductInfo>){
+        var netAmount = 0.0
+        for (soldProduct in soldProductList){
+            netAmount += soldProduct.totalAmt
+        }
+        this.netAmount.postValue(netAmount)
     }
 
 }
