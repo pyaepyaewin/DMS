@@ -151,7 +151,6 @@ class SaleActivity : BaseActivity(), KodeinAware {
         saleViewModel.updatedSoldProduct.observe(this, Observer {
             if (it != null){
                 mSoldProductListAdapter.updateList(it.first, it.second)
-                Toast.makeText(this, it.second.toString(), Toast.LENGTH_LONG).show()
             }
         })
 
@@ -162,8 +161,11 @@ class SaleActivity : BaseActivity(), KodeinAware {
             }
         })
 
-        saleViewModel.netAmount.observe(this, Observer {
-            tvNetAmount.text = Utils.formatAmount(it)
+        saleViewModel.calculatedSoldProductList.observe(this, Observer {
+            if (it != null){
+                mSoldProductListAdapter.setNewList(it.first)
+                tvNetAmount.text = Utils.formatAmount(it.second)
+            }
         })
 
     }
@@ -215,7 +217,12 @@ class SaleActivity : BaseActivity(), KodeinAware {
     private fun onFocCheckChange(data: SoldProductInfo, isChecked: Boolean, position: Int){
 
         data.isFocIsChecked = isChecked
-        saleViewModel.calculateSoldProductData(false, data, mSoldProductListAdapter.getDataList() as ArrayList, this.promotionList, position)
+
+        val newList = mSoldProductListAdapter.getDataList() as ArrayList
+        newList[position] = data
+        saleViewModel.calculateSoldProductData(newList, this.promotionList)
+
+        //saleViewModel.calculateSoldProductData(false, data, mSoldProductListAdapter.getDataList() as ArrayList, this.promotionList, position)
 
     }
 
@@ -267,9 +274,12 @@ class SaleActivity : BaseActivity(), KodeinAware {
 
                 }
 
-                mSoldProductListAdapter.removeItem(position)
+                val oldList = mSoldProductListAdapter.getDataList() as ArrayList
+                oldList.remove(soldProduct)
+                saleViewModel.calculateSoldProductData(oldList, this.promotionList)
+                //mSoldProductListAdapter.setNewList(newList = oldList)
 
-                if (mSoldProductListAdapter.getDataList().isEmpty()){
+                if (oldList.isEmpty()){
                     promotionList.clear()
                     promotionGiftByClassDis.clear()
                     saleViewModel.totalQtyForPercentWithProduct.clear()
@@ -318,7 +328,13 @@ class SaleActivity : BaseActivity(), KodeinAware {
                     }
 
                     soldProduct.quantity = quantity
-                    saleViewModel.calculateSoldProductData(true, soldProduct, mSoldProductListAdapter.getDataList() as ArrayList, this.promotionList, position)
+                    soldProduct.product.selling_price
+
+                    //saleViewModel.calculateSoldProductData(true, soldProduct, mSoldProductListAdapter.getDataList() as ArrayList, this.promotionList, position)
+
+                    val newList = mSoldProductListAdapter.getDataList() as ArrayList
+                    newList[position] = soldProduct
+                    saleViewModel.calculateSoldProductData(newList, this.promotionList)
 
                 }
 
@@ -357,7 +373,11 @@ class SaleActivity : BaseActivity(), KodeinAware {
                     soldProduct.setFocType(false)
                 }
 
-                saleViewModel.calculateSoldProductData(false, soldProduct, mSoldProductListAdapter.getDataList() as ArrayList, this.promotionList, position)
+                val newList = mSoldProductListAdapter.getDataList() as ArrayList
+                newList[position] = soldProduct
+                saleViewModel.calculateSoldProductData(newList, this.promotionList)
+
+                //saleViewModel.calculateSoldProductData(false, soldProduct, mSoldProductListAdapter.getDataList() as ArrayList, this.promotionList, position)
 
             }
             .setNegativeButton("Cancel", null)

@@ -19,7 +19,7 @@ class SaleViewModel(
     var productDataList = MutableLiveData<Pair<List<Product>, List<String>>>()
     var promotionList = MutableLiveData<ArrayList<Promotion>>()
     var updatedSoldProduct = MutableLiveData<Pair<SoldProductInfo, Int>>()
-    var netAmount = MutableLiveData<Double>()
+    var calculatedSoldProductList = MutableLiveData<Pair<ArrayList<SoldProductInfo>, Double>>()
 
     private var mapGift: HashMap<Int, ArrayList<Int>> = HashMap()
     private var mapPercent: HashMap<Int, ArrayList<Int>> = HashMap()
@@ -77,7 +77,7 @@ class SaleViewModel(
         }
     }
 
-    fun calculateSoldProductData( isQtyChange: Boolean, soldProductInfo: SoldProductInfo, soldProductList: ArrayList<SoldProductInfo>, promotionList: ArrayList<Promotion>, position: Int){
+    /*fun calculateSoldProductData( isQtyChange: Boolean, soldProductInfo: SoldProductInfo, soldProductList: ArrayList<SoldProductInfo>, promotionList: ArrayList<Promotion>, position: Int){
 
         this.tempSoldProductList = soldProductList
         this.tempPromotionList = promotionList
@@ -346,14 +346,52 @@ class SaleViewModel(
         soldProductList[position] = soldProductInfo
         calculateNetAmount(soldProductList)
 
+    }*/
+
+    fun calculateSoldProductData( soldProductList: ArrayList<SoldProductInfo>, promotionList: ArrayList<Promotion>){
+
+        val calculatedSoldProductList = ArrayList<SoldProductInfo>()
+
+        for (soldProductInfo in soldProductList){
+
+            var promoPrice = soldProductInfo.product.selling_price!!.toDouble()
+            if (soldProductInfo.promotionPrice != 0.0) promoPrice = soldProductInfo.promotionPrice
+
+            if (soldProductInfo.focPercent != 0.0 || soldProductInfo.focAmount != 0.0){
+                if (soldProductInfo.isFocTypePercent){
+                    val itemDiscount = promoPrice * soldProductInfo.focPercent / 100
+                    promoPrice -= itemDiscount
+                    soldProductInfo.itemDiscountAmount = itemDiscount
+                } else{
+                    promoPrice -= soldProductInfo.focAmount
+                    soldProductInfo.itemDiscountAmount = soldProductInfo.focAmount
+                }
+                soldProductInfo.promoPriceByDiscount = promoPrice
+            }
+
+            var totalAmount = promoPrice * soldProductInfo.quantity
+
+            if (soldProductInfo.isFocIsChecked){
+                totalAmount = 0.0
+                soldProductInfo.focQuantity = soldProductInfo.quantity
+            }
+
+            soldProductInfo.totalAmt = totalAmount
+            calculatedSoldProductList.add(soldProductInfo)
+
+        }
+
+        val netAmount = calculateNetAmount(calculatedSoldProductList)
+        this.calculatedSoldProductList.postValue(Pair(calculatedSoldProductList, netAmount))
+
     }
 
-    fun calculateNetAmount(soldProductList: ArrayList<SoldProductInfo>){
+    private fun calculateNetAmount(soldProductList: ArrayList<SoldProductInfo>): Double{
         var netAmount = 0.0
         for (soldProduct in soldProductList){
             netAmount += soldProduct.totalAmt
         }
-        this.netAmount.postValue(netAmount)
+        return netAmount
     }
 
 }
