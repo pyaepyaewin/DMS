@@ -38,7 +38,7 @@ class ViewByMapFragment : Fragment(), KodeinAware {
     var latlngList: MutableList<CustomerLocationDataClass>? = null
 //    private lateinit var mMap: GoogleMap
 
-    var mMap : GoogleMap? = null
+    var mMap: GoogleMap? = null
 
     override val kodein: Kodein by kodein()
     final val MY_PERMISSIONS_REQUEST_LOCATION = 99
@@ -60,8 +60,10 @@ class ViewByMapFragment : Fragment(), KodeinAware {
         val fragmentView = inflater.inflate(R.layout.fragment_e_route_map, container, false)
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(object : OnMapReadyCallback {
+
             override fun onMapReady(p0: GoogleMap?) {
                 mMap = p0!!
+
                 if (mMap != null) {
                     mMap!!.setTrafficEnabled(true)
                     mMap!!.getUiSettings().isMyLocationButtonEnabled = true
@@ -78,6 +80,7 @@ class ViewByMapFragment : Fragment(), KodeinAware {
                     } else {
                         mMap!!.setMyLocationEnabled(true)
                     }
+
                 }
 
             }
@@ -99,8 +102,6 @@ class ViewByMapFragment : Fragment(), KodeinAware {
     }
 
     private fun CustomerLocation() {
-
-
         for (i in latlngList!!) {
 
             var latlng = LatLng(i.latitude, i.longitude)
@@ -108,44 +109,25 @@ class ViewByMapFragment : Fragment(), KodeinAware {
             if (!latlng.equals(latlng1)) {
                 var markerOptions = MarkerOptions().position(latlng)
 
-                if (mMap != null){
+                if (mMap != null) {
                     mMap!!.addMarker(markerOptions)
                     mMap!!.moveCamera(CameraUpdateFactory.newLatLng(latlng))
-                }else{
-                    val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
-                    mapFragment.getMapAsync(object : OnMapReadyCallback {
-                        override fun onMapReady(p0: GoogleMap?) {
-                            mMap = p0!!
-                            if (mMap != null) {
-                                mMap!!.setTrafficEnabled(true)
-                                mMap!!.getUiSettings().isMyLocationButtonEnabled = true
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                                    if (ContextCompat.checkSelfPermission(
-                                            context!!,
-                                            Manifest.permission.ACCESS_FINE_LOCATION
-                                        ) == PackageManager.PERMISSION_GRANTED
-                                    ) {
-                                        mMap!!.setMyLocationEnabled(true)
-                                        mMap!!.addMarker(markerOptions)
-                                        mMap!!.moveCamera(CameraUpdateFactory.newLatLng(latlng))
-                                    } else {
-                                        CheckLocationPermission()
-                                    }
-                                } else {
-                                    mMap!!.setMyLocationEnabled(true)
-                                }
-                            }
+                    mMap!!.animateCamera(
+                        CameraUpdateFactory.newLatLngZoom(
+                            LatLng(
+                                latlng.latitude,
+                                latlng.longitude
+                            ), 12.0f
+                        )
+                    )
 
-                        }
-
-                    })
                 }
-
+}
 
 
             }
         }
-    }
+
 
     private fun CheckLocationPermission() {
         if (ContextCompat.checkSelfPermission(
