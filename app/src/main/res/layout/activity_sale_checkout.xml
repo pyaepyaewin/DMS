@@ -54,13 +54,15 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
                 android:background="#898989"
-                android:padding="10dp">
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp">
 
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="3"
                     android:gravity="center_horizontal"
+                    android:layout_gravity="center_vertical"
                     android:text="@string/product"
                     android:textColor="#FFFFFF"
                     android:textStyle="bold" />
@@ -71,6 +73,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:gravity="center_horizontal"
+                    android:layout_gravity="center_vertical"
                     android:text="@string/um"
                     android:textColor="#FFFFFF"
                     android:textStyle="bold" />
@@ -81,6 +84,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:gravity="center_horizontal"
+                    android:layout_gravity="center_vertical"
                     android:text="@string/qty"
                     android:textColor="#FFFFFF"
                     android:textStyle="bold" />
@@ -90,6 +94,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:gravity="center_horizontal"
+                    android:layout_gravity="center_vertical"
                     android:text="@string/price"
                     android:textColor="#FFFFFF"
                     android:textStyle="bold" />
@@ -100,6 +105,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:gravity="center_horizontal"
+                    android:layout_gravity="center_vertical"
                     android:text="@string/discount"
                     android:textColor="#FFFFFF"
                     android:textStyle="bold" />
@@ -109,6 +115,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="2"
                     android:gravity="center_horizontal"
+                    android:layout_gravity="center_vertical"
                     android:text="@string/amount"
                     android:textColor="#FFFFFF"
                     android:textStyle="bold" />
@@ -119,6 +126,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:gravity="center_horizontal"
+                    android:layout_gravity="center_vertical"
                     android:text="@string/foc"
                     android:textColor="#FFFFFF"
                     android:textStyle="bold"
@@ -126,7 +134,7 @@
             </LinearLayout>
 
             <ScrollView
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/soldProductList">
 
@@ -135,27 +143,29 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
-                    <ListView
-                        android:id="@+id/promotion_plan_item_listview"
+                    <android.support.v7.widget.RecyclerView
+                        android:id="@+id/promotion_plan_item_rv"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
+                        android:layout_height="wrap_content"
+                        android:padding="10dp" />
 
-                    <ListView
-                        android:id="@+id/promotion_plan_gift_listview"
+                    <android.support.v7.widget.RecyclerView
+                        android:id="@+id/promotion_plan_gift_rv"
                         android:layout_width="match_parent"
-                        android:layout_height="150dp" />
+                        android:layout_height="150dp"
+                        android:padding="10dp" />
 
                 </LinearLayout>
+
             </ScrollView>
 
-            <ListView
+            <android.support.v7.widget.RecyclerView
                 android:id="@+id/soldProductList"
                 android:layout_width="match_parent"
                 android:layout_height="300dp"
                 android:layout_below="@+id/headerLayout"
                 android:layout_alignParentStart="true"
                 android:layout_alignParentLeft="true"
-                android:descendantFocusability="blocksDescendants"
                 android:padding="10dp" />
 
         </RelativeLayout>
@@ -173,8 +183,10 @@
                     android:id="@+id/saleDateLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="right"
-                    android:orientation="horizontal">
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="10dp">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -193,7 +205,8 @@
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp">
 
                     <TextView
                         android:layout_width="0dp"
@@ -297,9 +310,9 @@
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
                                     android:layout_weight="2"
+                                    android:hint="0"
                                     android:imeOptions="actionDone"
-                                    android:inputType="numberDecimal"
-                                    android:text="0" />
+                                    android:inputType="numberDecimal" />
 
                                 <Button
                                     android:id="@+id/btn_disOk"
@@ -329,9 +342,9 @@
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
                                     android:layout_weight="2"
+                                    android:hint="0"
                                     android:imeOptions="actionDone"
-                                    android:inputType="numberDecimal"
-                                    android:text="0" />
+                                    android:inputType="numberDecimal" />
 
                                 <Button
                                     android:id="@+id/btn_amtOk"
@@ -600,6 +613,7 @@
                                 android:layout_marginRight="10dp"
                                 android:layout_weight="2"
                                 android:gravity="right"
+                                android:layout_gravity="center_vertical"
                                 android:text="@string/payment_method" />
 
                             <RadioGroup
@@ -620,6 +634,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:checked="true"
+                                    android:layout_marginLeft="5dp"
                                     android:text="Cash" />
 
                             </RadioGroup>

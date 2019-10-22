@@ -132,6 +132,7 @@ val repoModule = Kodein.Module {
 
 //ViewModel Module
 val vmModule = Kodein.Module {
+
     bind() from singleton { LoginViewModel(instance(), instance()) }
     bind() from singleton { SyncViewModel(instance(), instance()) }
     bind() from singleton { CustomerViewModel(instance(), instance()) }
@@ -151,8 +152,6 @@ val vmModule = Kodein.Module {
     bind() from singleton { ClassDiscountForShowGiftViewModel(instance(),instance()) }
     bind() from singleton { ViewByListViewModel(instance(),instance()) }
     bind() from singleton { CustomerLocationViewModel(instance(),instance()) }
-
-
 
 }
 

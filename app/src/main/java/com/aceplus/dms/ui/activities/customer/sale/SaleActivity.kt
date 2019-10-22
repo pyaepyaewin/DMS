@@ -277,7 +277,6 @@ class SaleActivity : BaseActivity(), KodeinAware {
                 val oldList = mSoldProductListAdapter.getDataList() as ArrayList
                 oldList.remove(soldProduct)
                 saleViewModel.calculateSoldProductData(oldList, this.promotionList)
-                //mSoldProductListAdapter.setNewList(newList = oldList)
 
                 if (oldList.isEmpty()){
                     promotionList.clear()
@@ -425,8 +424,9 @@ class SaleActivity : BaseActivity(), KodeinAware {
         val isFocPass = toEnableFocSameProduct()
 
         if (isFocPass){
-            Toast.makeText(this, "Go to checkout", Toast.LENGTH_LONG).show()
-            // ToDo - create checkout intent to start
+
+            startActivity(SaleCheckoutActivity.newIntentFromSale(this, customer!!, mSoldProductListAdapter.getDataList() as ArrayList, this.promotionList))
+
         }
 
     }
