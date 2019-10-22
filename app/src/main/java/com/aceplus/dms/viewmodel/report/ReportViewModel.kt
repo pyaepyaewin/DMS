@@ -2,17 +2,35 @@ package com.aceplus.dms.viewmodel.report
 
 import android.arch.lifecycle.MutableLiveData
 import android.util.Log
+import com.aceplus.domain.entity.CompanyInformation
+import com.aceplus.domain.entity.GroupCode
+import com.aceplus.domain.entity.cash.CashReceive
+import com.aceplus.domain.entity.credit.Credit
 import com.aceplus.domain.entity.customer.Customer
+import com.aceplus.domain.entity.customer.CustomerBalance
+import com.aceplus.domain.entity.customer.CustomerCategory
+import com.aceplus.domain.entity.customer.CustomerVisitRecordReport
 import com.aceplus.domain.entity.invoice.Invoice
+import com.aceplus.domain.entity.invoice.InvoicePresent
+import com.aceplus.domain.entity.preorder.PreOrder
+import com.aceplus.domain.entity.preorder.PreOrderPresent
 import com.aceplus.domain.entity.product.Product
 import com.aceplus.domain.entity.product.ProductCategory
 import com.aceplus.domain.entity.product.ProductGroup
+import com.aceplus.domain.entity.route.Route
+import com.aceplus.domain.entity.route.RouteScheduleItemV2
+import com.aceplus.domain.entity.sale.SaleMan
+import com.aceplus.domain.entity.sale.saleexchange.SaleExchange
+import com.aceplus.domain.entity.sale.salereturn.SaleReturn
 import com.aceplus.domain.entity.sale.saletarget.SaleTargetCustomer
 import com.aceplus.domain.entity.sale.saletarget.SaleTargetSaleMan
+import com.aceplus.domain.entity.sale.salevisit.SaleVisitRecordUpload
 import com.aceplus.domain.repo.report.ReportRepo
 import com.aceplus.domain.vo.report.*
 import com.aceplus.shared.viewmodel.BaseViewModel
 import com.kkk.githubpaging.network.rx.SchedulerProvider
+import java.text.SimpleDateFormat
+import java.util.*
 
 class ReportViewModel(
     private val reportRepo: ReportRepo,
@@ -323,6 +341,8 @@ class ReportViewModel(
 
     //sale target and actual sale for product
     var loadProductNameDataList = MutableLiveData<List<Product>>()
+    var loadGroupCodeNameDataList = MutableLiveData<List<GroupCode>>()
+    var loadProductCategoryNameDataList = MutableLiveData<List<ProductCategory>>()
     fun loadProductNameList(stockId:Int) {
         launch {
             reportRepo.saleTargetProductReport(stockId)
@@ -333,9 +353,144 @@ class ReportViewModel(
                 }
         }
     }
+    fun loadGroupCodeNameList(groupNo:Int) {
+        launch {
+            reportRepo.getGroupCodeListForSaleTargetProduct(groupNo)
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.mainThread())
+                .subscribe {
+                    loadGroupCodeNameDataList.postValue(it)
+                }
+        }
+    }
 
+    fun loadProductCategoryNameList(categoryId:String) {
+        launch {
+            reportRepo.getProductCategoryListForSaleTargetProduct(categoryId)
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.mainThread())
+                .subscribe {
+                    loadProductCategoryNameDataList.postValue(it)
+                }
+        }
+    }
 
-
+    //end of day report
+    var saleManDataList = MutableLiveData<List<SaleMan>>()
+    fun loadSaleManList() {
+        launch {
+            reportRepo.getSaleManNameList()
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.mainThread())
+                .subscribe {
+                    saleManDataList.postValue(it)
+                }
+        }
+    }
+    var saleManRouteNameDataList = MutableLiveData<List<Route>>()
+    fun loadSaleManRouteNameDataList() {
+        launch {
+            reportRepo.getSaleManRouteNameList()
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.mainThread())
+                .subscribe {
+                    saleManRouteNameDataList.postValue(it)
+                }
+        }
+    }
+    var startTimeAndEndTimeList = MutableLiveData<List<CompanyInformation>>()
+    fun loadStartTimeAndEndTimeList() {
+        launch {
+            reportRepo.getStartTimeAndEndTimeList()
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.mainThread())
+                .subscribe {
+                    startTimeAndEndTimeList.postValue(it)
+                }
+        }
+    }
+    var totalSaleOrderList = MutableLiveData<List<PreOrder>>()
+    fun loadTotalSaleOrderList() {
+        launch {
+            reportRepo.getTotalSaleOrderList()
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.mainThread())
+                .subscribe {
+                    totalSaleOrderList.postValue(it)
+                }
+        }
+    }
+    var totalSaleExchangeList = MutableLiveData<List<SaleExchange>>()
+    fun loadTotalSaleExchangeList() {
+        launch {
+            reportRepo.getTotalSaleExchangeList()
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.mainThread())
+                .subscribe {
+                    totalSaleExchangeList.postValue(it)
+                }
+        }
+    }
+    var totalSaleReturnList = MutableLiveData<List<SaleReturn>>()
+    fun loadTotalSaleReturnList() {
+        launch {
+            reportRepo.getTotalSaleReturnList()
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.mainThread())
+                .subscribe {
+                    totalSaleReturnList.postValue(it)
+                }
+        }
+    }
+    var totalCashReceiptList = MutableLiveData<List<Credit>>()
+    fun loadTotalCashReceiptList() {
+        launch {
+            reportRepo.getTotalCashReceiptList()
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.mainThread())
+                .subscribe {
+                    totalCashReceiptList.postValue(it)
+                }
+        }
+    }
+    var planCustomerList = MutableLiveData<List<RouteScheduleItemV2>>()
+    fun loadPlanCustomerList() {
+        launch {
+            reportRepo.getPlanCustomerList()
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.mainThread())
+                .subscribe {
+                    planCustomerList.postValue(it)
+                }
+        }
+    }
+    var dataForNewCustomerList = MutableLiveData<List<Customer>>()
+    fun loadDataForNewCustomerList() {
+        launch {
+            reportRepo.getDataForNewCustomerList()
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.mainThread())
+                .subscribe {
+                    dataForNewCustomerList.postValue(it)
+                }
+        }
+    }
+    var dataNotVisitedCountList = MutableLiveData<List<SaleVisitRecordUpload>>()
+    fun loadDataNotVisitedCountList() {
+        launch {
+            reportRepo.getDataNotVisitedCountList()
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.mainThread())
+                .subscribe {
+                    dataNotVisitedCountList.postValue(it)
+                }
+        }
+    }
+    fun setCurrentDate(): String{
+        val currentDate = Calendar.getInstance().time
+        val format = SimpleDateFormat("yyyy-MM-dd")
+        return format.format(currentDate)
+    }
     //spinner data
     var customerDataList = MutableLiveData<List<Customer>>()
     var groupDataList = MutableLiveData<List<ProductGroup>>()

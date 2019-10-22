@@ -16,6 +16,7 @@ import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
 import com.github.mikephil.charting.formatter.PercentFormatter
+import com.github.mikephil.charting.formatter.ValueFormatter
 import kotlinx.android.synthetic.main.fragment_sale_comparison_report.*
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
@@ -36,14 +37,17 @@ class TargetAndActualSalesForCustomerReportFragment : BaseFragment(), KodeinAwar
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        var targetAmount = 0.0
-        var saleAmount = 0.0
-        var sumAmount :Double
-        var tAmount:Int
         var value = mutableListOf<Float>()
         targetAndActualSalesForCustomerReportViewModel.saleTargetCustomerSuccessState.observe(
             this,
             Observer {
+                var targetAmount = 0.0
+                var saleAmount = 0.0
+                val sumAmount :Double
+                val tAmount:Int
+                val sAmount:Int
+                Log.d("First List", "${it!!.first.size}")
+                Log.d("Second List", "${it!!.second.size}")
                 for (target in it!!.first) {
                     targetAmount += target.target_amount!!.toDouble()
                 }
@@ -53,17 +57,22 @@ class TargetAndActualSalesForCustomerReportFragment : BaseFragment(), KodeinAwar
                     saleAmount += sale.total_amount!!.toDouble()
                 }
                 sale_txt.text = saleAmount.toString()
-
-                sumAmount = targetAmount + saleAmount
-                Log.d("Sum Amount", "$sumAmount")
-                tAmount = (targetAmount.toInt() / sumAmount.toInt()) * 100
-                Log.d("Multiply Amount", "$tAmount")
-                // sAmount = (saleAmount / sumAmount) * 100
+                if (targetAmount == 0.0 && saleAmount == 0.0){
+                    tAmount = 50
+                    sAmount = 50
+                }
+                else {
+                    sumAmount = targetAmount + saleAmount
+                    Log.d("Target Amount", "$sumAmount")
+                    tAmount = (targetAmount.toInt() * 100) / sumAmount.toInt()
+                    Log.d("Multiply Amount", "$tAmount")
+                    sAmount = (saleAmount.toInt() / sumAmount.toInt()) * 100
+                }
                 //pie chart show
                 pieChart?.setUsePercentValues(true)
                 val legend: Legend? = pieChart?.legend
                 legend?.horizontalAlignment = Legend.LegendHorizontalAlignment.LEFT
-                value = mutableListOf(tAmount.toFloat(), 0.toFloat())
+                value = mutableListOf(tAmount.toFloat(), sAmount.toFloat())
                 Log.d("All Amount", "${value[0]}")
                 val label = mutableListOf("Sale Target $targetAmount", "Sale $saleAmount")
 
@@ -72,20 +81,23 @@ class TargetAndActualSalesForCustomerReportFragment : BaseFragment(), KodeinAwar
                     entry.add(PieEntry(value[i], label[i]))
                 }
                 val dataSet = PieDataSet(entry, "Result")
-                dataSet.setColors(Color.GREEN, Color.RED)
+                dataSet.setColors(resources.getColor(R.color.colorPrimary), resources.getColor(R.color.colorPrimaryDark))
                 dataSet.setDrawValues(true)
                 val pieData = PieData(dataSet)
-                dataSet.yValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
+                dataSet.yValuePosition = PieDataSet.ValuePosition.INSIDE_SLICE
                 dataSet.valueLinePart1OffsetPercentage = 10f
                 dataSet.valueLinePart1Length = 0.43f
                 dataSet.valueLinePart2Length = .1f
                 dataSet.valueTextColor = Color.BLACK
                 dataSet.xValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
                 pieChart.setEntryLabelColor(Color.BLUE)
-                pieData.setValueFormatter(PercentFormatter())
+                pieData.setValueFormatter(PercentFormatter() as ValueFormatter?)
                 pieData.setValueTextSize(10f)
-                pieData.setValueTextColor(Color.WHITE)
+                pieData.setValueTextColor(Color.BLACK)
                 pieChart?.data = pieData
+                chart.canScrollHorizontally(20)
+                pieChart.animateXY(2000, 2000)
+                pieChart.invalidate()
             })
         targetAndActualSalesForCustomerReportViewModel.customerDataList.observe(
             this, Observer {

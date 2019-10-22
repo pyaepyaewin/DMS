@@ -1,19 +1,34 @@
 package com.aceplus.data.repoimpl.report
 
 import com.aceplus.data.database.MyDatabase
+import com.aceplus.domain.entity.CompanyInformation
+import com.aceplus.domain.entity.GroupCode
+import com.aceplus.domain.entity.cash.CashReceive
+import com.aceplus.domain.entity.credit.Credit
 import com.aceplus.domain.entity.customer.Customer
+import com.aceplus.domain.entity.customer.CustomerBalance
+import com.aceplus.domain.entity.customer.CustomerCategory
+import com.aceplus.domain.entity.customer.CustomerVisitRecordReport
 import com.aceplus.domain.entity.invoice.Invoice
+import com.aceplus.domain.entity.invoice.InvoicePresent
+import com.aceplus.domain.entity.preorder.PreOrder
+import com.aceplus.domain.entity.preorder.PreOrderPresent
 import com.aceplus.domain.entity.product.Product
 import com.aceplus.domain.entity.product.ProductCategory
 import com.aceplus.domain.entity.product.ProductGroup
+import com.aceplus.domain.entity.route.Route
+import com.aceplus.domain.entity.route.RouteScheduleItemV2
+import com.aceplus.domain.entity.sale.SaleMan
+import com.aceplus.domain.entity.sale.saleexchange.SaleExchange
+import com.aceplus.domain.entity.sale.salereturn.SaleReturn
 import com.aceplus.domain.entity.sale.saletarget.SaleTargetCustomer
 import com.aceplus.domain.entity.sale.saletarget.SaleTargetSaleMan
+import com.aceplus.domain.entity.sale.salevisit.SaleVisitRecordUpload
 import com.aceplus.domain.repo.report.ReportRepo
 import com.aceplus.domain.vo.report.*
 import io.reactivex.Observable
 
 class ReportRepoImpl(private val db: MyDatabase) : ReportRepo {
-
     //deliver report
     override fun deliverReport(): Observable<List<DeliverReport>> {
         return Observable.just(db.deliveryDao().getDeliverReport())
@@ -94,9 +109,10 @@ class ReportRepoImpl(private val db: MyDatabase) : ReportRepo {
 
     //sale target and sale man report
     override fun saleTargetSaleManReport(): Observable<List<SaleTargetSaleMan>> {
-       return Observable.just(db.saleTargetSaleManDao().allData)
+        return Observable.just(db.saleTargetSaleManDao().allData)
     }
-        override fun getAllInvoiceData(): Observable<List<Invoice>> {
+
+    override fun getAllInvoiceData(): Observable<List<Invoice>> {
         return Observable.just(db.invoiceDao().allData)
     }
 
@@ -106,8 +122,56 @@ class ReportRepoImpl(private val db: MyDatabase) : ReportRepo {
     }
 
     //sale target and actual sale for product
-    override fun saleTargetProductReport(stockId:Int): Observable<List<Product>> {
+    override fun saleTargetProductReport(stockId: Int): Observable<List<Product>> {
         return Observable.just(db.productDao().selectProductName(stockId))
     }
+
+    override fun getGroupCodeListForSaleTargetProduct(groupNo: Int): Observable<List<GroupCode>> {
+        return Observable.just(db.groupCodeDao().selectGroupCodeName(groupNo))
+    }
+
+    override fun getProductCategoryListForSaleTargetProduct(categoryId: String): Observable<List<ProductCategory>> {
+        return Observable.just(db.productCategoryDao().selectCategoryName(categoryId))
+    }
+
+    //end of day report
+    override fun getSaleManNameList(): Observable<List<SaleMan>> {
+        return Observable.just(db.saleManDao().allData)
+    }
+
+    override fun getSaleManRouteNameList(): Observable<List<Route>> {
+        return Observable.just(db.routeDao().allData)
+    }
+
+    override fun getStartTimeAndEndTimeList(): Observable<List<CompanyInformation>> {
+        return Observable.just(db.companyInformationDao().allData)
+    }
+
+    override fun getTotalSaleOrderList(): Observable<List<PreOrder>> {
+        return Observable.just(db.preOrderDao().allData)
+    }
+
+    override fun getTotalSaleExchangeList():Observable<List<SaleExchange>>{
+        return Observable.just(db.saleExchangeDao().allData)
+    }
+
+    override fun getTotalSaleReturnList():Observable<List<SaleReturn>>{
+        return Observable.just(db.saleReturnDao().allData)
+    }
+
+    override fun getTotalCashReceiptList():Observable<List<Credit>>{
+        return Observable.just(db.creditDao().allData)
+    }
+
+    override fun getPlanCustomerList():Observable<List<RouteScheduleItemV2>>{
+        return Observable.just(db.routeScheduleItemV2Dao().allData)
+    }
+    override fun getDataForNewCustomerList(): Observable<List<Customer>> {
+        return Observable.just(db.customerDao().customerList)
+    }
+    override fun getDataNotVisitedCountList(): Observable<List<SaleVisitRecordUpload>> {
+       return Observable.just(db.saleVisitRecordUploadDao().saleVisitUploadList)
+    }
+
 
 }

@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import com.aceplus.dms.R
 import com.aceplus.dms.viewmodel.report.ReportViewModel
 import com.aceplus.shared.ui.activities.BaseFragment
 import com.github.mikephil.charting.components.Legend
@@ -23,15 +24,10 @@ import org.kodein.di.android.support.kodein
 
 
 class TargetAndActualSalesForSalesManReportFragment : BaseFragment(), KodeinAware {
+
     override val kodein: Kodein by kodein()
     var groupNameList = mutableListOf<String>()
     var categoryNameList = mutableListOf<String>()
-    var targetAmount = 0.0
-    var saleAmount = 0.0
-    private var sumAmount = 0.0
-    private var tAmount = 0
-    private var sAmount = 0
-    var value = mutableListOf<Float>()
     private val targetAndActualSalesForSalesManReportViewModel: ReportViewModel by viewModel()
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -39,7 +35,7 @@ class TargetAndActualSalesForSalesManReportFragment : BaseFragment(), KodeinAwar
     ): View? {
         // Inflate the layout for this fragment
         return inflater.inflate(
-            com.aceplus.dms.R.layout.fragment_sale_comparison_report,
+            R.layout.fragment_sale_comparison_report,
             container,
             false
         )
@@ -49,6 +45,14 @@ class TargetAndActualSalesForSalesManReportFragment : BaseFragment(), KodeinAwar
         targetAndActualSalesForSalesManReportViewModel.saleTargetAndSaleManReportSuccessState.observe(
             this,
             Observer {
+                var value = mutableListOf<Float>()
+                var targetAmount = 0.0
+                var saleAmount = 0.0
+                val sumAmount :Double
+                val tAmount :Int
+                val sAmount :Int
+                Log.d("First List", "${it!!.first.size}")
+                Log.d("Second List", "${it!!.second.size}")
                 for (target in it!!.first) {
                     targetAmount += target.target_amount!!.toDouble()
                 }
@@ -58,17 +62,21 @@ class TargetAndActualSalesForSalesManReportFragment : BaseFragment(), KodeinAwar
                     saleAmount += sale.total_amount!!.toDouble()
                 }
                 sale_txt.text = saleAmount.toString()
-
-                sumAmount = targetAmount + saleAmount
-                Log.d("Sum Amount", "$sumAmount")
-                tAmount = (targetAmount.toInt() / sumAmount.toInt()) * 100
-                Log.d("Multiply Amount", "$tAmount")
-                // sAmount = (saleAmount / sumAmount) * 100
+                if (targetAmount == 0.0 && saleAmount == 0.0) {
+                    tAmount = 50
+                    sAmount = 50
+                } else {
+                    sumAmount = targetAmount + saleAmount
+                    Log.d("Sum Amount", "$sumAmount")
+                    tAmount = (targetAmount.toInt() * 100) / sumAmount.toInt()
+                    Log.d("Multiply Amount", "$tAmount")
+                    sAmount = (saleAmount.toInt() / sumAmount.toInt()) * 100
+                }
                 //pie chart show
                 pieChart?.setUsePercentValues(true)
                 val legend: Legend? = pieChart?.legend
                 legend?.horizontalAlignment = Legend.LegendHorizontalAlignment.LEFT
-                value = mutableListOf(tAmount.toFloat(), 0.toFloat())
+                value = mutableListOf(tAmount.toFloat(), sAmount.toFloat())
                 Log.d("All Amount", "${value[0]}")
                 val label = mutableListOf("Sale Target $targetAmount", "Sale $saleAmount")
 
@@ -77,10 +85,13 @@ class TargetAndActualSalesForSalesManReportFragment : BaseFragment(), KodeinAwar
                     entry.add(PieEntry(value[i], label[i]))
                 }
                 val dataSet = PieDataSet(entry, "Result")
-                dataSet.setColors(Color.GREEN, Color.RED)
+                dataSet.setColors(
+                    resources.getColor(R.color.colorPrimary),
+                    resources.getColor(R.color.colorPrimaryDark)
+                )
                 dataSet.setDrawValues(true)
                 val pieData = PieData(dataSet)
-                dataSet.yValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
+                dataSet.yValuePosition = PieDataSet.ValuePosition.INSIDE_SLICE
                 dataSet.valueLinePart1OffsetPercentage = 10f
                 dataSet.valueLinePart1Length = 0.43f
                 dataSet.valueLinePart2Length = .1f
@@ -89,7 +100,7 @@ class TargetAndActualSalesForSalesManReportFragment : BaseFragment(), KodeinAwar
                 pieChart.setEntryLabelColor(Color.BLUE)
                 pieData.setValueFormatter(PercentFormatter() as ValueFormatter?)
                 pieData.setValueTextSize(10f)
-                pieData.setValueTextColor(Color.WHITE)
+                pieData.setValueTextColor(Color.BLACK)
                 pieChart?.data = pieData
                 chart.canScrollHorizontally(20)
                 pieChart.animateXY(2000, 2000)
@@ -123,8 +134,7 @@ class TargetAndActualSalesForSalesManReportFragment : BaseFragment(), KodeinAwar
         targetAndActualSalesForSalesManReportViewModel.loadProductGroup()
         targetAndActualSalesForSalesManReportViewModel.loadProductCategory()
         targetAndActualSalesForSalesManReportViewModel.loadSaleTargetAndSaleManReport()
-        // targetAndActualSalesForSalesManReportViewModel.loadInvoiceList()
-    }
 
+    }
 
 }
