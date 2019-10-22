@@ -95,33 +95,10 @@ val repoModule = Kodein.Module {
         ReportRepoImpl(instance())
     }
 
-    bind<PromotionPriceRepo>() with singleton {
-        PromotionPriceRepoImpl(instance())
+    bind<PromotionRepo>() with singleton {
+        PromotionRepoImpl(instance())
     }
-    bind<PromotionGiftRepo>() with singleton {
-        PromotionGiftRepoImpl(instance())
-    }
-    bind<VolumeDiscountRepo>() with singleton {
-        VolumeDiscountRepoImpl(instance())
-    }
-    bind<VolumeDiscountFilterRepo>() with singleton {
-        VolumeDiscountFilterRepoImpl(instance())
-    }
-    bind<CategoryDiscountRepo>() with singleton {
-        CategoryDiscountRepoImpl(instance())
-    }
-    bind<ClassDiscountByPriceRepo>() with singleton {
-        ClassDiscountByPriceRepoImpl(instance())
-    }
-    bind<ClassDiscountByGiftRepo>() with singleton {
-        ClassDiscountByGiftRepoImpl(instance())
-    }
-    bind<ClassDiscountForShowPriceRepo>() with singleton {
-        ClassDiscountForShowPriceRepoImpl(instance())
-    }
-    bind<ClassDiscountForShowGiftRepo>() with singleton {
-        ClassDiscountForShowGiftRepoImpl(instance())
-    }
+
     bind<ViewByListRepo>() with singleton {
         ViewByListRepoImpl(instance())
     }
@@ -140,15 +117,8 @@ val vmModule = Kodein.Module {
     bind() from singleton { SalesReturnViewModel(instance(), instance()) }
     bind() from singleton { ReportViewModel(instance(), instance()) }
 
-    bind() from singleton { PromotionPriceViewModel(instance(), instance()) }
-    bind() from singleton { PromotionGiftViewModel(instance(), instance()) }
-    bind() from singleton { VolumeDiscountViewModel(instance(), instance()) }
-    bind() from singleton { VolumeDiscountFilterViewModel(instance(), instance()) }
-    bind() from singleton { CategoryDiscountViewModel(instance(), instance()) }
-    bind() from singleton { ClassDiscountByPriceViewModel(instance(), instance()) }
-    bind() from singleton { ClassDiscountByGiftViewModel(instance(), instance()) }
-    bind() from singleton { ClassDiscountForShowPriceViewModel(instance(), instance()) }
-    bind() from singleton { ClassDiscountForShowGiftViewModel(instance(), instance()) }
+    bind() from singleton { PromotionViewModel(instance(), instance()) }
+
     bind() from singleton { ViewByListViewModel(instance(), instance()) }
     bind() from singleton { CustomerLocationViewModel(instance(), instance()) }
 

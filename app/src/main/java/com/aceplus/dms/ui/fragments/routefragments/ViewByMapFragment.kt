@@ -65,8 +65,8 @@ class ViewByMapFragment : Fragment(), KodeinAware {
                 mMap = p0!!
 
                 if (mMap != null) {
-                    mMap!!.setTrafficEnabled(true)
-                    mMap!!.getUiSettings().isMyLocationButtonEnabled = true
+                    mMap!!.isTrafficEnabled = true
+                    mMap!!.uiSettings.isMyLocationButtonEnabled = true
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                         if (ContextCompat.checkSelfPermission(
                                 context!!,

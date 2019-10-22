@@ -13,7 +13,7 @@ import com.aceplus.dms.R
 import com.aceplus.dms.ui.activities.MainActivity
 import com.aceplus.dms.ui.adapters.promotionadapters.ClassDiscountForShowGiftAdapter
 import com.aceplus.dms.viewmodel.factory.KodeinViewModelFactory
-import com.aceplus.dms.viewmodel.promotionviewmodels.ClassDiscountForShowGiftViewModel
+import com.aceplus.dms.viewmodel.promotionviewmodels.PromotionViewModel
 import com.aceplus.domain.model.promotionDataClass.ClassDiscountForShowGiftDataClass
 import kotlinx.android.synthetic.main.tab_frag_class_dis_gift.*
 import kotlinx.android.synthetic.main.tab_frag_class_dis_gift.cancel_img
@@ -28,9 +28,9 @@ class ClassDiscountForShowGiftFragment :Fragment(),KodeinAware{
         ClassDiscountForShowGiftAdapter()
     }
 
-    private val classDiscountForShowGiftViewModel: ClassDiscountForShowGiftViewModel by lazy {
+    private val classDiscountForShowGiftViewModel: PromotionViewModel by lazy {
         ViewModelProviders.of(this, KodeinViewModelFactory((kodein)))
-            .get(ClassDiscountForShowGiftViewModel::class.java)
+            .get(PromotionViewModel::class.java)
     }
     override fun onCreateView(
         inflater: LayoutInflater,
