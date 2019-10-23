@@ -165,7 +165,7 @@
     <string name="str_scaning">scanning</string>
 
 
-<!--    promotion-->
+    <!--    promotion-->
     <string name="promotion_price">PROMOTION PRICE</string>
     <string name="promotion_gift">PROMOTION GIFT</string>
     <string name="promotion_volume_discount">Volume Discount</string>
@@ -175,8 +175,6 @@
     <string name="class_discount_by_gift">Class Discount By Gift</string>
     <string name="class_discount_for_show_price">Class Discount For Show Price</string>
     <string name="class_discount_for_show_gift">Class Discount For Show Gift</string>
-
-
 
 
     <!-- TODO: Remove or change this placeholder text -->

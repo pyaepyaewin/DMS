@@ -79,8 +79,8 @@
 
     </LinearLayout>
 
-    <ListView
-        android:id="@+id/customer_credit_list"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rvCreditCollection"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 

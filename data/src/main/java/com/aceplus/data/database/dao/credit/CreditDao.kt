@@ -6,6 +6,7 @@ import android.arch.persistence.room.Dao
 import android.arch.persistence.room.Insert
 import android.arch.persistence.room.OnConflictStrategy
 import android.arch.persistence.room.Query
+import com.aceplus.domain.model.creditcollectiondataclass.CreditCollectionDataClass
 
 
 @Dao
@@ -22,5 +23,8 @@ interface CreditDao {
 
     @Query("Delete from credit")
     fun deleteAll()
+
+    @Query("select Cus.customer_name,Cb.balance,C.pay_amount,C.amount from customer as Cus,credit as C,customer_balance as Cb where Cus.id=Cb.customer_id and C.customer_id=Cb.customer_id")
+    fun getCreditCollection():List<CreditCollectionDataClass>
 
 }
