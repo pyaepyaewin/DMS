@@ -7,6 +7,7 @@ import android.arch.persistence.room.Insert
 import android.arch.persistence.room.OnConflictStrategy
 import android.arch.persistence.room.Query
 import com.aceplus.domain.vo.report.SaleInvoiceReport
+import com.aceplus.domain.vo.report.SaleTargetVO
 
 @Dao
 interface InvoiceDao {

@@ -3,17 +3,10 @@ package com.aceplus.dms.viewmodel.report
 import android.arch.lifecycle.MutableLiveData
 import android.util.Log
 import com.aceplus.domain.entity.CompanyInformation
-import com.aceplus.domain.entity.GroupCode
-import com.aceplus.domain.entity.cash.CashReceive
 import com.aceplus.domain.entity.credit.Credit
 import com.aceplus.domain.entity.customer.Customer
-import com.aceplus.domain.entity.customer.CustomerBalance
-import com.aceplus.domain.entity.customer.CustomerCategory
-import com.aceplus.domain.entity.customer.CustomerVisitRecordReport
 import com.aceplus.domain.entity.invoice.Invoice
-import com.aceplus.domain.entity.invoice.InvoicePresent
 import com.aceplus.domain.entity.preorder.PreOrder
-import com.aceplus.domain.entity.preorder.PreOrderPresent
 import com.aceplus.domain.entity.product.Product
 import com.aceplus.domain.entity.product.ProductCategory
 import com.aceplus.domain.entity.product.ProductGroup
@@ -295,88 +288,118 @@ class ReportViewModel(
                 .subscribe({
                     invoiceDataList = it
                     // Log.d("Testing", "${invoiceDataList.size}")
+
+                    saleTargetAndSaleManReportSuccessState.postValue(
+                        Pair(
+                            saleTargetAndSaleManReportList,
+                            invoiceDataList
+                        )
+                    )
                 }, {
                     reportErrorState.value = it.localizedMessage
                 })
         }
-        saleTargetAndSaleManReportSuccessState.postValue(
-            Pair(
-                saleTargetAndSaleManReportList,
-                invoiceDataList
-            )
-        )
 
     }
 
     //sale target and actual for customer
+    //state of customerId = 0
     var saleTargetCustomerSuccessState =
-        MutableLiveData<Pair<List<SaleTargetCustomer>, List<Invoice>>>()
+        MutableLiveData<Pair<List<SaleTargetCustomer>, List<SaleTargetVO>>>()
 
-    fun loadSaleTargetAndActualForCustomerReport() {
+    fun loadSaleTargetAndActualForCustomerReport(customerId: Int, groupId: Int, categoryId: Int) {
         var saleTargetAndActualForCustomerReportList = listOf<SaleTargetCustomer>()
-        var invoiceDataList = listOf<Invoice>()
+        var saleTargetDataList = listOf<SaleTargetVO>()
         launch {
             reportRepo.saleTargetCustomerReport()
                 .doOnNext {
                     saleTargetAndActualForCustomerReportList = it
                 }
-                .flatMap { reportRepo.getAllInvoiceData() }
+                .flatMap { reportRepo.saleTargetAmountForCustomer(customerId, groupId, categoryId) }
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.mainThread())
                 .subscribe({
-                    invoiceDataList = it
+                    saleTargetDataList = it
+                    saleTargetCustomerSuccessState.postValue(
+                        Pair(
+                            saleTargetAndActualForCustomerReportList,
+                            saleTargetDataList
+                        )
+                    )
                 }, {
                     reportErrorState.value = it.localizedMessage
                 })
         }
-        saleTargetCustomerSuccessState.postValue(
-            Pair(
-                saleTargetAndActualForCustomerReportList,
-                invoiceDataList
-            )
-        )
 
+    }
+
+    //state of customerId != 0
+    var saleTargetAmountForCustomerList =
+        MutableLiveData<Pair<List<SaleTargetCustomer>, List<SaleTargetVO>>>()
+
+    fun loadSaleTargetAndActualAmountsForCustomerList(
+        customerId: Int,
+        groupId: Int,
+        categoryId: Int
+    ) {
+        var saleTargetAndActualForCustomerReportList = listOf<SaleTargetCustomer>()
+        var saleTargetDataList = listOf<SaleTargetVO>()
+        launch {
+            reportRepo.saleTargetCustomerIdList(customerId)
+                .doOnNext {
+                    saleTargetAndActualForCustomerReportList = it
+                }
+                .flatMap { reportRepo.saleTargetAmountForCustomer(customerId, groupId, categoryId) }
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.mainThread())
+                .subscribe({
+                    saleTargetDataList = it
+                    saleTargetAmountForCustomerList.postValue(
+                        Pair(
+                            saleTargetAndActualForCustomerReportList,
+                            saleTargetDataList
+                        )
+                    )
+                }, {
+                    reportErrorState.value = it.localizedMessage
+                })
+        }
 
     }
 
     //sale target and actual sale for product
-    var loadProductNameDataList = MutableLiveData<List<Product>>()
-    var loadGroupCodeNameDataList = MutableLiveData<List<GroupCode>>()
-    var loadProductCategoryNameDataList = MutableLiveData<List<ProductCategory>>()
-    fun loadProductNameList(stockId:Int) {
-        launch {
-            reportRepo.saleTargetProductReport(stockId)
-                .subscribeOn(schedulerProvider.io())
-                .observeOn(schedulerProvider.mainThread())
-                .subscribe {
-                    loadProductNameDataList.postValue(it)
-                }
-        }
-    }
-    fun loadGroupCodeNameList(groupNo:Int) {
-        launch {
-            reportRepo.getGroupCodeListForSaleTargetProduct(groupNo)
-                .subscribeOn(schedulerProvider.io())
-                .observeOn(schedulerProvider.mainThread())
-                .subscribe {
-                    loadGroupCodeNameDataList.postValue(it)
-                }
-        }
-    }
+    var saleTargetAndSaleManForProductReportSuccessState =
+        MutableLiveData<Pair<List<SaleTargetSaleMan>, List<TargetAndActualSaleForProduct>>>()
 
-    fun loadProductCategoryNameList(categoryId:String) {
+    fun loadNameListForSaleTargetProduct() {
+        var saleTargetAndActualForProductReportList = listOf<SaleTargetSaleMan>()
+        var nameListForSaleTargetProductList = listOf<TargetAndActualSaleForProduct>()
         launch {
-            reportRepo.getProductCategoryListForSaleTargetProduct(categoryId)
+            reportRepo.saleTargetSaleManReport()
+                .doOnNext {
+                    saleTargetAndActualForProductReportList = it
+                }
+                .flatMap { reportRepo.getNameListForSaleTargetProduct() }
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.mainThread())
                 .subscribe {
-                    loadProductCategoryNameDataList.postValue(it)
+                    nameListForSaleTargetProductList = it
+                    saleTargetAndSaleManForProductReportSuccessState.postValue(
+                        Pair(
+                            saleTargetAndActualForProductReportList,
+                            nameListForSaleTargetProductList
+                        )
+                    )
+
                 }
+
+
         }
     }
 
     //end of day report
     var saleManDataList = MutableLiveData<List<SaleMan>>()
+
     fun loadSaleManList() {
         launch {
             reportRepo.getSaleManNameList()
@@ -387,6 +410,7 @@ class ReportViewModel(
                 }
         }
     }
+
     var saleManRouteNameDataList = MutableLiveData<List<Route>>()
     fun loadSaleManRouteNameDataList() {
         launch {
@@ -398,6 +422,7 @@ class ReportViewModel(
                 }
         }
     }
+
     var startTimeAndEndTimeList = MutableLiveData<List<CompanyInformation>>()
     fun loadStartTimeAndEndTimeList() {
         launch {
@@ -409,6 +434,7 @@ class ReportViewModel(
                 }
         }
     }
+
     var totalSaleOrderList = MutableLiveData<List<PreOrder>>()
     fun loadTotalSaleOrderList() {
         launch {
@@ -420,6 +446,7 @@ class ReportViewModel(
                 }
         }
     }
+
     var totalSaleExchangeList = MutableLiveData<List<SaleExchange>>()
     fun loadTotalSaleExchangeList() {
         launch {
@@ -431,6 +458,7 @@ class ReportViewModel(
                 }
         }
     }
+
     var totalSaleReturnList = MutableLiveData<List<SaleReturn>>()
     fun loadTotalSaleReturnList() {
         launch {
@@ -442,6 +470,7 @@ class ReportViewModel(
                 }
         }
     }
+
     var totalCashReceiptList = MutableLiveData<List<Credit>>()
     fun loadTotalCashReceiptList() {
         launch {
@@ -453,6 +482,7 @@ class ReportViewModel(
                 }
         }
     }
+
     var planCustomerList = MutableLiveData<List<RouteScheduleItemV2>>()
     fun loadPlanCustomerList() {
         launch {
@@ -464,6 +494,7 @@ class ReportViewModel(
                 }
         }
     }
+
     var dataForNewCustomerList = MutableLiveData<List<Customer>>()
     fun loadDataForNewCustomerList() {
         launch {
@@ -475,6 +506,7 @@ class ReportViewModel(
                 }
         }
     }
+
     var dataNotVisitedCountList = MutableLiveData<List<SaleVisitRecordUpload>>()
     fun loadDataNotVisitedCountList() {
         launch {
@@ -486,11 +518,13 @@ class ReportViewModel(
                 }
         }
     }
-    fun setCurrentDate(): String{
+
+    fun setCurrentDate(): String {
         val currentDate = Calendar.getInstance().time
         val format = SimpleDateFormat("yyyy-MM-dd")
         return format.format(currentDate)
     }
+
     //spinner data
     var customerDataList = MutableLiveData<List<Customer>>()
     var groupDataList = MutableLiveData<List<ProductGroup>>()

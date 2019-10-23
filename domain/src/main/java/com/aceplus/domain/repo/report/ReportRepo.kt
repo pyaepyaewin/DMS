@@ -71,14 +71,14 @@ interface ReportRepo {
 
     fun getAllInvoiceData(): Observable<List<Invoice>>
 
-    //sale target and customer
+    //sale target and actual sale for customer
     fun saleTargetCustomerReport(): Observable<List<SaleTargetCustomer>>
+    fun saleTargetAmountForCustomer(customerId:Int,groupId:Int,categoryId:Int):Observable<List<SaleTargetVO>>
+    fun saleTargetCustomerIdList(customerId:Int): Observable<List<SaleTargetCustomer>>
 
     //target and actual sale for product
-    fun saleTargetProductReport(stockId: Int): Observable<List<com.aceplus.domain.entity.product.Product>>
+    fun getNameListForSaleTargetProduct(): Observable<List<TargetAndActualSaleForProduct>>
 
-    fun getGroupCodeListForSaleTargetProduct(groupNo: Int): Observable<List<GroupCode>>
-    fun getProductCategoryListForSaleTargetProduct(categoryId: String): Observable<List<ProductCategory>>
 
     //end of day report
     fun getSaleManNameList(): Observable<List<SaleMan>>

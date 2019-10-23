@@ -12,9 +12,11 @@ import com.aceplus.domain.entity.sale.saletarget.SaleTargetSaleMan
 import com.aceplus.domain.model.sale.SaleTarget
 import com.aceplus.shared.ui.activities.BaseFragment
 import com.github.mikephil.charting.components.Description
+import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
 import com.github.mikephil.charting.data.BarEntry
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import kotlinx.android.synthetic.main.fragment_product_report.*
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
@@ -23,8 +25,6 @@ import org.kodein.di.android.support.kodein
 
 class TargetAndActualSalesForProductReportFragment : BaseFragment(), KodeinAware {
     override val kodein: Kodein by kodein()
-    private var saleTargetArrayList = listOf<SaleTargetSaleMan>()
-    private var targetArrList = HashMap<Int, SaleTarget>()
     private val targetAndActualSalesForProductReportViewModel: ReportViewModel by viewModel()
 
     override fun onCreateView(
@@ -36,9 +36,11 @@ class TargetAndActualSalesForProductReportFragment : BaseFragment(), KodeinAware
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        targetAndActualSalesForProductReportViewModel.saleTargetAndSaleManReportSuccessState.observe(
+        targetAndActualSalesForProductReportViewModel.saleTargetAndSaleManForProductReportSuccessState.observe(
             this,
             Observer {
+                var saleTargetArrayList = listOf<SaleTargetSaleMan>()
+                val targetArrList = HashMap<Int, SaleTarget>()
                 val amount = mutableListOf<String>()
                 val col = mutableListOf<Float>()
                 saleTargetArrayList = it!!.first
@@ -51,20 +53,22 @@ class TargetAndActualSalesForProductReportFragment : BaseFragment(), KodeinAware
                     amount.add(i.target_amount.toString())
                     col.add(i.id.toFloat())
                     //get xAxis
-                    if (i.stock_id != null) {
-                        xAxis.add(getProductNameFromDb(Integer.parseInt(i.stock_id)))
-                    } else if (i.group_code_id != null) {
-
-                        xAxis.add(getGroupNameFromDb(Integer.parseInt(i.group_code_id)))
-                    } else if (i.category_id != null) {
-
-                        xAxis.add(getCategoryNameFromDb(i.category_id.toString()))
-                    } else {
-                        xAxis.add("")
+                    when {
+                        i.stock_id != null -> for (i in it!!.second){
+                            xAxis.add(i.productName!!)
+                        }
+                        i.group_code_id != null -> for (i in it!!.second){
+                            xAxis.add(i.groupCodeName!!)
+                        }
+                        i.category_id != null -> for (i in it!!.second){
+                            xAxis.add(i.categoryName!!)
+                        }
+                        else -> xAxis.add("")
                     }
 
                 }
-                Log.d("XXXXXX","$xAxis")
+                Log.d("Second List Size", "${it!!.second.size}")
+                Log.d("XXXXXX", "${xAxis.size}")
 
                 Log.d("Amount", "$amount")
                 Log.d("Column", "$col")
@@ -99,53 +103,19 @@ class TargetAndActualSalesForProductReportFragment : BaseFragment(), KodeinAware
                 val barDataSet2 = BarDataSet(valueSet2, "Actual Sale")
                 val res2 = this.resources
                 barDataSet2.color = res2.getColor(R.color.colorPrimaryDark)
-                val data = BarData(barDataSet1)
+                val data = BarData(barDataSet1,barDataSet2)
                 val description = Description()
                 description.text = "Sale Target"
                 chart.description = description
                 chart.data = data
                 chart.animateXY(2000, 2000)
                 chart.invalidate()
+                //X-axis
+                chart.xAxis.valueFormatter = IndexAxisValueFormatter(xAxis)
+
 
             })
-        targetAndActualSalesForProductReportViewModel.loadSaleTargetAndSaleManReport()
-    }
-
-    private fun getProductNameFromDb(stockId: Int): String {
-        var name = ""
-        targetAndActualSalesForProductReportViewModel.loadProductNameDataList.observe(
-            this,
-            Observer {
-                for (pName in it!!) {
-                    name = pName.product_name!!
-                }
-            })
-        targetAndActualSalesForProductReportViewModel.loadProductNameList(stockId = stockId)
-        return name
-    }
-
-    private fun getGroupNameFromDb(groupNo: Int): String {
-        var name = ""
-        targetAndActualSalesForProductReportViewModel.loadGroupCodeNameDataList.observe(this,
-            Observer {
-                for (gName in it!!) {
-                    name = gName.name!!
-                }
-            })
-        targetAndActualSalesForProductReportViewModel.loadGroupCodeNameList(groupNo)
-        return name
-    }
-
-    private fun getCategoryNameFromDb(categoryId: String): String {
-        var name = ""
-        targetAndActualSalesForProductReportViewModel.loadProductCategoryNameDataList.observe(this,
-            Observer {
-                for (cName in it!!) {
-                    name = cName.category_name!!
-                }
-            })
-        targetAndActualSalesForProductReportViewModel.loadProductCategoryNameList(categoryId)
-        return name
+        targetAndActualSalesForProductReportViewModel.loadNameListForSaleTargetProduct()
     }
 
 }
