@@ -1,13 +1,15 @@
 package com.aceplus.domain.vo;
 
 import android.app.Activity;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import com.aceplus.domain.entity.product.Product;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 
-public class SoldProductInfo implements Serializable {
+public class SoldProductInfo implements Parcelable {
 
     private static final long serialVersionUID = 1L;
 
@@ -58,6 +60,94 @@ public class SoldProductInfo implements Serializable {
     }
 
 
+    protected SoldProductInfo(Parcel in) {
+        product = in.readParcelable(Product.class.getClassLoader());
+        quantity = in.readInt();
+        discount = in.readDouble();
+        isForPackage = in.readByte() != 0;
+        extraDiscount = in.readDouble();
+        discountPercent = in.readDouble();
+        discountAmount = in.readDouble();
+        serialList = in.createStringArrayList();
+        discountWithCategoryItem = in.readDouble();
+        orderedQuantity = in.readInt();
+        size_in_store_share = in.readInt();
+        remark = in.readString();
+        tf = in.readByte() != 0;
+        promotionPrice = in.readDouble();
+        totalAmt = in.readDouble();
+        focStatus = in.readByte() != 0;
+        promotionPlanId = in.readString();
+        if (in.readByte() == 0) {
+            exclude = null;
+        } else {
+            exclude = in.readInt();
+        }
+        focQuantity = in.readInt();
+        focPercent = in.readDouble();
+        itemDiscountAmount = in.readDouble();
+        promoPriceByDiscount = in.readDouble();
+        focAmount = in.readDouble();
+        currentProductQty = in.readInt();
+        priceByClassDiscount = in.readInt();
+        cancelQty = in.readInt();
+        focIsChecked = in.readByte() != 0;
+        isFocTypePercent = in.readByte() != 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeParcelable(product, flags);
+        dest.writeInt(quantity);
+        dest.writeDouble(discount);
+        dest.writeByte((byte) (isForPackage ? 1 : 0));
+        dest.writeDouble(extraDiscount);
+        dest.writeDouble(discountPercent);
+        dest.writeDouble(discountAmount);
+        dest.writeStringList(serialList);
+        dest.writeDouble(discountWithCategoryItem);
+        dest.writeInt(orderedQuantity);
+        dest.writeInt(size_in_store_share);
+        dest.writeString(remark);
+        dest.writeByte((byte) (tf ? 1 : 0));
+        dest.writeDouble(promotionPrice);
+        dest.writeDouble(totalAmt);
+        dest.writeByte((byte) (focStatus ? 1 : 0));
+        dest.writeString(promotionPlanId);
+        if (exclude == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeInt(exclude);
+        }
+        dest.writeInt(focQuantity);
+        dest.writeDouble(focPercent);
+        dest.writeDouble(itemDiscountAmount);
+        dest.writeDouble(promoPriceByDiscount);
+        dest.writeDouble(focAmount);
+        dest.writeInt(currentProductQty);
+        dest.writeInt(priceByClassDiscount);
+        dest.writeInt(cancelQty);
+        dest.writeByte((byte) (focIsChecked ? 1 : 0));
+        dest.writeByte((byte) (isFocTypePercent ? 1 : 0));
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Creator<SoldProductInfo> CREATOR = new Creator<SoldProductInfo>() {
+        @Override
+        public SoldProductInfo createFromParcel(Parcel in) {
+            return new SoldProductInfo(in);
+        }
+
+        @Override
+        public SoldProductInfo[] newArray(int size) {
+            return new SoldProductInfo[size];
+        }
+    };
 
     public double getPromoPriceByDiscount() {
         return promoPriceByDiscount;

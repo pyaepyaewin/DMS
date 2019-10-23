@@ -366,8 +366,9 @@ class SaleViewModel(
                     promoPrice -= soldProductInfo.focAmount
                     soldProductInfo.itemDiscountAmount = soldProductInfo.focAmount
                 }
-                soldProductInfo.promoPriceByDiscount = promoPrice
             }
+
+            soldProductInfo.promoPriceByDiscount = promoPrice
 
             var totalAmount = promoPrice * soldProductInfo.quantity
 

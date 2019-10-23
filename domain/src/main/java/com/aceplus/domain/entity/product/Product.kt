@@ -3,12 +3,14 @@ package com.aceplus.domain.entity.product
 import android.arch.persistence.room.ColumnInfo
 import android.arch.persistence.room.Entity
 import android.arch.persistence.room.PrimaryKey
+import android.os.Parcel
+import android.os.Parcelable
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 import io.reactivex.annotations.NonNull
 
 @Entity(tableName = "product")
-class Product {
+class Product() : Parcelable {
 
     @PrimaryKey
     @ColumnInfo(name = "id")
@@ -105,4 +107,62 @@ class Product {
     @SerializedName("class_id")
     @Expose
     var class_id: String? = null
+
+    constructor(parcel: Parcel) : this() {
+        id = parcel.readInt()
+        product_id = parcel.readString()
+        product_name = parcel.readString()
+        category_id = parcel.readString()
+        group_id = parcel.readString()
+        total_quantity = parcel.readInt()
+        remaining_quantity = parcel.readInt()
+        selling_price = parcel.readString()
+        purchase_price = parcel.readString()
+        discount_type = parcel.readString()
+        um = parcel.readString()
+        sold_quantity = parcel.readInt()
+        order_quantity = parcel.readInt()
+        exchange_quantity = parcel.readInt()
+        return_quantity = parcel.readInt()
+        delivery_quantity = parcel.readInt()
+        present_quantity = parcel.readInt()
+        device_issue_status = parcel.readString()
+        class_id = parcel.readString()
+    }
+
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeInt(id)
+        parcel.writeString(product_id)
+        parcel.writeString(product_name)
+        parcel.writeString(category_id)
+        parcel.writeString(group_id)
+        parcel.writeInt(total_quantity)
+        parcel.writeInt(remaining_quantity)
+        parcel.writeString(selling_price)
+        parcel.writeString(purchase_price)
+        parcel.writeString(discount_type)
+        parcel.writeString(um)
+        parcel.writeInt(sold_quantity)
+        parcel.writeInt(order_quantity)
+        parcel.writeInt(exchange_quantity)
+        parcel.writeInt(return_quantity)
+        parcel.writeInt(delivery_quantity)
+        parcel.writeInt(present_quantity)
+        parcel.writeString(device_issue_status)
+        parcel.writeString(class_id)
+    }
+
+    override fun describeContents(): Int {
+        return 0
+    }
+
+    companion object CREATOR : Parcelable.Creator<Product> {
+        override fun createFromParcel(parcel: Parcel): Product {
+            return Product(parcel)
+        }
+
+        override fun newArray(size: Int): Array<Product?> {
+            return arrayOfNulls(size)
+        }
+    }
 }
