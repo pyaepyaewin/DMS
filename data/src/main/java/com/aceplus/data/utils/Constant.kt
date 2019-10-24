@@ -37,6 +37,8 @@ class Constant {
 
         var PRODUCT_COUNT = 0
 
+        var INVOICE_COUNT = "invoice_count"
+
         fun changeUrl(ip: String) {
             BASE_URL = ""
             BASE_URL = ip

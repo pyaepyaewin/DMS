@@ -9,6 +9,7 @@ import com.aceplus.domain.entity.classdiscount.ClassDiscountByPriceItem
 import com.aceplus.domain.entity.customer.Customer
 import com.aceplus.domain.entity.customer.CustomerFeedback
 import com.aceplus.domain.entity.customer.DidCustomerFeedback
+import com.aceplus.domain.entity.invoice.InvoiceProduct
 import com.aceplus.domain.entity.product.Product
 import com.aceplus.domain.entity.promotion.PromotionDate
 import com.aceplus.domain.entity.promotion.PromotionGift
@@ -104,6 +105,10 @@ class CustomerVisitRepoImpl(
 
     override fun getProductByID(productID: Int): Observable<List<Product>> {
         return Observable.just(db.productDao().getProductByID(productID))
+    }
+
+    override fun updateProductRemainingQty(soldProductInfo: SoldProductInfo) {
+        db.productDao().updateProductRemainingQty(soldProductInfo.quantity, soldProductInfo.product.id)
     }
 
     override fun saveDataForTempSaleManRoute(selectedCustomer: Customer, currentDate: String) {
@@ -231,6 +236,14 @@ class CustomerVisitRepoImpl(
 
     override fun getPromotionToBuyProduct(promotionPlanId: String, soldProductInfo: SoldProductInfo): Observable<List<PromotionGift>> {
         return Observable.just(db.promotionGiftDao().getPromotionToBuyProduct(promotionPlanId, soldProductInfo.product.sold_quantity, soldProductInfo.product.id.toString()))
+    }
+
+    override fun getInvoiceCountByID(invoiceId: String): Observable<Int> {
+        return Observable.just(db.invoiceDao().getInvoiceCountByID(invoiceId))
+    }
+
+    override fun insertInvoiceProduct(invoiceProduct: InvoiceProduct) {
+        db.invoiceProductDao().insert(invoiceProduct)
     }
 
 }

@@ -396,9 +396,7 @@ public class SoldProductInfo implements Parcelable {
 
 
 
-    public String getPromotionPlanId() {
-        return promotionPlanId;
-    }
+    public String getPromotionPlanId() { return promotionPlanId; }
 
     public void setPromotionPlanId(String promotionPlanId) { this.promotionPlanId = promotionPlanId; }
 

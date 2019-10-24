@@ -32,4 +32,7 @@ interface InvoiceDao {
     @Query("select invoice.invoice_id,customer_name,address,total_amount,total_discount_amount from invoice inner join customer on customer.id = invoice.customer_id")
     fun getSaleInvoiceReport(): List<SaleInvoiceReport>
 
+    @Query("select count(*) from invoice where invoice_id = :invoiceId")
+    fun getInvoiceCountByID(invoiceId: String): Int
+
 }

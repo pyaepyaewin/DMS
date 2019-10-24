@@ -6,6 +6,7 @@ import com.aceplus.domain.entity.classdiscount.ClassDiscountByPriceItem
 import com.aceplus.domain.entity.customer.Customer
 import com.aceplus.domain.entity.customer.CustomerFeedback
 import com.aceplus.domain.entity.customer.DidCustomerFeedback
+import com.aceplus.domain.entity.invoice.InvoiceProduct
 import com.aceplus.domain.entity.product.Product
 import com.aceplus.domain.entity.promotion.PromotionDate
 import com.aceplus.domain.entity.promotion.PromotionGift
@@ -28,6 +29,7 @@ interface CustomerVisitRepo {
 
     fun getAllProductData(): Observable<List<Product>>
     fun getProductByID(productID: Int): Observable<List<Product>>
+    fun updateProductRemainingQty(soldProductInfo: SoldProductInfo)
 
     fun saveDataForTempSaleManRoute(selectedCustomer: Customer, currentDate: String)
     fun saveCustomerFeedback(didCustomerFeedbackEntity: DidCustomerFeedback)
@@ -46,5 +48,9 @@ interface CustomerVisitRepo {
 
     fun getPromotionGiftByPlanID(promotionPlanId: String): Observable<List<PromotionGift>>
     fun getPromotionToBuyProduct(promotionPlanId: String, soldProductInfo: SoldProductInfo): Observable<List<PromotionGift>>
+
+    fun getInvoiceCountByID(invoiceId: String): Observable<Int>
+
+    fun insertInvoiceProduct(invoiceProduct: InvoiceProduct)
 
 }

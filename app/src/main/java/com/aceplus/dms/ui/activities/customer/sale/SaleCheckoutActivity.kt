@@ -13,6 +13,7 @@ import android.view.View
 import android.view.WindowManager
 import android.widget.CompoundButton
 import android.widget.Toast
+import com.aceplus.data.utils.Constant
 import com.aceplus.dms.R
 import com.aceplus.dms.ui.adapters.sale.CheckoutSoldProductListAdapter
 import com.aceplus.dms.utils.Utils
@@ -21,6 +22,7 @@ import com.aceplus.domain.entity.customer.Customer
 import com.aceplus.domain.entity.promotion.Promotion
 import com.aceplus.domain.model.forApi.invoice.InvoiceDetail
 import com.aceplus.domain.vo.SoldProductInfo
+import com.aceplussolutions.rms.constants.AppUtils
 import com.aceplussolutions.rms.ui.activities.BaseActivity
 import kotlinx.android.synthetic.main.activity_sale_checkout.*
 import kotlinx.android.synthetic.main.gridview_item.view.*
@@ -69,6 +71,7 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
     private var taxType: String = ""
     private var taxPercent: Double = 0.0
     private var invoiceId: String = ""
+    private var taxAmt: Double = 0.0
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -211,10 +214,23 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
         try {
             val check = intent.getStringExtra(IE_SALE_EXCHANGE)
             if (check != null && !check.equals("yes", true)){
-                // ToDo - get invoice id
+                val invoiceCount = AppUtils.getIntFromShp(Constant.INVOICE_COUNT, this) ?: 0
+
+                if (invoiceCount >= 0)
+                    AppUtils.saveIntToShp(Constant.INVOICE_COUNT, invoiceCount + 1, this)
+
+                try {
+                    val invoiceID = "xxxxxxx" // get invoice id from utils
+                    tvInvoiceId.text = invoiceID
+                    this.invoiceId = invoiceID
+                } catch (e: NullPointerException){
+                    e.printStackTrace()
+                    finish() // need to change back to login
+                }
             }
         } catch (e: NullPointerException){
             e.printStackTrace()
+            finish() // need to change back to login
         }
 
     }
@@ -226,6 +242,7 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
 
         tax_label_saleCheckout.text = "Tax (Include) : "
         tax_txtView.text = df.format(taxAmt)
+        this.taxAmt = taxAmt
     }
 
     private fun chooseDueDate(){
@@ -255,11 +272,11 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
             if (validationInput(paymentMethod == "B")){
 
                 if (refundAmount < 0){
-                    setInvoiceId() // Need to update
+                    setInvoiceId()
                     saveData("CR")
                     // saleOrExchange() ToDo
                 } else{
-                    setInvoiceId() // Need to update
+                    setInvoiceId()
                     saveData(paymentMethod)
                     // saleOrExchange() ToDo
                 }
@@ -317,16 +334,13 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
         val saleDate = Utils.getCurrentDate(true)
         val payAmt = if (payAmount.text.isNotBlank()) payAmount.text.toString().toDouble() else 0.0
         val receiptPerson = receiptPerson.text.toString()
-        var salePersonId = "" // Need to update from sharePref
+        var salePersonId = AppUtils.getStringFromShp(Constant.SALEMAN_ID, this) ?: ""
         val invoiceTime = Utils.getCurrentDate(true)
         val deviceId = Utils.getDeviceId(this)
 
         var dueDate: String? = null
         if (cashOrLoanOrBank == "CR") dueDate = saleDate
         if (edt_dueDate.text.isNotBlank()) dueDate = edt_dueDate.text.toString()
-
-        var totalQtyForInvoice = 0
-        val invoiceDetailList: ArrayList<InvoiceDetail> = ArrayList()
 
     }
 
