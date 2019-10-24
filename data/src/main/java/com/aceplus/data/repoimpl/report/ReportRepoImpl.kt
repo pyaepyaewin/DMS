@@ -22,7 +22,6 @@ import com.aceplus.domain.vo.report.*
 import io.reactivex.Observable
 
 class ReportRepoImpl(private val db: MyDatabase) : ReportRepo {
-
     //deliver report
     override fun deliverReport(): Observable<List<DeliverReport>> {
         return Observable.just(db.deliveryDao().getDeliverReport())
@@ -106,6 +105,19 @@ class ReportRepoImpl(private val db: MyDatabase) : ReportRepo {
         return Observable.just(db.saleTargetSaleManDao().allData)
     }
 
+    override fun saleTargetAmountForSaleMan(
+        groupId: Int,
+        categoryId: Int
+    ): Observable<List<SaleTargetVO>> {
+        return Observable.just(
+            db.saleTargetSaleManDao().actualSaleDataForSaleMan(
+                groupId,
+                categoryId
+            )
+        )
+    }
+
+
     override fun getAllInvoiceData(): Observable<List<Invoice>> {
         return Observable.just(db.invoiceDao().allData)
     }
@@ -120,13 +132,13 @@ class ReportRepoImpl(private val db: MyDatabase) : ReportRepo {
     }
 
     override fun saleTargetAmountForCustomer(
-        customerId: Int,
+        iCustomerId: String,
         groupId: Int,
         categoryId: Int
     ): Observable<List<SaleTargetVO>> {
         return Observable.just(
             db.saleTargetCustomerDao().actualSaleData(
-                customerId,
+                iCustomerId,
                 groupId,
                 categoryId
             )

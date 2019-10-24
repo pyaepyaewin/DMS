@@ -68,12 +68,14 @@ interface ReportRepo {
 
     //sale target sale man
     fun saleTargetSaleManReport(): Observable<List<SaleTargetSaleMan>>
+    fun saleTargetAmountForSaleMan(groupId:Int,categoryId:Int):Observable<List<SaleTargetVO>>
+
 
     fun getAllInvoiceData(): Observable<List<Invoice>>
 
     //sale target and actual sale for customer
     fun saleTargetCustomerReport(): Observable<List<SaleTargetCustomer>>
-    fun saleTargetAmountForCustomer(customerId:Int,groupId:Int,categoryId:Int):Observable<List<SaleTargetVO>>
+    fun saleTargetAmountForCustomer(iCustomerId:String,groupId:Int,categoryId:Int):Observable<List<SaleTargetVO>>
     fun saleTargetCustomerIdList(customerId:Int): Observable<List<SaleTargetCustomer>>
 
     //target and actual sale for product

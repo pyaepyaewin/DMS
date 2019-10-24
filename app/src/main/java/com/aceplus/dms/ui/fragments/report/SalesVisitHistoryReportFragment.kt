@@ -35,6 +35,7 @@ class SalesVisitHistoryReportFragment : BaseFragment(), KodeinAware {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        btn_sale_visit_search.setOnClickListener {  }
         salesVisitHistoryReportViewModel.salesVisitHistoryReportSuccessState.observe(
             this,
             Observer {

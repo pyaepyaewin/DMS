@@ -11,6 +11,7 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import com.aceplus.dms.R
 import com.aceplus.dms.viewmodel.report.ReportViewModel
+import com.aceplus.domain.entity.invoice.Invoice
 import com.aceplus.domain.entity.sale.saletarget.SaleTargetCustomer
 import com.aceplus.domain.vo.report.SaleTargetVO
 import com.aceplus.shared.ui.activities.BaseFragment
@@ -43,11 +44,6 @@ class TargetAndActualSalesForCustomerReportFragment : BaseFragment(), KodeinAwar
         var customerId = 0
         var groupId = 0
         var categoryId = 0
-        targetAndActualSalesForCustomerReportViewModel.saleTargetCustomerSuccessState.observe(
-            this,
-            Observer {
-                // pieChart(it!!.first, it!!.second)
-            })
         targetAndActualSalesForCustomerReportViewModel.customerDataList.observe(
             this, Observer { it ->
                 if (it != null) {
@@ -70,6 +66,7 @@ class TargetAndActualSalesForCustomerReportFragment : BaseFragment(), KodeinAwar
                             p3: Long
                         ) {
                             if (p2 == 0) {
+                                Log.d("Index", "$p2,$groupId,$categoryId")
                                 targetAndActualSalesForCustomerReportViewModel.saleTargetCustomerSuccessState.observe(
                                     this@TargetAndActualSalesForCustomerReportFragment,
                                     Observer {
@@ -77,23 +74,21 @@ class TargetAndActualSalesForCustomerReportFragment : BaseFragment(), KodeinAwar
                                     })
                             } else {
                                 customerId = p2
-                                Log.d("CuId", "$p2")
                                 targetAndActualSalesForCustomerReportViewModel.saleTargetAmountForCustomerList.observe(
                                     this@TargetAndActualSalesForCustomerReportFragment,
                                     Observer {
-                                        pieChart(it!!.first, it!!.second)
+                                        pieChart1(it!!.first, it!!.second)
                                     })
+
                             }
                         }
 
                         override fun onNothingSelected(p0: AdapterView<*>?) {
                             TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
                         }
-
-
                     }
             })
-
+        Log.d("CustomerId", "$customerId")
         targetAndActualSalesForCustomerReportViewModel.groupDataList.observe(this, Observer {
             if (it != null) {
                 groupNameList.add("All Group")
@@ -109,7 +104,6 @@ class TargetAndActualSalesForCustomerReportFragment : BaseFragment(), KodeinAwar
                 object : AdapterView.OnItemSelectedListener {
                     override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
                         groupId = p2
-                        Log.d("GaId", "$p2")
                     }
 
                     override fun onNothingSelected(p0: AdapterView<*>?) {
@@ -132,7 +126,6 @@ class TargetAndActualSalesForCustomerReportFragment : BaseFragment(), KodeinAwar
                 object : AdapterView.OnItemSelectedListener {
                     override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
                         categoryId = p2
-                        Log.d("CaId", "$p2")
                     }
 
                     override fun onNothingSelected(p0: AdapterView<*>?) {
@@ -147,23 +140,49 @@ class TargetAndActualSalesForCustomerReportFragment : BaseFragment(), KodeinAwar
         targetAndActualSalesForCustomerReportViewModel.loadCustomer()
         targetAndActualSalesForCustomerReportViewModel.loadProductGroup()
         targetAndActualSalesForCustomerReportViewModel.loadProductCategory()
+        targetAndActualSalesForCustomerReportViewModel.loadSaleTargetAndActualForCustomerReport()
         targetAndActualSalesForCustomerReportViewModel.loadSaleTargetAndActualAmountsForCustomerList(
-            customerId,
-            groupId,
-            categoryId
-        )
-        targetAndActualSalesForCustomerReportViewModel.loadSaleTargetAndActualForCustomerReport(
-            customerId,
+            customerId, customerId.toString(),
             groupId,
             categoryId
         )
     }
 
-    private fun pieChart(first: List<SaleTargetCustomer>, second: List<SaleTargetVO>) {
-        var value = mutableListOf<Float>()
+    private fun pieChart(first: List<SaleTargetCustomer>, second: List<Invoice>) {
         var targetAmount = 0.0
         var saleAmount = 0.0
-        val sumAmount: Double
+        var sumAmount: Double
+        val tAmount: Int
+        val sAmount: Int
+        Log.d("First List", "${first.size}")
+        Log.d("Second List", "${second.size}")
+        for (target in first) {
+            targetAmount += target.target_amount!!.toDouble()
+        }
+        sale_target_txt.text = targetAmount.toString()
+
+        for (sale in second) {
+            saleAmount += sale.total_amount!!.toDouble()
+        }
+        sale_txt.text = saleAmount.toString()
+        if (targetAmount == 0.0 && saleAmount == 0.0) {
+            tAmount = 50
+            sAmount = 50
+        } else {
+            sumAmount = targetAmount + saleAmount
+            Log.d("Target Amount", "$sumAmount")
+            tAmount = (targetAmount.toInt() * 100) / sumAmount.toInt()
+            Log.d("Multiply Amount", "$tAmount")
+            sAmount = (saleAmount.toInt() / sumAmount.toInt()) * 100
+        }
+        showChart(tAmount, sAmount, targetAmount, saleAmount)
+
+    }
+
+    private fun pieChart1(first: List<SaleTargetCustomer>, second: List<SaleTargetVO>) {
+        var targetAmount = 0.0
+        var saleAmount = 0.0
+        var sumAmount: Double
         val tAmount: Int
         val sAmount: Int
         Log.d("First List", "${first.size}")
@@ -187,6 +206,12 @@ class TargetAndActualSalesForCustomerReportFragment : BaseFragment(), KodeinAwar
             Log.d("Multiply Amount", "$tAmount")
             sAmount = (saleAmount.toInt() / sumAmount.toInt()) * 100
         }
+        showChart(tAmount, sAmount, targetAmount, saleAmount)
+
+    }
+
+    private fun showChart(tAmount: Int, sAmount: Int, targetAmount: Double, saleAmount: Double) {
+        var value = mutableListOf<Float>()
         //pie chart show
         pieChart?.setUsePercentValues(true)
         val legend: Legend? = pieChart?.legend
@@ -220,6 +245,5 @@ class TargetAndActualSalesForCustomerReportFragment : BaseFragment(), KodeinAwar
         chart.canScrollHorizontally(20)
         pieChart.animateXY(2000, 2000)
         pieChart.invalidate()
-
     }
 }
