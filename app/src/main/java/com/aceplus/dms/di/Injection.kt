@@ -19,6 +19,7 @@ import com.aceplus.data.utils.Constant
 import com.aceplus.dms.viewmodel.LoginViewModel
 import com.aceplus.dms.viewmodel.SyncViewModel
 import com.aceplus.dms.viewmodel.customer.CustomerViewModel
+import com.aceplus.dms.viewmodel.customer.sale.SaleCheckoutViewModel
 
 import com.aceplus.dms.viewmodel.customer.sale.SaleViewModel
 import com.aceplus.dms.viewmodel.customer.sale.SalesReturnViewModel
@@ -138,6 +139,7 @@ val vmModule = Kodein.Module {
     bind() from singleton { CustomerViewModel(instance(), instance()) }
 
     bind() from singleton { SaleViewModel(instance(), instance()) }
+    bind() from singleton { SaleCheckoutViewModel(instance(), instance()) }
     bind() from singleton { SalesReturnViewModel(instance(), instance()) }
     bind() from singleton { ReportViewModel(instance(), instance()) }
 

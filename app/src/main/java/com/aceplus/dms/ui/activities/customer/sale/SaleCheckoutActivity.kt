@@ -1,5 +1,6 @@
 package com.aceplus.dms.ui.activities.customer.sale
 
+import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.content.Context
 import android.content.Intent
@@ -11,14 +12,18 @@ import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import android.widget.CompoundButton
+import android.widget.Toast
 import com.aceplus.dms.R
 import com.aceplus.dms.ui.adapters.sale.CheckoutSoldProductListAdapter
 import com.aceplus.dms.utils.Utils
+import com.aceplus.dms.viewmodel.customer.sale.SaleCheckoutViewModel
 import com.aceplus.domain.entity.customer.Customer
 import com.aceplus.domain.entity.promotion.Promotion
+import com.aceplus.domain.model.forApi.invoice.InvoiceDetail
 import com.aceplus.domain.vo.SoldProductInfo
 import com.aceplussolutions.rms.ui.activities.BaseActivity
 import kotlinx.android.synthetic.main.activity_sale_checkout.*
+import kotlinx.android.synthetic.main.gridview_item.view.*
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.kodein
@@ -51,6 +56,7 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
 
     }
 
+    private val saleCheckoutViewModel: SaleCheckoutViewModel by viewModel()
     private val checkoutSoldProductListAdapter: CheckoutSoldProductListAdapter by lazy { CheckoutSoldProductListAdapter() }
 
     private val df = DecimalFormat(".##")
@@ -62,6 +68,7 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
     private var refundAmount: Double = 0.0
     private var taxType: String = ""
     private var taxPercent: Double = 0.0
+    private var invoiceId: String = ""
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -75,6 +82,8 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
 
         checkoutSoldProductListAdapter.setNewList(soldProductList)
         calculateTotalAmount()
+        calculateTax() // Just temporary
+        saleCheckoutViewModel.calculateFinalAmount() // Need to update
         setPromotionProductList()
 
     }
@@ -96,10 +105,13 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
     private fun catchEvents(){
 
         back_img.setOnClickListener { onBackPressed() }
-        confirmAndPrint_img.setOnClickListener {  }
         btn_disOk.setOnClickListener { calculateDiscPercentToAmt() }
         btn_amtOk.setOnClickListener { calculateDiscAmtToPercent() }
         edt_dueDate.setOnClickListener { chooseDueDate() }
+
+        confirmAndPrint_img.setOnClickListener {
+            Utils.askConfirmationDialog("Save", "Do you want to confirm?", "save", this, this::onClickSaveButton)
+        }
 
         payAmount.addTextChangedListener(object :TextWatcher{
             override fun afterTextChanged(p0: Editable?) {}
@@ -207,14 +219,13 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
 
     }
 
-    private fun getTaxAmount(){
-        // ToDo - get tax from database
-    }
-
-    private fun calculateTax(): Double{
+    private fun calculateTax(){
         var taxAmt = 0.0
-        if (taxPercent != 0.0) taxAmt = netAmount / 21
-        return taxAmt
+        //if (taxPercent != 0.0)
+            taxAmt = netAmount / 21
+
+        tax_label_saleCheckout.text = "Tax (Include) : "
+        tax_txtView.text = df.format(taxAmt)
     }
 
     private fun chooseDueDate(){
@@ -228,6 +239,94 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
         }, myCalendar.get(Calendar.YEAR), myCalendar.get(Calendar.MONTH), myCalendar.get(Calendar.DAY_OF_MONTH))
 
         dateDialog.show()
+
+    }
+
+    private fun onClickSaveButton(type: String){
+
+        if (type == "save"){
+
+            var paymentMethod = when(activity_sale_checkout_radio_group.checkedRadioButtonId){
+                R.id.activity_sale_checkout_radio_bank -> "B"
+                R.id.activity_sale_checkout_radio_cash -> "CA"
+                else -> ""
+            }
+
+            if (validationInput(paymentMethod == "B")){
+
+                if (refundAmount < 0){
+                    setInvoiceId() // Need to update
+                    saveData("CR")
+                    // saleOrExchange() ToDo
+                } else{
+                    setInvoiceId() // Need to update
+                    saveData(paymentMethod)
+                    // saleOrExchange() ToDo
+                }
+
+            }
+
+        }
+
+    }
+
+    private fun validationInput(withBankInfo: Boolean): Boolean{
+
+        var dateAndPayment = false
+        var name = false
+        var bank = false
+        var acc = false
+        receiptPerson.error = null
+        edit_txt_branch_name.error = null
+        edit_txt_account_name.error = null
+
+        if (edt_dueDate.text.isNotBlank() || payAmount.text.isNotBlank()){
+
+            dateAndPayment = true
+
+        } else if (payAmount.text.isBlank()){
+
+            AlertDialog.Builder(this)
+                .setTitle("Alert")
+                .setMessage("You must specify due date.")
+                .setPositiveButton("OK", null)
+                .show()
+
+        }
+
+        if (receiptPerson.text.isNotBlank()) name = true
+        else receiptPerson.error = "Please enter receipt person"
+
+        return if (withBankInfo){
+            if (edit_txt_branch_name.text.isNotBlank()) bank = true
+            else edit_txt_branch_name.error = "Please enter bank name"
+
+            if (edit_txt_account_name.text.isNotBlank()) acc = true
+            else edit_txt_account_name.error = "Please enter bank account"
+
+            dateAndPayment && name && bank && acc
+        } else{
+            dateAndPayment && name
+        }
+
+    }
+
+    private fun saveData(cashOrLoanOrBank: String){
+
+        val customerId = customer!!.id
+        val saleDate = Utils.getCurrentDate(true)
+        val payAmt = if (payAmount.text.isNotBlank()) payAmount.text.toString().toDouble() else 0.0
+        val receiptPerson = receiptPerson.text.toString()
+        var salePersonId = "" // Need to update from sharePref
+        val invoiceTime = Utils.getCurrentDate(true)
+        val deviceId = Utils.getDeviceId(this)
+
+        var dueDate: String? = null
+        if (cashOrLoanOrBank == "CR") dueDate = saleDate
+        if (edt_dueDate.text.isNotBlank()) dueDate = edt_dueDate.text.toString()
+
+        var totalQtyForInvoice = 0
+        val invoiceDetailList: ArrayList<InvoiceDetail> = ArrayList()
 
     }
 
