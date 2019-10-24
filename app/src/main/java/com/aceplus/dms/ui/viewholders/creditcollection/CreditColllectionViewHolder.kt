@@ -9,10 +9,10 @@ class CreditColllectionViewHolder(itemView: View,val onClick: (data: CreditColle
     override fun setData(data: CreditCollectionDataClass) {
         itemView.credit_customer_name.text=data.customer_name
         itemView.credit_totalamt.text= data.amount.toString()
-        var paidAmt:Double=data.pay_amount
-        itemView.credit_paidamt.text=paidAmt.toString()
+        //var paidAmt:Double=data.pay_amount
+        itemView.credit_paidamt.text=data.pay_amount.toString()
         var creditAmt:Double=data.amount
-        var unpaidAmt:Double=creditAmt-paidAmt
+        var unpaidAmt:Double=creditAmt-data.pay_amount!!
         itemView.credit_unpaidamt.text=unpaidAmt.toString()
         itemView.setOnClickListener {
             onClick(data)

@@ -7,6 +7,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
+import android.util.Log.i
 import android.widget.Toast
 import com.aceplus.dms.R
 import com.aceplus.dms.ui.activities.CreditCollectionCheckoutActivity
@@ -59,15 +60,12 @@ class CreditCollectionActivity : BaseActivity(), KodeinAware {
             onBackPressed()
             true
         }
-        var arraylist = CreditCollectionDataClass("Ko Ko", 10000.00, 5000.00, 5000.00)
 
         creditCollectionViewModel.creditCollectionSuccessState.observe(
             this,
             android.arch.lifecycle.Observer {
 
-                if (it!!.isEmpty()) {
-                    creditCollectionAdapter.addNewItem(arraylist)
-                } else
+
                     creditCollectionAdapter.setNewList(it as ArrayList<CreditCollectionDataClass>)
 
 
@@ -76,6 +74,7 @@ class CreditCollectionActivity : BaseActivity(), KodeinAware {
         creditCollectionViewModel.creditCollectionErrorState.observe(
             this,
             android.arch.lifecycle.Observer {
+                i("Error",it)
             })
         rvCreditCollection.apply {
             layoutManager = LinearLayoutManager(context)

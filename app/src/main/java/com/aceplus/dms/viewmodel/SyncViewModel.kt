@@ -24,7 +24,7 @@ class SyncViewModel(private val syncRepo: SyncRepo, private val schedulerProvide
         syncRepo.saveStartTime(startTime)
         val saleMan = syncRepo.getSaleManData()
         val routeScheduleID = syncRepo.getRouteScheduleIDV2()
-        val customerIdList = syncRepo.getCustomerIdList()
+        var customerIdList = syncRepo.getCustomerIdList()
 
         launch {
             val customerParam = ParamUtils.createParamData(
@@ -44,6 +44,7 @@ class SyncViewModel(private val syncRepo: SyncRepo, private val schedulerProvide
                         errorState.postValue(Pair(it.aceplusStatusMessage, "download"))
                     }
 
+                    customerIdList = syncRepo.getCustomerIdList()
                     val productParam = ParamUtils.createDownloadProductParamData(
                         saleMan.user_id,
                         saleMan.password!!,
@@ -207,7 +208,6 @@ class SyncViewModel(private val syncRepo: SyncRepo, private val schedulerProvide
                     } else {
                         errorState.postValue(Pair(it.aceplusStatusMessage, "download"))
                     }
-
                     val creditParam = ParamUtils.createParamDataWithCustomerIDList(
                         saleMan.user_id,
                         saleMan.password!!,

@@ -1,7 +1,6 @@
 package com.aceplus.data.repoimpl
 
 import android.content.SharedPreferences
-import android.util.Log
 import com.aceplus.data.database.MyDatabase
 import com.aceplus.data.remote.DownloadApiService
 import com.aceplus.data.remote.UploadApiService
@@ -139,9 +138,7 @@ class SyncRepoImpl(
     }
 
     override fun getCustomerIdList(): List<Int> {
-//        return db.customerDao().allID.filter { it.data.toInt() }
-        val list = mutableListOf<Int>()
-        return list
+        return db.customerDao().allID.map { it.data.toInt() }
     }
 
     override fun getCustomerList(): List<CustomerForApi> {

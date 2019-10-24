@@ -8,9 +8,9 @@ import com.kkk.githubpaging.network.rx.SchedulerProvider
 import io.reactivex.android.schedulers.AndroidSchedulers
 
 class CreditCollectionViewModel(
-    private val creditCollectionRepo:CreditCollectionRepo,
+    private val creditCollectionRepo: CreditCollectionRepo,
     private val schedulerProvider: SchedulerProvider
-) :BaseViewModel() {
+) : BaseViewModel() {
     var creditCollectionSuccessState = MutableLiveData<List<CreditCollectionDataClass>>()
     var creditCollectionErrorState = MutableLiveData<String>()
     fun loadCreditCollection() {
