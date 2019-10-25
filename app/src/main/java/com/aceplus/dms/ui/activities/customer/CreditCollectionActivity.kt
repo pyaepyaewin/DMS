@@ -38,8 +38,7 @@ class CreditCollectionActivity : BaseActivity(), KodeinAware {
             "You clicked at ${data.customer_name}",
             Toast.LENGTH_SHORT
         ).show()
-        val checkOutIntent = Intent(this, CreditCollectionCheckoutActivity::class.java)
-        startActivity(checkOutIntent)
+        startActivity(CreditCollectionCheckoutActivity.getIntent(this,data.id,data.customer_name))
     }
 
     private val creditCollectionViewModel: CreditCollectionViewModel by lazy {

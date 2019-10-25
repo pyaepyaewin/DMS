@@ -11,6 +11,7 @@ import com.aceplus.data.remote.UploadApiService
 import com.aceplus.data.repoimpl.CustomerVisitRepoImpl
 import com.aceplus.data.repoimpl.LoginRepoImpl
 import com.aceplus.data.repoimpl.SyncRepoImpl
+import com.aceplus.data.repoimpl.creditcollectionrepoimpl.CreditCollectionCheckoutRepoImpl
 import com.aceplus.data.repoimpl.creditcollectionrepoimpl.CreditCollectionRepoImpl
 import com.aceplus.data.repoimpl.report.ReportRepoImpl
 import com.aceplus.data.repoimpl.promotionrepoImpl.*
@@ -19,6 +20,7 @@ import com.aceplus.data.repoimpl.routrepoimpl.ViewByListRepoImpl
 import com.aceplus.data.utils.Constant
 import com.aceplus.dms.viewmodel.LoginViewModel
 import com.aceplus.dms.viewmodel.SyncViewModel
+import com.aceplus.dms.viewmodel.creditcollection.CreditCollectionCheckOutViewModel
 import com.aceplus.dms.viewmodel.creditcollection.CreditCollectionViewModel
 import com.aceplus.dms.viewmodel.customer.CustomerViewModel
 
@@ -31,6 +33,7 @@ import com.aceplus.dms.viewmodel.routeviewmodels.ViewByListViewModel
 import com.aceplus.domain.repo.CustomerVisitRepo
 import com.aceplus.domain.repo.LoginRepo
 import com.aceplus.domain.repo.SyncRepo
+import com.aceplus.domain.repo.creditcollectionrepo.CreditCollectionCheckOutRepo
 import com.aceplus.domain.repo.creditcollectionrepo.CreditCollectionRepo
 import com.aceplus.domain.repo.report.ReportRepo
 import com.aceplus.domain.repo.promotionrepo.*
@@ -111,6 +114,9 @@ val repoModule = Kodein.Module {
     bind<CreditCollectionRepo>() with singleton {
         CreditCollectionRepoImpl(instance())
     }
+    bind<CreditCollectionCheckOutRepo>() with singleton {
+        CreditCollectionCheckoutRepoImpl(instance())
+    }
 }
 
 //ViewModel Module
@@ -128,6 +134,9 @@ val vmModule = Kodein.Module {
     bind() from singleton { ViewByListViewModel(instance(), instance()) }
     bind() from singleton { CustomerLocationViewModel(instance(), instance()) }
     bind() from singleton { CreditCollectionViewModel(instance(), instance()) }
+    bind() from singleton { CreditCollectionCheckOutViewModel(instance(), instance()) }
+
+
 
 
 }

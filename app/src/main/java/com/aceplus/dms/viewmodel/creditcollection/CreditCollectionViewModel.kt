@@ -17,7 +17,6 @@ class CreditCollectionViewModel(
         launch {
             creditCollectionRepo.getCreditCollectionList()
                 .subscribeOn(schedulerProvider.io())
-                //.subscribeOn(schedulerProvider.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     creditCollectionSuccessState.postValue(it)

@@ -27,7 +27,7 @@ interface CreditDao {
 //    @Query("select Cus.customer_id,Cus.customer_name,sum(Cb.balance),sum(C.pay_amount),C.amount from customer as Cus,credit as C,customer_balance as Cb where Cus.id=Cb.customer_id and C.customer_id=Cb.customer_id GROUP BY Cus.customer_id")
 //    fun getCreditCollection():List<CreditCollectionDataClass>
 
-    @Query("select Cus.customer_id,Cus.customer_name,SUM(balance) as balance,SUM(pay_amount) as pay_amount,C.amount from customer as Cus,credit as C,customer_balance as Cb where Cus.id=Cb.customer_id and C.customer_id=Cb.customer_id GROUP BY Cus.customer_id")
+    @Query("select Cus.id,Cus.customer_name,SUM(balance) as balance,SUM(pay_amount) as pay_amount,SUM(C.amount) as amount from customer as Cus,credit as C,customer_balance as Cb where Cus.id=Cb.customer_id and C.customer_id=Cb.customer_id GROUP BY Cus.customer_id")
     fun getCreditCollection():List<CreditCollectionDataClass>
 
 }

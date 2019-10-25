@@ -25,7 +25,7 @@ interface CreditItemDao {
     @Query("Delete from credit_item")
     fun deleteAll()
 
-    @Query("select credit_item.invoice_id,credit.invoice_date,credit.amount from credit_item,credit where credit_item.invoice_id=credit.id and credit.customer_id=:customerId")
+    @Query("select credit.invoice_no,credit.invoice_date,credit.amount,credit.pay_amount from credit where credit.customer_id=:customerId")
     fun getCreditCheckout(customerId:String):List<CreditCollectionCheckoutDataClass>
 
 }
