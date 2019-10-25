@@ -46,72 +46,83 @@ class TargetAndActualSalesForSalesManReportFragment : BaseFragment(), KodeinAwar
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        spinner_customer.visibility = View.GONE
         var groupId = 0
         var categoryId = 0
-        targetAndActualSalesForSalesManReportViewModel.groupDataList.observe(this, Observer {
-            if (it != null) {
-                groupNameList.add("All Group")
-                for (group in it) {
-                    groupNameList.add(group.group_name.toString())
-                }
-            }
-            val groupNameSpinnerAdapter =
-                ArrayAdapter(context, android.R.layout.simple_spinner_item, groupNameList)
-            groupNameSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            spinner_group.adapter = groupNameSpinnerAdapter
-            spinner_group.onItemSelectedListener =
-                object : AdapterView.OnItemSelectedListener {
-                    override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-                        val groupId = p2
-                        Log.d("GroupId", "$groupId")
+        spinner_customer.visibility = View.GONE
+        targetAndActualSalesForSalesManReportViewModel.productGroupAndCategoryDataList.observe(
+            this,
+            Observer {
+                //select group list in spinner
+                if (it!!.first != null) {
+                    groupNameList.add("All Group")
+                    for (group in it!!.first) {
+                        groupNameList.add(group.group_name.toString())
                     }
+                }
+                val groupNameSpinnerAdapter =
+                    ArrayAdapter(context, android.R.layout.simple_spinner_item, groupNameList)
+                groupNameSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                spinner_group.adapter = groupNameSpinnerAdapter
+                spinner_group.onItemSelectedListener =
+                    object : AdapterView.OnItemSelectedListener {
+                        override fun onItemSelected(
+                            p0: AdapterView<*>?,
+                            p1: View?,
+                            p2: Int,
+                            p3: Long
+                        ) {
+                            groupId = p2
+                        }
 
-                    override fun onNothingSelected(p0: AdapterView<*>?) {
-                        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-                    }
-                }
-        })
-        targetAndActualSalesForSalesManReportViewModel.categoryDataList.observe(this, Observer {
-            if (it != null) {
-                categoryNameList.add("All Category")
-                for (category in it) {
-                    categoryNameList.add(category.category_name.toString())
-                }
-            }
-            val categoryNameSpinnerAdapter =
-                ArrayAdapter(context, android.R.layout.simple_spinner_item, categoryNameList)
-            categoryNameSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            spinner_category.adapter = categoryNameSpinnerAdapter
-            spinner_category.onItemSelectedListener =
-                object : AdapterView.OnItemSelectedListener {
-                    override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-                        if (p2 == 0) {
-                            targetAndActualSalesForSalesManReportViewModel.saleTargetAndSaleManReportSuccessState.observe(
-                                this@TargetAndActualSalesForSalesManReportFragment,
-                                Observer { pair ->
-                                    piChart(pair!!.first, pair!!.second)
-                                })
-                        } else {
-                            targetAndActualSalesForSalesManReportViewModel.saleTargetAndSaleManIdList.observe(
-                                this@TargetAndActualSalesForSalesManReportFragment,
-                                Observer { it1 ->
-                                    piChart1(it1!!.first, it1!!.second)
-                                })
+                        override fun onNothingSelected(p0: AdapterView<*>?) {
+                            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
                         }
                     }
-
-                    override fun onNothingSelected(p0: AdapterView<*>?) {
-                        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                //select category list in spinner
+                if (it!!.second != null) {
+                    categoryNameList.add("All Category")
+                    for (category in it!!.second) {
+                        categoryNameList.add(category.category_name.toString())
                     }
                 }
-        })
-        targetAndActualSalesForSalesManReportViewModel.loadProductGroup()
-        targetAndActualSalesForSalesManReportViewModel.loadProductCategory()
+                val categoryNameSpinnerAdapter =
+                    ArrayAdapter(context, android.R.layout.simple_spinner_item, categoryNameList)
+                categoryNameSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                spinner_category.adapter = categoryNameSpinnerAdapter
+                spinner_category.onItemSelectedListener =
+                    object : AdapterView.OnItemSelectedListener {
+                        override fun onItemSelected(
+                            p0: AdapterView<*>?,
+                            p1: View?,
+                            p2: Int,
+                            p3: Long
+                        ) {
+                            if (categoryId == 0 && groupId == 0) {
+                                targetAndActualSalesForSalesManReportViewModel.saleTargetAndSaleManReportSuccessState.observe(
+                                    this@TargetAndActualSalesForSalesManReportFragment,
+                                    Observer { pair ->
+                                        piChart(pair!!.first, pair!!.second)
+                                    })
+                            } else {
+                                categoryId = p2
+                                targetAndActualSalesForSalesManReportViewModel.saleTargetAndSaleManIdList.observe(
+                                    this@TargetAndActualSalesForSalesManReportFragment,
+                                    Observer { it1 ->
+                                        piChart1(it1!!.first, it1!!.second)
+                                    })
+                            }
+                        }
+
+                        override fun onNothingSelected(p0: AdapterView<*>?) {
+                            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                        }
+                    }
+            })
+        targetAndActualSalesForSalesManReportViewModel.loadProductGroupAndProductCategoryList()
         targetAndActualSalesForSalesManReportViewModel.loadSaleTargetAndSaleManReport()
         targetAndActualSalesForSalesManReportViewModel.loadSaleTargetAndSaleIdList(
             groupId,
-            1
+            categoryId
         )
     }
 

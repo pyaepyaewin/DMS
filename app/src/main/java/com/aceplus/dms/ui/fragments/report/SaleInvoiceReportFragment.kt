@@ -57,7 +57,6 @@ class SaleInvoiceReportFragment : BaseFragment(), KodeinAware {
         edit_text_sale_report_to_date.setOnClickListener {
             chooseDob(2)
         }
-        btn_sale_report_search.setOnClickListener { }
         btn_sale_report_clear.setOnClickListener {
             edit_text_sale_report_from_date.setText("")
             edit_text_sale_report_from_date.error = null
@@ -100,6 +99,9 @@ class SaleInvoiceReportFragment : BaseFragment(), KodeinAware {
                     }
 
                 }
+            btn_sale_report_search.setOnClickListener {
+            }
+
             //Calculate and setText for total,discount and net amounts
             calculateAmount(it!!.first)
         })

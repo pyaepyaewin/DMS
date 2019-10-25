@@ -28,9 +28,6 @@ import org.kodein.di.android.support.kodein
 
 class TargetAndActualSalesForCustomerReportFragment : BaseFragment(), KodeinAware {
     override val kodein: Kodein by kodein()
-    var customerNameList = mutableListOf<String>()
-    var groupNameList = mutableListOf<String>()
-    var categoryNameList = mutableListOf<String>()
     private val targetAndActualSalesForCustomerReportViewModel: ReportViewModel by viewModel()
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -41,18 +38,21 @@ class TargetAndActualSalesForCustomerReportFragment : BaseFragment(), KodeinAwar
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        val customerNameList = mutableListOf<String>()
+        val groupNameList = mutableListOf<String>()
+        val categoryNameList = mutableListOf<String>()
         var customerId = 0
         var groupId = 0
         var categoryId = 0
-        targetAndActualSalesForCustomerReportViewModel.customerDataList.observe(
-            this, Observer { it ->
-                if (it != null) {
-                    customerNameList.add("All Customer")
-                    for (customer in it) {
-                        customerNameList.add(customer.customer_name.toString())
-                    }
+        targetAndActualSalesForCustomerReportViewModel.customerAndProductGroupAndProductCategoryList.observe(
+            this, Observer {
+                //select customer list in spinner
+                Log.d("Size", "${it!!.first.size}")
+                customerNameList.add("All Customer")
+                for (customer in it.first) {
+                    customerNameList.add(customer.customer_name.toString())
                 }
-                //Bind customer name in fragment spinner
+                //add customer name in spinner
                 val customerNameSpinnerAdapter =
                     ArrayAdapter(context, android.R.layout.simple_spinner_item, customerNameList)
                 customerNameSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
@@ -65,19 +65,19 @@ class TargetAndActualSalesForCustomerReportFragment : BaseFragment(), KodeinAwar
                             p2: Int,
                             p3: Long
                         ) {
-                            if (p2 == 0) {
-                                Log.d("Index", "$p2,$groupId,$categoryId")
+                            customerId = p2
+                            Log.d("CuIndex", "$customerId")
+                            if (customerId == 0) {
                                 targetAndActualSalesForCustomerReportViewModel.saleTargetCustomerSuccessState.observe(
                                     this@TargetAndActualSalesForCustomerReportFragment,
                                     Observer {
-                                        pieChart(it!!.first, it!!.second)
+                                        pieChart(it!!.first, it.second)
                                     })
                             } else {
-                                customerId = p2
                                 targetAndActualSalesForCustomerReportViewModel.saleTargetAmountForCustomerList.observe(
                                     this@TargetAndActualSalesForCustomerReportFragment,
                                     Observer {
-                                        pieChart1(it!!.first, it!!.second)
+                                        pieChart1(it!!.first, it.second)
                                     })
 
                             }
@@ -87,60 +87,63 @@ class TargetAndActualSalesForCustomerReportFragment : BaseFragment(), KodeinAwar
                             TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
                         }
                     }
-            })
-        Log.d("CustomerId", "$customerId")
-        targetAndActualSalesForCustomerReportViewModel.groupDataList.observe(this, Observer {
-            if (it != null) {
+                //select group list in spinner
                 groupNameList.add("All Group")
-                for (group in it) {
+                for (group in it.second) {
                     groupNameList.add(group.group_name.toString())
                 }
-            }
-            val groupNameSpinnerAdapter =
-                ArrayAdapter(context, android.R.layout.simple_spinner_item, groupNameList)
-            groupNameSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            spinner_group.adapter = groupNameSpinnerAdapter
-            spinner_group.onItemSelectedListener =
-                object : AdapterView.OnItemSelectedListener {
-                    override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-                        groupId = p2
-                    }
+                val groupNameSpinnerAdapter =
+                    ArrayAdapter(context!!, android.R.layout.simple_spinner_item, groupNameList)
+                groupNameSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                spinner_group.adapter = groupNameSpinnerAdapter
+                spinner_group.onItemSelectedListener =
+                    object : AdapterView.OnItemSelectedListener {
+                        override fun onItemSelected(
+                            p0: AdapterView<*>?,
+                            p1: View?,
+                            p2: Int,
+                            p3: Long
+                        ) {
+                            groupId = p2
+                            Log.d("GIndex", "$groupId")
+                        }
 
-                    override fun onNothingSelected(p0: AdapterView<*>?) {
-                        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                        override fun onNothingSelected(p0: AdapterView<*>?) {
+                            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                        }
                     }
-                }
-        })
-        targetAndActualSalesForCustomerReportViewModel.categoryDataList.observe(this, Observer {
-            if (it != null) {
+                //select category list in spinner
                 categoryNameList.add("All Category")
-                for (category in it) {
+                for (category in it.third) {
                     categoryNameList.add(category.category_name.toString())
                 }
-            }
-            val categoryNameSpinnerAdapter =
-                ArrayAdapter(context, android.R.layout.simple_spinner_item, categoryNameList)
-            categoryNameSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            spinner_category.adapter = categoryNameSpinnerAdapter
-            spinner_category.onItemSelectedListener =
-                object : AdapterView.OnItemSelectedListener {
-                    override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-                        categoryId = p2
+                val categoryNameSpinnerAdapter =
+                    ArrayAdapter(context, android.R.layout.simple_spinner_item, categoryNameList)
+                categoryNameSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                spinner_category.adapter = categoryNameSpinnerAdapter
+                spinner_category.onItemSelectedListener =
+                    object : AdapterView.OnItemSelectedListener {
+                        override fun onItemSelected(
+                            p0: AdapterView<*>?,
+                            p1: View?,
+                            p2: Int,
+                            p3: Long
+                        ) {
+                            categoryId = p2
+                            Log.d("CaIndex", "$categoryId")
+                        }
+
+                        override fun onNothingSelected(p0: AdapterView<*>?) {
+                            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                        }
+
+
                     }
 
-                    override fun onNothingSelected(p0: AdapterView<*>?) {
-                        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-                    }
-
-
-                }
-
-
-        })
-        targetAndActualSalesForCustomerReportViewModel.loadCustomer()
-        targetAndActualSalesForCustomerReportViewModel.loadProductGroup()
-        targetAndActualSalesForCustomerReportViewModel.loadProductCategory()
+                Log.d("Index", "$customerId,$groupId,$categoryId")
+            })
         targetAndActualSalesForCustomerReportViewModel.loadSaleTargetAndActualForCustomerReport()
+        targetAndActualSalesForCustomerReportViewModel.loadCustomerAndProductGroupAndProductCategoryList()
         targetAndActualSalesForCustomerReportViewModel.loadSaleTargetAndActualAmountsForCustomerList(
             customerId, customerId.toString(),
             groupId,
@@ -151,7 +154,7 @@ class TargetAndActualSalesForCustomerReportFragment : BaseFragment(), KodeinAwar
     private fun pieChart(first: List<SaleTargetCustomer>, second: List<Invoice>) {
         var targetAmount = 0.0
         var saleAmount = 0.0
-        var sumAmount: Double
+        val sumAmount: Double
         val tAmount: Int
         val sAmount: Int
         Log.d("First List", "${first.size}")
@@ -182,7 +185,7 @@ class TargetAndActualSalesForCustomerReportFragment : BaseFragment(), KodeinAwar
     private fun pieChart1(first: List<SaleTargetCustomer>, second: List<SaleTargetVO>) {
         var targetAmount = 0.0
         var saleAmount = 0.0
-        var sumAmount: Double
+        val sumAmount: Double
         val tAmount: Int
         val sAmount: Int
         Log.d("First List", "${first.size}")
