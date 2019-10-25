@@ -1,5 +1,6 @@
 package com.aceplus.dms.viewmodel.customer.sale
 
+import android.arch.lifecycle.MutableLiveData
 import android.util.Log
 import android.widget.Toast
 import com.aceplus.dms.utils.Utils
@@ -12,12 +13,28 @@ import com.aceplus.domain.vo.SoldProductInfo
 import com.aceplus.shared.viewmodel.BaseViewModel
 import com.kkk.githubpaging.network.rx.SchedulerProvider
 
-class SaleCheckoutViewModel(
-    private val customerVisitRepo: CustomerVisitRepo,
-    private val schedulerProvider: SchedulerProvider
-): BaseViewModel() {
+class SaleCheckoutViewModel(private val customerVisitRepo: CustomerVisitRepo, private val schedulerProvider: SchedulerProvider): BaseViewModel() {
 
-    private val invoice = Invoice()
+    var locationData = MutableLiveData<Pair<Int, String>>()
+
+    fun getLocation(){
+
+        launch {
+            customerVisitRepo.getAllLocation()
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.mainThread())
+                .subscribe{
+                    var locationCode = 0
+                    var locationCodeName = ""
+                    for (location in it){
+                        locationCode = location.location_id.toInt()
+                        locationCodeName = location.location_name.toString()
+                    }
+                    locationData.postValue(Pair(locationCode, locationCodeName))
+                }
+        }
+
+    }
 
     fun calculateFinalAmount(){
 
@@ -29,7 +46,7 @@ class SaleCheckoutViewModel(
     }
 
     fun saveCheckoutData(
-        customerId: String,
+        customerId: Int,
         saleDate: String,
         invoiceId: String,
         payAmount: Double,
@@ -50,6 +67,7 @@ class SaleCheckoutViewModel(
 
         var totalQtyForInvoice = 0
         val invoiceDetailList: ArrayList<InvoiceDetail> = ArrayList()
+        val invoice = Invoice()
 
         launch {
             customerVisitRepo.getInvoiceCountByID(invoiceId)
@@ -61,6 +79,7 @@ class SaleCheckoutViewModel(
 
                         val index: ArrayList<Int> = ArrayList()
                         val tempSoldProduct: ArrayList<SoldProductInfo> = ArrayList()
+                        val invoiceProductList: ArrayList<InvoiceProduct> = ArrayList()
 
                         for (soldProduct in soldProductList){
 
@@ -92,17 +111,19 @@ class SaleCheckoutViewModel(
                             invoiceProduct.discount_percent = soldProduct.discountPercent
                             invoiceProduct.s_price = soldProduct.product.selling_price!!.toDouble()
                             invoiceProduct.p_price = soldProduct.product.purchase_price!!.toDouble()
-                            invoiceProduct.promotion_plan_id = soldProduct.promotionPlanId.toInt()
                             invoiceProduct.promotion_price = soldProduct.promoPriceByDiscount
                             invoiceProduct.item_discount_percent = soldProduct.focPercent
                             invoiceProduct.item_discount_amount = soldProduct.focAmount
-                            invoiceProduct.exclude = soldProduct.exclude.toString()
+                            invoiceProduct.exclude = "${soldProduct.exclude}"
+
+                            if (!soldProduct.promotionPlanId.isNullOrEmpty())
+                                invoiceProduct.promotion_plan_id = soldProduct.promotionPlanId.toInt()
 
                             totalQtyForInvoice += soldProduct.quantity
 
                             if (soldProduct.totalAmt != 0.0){
-                                customerVisitRepo.insertInvoiceProduct(invoiceProduct)
-                                customerVisitRepo.updateProductRemainingQty(soldProduct)
+                                invoiceProductList.add(invoiceProduct)
+                                customerVisitRepo.updateProductRemainingQty(soldProduct) // Need to repair !!!
                             }
 
                             if (soldProduct.focQuantity > 0 && soldProduct.totalAmt == 0.0){
@@ -111,34 +132,60 @@ class SaleCheckoutViewModel(
 
                         }
 
+                        customerVisitRepo.insertAllInvoiceProduct(invoiceProductList)
+
                         for (promotion in promotionList){
                             // ToDo - update qty
+                            // ToDo - insert invoice present
                         }
 
                         /*totalDiscountAmount = volDisAmount
                         totalVolumeDiscountPercent = volDisPercent*/
                         invoice.invoice_id = invoiceId
-                        invoice.customer_id = customerId
+                        invoice.customer_id = customerId.toString()
                         invoice.sale_date = saleDate
                         invoice.total_amount = totalAmount.toString()
-                        invoice.total_quantity = totalQtyForInvoice.toDouble() // Check int or double
+                        invoice.total_discount_amount = 0.0 // Need to check
                         invoice.pay_amount = payAmount.toString()
                         invoice.refund_amount = refundAmount.toString()
                         invoice.receipt_person_name = receiptPerson
                         invoice.sale_person_id = salePersonId
+                        invoice.due_date = dueDate
+                        invoice.cash_or_credit = cashOrLoanOrBank
                         invoice.location_code = "" // Need to add
                         invoice.device_id = deviceId
                         invoice.invoice_time = invoiceTime
-                        invoice.customer_id = "1"
+                        invoice.package_invoice_number = 0 // Need to add
+                        invoice.package_status = 0 // Need to check
+                        invoice.volume_amount = 0.0 // Need to check
+                        invoice.package_grade = "" // Need to check
+                        invoice.invoice_product_id = 0 // Need to check
+                        invoice.total_quantity = totalQtyForInvoice.toDouble() // Check int or double
                         invoice.invoice_status = cashOrLoanOrBank
-                        //invoice.setDiscountPercent(totalVolumeDiscountPercent)
+                        invoice.total_discount_percent = "0.0"  // Need to check
                         invoice.rate = "1"
                         invoice.tax_amount = taxAmt
-                        invoice.due_date = dueDate
+                        invoice.bank_name = bank
+                        invoice.bank_account_no = acc
+                        invoice.sale_flag = 0 // Need to check
 
-                        if (bank.isNotBlank()) invoice.bank_name = bank
-                        if (acc.isNotBlank()) invoice.bank_account_no = acc
+                        customerVisitRepo.insertNewInvoice(invoice)
 
+                        // ToDo - for sale return
+
+                        customerVisitRepo.getAllInvoice()
+                            .subscribeOn(schedulerProvider.io())
+                            .observeOn(schedulerProvider.mainThread())
+                            .subscribe{ invoiceList ->
+                                Log.d("Testing", "Invoice count = ${invoiceList.size}")
+                            }
+
+                        customerVisitRepo.getAllInvoiceProduct()
+                            .subscribeOn(schedulerProvider.io())
+                            .observeOn(schedulerProvider.mainThread())
+                            .subscribe{ invoiceProductList ->
+                                Log.d("Testing", "Invoice product count = ${invoiceProductList.size}")
+                            }
 
                     } else Log.d("Testing", "Found same invoice id")
 

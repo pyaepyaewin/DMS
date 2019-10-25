@@ -11,8 +11,6 @@ import android.text.TextWatcher
 import android.util.Log
 import android.view.View
 import android.view.WindowManager
-import android.widget.CompoundButton
-import android.widget.Toast
 import com.aceplus.data.utils.Constant
 import com.aceplus.dms.R
 import com.aceplus.dms.ui.adapters.sale.CheckoutSoldProductListAdapter
@@ -20,12 +18,10 @@ import com.aceplus.dms.utils.Utils
 import com.aceplus.dms.viewmodel.customer.sale.SaleCheckoutViewModel
 import com.aceplus.domain.entity.customer.Customer
 import com.aceplus.domain.entity.promotion.Promotion
-import com.aceplus.domain.model.forApi.invoice.InvoiceDetail
 import com.aceplus.domain.vo.SoldProductInfo
 import com.aceplussolutions.rms.constants.AppUtils
 import com.aceplussolutions.rms.ui.activities.BaseActivity
 import kotlinx.android.synthetic.main.activity_sale_checkout.*
-import kotlinx.android.synthetic.main.gridview_item.view.*
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.kodein
@@ -53,6 +49,7 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
             intent.putExtra(IE_CUSTOMER_DATA, customerData)
             intent.putExtra(IE_SOLD_PRODUCT_LIST, soldProductList)
             intent.putExtra(IE_PROMOTION_LIST, promotionList)
+            intent.putExtra(IE_SALE_EXCHANGE, "no")
             return intent
         }
 
@@ -72,6 +69,9 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
     private var taxPercent: Double = 0.0
     private var invoiceId: String = ""
     private var taxAmt: Double = 0.0
+    private var isSaleExchange: String? = null
+    private var locationData: Pair<Int, String> = Pair(0, "")
+    private var salePersonId: String? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -83,6 +83,7 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
         setupUI()
         catchEvents()
 
+        saleCheckoutViewModel.getLocation()
         checkoutSoldProductListAdapter.setNewList(soldProductList)
         calculateTotalAmount()
         calculateTax() // Just temporary
@@ -129,6 +130,10 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
             bank_account_layout.visibility = if (isChecked) View.VISIBLE else View.GONE
         }
 
+        saleCheckoutViewModel.locationData.observe(this, android.arch.lifecycle.Observer {
+            if (it != null) locationData = it
+        })
+
     }
 
     private fun getIntentData(){
@@ -136,6 +141,7 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
         customer = intent.getParcelableExtra(IE_CUSTOMER_DATA)
         soldProductList = intent.getParcelableArrayListExtra(IE_SOLD_PRODUCT_LIST)
         promotionList = intent.getParcelableArrayListExtra(IE_PROMOTION_LIST)
+        isSaleExchange = intent.getStringExtra(IE_SALE_EXCHANGE)
 
     }
 
@@ -211,16 +217,19 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
 
     private fun setInvoiceId(){
 
+        salePersonId = AppUtils.getStringFromShp(Constant.SALEMAN_ID, this) ?: ""
+
         try {
-            val check = intent.getStringExtra(IE_SALE_EXCHANGE)
-            if (check != null && !check.equals("yes", true)){
+            if (isSaleExchange != null && !isSaleExchange.equals("yes", true)){
                 val invoiceCount = AppUtils.getIntFromShp(Constant.INVOICE_COUNT, this) ?: 0
 
                 if (invoiceCount >= 0)
                     AppUtils.saveIntToShp(Constant.INVOICE_COUNT, invoiceCount + 1, this)
 
                 try {
-                    val invoiceID = "xxxxxxx" // get invoice id from utils
+                    //val format = SimpleDateFormat("mmMMddyyss")
+                    //val invoiceID = format.format(Calendar.getInstance().time) // get invoice id from utils
+                    val invoiceID = Utils.getInvoiceNo(salePersonId!!, locationData.first.toString(), Constant.FOR_SALE, "1")
                     tvInvoiceId.text = invoiceID
                     this.invoiceId = invoiceID
                 } catch (e: NullPointerException){
@@ -277,7 +286,7 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
                     // saleOrExchange() ToDo
                 } else{
                     setInvoiceId()
-                    saveData(paymentMethod)
+                    saveData("CA")
                     // saleOrExchange() ToDo
                 }
 
@@ -334,13 +343,32 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
         val saleDate = Utils.getCurrentDate(true)
         val payAmt = if (payAmount.text.isNotBlank()) payAmount.text.toString().toDouble() else 0.0
         val receiptPerson = receiptPerson.text.toString()
-        var salePersonId = AppUtils.getStringFromShp(Constant.SALEMAN_ID, this) ?: ""
         val invoiceTime = Utils.getCurrentDate(true)
         val deviceId = Utils.getDeviceId(this)
 
-        var dueDate: String? = null
+        var dueDate = ""
         if (cashOrLoanOrBank == "CR") dueDate = saleDate
         if (edt_dueDate.text.isNotBlank()) dueDate = edt_dueDate.text.toString()
+
+        saleCheckoutViewModel.saveCheckoutData(
+            customerId,
+            saleDate,
+            invoiceId,
+            payAmt,
+            refundAmount,
+            receiptPerson,
+            salePersonId!!,
+            invoiceTime,
+            dueDate,
+            deviceId,
+            cashOrLoanOrBank,
+            soldProductList,
+            promotionList,
+            totalAmount,
+            taxAmt,
+            edit_txt_branch_name.text.toString(),
+            edit_txt_account_name.text.toString()
+        )
 
     }
 

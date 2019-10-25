@@ -1,11 +1,13 @@
 package com.aceplus.domain.repo
 
+import com.aceplus.domain.entity.Location
 import com.aceplus.domain.vo.SoldProductInfo
 import com.aceplus.domain.entity.classdiscount.ClassDiscountByPrice
 import com.aceplus.domain.entity.classdiscount.ClassDiscountByPriceItem
 import com.aceplus.domain.entity.customer.Customer
 import com.aceplus.domain.entity.customer.CustomerFeedback
 import com.aceplus.domain.entity.customer.DidCustomerFeedback
+import com.aceplus.domain.entity.invoice.Invoice
 import com.aceplus.domain.entity.invoice.InvoiceProduct
 import com.aceplus.domain.entity.product.Product
 import com.aceplus.domain.entity.promotion.PromotionDate
@@ -50,7 +52,13 @@ interface CustomerVisitRepo {
     fun getPromotionToBuyProduct(promotionPlanId: String, soldProductInfo: SoldProductInfo): Observable<List<PromotionGift>>
 
     fun getInvoiceCountByID(invoiceId: String): Observable<Int>
+    fun insertNewInvoice(invoice: Invoice)
+    fun getAllInvoice(): Observable<List<Invoice>>
 
     fun insertInvoiceProduct(invoiceProduct: InvoiceProduct)
+    fun getAllInvoiceProduct(): Observable<List<InvoiceProduct>>
+    fun insertAllInvoiceProduct(invoiceProductList: ArrayList<InvoiceProduct>)
+
+    fun getAllLocation(): Observable<List<Location>>
 
 }

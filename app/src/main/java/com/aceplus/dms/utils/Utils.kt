@@ -686,9 +686,11 @@ object Utils {
 
         invoiceNo += locationCode
         invoiceNo += saleManId
-        invoiceNo += SimpleDateFormat("yyMMdd").format(Date())
+        invoiceNo += SimpleDateFormat("yyMMddHHmmss").format(Date())
 
-        return invoiceNo + String.format("%0" + (idLength - invoiceNo.length) + "d", nextCount) //To Check ERROR
+//        return invoiceNo + String.format("%0" + (idLength - invoiceNo.length) + "d", nextCount) //To Check ERROR
+
+        return invoiceNo //To Check ERROR
     }
 
 //    fun getInvoiceNoForPOSM(context: Context, saleManId:String, locationCode:String):String {

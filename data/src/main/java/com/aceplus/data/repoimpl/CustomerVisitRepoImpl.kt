@@ -3,12 +3,14 @@ package com.aceplus.data.repoimpl
 import android.content.SharedPreferences
 import com.aceplus.data.database.MyDatabase
 import com.aceplus.data.utils.Constant
+import com.aceplus.domain.entity.Location
 import com.aceplus.domain.vo.SoldProductInfo
 import com.aceplus.domain.entity.classdiscount.ClassDiscountByPrice
 import com.aceplus.domain.entity.classdiscount.ClassDiscountByPriceItem
 import com.aceplus.domain.entity.customer.Customer
 import com.aceplus.domain.entity.customer.CustomerFeedback
 import com.aceplus.domain.entity.customer.DidCustomerFeedback
+import com.aceplus.domain.entity.invoice.Invoice
 import com.aceplus.domain.entity.invoice.InvoiceProduct
 import com.aceplus.domain.entity.product.Product
 import com.aceplus.domain.entity.promotion.PromotionDate
@@ -242,8 +244,28 @@ class CustomerVisitRepoImpl(
         return Observable.just(db.invoiceDao().getInvoiceCountByID(invoiceId))
     }
 
+    override fun insertNewInvoice(invoice: Invoice) {
+        db.invoiceDao().insert(invoice)
+    }
+
+    override fun getAllInvoice(): Observable<List<Invoice>> {
+        return Observable.just(db.invoiceDao().allData)
+    }
+
     override fun insertInvoiceProduct(invoiceProduct: InvoiceProduct) {
         db.invoiceProductDao().insert(invoiceProduct)
+    }
+
+    override fun getAllInvoiceProduct(): Observable<List<InvoiceProduct>> {
+        return Observable.just(db.invoiceProductDao().allData)
+    }
+
+    override fun insertAllInvoiceProduct(invoiceProductList: ArrayList<InvoiceProduct>) {
+        db.invoiceProductDao().insertAll(invoiceProductList)
+    }
+
+    override fun getAllLocation(): Observable<List<Location>> {
+        return Observable.just(db.locationDao().allData)
     }
 
 }

@@ -24,6 +24,9 @@ interface InvoiceDao {
     val dataCountForSaleExchange: Int
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insert(invoice: Invoice)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(list: List<Invoice>)
 
     @Query("Delete from invoice")
