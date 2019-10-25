@@ -33,9 +33,6 @@ interface ProductDao {
     @Query("Delete from product")
     fun deleteAll()
 
-    @Query("select * FROM product WHERE product.id = :stockId")
-    fun selectProductName(stockId:Int):List<Product>
-
     @Query("select product_name,total_quantity,order_quantity,sold_quantity,exchange_quantity,return_quantity,delivery_quantity,present_quantity,remaining_quantity from product")
     fun getProductBalanceReport(): List<ProductBalanceReport>
 

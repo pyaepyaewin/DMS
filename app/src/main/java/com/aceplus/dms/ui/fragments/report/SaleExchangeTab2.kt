@@ -41,6 +41,7 @@ class SaleExchangeTab2 : BaseFragment(), KodeinAware {
         var view: View = inflater.inflate(R.layout.fragment_sale_invoice_report, container, false)
         return view
     }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         table_row_advance_amt.visibility = View.GONE
         tb_2.visibility = View.GONE
@@ -54,7 +55,7 @@ class SaleExchangeTab2 : BaseFragment(), KodeinAware {
         btn_sale_report_search.visibility = View.GONE
         btn_sale_report_clear.visibility = View.GONE
         saleInvoiceReportViewModel.saleInvoiceReportSuccessState.observe(this, Observer {
-            saleInvoiceReportAdapter.setNewList(it as ArrayList<SaleInvoiceReport>)
+            saleInvoiceReportAdapter.setNewList(it!!.first as ArrayList<SaleInvoiceReport>)
         })
 
         saleInvoiceReportViewModel.reportErrorState.observe(this, Observer {

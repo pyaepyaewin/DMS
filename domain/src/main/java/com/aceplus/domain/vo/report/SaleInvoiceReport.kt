@@ -16,5 +16,7 @@ class SaleInvoiceReport(
     var totalAmount:String,
 
     @ColumnInfo(name = "total_discount_amount")
-    var totalDiscountAmount:Double
+    var totalDiscountAmount:Double,
+    @ColumnInfo(name = "sale_date")
+    var saleDate: String? = null
 )

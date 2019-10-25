@@ -14,6 +14,9 @@ interface SaleVisitRecordUploadDao {
     @get:Query("select * from sale_visit_record_upload")
     val allData: List<SaleVisitRecordUpload>
 
+    @get:Query("select * from sale_visit_record_upload where  visit_flag=1")
+    val saleVisitUploadList: List<SaleVisitRecordUpload>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(list: List<SaleVisitRecordUpload>)
 
