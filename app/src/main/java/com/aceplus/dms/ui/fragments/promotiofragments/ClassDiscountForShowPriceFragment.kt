@@ -13,7 +13,7 @@ import com.aceplus.dms.R
 import com.aceplus.dms.ui.activities.MainActivity
 import com.aceplus.dms.ui.adapters.promotionadapters.ClassDiscountForShowPriceAdapter
 import com.aceplus.dms.viewmodel.factory.KodeinViewModelFactory
-import com.aceplus.dms.viewmodel.promotionviewmodels.ClassDiscountForShowPriceViewModel
+import com.aceplus.dms.viewmodel.promotionviewmodels.PromotionViewModel
 import com.aceplus.domain.model.promotionDataClass.ClassDiscountForShowPriceDataClass
 import kotlinx.android.synthetic.main.tab_fragment_category_discount_quantity.*
 import org.kodein.di.Kodein
@@ -26,9 +26,9 @@ class ClassDiscountForShowPriceFragment:Fragment(),KodeinAware {
         ClassDiscountForShowPriceAdapter()
     }
 
-    private val classDiscountForShowPriceViewModel: ClassDiscountForShowPriceViewModel by lazy {
+    private val classDiscountForShowPriceViewModel: PromotionViewModel by lazy {
         ViewModelProviders.of(this, KodeinViewModelFactory((kodein)))
-            .get(ClassDiscountForShowPriceViewModel::class.java)
+            .get(PromotionViewModel::class.java)
     }
     override fun onCreateView(
         inflater: LayoutInflater,

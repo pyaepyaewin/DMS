@@ -11,14 +11,18 @@ import com.aceplus.data.remote.UploadApiService
 import com.aceplus.data.repoimpl.CustomerVisitRepoImpl
 import com.aceplus.data.repoimpl.LoginRepoImpl
 import com.aceplus.data.repoimpl.SyncRepoImpl
+import com.aceplus.data.repoimpl.creditcollectionrepoimpl.CreditCollectionCheckoutRepoImpl
+import com.aceplus.data.repoimpl.creditcollectionrepoimpl.CreditCollectionRepoImpl
+import com.aceplus.data.repoimpl.report.ReportRepoImpl
 import com.aceplus.data.repoimpl.promotionrepoImpl.*
 import com.aceplus.data.repoimpl.prospectcustomet.ProspectCustomerRepoImpl
-import com.aceplus.data.repoimpl.report.ReportRepoImpl
 import com.aceplus.data.repoimpl.routrepoimpl.CustomerLocationRepoImpl
 import com.aceplus.data.repoimpl.routrepoimpl.ViewByListRepoImpl
 import com.aceplus.data.utils.Constant
 import com.aceplus.dms.viewmodel.LoginViewModel
 import com.aceplus.dms.viewmodel.SyncViewModel
+import com.aceplus.dms.viewmodel.creditcollection.CreditCollectionCheckOutViewModel
+import com.aceplus.dms.viewmodel.creditcollection.CreditCollectionViewModel
 import com.aceplus.dms.viewmodel.customer.CustomerViewModel
 import com.aceplus.dms.viewmodel.customer.sale.SaleCheckoutViewModel
 import com.aceplus.dms.viewmodel.customer.prospectcustomer.ProspectCustomerViewModel
@@ -31,9 +35,11 @@ import com.aceplus.dms.viewmodel.routeviewmodels.ViewByListViewModel
 import com.aceplus.domain.repo.CustomerVisitRepo
 import com.aceplus.domain.repo.LoginRepo
 import com.aceplus.domain.repo.SyncRepo
+import com.aceplus.domain.repo.creditcollectionrepo.CreditCollectionCheckOutRepo
+import com.aceplus.domain.repo.creditcollectionrepo.CreditCollectionRepo
+import com.aceplus.domain.repo.report.ReportRepo
 import com.aceplus.domain.repo.promotionrepo.*
 import com.aceplus.domain.repo.prospectcustomer.ProspectCustomerRepo
-import com.aceplus.domain.repo.report.ReportRepo
 import com.aceplus.domain.repo.routerepo.CustomerLocationRepo
 import com.aceplus.domain.repo.routerepo.ViewByListRepo
 import com.aceplussolutions.rms.constants.SharedConstants
@@ -98,42 +104,22 @@ val repoModule = Kodein.Module {
         ReportRepoImpl(instance())
     }
 
-    bind<ProspectCustomerRepo>() with  singleton {
-        ProspectCustomerRepoImpl(instance())
+
+    bind<PromotionRepo>() with singleton {
+        PromotionRepoImpl(instance())
     }
 
-    bind<PromotionPriceRepo>() with singleton {
-        PromotionPriceRepoImpl(instance())
-    }
-    bind<PromotionGiftRepo>() with singleton {
-        PromotionGiftRepoImpl(instance())
-    }
-    bind<VolumeDiscountRepo>() with singleton {
-        VolumeDiscountRepoImpl(instance())
-    }
-    bind<VolumeDiscountFilterRepo>() with singleton {
-        VolumeDiscountFilterRepoImpl(instance())
-    }
-    bind<CategoryDiscountRepo>() with singleton {
-        CategoryDiscountRepoImpl(instance())
-    }
-    bind<ClassDiscountByPriceRepo>() with singleton {
-        ClassDiscountByPriceRepoImpl(instance())
-    }
-    bind<ClassDiscountByGiftRepo>() with singleton {
-        ClassDiscountByGiftRepoImpl(instance())
-    }
-    bind<ClassDiscountForShowPriceRepo>() with singleton {
-        ClassDiscountForShowPriceRepoImpl(instance())
-    }
-    bind<ClassDiscountForShowGiftRepo>() with singleton {
-        ClassDiscountForShowGiftRepoImpl(instance())
-    }
     bind<ViewByListRepo>() with singleton {
         ViewByListRepoImpl(instance())
     }
     bind<CustomerLocationRepo>() with singleton {
         CustomerLocationRepoImpl(instance())
+    }
+    bind<CreditCollectionRepo>() with singleton {
+        CreditCollectionRepoImpl(instance())
+    }
+    bind<CreditCollectionCheckOutRepo>() with singleton {
+        CreditCollectionCheckoutRepoImpl(instance())
     }
 }
 
@@ -150,17 +136,13 @@ val vmModule = Kodein.Module {
     bind() from singleton { ReportViewModel(instance(), instance()) }
     bind() from  singleton { ProspectCustomerViewModel(instance(),instance()) }
 
-    bind() from singleton { PromotionPriceViewModel(instance(),instance()) }
-    bind() from singleton { PromotionGiftViewModel(instance(),instance()) }
-    bind() from singleton { VolumeDiscountViewModel(instance(),instance()) }
-    bind() from singleton { VolumeDiscountFilterViewModel(instance(),instance()) }
-    bind() from singleton { CategoryDiscountViewModel(instance(),instance()) }
-    bind() from singleton { ClassDiscountByPriceViewModel(instance(),instance()) }
-    bind() from singleton { ClassDiscountByGiftViewModel(instance(),instance()) }
-    bind() from singleton { ClassDiscountForShowPriceViewModel(instance(),instance()) }
-    bind() from singleton { ClassDiscountForShowGiftViewModel(instance(),instance()) }
-    bind() from singleton { ViewByListViewModel(instance(),instance()) }
-    bind() from singleton { CustomerLocationViewModel(instance(),instance()) }
+    bind() from singleton { PromotionViewModel(instance(), instance()) }
+
+    bind() from singleton { ViewByListViewModel(instance(), instance()) }
+    bind() from singleton { CustomerLocationViewModel(instance(), instance()) }
+    bind() from singleton { CreditCollectionViewModel(instance(), instance()) }
+    bind() from singleton { CreditCollectionCheckOutViewModel(instance(), instance()) }
+
 
 }
 

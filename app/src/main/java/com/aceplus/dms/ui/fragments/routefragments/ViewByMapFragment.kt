@@ -36,8 +36,10 @@ import java.util.zip.Inflater
 class ViewByMapFragment : Fragment(), KodeinAware {
 
     var latlngList: MutableList<CustomerLocationDataClass>? = null
+//    private lateinit var mMap: GoogleMap
 
-    private lateinit var mMap: GoogleMap
+    var mMap: GoogleMap? = null
+
     override val kodein: Kodein by kodein()
     final val MY_PERMISSIONS_REQUEST_LOCATION = 99
     private val customerLocationViewModel: CustomerLocationViewModel by lazy {
@@ -49,12 +51,42 @@ class ViewByMapFragment : Fragment(), KodeinAware {
         super.onViewCreated(view, savedInstanceState)
     }
 
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         val fragmentView = inflater.inflate(R.layout.fragment_e_route_map, container, false)
+        val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
+        mapFragment.getMapAsync(object : OnMapReadyCallback {
+
+            override fun onMapReady(p0: GoogleMap?) {
+                mMap = p0!!
+
+                if (mMap != null) {
+                    mMap!!.isTrafficEnabled = true
+                    mMap!!.uiSettings.isMyLocationButtonEnabled = true
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        if (ContextCompat.checkSelfPermission(
+                                context!!,
+                                Manifest.permission.ACCESS_FINE_LOCATION
+                            ) == PackageManager.PERMISSION_GRANTED
+                        ) {
+                            mMap!!.setMyLocationEnabled(true)
+                        } else {
+                            CheckLocationPermission()
+                        }
+                    } else {
+                        mMap!!.setMyLocationEnabled(true)
+                    }
+
+                }
+
+            }
+
+        })
+
         customerLocationViewModel.customerLocationSuccessState.observe(this, Observer {
             latlngList = it as MutableList<CustomerLocationDataClass>
             CustomerLocation()
@@ -63,44 +95,39 @@ class ViewByMapFragment : Fragment(), KodeinAware {
             Toast.makeText(context, it, Toast.LENGTH_LONG).show()
         })
         customerLocationViewModel.loadCustomerLocation()
-        val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
-        mapFragment.getMapAsync(object : OnMapReadyCallback {
-            override fun onMapReady(p0: GoogleMap?) {
-                mMap = p0!!
-                mMap.setTrafficEnabled(true)
-                mMap.getUiSettings().isMyLocationButtonEnabled = true
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    if (ContextCompat.checkSelfPermission(
-                            context!!,
-                            Manifest.permission.ACCESS_FINE_LOCATION
-                        ) == PackageManager.PERMISSION_GRANTED
-                    ) {
-                        mMap.setMyLocationEnabled(true)
-                    } else {
-                        CheckLocationPermission()
-                    }
-                } else {
-                    mMap.setMyLocationEnabled(true)
-                }
-            }
-
-        })
 
         return fragmentView
+
+
     }
 
     private fun CustomerLocation() {
-
         for (i in latlngList!!) {
+
             var latlng = LatLng(i.latitude, i.longitude)
             val latlng1 = LatLng(0.0, 0.0)
             if (!latlng.equals(latlng1)) {
                 var markerOptions = MarkerOptions().position(latlng)
-                mMap.addMarker(markerOptions)
-                mMap.moveCamera(CameraUpdateFactory.newLatLng(latlng))
+
+                if (mMap != null) {
+                    mMap!!.addMarker(markerOptions)
+                    mMap!!.moveCamera(CameraUpdateFactory.newLatLng(latlng))
+                    mMap!!.animateCamera(
+                        CameraUpdateFactory.newLatLngZoom(
+                            LatLng(
+                                latlng.latitude,
+                                latlng.longitude
+                            ), 12.0f
+                        )
+                    )
+
+                }
+}
+
+
             }
         }
-    }
+
 
     private fun CheckLocationPermission() {
         if (ContextCompat.checkSelfPermission(
@@ -140,18 +167,39 @@ class ViewByMapFragment : Fragment(), KodeinAware {
 
     }
 
-//    override fun onRequestPermissionsResult(
-//        requestCode: Int,
-//        permissions: Array<out String>,
-//        grantResults: IntArray
-//    ) {
-//        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-//        when(requestCode)
-//        {
-//
-//        }
-            //}
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        when (requestCode) {
+            MY_PERMISSIONS_REQUEST_LOCATION -> {
+                if (grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    if (ContextCompat.checkSelfPermission(
+                            context!!,
+                            Manifest.permission.ACCESS_FINE_LOCATION
+                        ) == PackageManager.PERMISSION_GRANTED
+                    ) {
+
+                        mMap!!.isMyLocationEnabled = true
+                        CustomerLocation()
+                    }
+
+                } else {
+                    Toast.makeText(context, "permission denied", Toast.LENGTH_LONG).show()
+                }
+                return
+            }
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Toast.makeText(context, "Destroyed", Toast.LENGTH_SHORT).show()
+    }
 }
+
 
 
 
