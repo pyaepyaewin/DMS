@@ -145,6 +145,10 @@ class CustomerVisitRepoImpl(
         }
     }
 
+    override fun updateSaleVisitRecord(customerId: Int, visitFlag: String, saleFlag: String) {
+        db.saleVisitRecordUploadDao().updateSaleVisitRecord(customerId, visitFlag, saleFlag)
+    }
+
     override fun updateDepartureTimeForSaleManRoute(saleManId: String, customerId: String, currentDate: String) {
         db.tempForSaleManRouteDao().updateDepartureTime(saleManId, customerId, currentDate)
     }

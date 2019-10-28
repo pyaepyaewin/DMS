@@ -2,8 +2,8 @@ package com.aceplus.dms.viewmodel.customer.sale
 
 import android.arch.lifecycle.MutableLiveData
 import android.util.Log
-import android.widget.Toast
 import com.aceplus.dms.utils.Utils
+import com.aceplus.domain.entity.customer.Customer
 import com.aceplus.domain.entity.invoice.Invoice
 import com.aceplus.domain.entity.invoice.InvoiceProduct
 import com.aceplus.domain.entity.promotion.Promotion
@@ -15,25 +15,15 @@ import com.kkk.githubpaging.network.rx.SchedulerProvider
 
 class SaleCheckoutViewModel(private val customerVisitRepo: CustomerVisitRepo, private val schedulerProvider: SchedulerProvider): BaseViewModel() {
 
-    var locationData = MutableLiveData<Pair<Int, String>>()
+    var invoice = MutableLiveData<Invoice>()
 
-    fun getLocation(){
+    fun getSaleManID(): String{
+        val saleManData = customerVisitRepo.getSaleManData()
+        return saleManData.id
+    }
 
-        launch {
-            customerVisitRepo.getAllLocation()
-                .subscribeOn(schedulerProvider.io())
-                .observeOn(schedulerProvider.mainThread())
-                .subscribe{
-                    var locationCode = 0
-                    var locationCodeName = ""
-                    for (location in it){
-                        locationCode = location.location_id.toInt()
-                        locationCodeName = location.location_name.toString()
-                    }
-                    locationData.postValue(Pair(locationCode, locationCodeName))
-                }
-        }
-
+    fun getRouteID(): Int{
+        return customerVisitRepo.getRouteScheduleIDV2()
     }
 
     fun calculateFinalAmount(){
@@ -77,8 +67,6 @@ class SaleCheckoutViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
 
                     if (it == 0){
 
-                        val index: ArrayList<Int> = ArrayList()
-                        val tempSoldProduct: ArrayList<SoldProductInfo> = ArrayList()
                         val invoiceProductList: ArrayList<InvoiceProduct> = ArrayList()
 
                         for (soldProduct in soldProductList){
@@ -102,6 +90,7 @@ class SaleCheckoutViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
 
                             invoiceDetailList.add(invoiceDetail)
 
+
                             val invoiceProduct = InvoiceProduct()
                             invoiceProduct.invoice_product_id = invoiceId
                             invoiceProduct.product_id = soldProduct.product.id.toString()
@@ -123,7 +112,7 @@ class SaleCheckoutViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
 
                             if (soldProduct.totalAmt != 0.0){
                                 invoiceProductList.add(invoiceProduct)
-                                customerVisitRepo.updateProductRemainingQty(soldProduct) // Need to repair !!!
+                                customerVisitRepo.updateProductRemainingQty(soldProduct) // Need to remind !!!
                             }
 
                             if (soldProduct.focQuantity > 0 && soldProduct.totalAmt == 0.0){
@@ -170,6 +159,7 @@ class SaleCheckoutViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
                         invoice.sale_flag = 0 // Need to check
 
                         customerVisitRepo.insertNewInvoice(invoice)
+                        this.invoice.postValue(invoice)
 
                         // ToDo - for sale return
 
@@ -192,6 +182,18 @@ class SaleCheckoutViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
                 }
         }
 
+    }
+
+    fun updateDepartureTimeForSaleManRoute(saleManId: String, customerId: String){
+        customerVisitRepo.updateDepartureTimeForSaleManRoute(
+            saleManId,
+            customerId,
+            Utils.getCurrentDate(true)
+        )
+    }
+
+    fun updateSaleVisitRecord(customerId: Int){
+        customerVisitRepo.updateSaleVisitRecord(customerId, "1", "1")
     }
 
 }

@@ -567,7 +567,8 @@
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
             android:background="#898989"
-            android:padding="10dp">
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp">
 
             <TextView
                 android:layout_width="0dp"
@@ -576,7 +577,8 @@
                 android:gravity="center_horizontal|left"
                 android:text="@string/product"
                 android:textColor="#FFFFFF"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:paddingLeft="10dp"/>
 
             <TextView
                 android:layout_width="0dp"
@@ -733,7 +735,7 @@
             android:layout_below="@id/headerLayout"
             android:orientation="vertical">-->
 
-        <ListView
+        <android.support.v7.widget.RecyclerView
             android:id="@+id/print_soldProductList"
             android:layout_width="match_parent"
             android:layout_height="200dp"
@@ -743,7 +745,7 @@
             android:padding="10dp" />
 
         <ScrollView
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="150dp"
             android:layout_above="@+id/netAmountLayout"
             android:layout_below="@+id/print_soldProductList">
@@ -752,10 +754,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="150dp">
 
-                <ListView
-                    android:id="@+id/promotion_plan_item_listview"
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/promotion_plan_item_listView"
                     android:layout_width="match_parent"
-                    android:layout_height="150dp" />
+                    android:layout_height="150dp"
+                    android:layout_margin="10dp"/>
 
             </LinearLayout>
         </ScrollView>
