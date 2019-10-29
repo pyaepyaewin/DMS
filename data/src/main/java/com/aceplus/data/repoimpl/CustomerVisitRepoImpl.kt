@@ -3,6 +3,7 @@ package com.aceplus.data.repoimpl
 import android.content.SharedPreferences
 import com.aceplus.data.database.MyDatabase
 import com.aceplus.data.utils.Constant
+import com.aceplus.domain.entity.CompanyInformation
 import com.aceplus.domain.entity.Location
 import com.aceplus.domain.vo.SoldProductInfo
 import com.aceplus.domain.entity.classdiscount.ClassDiscountByPrice
@@ -41,6 +42,10 @@ class CustomerVisitRepoImpl(
         saleMan.user_id = AppUtils.getStringFromShp(Constant.SALEMAN_NO, shf).toString()
         saleMan.password = AppUtils.getStringFromShp(Constant.SALEMAN_PWD, shf)
         return saleMan
+    }
+
+    override fun getSaleManName(saleManId: String): Observable<List<String?>>{
+        return Observable.just(db.saleManDao().getSaleManNameByID(saleManId))
     }
 
     override fun getRouteScheduleIDV2(): Int {
@@ -270,6 +275,10 @@ class CustomerVisitRepoImpl(
 
     override fun getAllLocation(): Observable<List<Location>> {
         return Observable.just(db.locationDao().allData)
+    }
+
+    override fun getCompanyInfo(): Observable<List<CompanyInformation>> {
+        return Observable.just(db.companyInformationDao().allData)
     }
 
 }

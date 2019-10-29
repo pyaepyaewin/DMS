@@ -1,5 +1,6 @@
 package com.aceplus.domain.repo
 
+import com.aceplus.domain.entity.CompanyInformation
 import com.aceplus.domain.entity.Location
 import com.aceplus.domain.vo.SoldProductInfo
 import com.aceplus.domain.entity.classdiscount.ClassDiscountByPrice
@@ -21,6 +22,7 @@ interface CustomerVisitRepo {
 
     fun getLocationCode(): Int
     fun getSaleManData(): SaleMan
+    fun getSaleManName(saleManId: String): Observable<List<String?>>
     fun getRouteScheduleIDV2(): Int
     fun getLastCountForInvoiceNumber(mode: String): Int
 
@@ -61,5 +63,7 @@ interface CustomerVisitRepo {
     fun insertAllInvoiceProduct(invoiceProductList: ArrayList<InvoiceProduct>)
 
     fun getAllLocation(): Observable<List<Location>>
+
+    fun getCompanyInfo(): Observable<List<CompanyInformation>>
 
 }

@@ -740,9 +740,9 @@
             android:layout_width="match_parent"
             android:layout_height="200dp"
             android:layout_below="@id/headerLayout"
-            android:layout_margin="10dp"
             android:descendantFocusability="blocksDescendants"
-            android:padding="10dp" />
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"/>
 
         <ScrollView
             android:layout_width="match_parent"
