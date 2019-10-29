@@ -60,6 +60,9 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
 
     private var mBluetoothAdapter: BluetoothAdapter? = null
 
+    private val IR_REQUEST_CONNECT_DEVICE = 1
+    private val IR_REQUEST_ENABLE_BT = 2
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -86,6 +89,8 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
         printInvoiceViewModel.salePersonName.observe(this, Observer {
             saleMan.text = it
         })
+
+        print_img.setOnClickListener { onConnecting() }
 
     }
 
@@ -144,6 +149,12 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
         } else if (printMode == "SR"){
 
         }
+
+    }
+
+    private fun onConnecting(){
+
+        startActivityForResult(DeviceListActivity.getIntentFromPrintInvoice(this), IR_REQUEST_CONNECT_DEVICE)
 
     }
 
