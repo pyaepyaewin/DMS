@@ -23,10 +23,13 @@ interface CustomerVisitRepo {
     fun getLocationCode(): Int
     fun getSaleManData(): SaleMan
     fun getSaleManName(saleManId: String): Observable<List<String?>>
+    fun getRouteID(saleManId: String): Observable<List<Int>>
     fun getRouteScheduleIDV2(): Int
     fun getLastCountForInvoiceNumber(mode: String): Int
 
     fun getAllCustomerData(): Observable<List<Customer>>
+    fun getCustomerByID(customerID: Int): Observable<Customer>
+    fun getCustomerTownshipName(customerID: Int): Observable<String>
     fun updateCustomerData(customer: Customer)
     fun getAllDidFeedback(): Observable<List<String>>
     fun getAllDefaultFeedback(): Observable<List<CustomerFeedback>>

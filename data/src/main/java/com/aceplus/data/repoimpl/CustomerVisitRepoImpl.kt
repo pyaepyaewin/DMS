@@ -48,6 +48,10 @@ class CustomerVisitRepoImpl(
         return Observable.just(db.saleManDao().getSaleManNameByID(saleManId))
     }
 
+    override fun getRouteID(saleManId: String): Observable<List<Int>> {
+        return Observable.just(db.routeScheduleV2Dao().getRouteId(saleManId))
+    }
+
     override fun getRouteScheduleIDV2(): Int {
         val saleManId = AppUtils.getStringFromShp(Constant.SALEMAN_ID, shf)
         val routeSchedule = db.routeScheduleV2Dao().dataBySaleManId(saleManId!!)
@@ -91,6 +95,14 @@ class CustomerVisitRepoImpl(
 
     override fun getAllCustomerData(): Observable<List<Customer>> {
         return Observable.just(db.customerDao().allCustomerData())
+    }
+
+    override fun getCustomerByID(customerID: Int): Observable<Customer> {
+        return Observable.just(db.customerDao().dataById(customerID))
+    }
+
+    override fun getCustomerTownshipName(customerID: Int): Observable<String> {
+        return Observable.just(db.townshipDao().townshipNameByID(customerID))
     }
 
     override fun updateCustomerData(customer: Customer) {

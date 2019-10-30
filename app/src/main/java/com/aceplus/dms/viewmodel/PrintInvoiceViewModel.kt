@@ -2,6 +2,7 @@ package com.aceplus.dms.viewmodel
 
 import android.arch.lifecycle.MutableLiveData
 import android.util.Log
+import com.aceplus.domain.entity.customer.Customer
 import com.aceplus.domain.repo.CustomerVisitRepo
 import com.aceplus.shared.viewmodel.BaseViewModel
 import com.kkk.githubpaging.network.rx.SchedulerProvider
@@ -10,6 +11,7 @@ class PrintInvoiceViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
 
     var taxInfo = MutableLiveData<Triple<String, Int, Int>>()
     var salePersonName = MutableLiveData<String>()
+    var relatedDataForPrint = MutableLiveData<Triple<Customer, Int, String>>()
 
     fun getSalePersonName(salePersonID: String){
         launch {
@@ -43,6 +45,36 @@ class PrintInvoiceViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
                     taxInfo.postValue(Triple(taxType, taxPercent, branchCode))
                 }
         }
+    }
+
+    fun getRelatedDataAndPrint(customerID: String, saleManID: String){
+
+        var customer: Customer? = null
+        var routeID = 0
+        var customerTownShipName: String? = null
+
+        launch {
+            customerVisitRepo.getCustomerByID(customerID.toInt())
+                .flatMap {
+                    customer = it
+                    return@flatMap customerVisitRepo.getRouteID(saleManID)
+                }
+                .flatMap {
+                    for (i in it){
+                        routeID = i
+                    }
+                    return@flatMap customerVisitRepo.getCustomerTownshipName(customerID.toInt())
+                }
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.mainThread())
+                .subscribe{
+                    customerTownShipName = it
+                }
+        }
+
+        if (customer != null && customerTownShipName != null)
+            relatedDataForPrint.postValue(Triple(customer!!, routeID, customerTownShipName!!))
+
     }
 
 }

@@ -20,6 +20,9 @@ interface RouteScheduleV2Dao {
     @Query("select * from route_schedule_v2 where sale_man_id = :saleManId")
     fun dataBySaleManId(saleManId: String): RouteScheduleV2
 
+    @Query("select id from route_schedule_v2 where sale_man_id = :saleManId")
+    fun getRouteId(saleManId: String): List<Int>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(list: List<RouteScheduleV2>)
 
