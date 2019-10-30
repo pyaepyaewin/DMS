@@ -18,6 +18,7 @@ import com.aceplus.dms.ui.adapters.sale.CheckoutSoldProductListAdapter
 import com.aceplus.dms.utils.Utils
 import com.aceplus.dms.viewmodel.customer.sale.SaleCheckoutViewModel
 import com.aceplus.domain.entity.customer.Customer
+import com.aceplus.domain.entity.invoice.Invoice
 import com.aceplus.domain.entity.promotion.Promotion
 import com.aceplus.domain.vo.SoldProductInfo
 import com.aceplussolutions.rms.constants.AppUtils
@@ -73,6 +74,7 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
     private var isSaleExchange: String? = null
     private var locationCode: Int = 0
     private var salePersonId: String? = null
+    private var invoice: Invoice? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -137,6 +139,14 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
             bank_branch_layout.visibility = if (isChecked) View.VISIBLE else View.GONE
             bank_account_layout.visibility = if (isChecked) View.VISIBLE else View.GONE
         }
+
+        saleCheckoutViewModel.invoice.observe(this, android.arch.lifecycle.Observer {
+            if (it != null){
+                invoice = it
+                saleCheckoutViewModel.invoice.value = null
+                saleOrExchange()
+            }
+        })
 
     }
 
@@ -283,11 +293,11 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
                 if (refundAmount < 0 || payAmount.text.isBlank()){
                     setInvoiceId()
                     saveData("CR")
-                     saleOrExchange()
+                    //saleOrExchange()
                 } else{
                     setInvoiceId()
                     saveData("CA")
-                    saleOrExchange()
+                    //saleOrExchange()
                 }
 
             }
@@ -379,13 +389,8 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
         } else{
             saleCheckoutViewModel.updateDepartureTimeForSaleManRoute( salePersonId!!, customer!!.id.toString())
             saleCheckoutViewModel.updateSaleVisitRecord(customer!!.id) // Need to check
-
-            saleCheckoutViewModel.invoice.observe(this, android.arch.lifecycle.Observer {
-                if (it != null){
-                    val intent = PrintInvoiceActivity.newIntentFromSaleCheckout(this, it, soldProductList, promotionList)
-                    startActivity(intent)
-                }
-            })
+            val intent = PrintInvoiceActivity.newIntentFromSaleCheckout(this, invoice!!, soldProductList, promotionList)
+            startActivity(intent)
         }
 
     }

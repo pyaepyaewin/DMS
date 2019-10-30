@@ -21,7 +21,7 @@
     <TextView android:id="@+id/title_paired_devices"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="title_paired_devices"
+        android:text="Paired Devices"
         android:visibility="gone"
         android:background="#666"
         android:textColor="#fff"
@@ -29,14 +29,15 @@
 
     <ListView android:id="@+id/paired_devices"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:stackFromBottom="true"
-        android:layout_weight="1" />
+        android:layout_height="match_parent"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_weight="2" />
 
     <TextView android:id="@+id/title_new_devices"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="title_other_devices"
+        android:text="Other Devices"
         android:visibility="gone"
         android:background="#666"
         android:textColor="#fff"
@@ -44,14 +45,16 @@
 
     <ListView android:id="@+id/new_devices"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:stackFromBottom="true"
-        android:layout_weight="2" />
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_weight="3" />
 
     <Button
-            android:id="@+id/button_scan"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="Scan" />
+        android:id="@+id/button_scan"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Scan" />
 
 </LinearLayout>
