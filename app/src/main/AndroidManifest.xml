@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.aceplus.dms">
+        package="com.aceplus.dms">
 
     <uses-feature
-        android:glEsVersion="0x00020000"
-        android:required="true" />
+            android:glEsVersion="0x00020000"
+            android:required="true" />
 
     <permission
-        android:name="com.aceplus.samparoo.permission.MAPS_RECEIVE"
-        android:protectionLevel="signature" />
+            android:name="com.aceplus.samparoo.permission.MAPS_RECEIVE"
+            android:protectionLevel="signature" />
 
     <uses-permission android:name="com.aceplus.samparoo.permission.MAPS_RECEIVE" />
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
@@ -25,15 +25,17 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
-        android:name=".MyApp"
-        android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
-        android:supportsRtl="true"
-        android:theme="@style/AppTheme">
-        <activity android:name=".ui.activities.customer.sale.SaleCheckoutActivity"></activity>
-        <activity android:name=".ui.activities.PrintInvoiceActivity"></activity>
+            android:name=".MyApp"
+            android:allowBackup="true"
+            android:icon="@mipmap/ic_launcher"
+            android:label="@string/app_name"
+            android:roundIcon="@mipmap/ic_launcher_round"
+            android:supportsRtl="true"
+            android:theme="@style/AppTheme">
+        <activity android:name=".ui.activities.customer.CheckOutActivity"></activity>
+        <activity android:name=".ui.activities.DeviceListActivity" />
+        <activity android:name=".ui.activities.customer.sale.SaleCheckoutActivity" />
+        <activity android:name=".ui.activities.PrintInvoiceActivity" />
         <activity
                 android:name=".ui.activities.CreditCollectionCheckoutActivity"
                 android:screenOrientation="landscape" />
@@ -46,8 +48,8 @@
                 android:value="@string/google_map_api_key" />
 
         <activity
-            android:name=".ui.activities.SplashActivity"
-            android:screenOrientation="landscape">
+                android:name=".ui.activities.SplashActivity"
+                android:screenOrientation="landscape">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -57,62 +59,62 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.activities.MainActivity"
-            android:screenOrientation="landscape"></activity>
+                android:name=".ui.activities.MainActivity"
+                android:screenOrientation="landscape" />
         <activity
-            android:name=".ui.activities.LoginActivity"
-            android:screenOrientation="landscape"></activity>
+                android:name=".ui.activities.LoginActivity"
+                android:screenOrientation="landscape" />
         <activity
-            android:name=".ui.activities.SyncActivity"
-            android:screenOrientation="landscape"></activity>
+                android:name=".ui.activities.SyncActivity"
+                android:screenOrientation="landscape" />
         <activity
-            android:name=".ui.activities.RouteActivity"
-            android:screenOrientation="landscape"></activity>
+                android:name=".ui.activities.RouteActivity"
+                android:screenOrientation="landscape" />
         <activity
-            android:name=".ui.activities.CustomerVisitActivity"
-            android:screenOrientation="landscape"></activity>
+                android:name=".ui.activities.CustomerVisitActivity"
+                android:screenOrientation="landscape" />
         <activity
-            android:name=".ui.activities.PromotionActivity"
-            android:screenOrientation="landscape"></activity>
+                android:name=".ui.activities.PromotionActivity"
+                android:screenOrientation="landscape" />
         <activity
-            android:name=".ui.activities.VanIssueActivity"
-            android:screenOrientation="landscape"></activity>
+                android:name=".ui.activities.VanIssueActivity"
+                android:screenOrientation="landscape" />
         <activity
-            android:name=".ui.activities.ReportActivity"
-            android:screenOrientation="landscape"></activity>
+                android:name=".ui.activities.ReportActivity"
+                android:screenOrientation="landscape" />
         <activity
-            android:name=".ui.activities.customer.CustomerActivity"
-            android:screenOrientation="landscape"></activity>
+                android:name=".ui.activities.customer.CustomerActivity"
+                android:screenOrientation="landscape" />
         <activity
-            android:name=".ui.activities.customer.AddNewCustomerActivity"
-            android:screenOrientation="landscape"></activity>
+                android:name=".ui.activities.customer.AddNewCustomerActivity"
+                android:screenOrientation="landscape" />
         <activity
-            android:name=".ui.activities.customer.CreditCollectionActivity"
-            android:screenOrientation="landscape"></activity>
+                android:name=".ui.activities.customer.CreditCollectionActivity"
+                android:screenOrientation="landscape" />
         <activity
-            android:name=".ui.activities.customer.DeliveryActivity"
-            android:screenOrientation="landscape"></activity>
+                android:name=".ui.activities.customer.DeliveryActivity"
+                android:screenOrientation="landscape" />
         <activity
-            android:name=".ui.activities.customer.sale.SaleCancelActivity"
-            android:screenOrientation="landscape"></activity>
+                android:name=".ui.activities.customer.sale.SaleCancelActivity"
+                android:screenOrientation="landscape" />
         <activity
-            android:name=".ui.activities.customer.CustomerLocationActivity"
-            android:screenOrientation="landscape"></activity>
+                android:name=".ui.activities.customer.CustomerLocationActivity"
+                android:screenOrientation="landscape" />
         <activity
-            android:name=".ui.activities.customer.sale.SaleReturnActivity"
-            android:screenOrientation="landscape"></activity>
+                android:name=".ui.activities.customer.sale.SaleReturnActivity"
+                android:screenOrientation="landscape" />
         <activity
-            android:name=".ui.activities.customer.AddNewCustomerLocationActivity"
-            android:screenOrientation="landscape"></activity>
+                android:name=".ui.activities.customer.AddNewCustomerLocationActivity"
+                android:screenOrientation="landscape" />
         <activity
-            android:name=".ui.activities.customer.sale.SaleActivity"
-            android:screenOrientation="landscape"></activity>
+                android:name=".ui.activities.customer.sale.SaleActivity"
+                android:screenOrientation="landscape" />
         <activity
-            android:name=".ui.activities.customer.SaleOrderActivity"
-            android:screenOrientation="landscape"></activity>
+                android:name=".ui.activities.customer.SaleOrderActivity"
+                android:screenOrientation="landscape" />
         <activity
-            android:name=".ui.activities.customer.PosmActivity"
-            android:screenOrientation="landscape"></activity>
+                android:name=".ui.activities.customer.PosmActivity"
+                android:screenOrientation="landscape" />
     </application>
 
 </manifest>
