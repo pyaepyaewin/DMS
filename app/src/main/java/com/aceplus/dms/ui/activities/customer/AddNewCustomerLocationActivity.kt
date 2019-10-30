@@ -40,16 +40,44 @@ class AddNewCustomerLocationActivity : BaseActivity(), KodeinAware {
     override val layoutId: Int
         get() = R.layout.activity_add_new_customer_location
 
+    private var latDouble = 0.0
+    private var lonDouble = 0.0
+
     companion object {
         private const val IE_FROM = "IE_FROM"
         private const val IE_SALE_MAN_ID = "IE_SALE_MAN_ID"
         private const val IE_CUSTOMER_DATA = "IE_CUSTOMER_DATA"
 
-        fun newIntentFromCustomerActivity(context: Context, salesmanId: String, customer: Customer): Intent {
+        private const val NAME = "name"
+        private const val PERSON = "person"
+        private const val PHONE = "phone"
+        private const val ADDRESS = "address"
+
+        fun newIntentFromCustomerActivity(
+            context: Context,
+            salesmanId: String,
+            customer: Customer
+        ): Intent {
             val intent = Intent(context, AddNewCustomerLocationActivity::class.java)
             intent.putExtra(IE_FROM, "customerActivity")
             intent.putExtra(IE_SALE_MAN_ID, salesmanId)
             intent.putExtra(IE_CUSTOMER_DATA, customer)
+            return intent
+        }
+
+        fun newIntentFromAddNewCustomerActivity(
+            context: Context,
+            customerName: String,
+            contactPerson: String,
+            phone: String,
+            address: String
+        ): Intent {
+            val intent = Intent(context, AddNewCustomerLocationActivity::class.java)
+            intent.putExtra(IE_FROM, "addNewCustomerActivity")
+            intent.putExtra(NAME, customerName)
+            intent.putExtra(PERSON, contactPerson)
+            intent.putExtra(PHONE, phone)
+            intent.putExtra(ADDRESS, address)
             return intent
         }
     }
@@ -62,60 +90,81 @@ class AddNewCustomerLocationActivity : BaseActivity(), KodeinAware {
     private var map: GoogleMap? = null
     private var markerCount: Int = 0
 
+    private lateinit var name: String
+    private lateinit var person: String
+    private lateinit var phone: String
+    private lateinit var address: String
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
-
         getIntentData()
-        setupUI()
+        if (from == "customerActivity") {
+            setupUI()
+        } else {
+            addNewUI()
+        }
         catchEvents()
+
     }
 
-    private fun getIntentData(){
+    private fun getIntentData() {
         customer = intent.getParcelableExtra(IE_CUSTOMER_DATA)
         from = intent.getStringExtra(IE_FROM)
         salesmanId = intent.getStringExtra(IE_SALE_MAN_ID)
+
+        name = intent.getStringExtra(NAME)
+        person = intent.getStringExtra(PERSON)
+        phone = intent.getStringExtra(PHONE)
+        address = intent.getStringExtra(ADDRESS)
+
     }
 
-    private fun setupUI(){
+    private fun setupUI() {
 
         val status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(baseContext)
-        if (status != ConnectionResult.SUCCESS){
+        if (status != ConnectionResult.SUCCESS) {
             val requestCode = 10
             GooglePlayServicesUtil.getErrorDialog(status, this, requestCode).show()
-        } else{
-            val mapView = supportFragmentManager.findFragmentById(R.id.mapView) as SupportMapFragment
+        } else {
+            val mapView =
+                supportFragmentManager.findFragmentById(R.id.mapView) as SupportMapFragment
             mapView.getMapAsync {
                 this.map = it
                 map!!.uiSettings.isMyLocationButtonEnabled = true
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
-                    if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                        == PackageManager.PERMISSION_GRANTED) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    if (ContextCompat.checkSelfPermission(
+                            this,
+                            Manifest.permission.ACCESS_FINE_LOCATION
+                        )
+                        == PackageManager.PERMISSION_GRANTED
+                    ) {
 
                         map!!.isMyLocationEnabled = true
                         val gpsTracker = GPSTracker(this)
                         var lat = 0.0
                         var lon = 0.0
 
-                        if (gpsTracker.canGetLocation()){
+                        if (gpsTracker.canGetLocation()) {
                             lat = gpsTracker.getLatitude()
                             lon = gpsTracker.getLongitude()
                         }
 
                         map!!.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(lat, lon), 15f))
 
-                    } else{
+                    } else {
                         checkLocationPermission() //Request Location Permission
                     }
-                } else{
+                } else {
                     map!!.isMyLocationEnabled = true
                     val gpsTracker = GPSTracker(this)
                     var lat = 0.0
                     var lon = 0.0
 
-                    if (gpsTracker.canGetLocation()){
+                    if (gpsTracker.canGetLocation()) {
                         lat = gpsTracker.getLatitude()
                         lon = gpsTracker.getLongitude()
                     }
@@ -124,7 +173,7 @@ class AddNewCustomerLocationActivity : BaseActivity(), KodeinAware {
                 }
 
                 map?.setOnMapClickListener { location ->
-                    if (markerCount == 0){
+                    if (markerCount == 0) {
                         drawMarker(location)
                         val latDouble = location.latitude
                         val lonDouble = location.longitude
@@ -142,15 +191,82 @@ class AddNewCustomerLocationActivity : BaseActivity(), KodeinAware {
                     customer?.longitude = null
                 }
 
-                if (customer!!.latitude != null){
-                    drawMarker(LatLng(customer!!.latitude!!.toDouble(), customer!!.longitude!!.toDouble()))
+                if (customer!!.latitude != null) {
+                    drawMarker(
+                        LatLng(
+                            customer!!.latitude!!.toDouble(),
+                            customer!!.longitude!!.toDouble()
+                        )
+                    )
                 }
             }
         }
 
     }
 
-    private fun catchEvents(){
+    private fun addNewUI() {
+
+        val status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(baseContext)
+        if (status != ConnectionResult.SUCCESS) {
+            val requestCode = 10
+            GooglePlayServicesUtil.getErrorDialog(status, this, requestCode).show()
+        } else {
+            val mapView =
+                supportFragmentManager.findFragmentById(R.id.mapView) as SupportMapFragment
+            mapView.getMapAsync {
+                this.map = it
+                map!!.uiSettings.isMyLocationButtonEnabled = true
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    if (ContextCompat.checkSelfPermission(
+                            this,
+                            Manifest.permission.ACCESS_FINE_LOCATION
+                        )
+                        == PackageManager.PERMISSION_GRANTED
+                    ) {
+
+                        map!!.isMyLocationEnabled = true
+                        val gpsTracker = GPSTracker(this)
+                        var lat = 0.0
+                        var lon = 0.0
+
+                        if (gpsTracker.canGetLocation()) {
+                            lat = gpsTracker.getLatitude()
+                            lon = gpsTracker.getLongitude()
+                        }
+
+                        map!!.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(lat, lon), 15f))
+
+                    } else {
+                        checkLocationPermission() //Request Location Permission
+                    }
+                } else {
+                    map!!.isMyLocationEnabled = true
+                    val gpsTracker = GPSTracker(this)
+                    var lat = 0.0
+                    var lon = 0.0
+
+                    if (gpsTracker.canGetLocation()) {
+                        lat = gpsTracker.getLatitude()
+                        lon = gpsTracker.getLongitude()
+                    }
+
+                    map!!.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(lat, lon), 15f))
+                }
+
+                map?.setOnMapClickListener { location ->
+                    if (markerCount == 0) {
+                        drawMarker(location)
+                        latDouble = location.latitude
+                        lonDouble = location.longitude
+                    }
+                    Log.d("LAT","$latDouble")
+                    Log.d("LON","$lonDouble")
+                }
+            }
+        }
+    }
+
+    private fun catchEvents() {
 
         back_img.setOnClickListener {
             onBackPressed()
@@ -158,19 +274,19 @@ class AddNewCustomerLocationActivity : BaseActivity(), KodeinAware {
 
         search_img.setOnClickListener {
             val location = address_txt.text.toString()
-            if (!location.isNullOrBlank()){
+            if (!location.isNullOrBlank()) {
                 var addressList: List<Address> = listOf()
                 val geoCoder = Geocoder(this)
                 try {
                     addressList = geoCoder.getFromLocationName(location, 1)
-                } catch (e: IOException){
+                } catch (e: IOException) {
                     e.printStackTrace()
                 }
                 try {
                     val address = addressList[0]
                     val latLng = LatLng(address.latitude, address.longitude)
                     map!!.animateCamera(CameraUpdateFactory.newLatLng(latLng))
-                } catch (e: IOException){
+                } catch (e: IOException) {
                     e.printStackTrace()
                 }
             }
@@ -180,41 +296,60 @@ class AddNewCustomerLocationActivity : BaseActivity(), KodeinAware {
 
     private val MY_PERMISSIONS_REQUEST_LOCATION = 99
 
-    private fun checkLocationPermission(){
+    private fun checkLocationPermission() {
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-            != PackageManager.PERMISSION_GRANTED){
+            != PackageManager.PERMISSION_GRANTED
+        ) {
 
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)){
+            if (ActivityCompat.shouldShowRequestPermissionRationale(
+                    this,
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                )
+            ) {
 
                 AlertDialog.Builder(this)
                     .setTitle("Location Permission Needed")
                     .setMessage("This app needs the Location permission, please accept to use location functionality")
                     .setPositiveButton("OK") { dialogInterface: DialogInterface, i: Int ->
                         ActivityCompat.requestPermissions(
-                            this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), MY_PERMISSIONS_REQUEST_LOCATION
+                            this,
+                            arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                            MY_PERMISSIONS_REQUEST_LOCATION
                         )
                     }
                     .create()
                     .show()
 
-            } else{
-                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), MY_PERMISSIONS_REQUEST_LOCATION)
+            } else {
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                    MY_PERMISSIONS_REQUEST_LOCATION
+                )
             }
 
         }
 
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
 
-        when(requestCode){
+        when (requestCode) {
             MY_PERMISSIONS_REQUEST_LOCATION -> {
-                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                    if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    if (ContextCompat.checkSelfPermission(
+                            this,
+                            Manifest.permission.ACCESS_FINE_LOCATION
+                        ) == PackageManager.PERMISSION_GRANTED
+                    ) {
                         map!!.isMyLocationEnabled = true
                     }
-                } else{
+                } else {
                     Toast.makeText(this, "permission denied", Toast.LENGTH_LONG).show()
                 }
                 return
@@ -226,14 +361,23 @@ class AddNewCustomerLocationActivity : BaseActivity(), KodeinAware {
 
     override fun onBackPressed() {
         super.onBackPressed()
-
-        if (from.equals("AddNewCustomerActivity", true)){
-            // ToDo go to AddNewCustomerActivity with data
+        Log.d("LAT", "$latDouble")
+        if (from.equals("AddNewCustomerActivity", true)) {
+            val intent = AddNewCustomerActivity.newIntentFromAddNewCustomerLocation(
+                applicationContext,
+                name,
+                person,
+                phone,
+                address,
+                latDouble,
+                lonDouble
+            )
+            startActivity(intent)
             finish()
-        } else{
+        }else {
             customer!!.flag = "2"
             customerViewModel.updateCustomerData(customer!!)
-            if (customer!!.latitude != null){
+            if (customer!!.latitude != null) {
                 // ToDo updateDepartureTimeForSalemanRoute
                 finish()
             }

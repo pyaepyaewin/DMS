@@ -44,11 +44,11 @@ class EndOfDayReportFragment : BaseFragment(), KodeinAware {
         })
         endOfDayReportViewModel.saleTargetAndSaleManReportSuccessState.observe(this, Observer {
             if (it != null) {
-                var saleAmount = 0
-                var exchangeAmount = 0
+                var saleAmount = 0.0
+                var exchangeAmount = 0.0
                 for (i in it!!.second) {
-                    saleAmount += i.total_amount!!.toInt()
-                    exchangeAmount += i.pay_amount!!.toInt()
+                    saleAmount += i.total_amount!!.toDouble()
+                    exchangeAmount += i.pay_amount!!.toDouble()
                 }
                 fragment_daily_report_total_exchange.text = exchangeAmount.toString()
                 fragment_daily_report_total_sale.text = saleAmount.toString()

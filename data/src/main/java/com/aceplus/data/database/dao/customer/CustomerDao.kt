@@ -8,6 +8,7 @@ import android.arch.persistence.room.Insert
 import android.arch.persistence.room.OnConflictStrategy
 import android.arch.persistence.room.Query
 import com.aceplus.domain.entity.predefine.Township
+import com.aceplus.domain.model.customer.prospectcustomer.NewCustomer
 import com.aceplus.domain.model.roomdb.StringObject
 import com.aceplus.domain.model.routedataclass.CustomerLocationDataClass
 import io.reactivex.Observable
@@ -38,6 +39,9 @@ interface CustomerDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(list: List<Customer>)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertCustomerData(customer:Customer)
 
     @Query("Delete from customer")
     fun deleteAll()

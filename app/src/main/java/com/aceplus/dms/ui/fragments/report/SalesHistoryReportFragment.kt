@@ -5,6 +5,7 @@ import android.app.Dialog
 import android.arch.lifecycle.Observer
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -32,6 +33,7 @@ class SalesHistoryReportFragment : BaseFragment(), KodeinAware {
     private var myCalendar = Calendar.getInstance()
     private lateinit var fromDate: Date
     private lateinit var toDate: Date
+    var saleHistoryDataList: List<SaleInvoiceReport> = listOf()
     private val saleHistoryReportAdapter: SaleInvoiceReportAdapter by lazy {
         SaleInvoiceReportAdapter(
             this::onClickItem
@@ -63,12 +65,17 @@ class SalesHistoryReportFragment : BaseFragment(), KodeinAware {
             edit_text_sale_report_to_date.setText("")
             edit_text_sale_report_to_date.error = null
         }
-        saleHistoryReportViewModel.saleInvoiceReportSuccessState.observe(this, Observer {
-            saleHistoryReportAdapter.setNewList(it!!.first as ArrayList<SaleInvoiceReport>)
+        saleHistoryReportViewModel.saleInvoiceReportList.observe(this, Observer {
+            saleHistoryReportAdapter.setNewList(it as ArrayList<SaleInvoiceReport>)
+            saleHistoryDataList = it
+            //Calculate and setText for total,discount and net amounts
+            calculateAmount(it)
+        })
+        saleHistoryReportViewModel.customerDataList.observe(this, Observer {
             //select customer name list in db
-            if (it!!.second != null) {
+            if (it != null) {
                 customerNameList.add("All")
-                for (customer in it!!.second) {
+                for (customer in it) {
                     customerNameList.add(customer.customer_name.toString())
                 }
 
@@ -82,22 +89,28 @@ class SalesHistoryReportFragment : BaseFragment(), KodeinAware {
                 object : AdapterView.OnItemSelectedListener {
                     override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
                         val filterList: ArrayList<SaleInvoiceReport> = ArrayList()
-                        for (c in it!!.first) {
-                            if (c.customerName == customerNameList[p2]) {
+                        if (customerNameList[p2] != "All") {
+                            for (c in saleHistoryDataList) {
+                                if (c.customerName == customerNameList[p2]) {
+                                    filterList.add(c)
+                                }
+                            }
+                            saleHistoryReportAdapter.setNewList(filterList)
+                            calculateAmount(filterList)
+                        } else {
+                            for (c in saleHistoryDataList) {
                                 filterList.add(c)
                             }
-                            if (c.customerName == "All") {
-                                filterList.add(c)
-                            }
+                            saleHistoryReportAdapter.setNewList(filterList)
+                            calculateAmount(filterList)
                         }
-                        saleHistoryReportAdapter.setNewList(filterList)
+                        Log.d("Filter List:", "$filterList")
+
                     }
 
                     override fun onNothingSelected(p0: AdapterView<*>?) {
                     }
                 }
-            //Calculate and setText for total,discount and net amounts
-            calculateAmount(it!!.first)
         })
 
         saleHistoryReportViewModel.reportErrorState.observe(this, Observer {
@@ -108,7 +121,8 @@ class SalesHistoryReportFragment : BaseFragment(), KodeinAware {
             layoutManager = LinearLayoutManager(activity)
             adapter = saleHistoryReportAdapter
         }
-        saleHistoryReportViewModel.loadSaleInvoiceReport()
+        saleHistoryReportViewModel.loadSaleInvoiceList()
+        saleHistoryReportViewModel.loadCustomer()
     }
 
     private fun onClickItem(invoiceId: String) {

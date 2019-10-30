@@ -104,6 +104,10 @@ val repoModule = Kodein.Module {
         ReportRepoImpl(instance())
     }
 
+    bind<ProspectCustomerRepo>() with singleton {
+        ProspectCustomerRepoImpl(instance())
+    }
+
 
     bind<PromotionRepo>() with singleton {
         PromotionRepoImpl(instance())

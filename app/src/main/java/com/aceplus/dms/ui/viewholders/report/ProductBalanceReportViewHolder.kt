@@ -23,6 +23,17 @@ class ProductBalanceReportViewHolder(private val view: View) :
                 deliveryQuantity.setTextColor(resources.getColor(R.color.accentColor))
                 presentQuantity.setTextColor(resources.getColor(R.color.accentColor))
                 remainingQuantity.setTextColor(resources.getColor(R.color.accentColor))
+            } else {
+                productName.setTextColor(resources.getColor(R.color.black))
+                totalQuantity.setTextColor(resources.getColor(R.color.black))
+                orderQuantity.setTextColor(resources.getColor(R.color.black))
+                soldQuantity.setTextColor(resources.getColor(R.color.black))
+                exchangeQuantity.setTextColor(resources.getColor(R.color.black))
+                returnQuantity.setTextColor(resources.getColor(R.color.black))
+                deliveryQuantity.setTextColor(resources.getColor(R.color.black))
+                presentQuantity.setTextColor(resources.getColor(R.color.black))
+                remainingQuantity.setTextColor(resources.getColor(R.color.black))
+
             }
             productName.text = data.product_name
             totalQuantity.text = data.total_quantity.toString()

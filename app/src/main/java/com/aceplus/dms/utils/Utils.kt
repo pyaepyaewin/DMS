@@ -764,7 +764,7 @@ object Utils {
             .setMessage(message)
             .setPositiveButton(
                 "Yes"
-            ) { dialogInterface, i -> action(type) }
+            ) { _, _ -> action(type) }
             .setNegativeButton("No", null)
             .show()
 

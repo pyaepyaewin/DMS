@@ -116,19 +116,33 @@ class ReportViewModel(
     }
 
     //sale invoice report
+    var saleInvoiceReportList = MutableLiveData<List<SaleInvoiceReport>>()
     var saleInvoiceReportSuccessState =
         MutableLiveData<Pair<List<SaleInvoiceReport>, List<Customer>>>()
     var saleInvoiceDetailReportSuccessState = MutableLiveData<List<SaleInvoiceDetailReport>>()
+
+    fun loadSaleInvoiceList() {
+        launch {
+            reportRepo.saleInvoiceReport()
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.mainThread())
+                .subscribe {
+                    saleInvoiceReportList.postValue(it)
+                }
+        }
+    }
+
     fun loadSaleInvoiceReport() {
         var customerDataList: List<Customer>
         var saleInvoiceReport = listOf<SaleInvoiceReport>()
         launch {
             reportRepo.saleInvoiceReport()
-                .doOnNext {
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.mainThread())
+                .subscribe {
                     saleInvoiceReport = it
                 }
-                .flatMap { reportRepo.getAllCustomerData() }
-
+            reportRepo.getAllCustomerData()
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.mainThread())
                 .subscribe({
@@ -145,6 +159,7 @@ class ReportViewModel(
         }
 
     }
+
 
     fun loadSaleInvoiceDetailReport(invoiceId: String) {
         launch {
@@ -164,7 +179,9 @@ class ReportViewModel(
     //sale cancel report
     var salesCancelReportSuccessState =
         MutableLiveData<Pair<List<SalesCancelReport>, List<Customer>>>()
-    var saleCancelDetailReportSuccessState = MutableLiveData<List<SaleCancelInvoiceDetailReport>>()
+    var saleCancelDetailReportSuccessState =
+        MutableLiveData<List<SaleCancelInvoiceDetailReport>>()
+
     fun loadSalesCancelReport() {
         var customerDataList: List<Customer>
         var saleCancelReport = listOf<SalesCancelReport>()
@@ -391,7 +408,12 @@ class ReportViewModel(
                 .observeOn(schedulerProvider.mainThread())
                 .subscribe {
                     categoryDataList = it
-                    productGroupAndCategoryDataList.postValue(Pair(groupDataList, categoryDataList))
+                    productGroupAndCategoryDataList.postValue(
+                        Pair(
+                            groupDataList,
+                            categoryDataList
+                        )
+                    )
                 }
         }
     }

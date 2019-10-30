@@ -27,13 +27,13 @@ import org.kodein.di.KodeinAware
 import org.kodein.di.android.support.kodein
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.ArrayList
 
 class SaleInvoiceReportFragment : BaseFragment(), KodeinAware {
     private var myCalendar = Calendar.getInstance()
     private lateinit var fromDate: Date
     private lateinit var toDate: Date
     override val kodein: Kodein by kodein()
+    var saleInvoiceDataList: List<SaleInvoiceReport> = listOf()
     private val saleInvoiceReportAdapter: SaleInvoiceReportAdapter by lazy {
         SaleInvoiceReportAdapter(
             this::onClickItem
@@ -57,20 +57,29 @@ class SaleInvoiceReportFragment : BaseFragment(), KodeinAware {
         edit_text_sale_report_to_date.setOnClickListener {
             chooseDob(2)
         }
+        btn_sale_report_search.setOnClickListener {}
         btn_sale_report_clear.setOnClickListener {
             edit_text_sale_report_from_date.setText("")
             edit_text_sale_report_from_date.error = null
             edit_text_sale_report_to_date.setText("")
             edit_text_sale_report_to_date.error = null
         }
-        saleInvoiceReportViewModel.saleInvoiceReportSuccessState.observe(this, Observer {
-            saleInvoiceReportAdapter.setNewList(it!!.first as ArrayList<SaleInvoiceReport>)
+        saleInvoiceReportViewModel.saleInvoiceReportList.observe(this, Observer {
+            saleInvoiceReportAdapter.setNewList(it as ArrayList<SaleInvoiceReport>)
+            saleInvoiceDataList = it
+            //Calculate and setText for total,discount and net amounts
+            calculateAmount(it)
+        })
+        Log.d("Sale Invoice List:", "${saleInvoiceDataList.size}")
+        saleInvoiceReportViewModel.customerDataList.observe(this, Observer {
             //select customer name list in db
-            if (it!!.second != null) {
+            if (it != null) {
                 customerNameList.add("All")
-                for (customer in it!!.second) {
+                for (customer in it) {
                     customerNameList.add(customer.customer_name.toString())
                 }
+
+                Log.d("Customer Size","${it.size}")
 
             }
             //Add customer name in spinner in this fragment
@@ -82,16 +91,25 @@ class SaleInvoiceReportFragment : BaseFragment(), KodeinAware {
                 object : AdapterView.OnItemSelectedListener {
                     override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
                         val filterList: ArrayList<SaleInvoiceReport> = ArrayList()
-                        for (c in it!!.first) {
-                            if (c.customerName == customerNameList[p2]) {
+
+                        if (customerNameList[p2] != "All") {
+                            for (c in saleInvoiceDataList) {
+                                if (c.customerName == customerNameList[p2]) {
+                                    filterList.add(c)
+                                }
+                            }
+                            saleInvoiceReportAdapter.setNewList(filterList)
+                            calculateAmount(filterList)
+                        } else {
+                            for (c in saleInvoiceDataList) {
                                 filterList.add(c)
                             }
-                            if (c.customerName == "All") {
-                                filterList.add(c)
-                            }
+                            saleInvoiceReportAdapter.setNewList(filterList)
+                            calculateAmount(filterList)
                         }
                         Log.d("Filter List:", "$filterList")
-                        saleInvoiceReportAdapter.setNewList(filterList)
+
+
                     }
 
                     override fun onNothingSelected(p0: AdapterView<*>?) {
@@ -99,22 +117,19 @@ class SaleInvoiceReportFragment : BaseFragment(), KodeinAware {
                     }
 
                 }
-            btn_sale_report_search.setOnClickListener {
-            }
-
-            //Calculate and setText for total,discount and net amounts
-            calculateAmount(it!!.first)
         })
 
         saleInvoiceReportViewModel.reportErrorState.observe(this, Observer {
             Toast.makeText(activity, it, Toast.LENGTH_LONG).show()
         })
 
+
         saleInvoceReports.apply {
             layoutManager = LinearLayoutManager(activity)
             adapter = saleInvoiceReportAdapter
         }
-        saleInvoiceReportViewModel.loadSaleInvoiceReport()
+        saleInvoiceReportViewModel.loadSaleInvoiceList()
+        saleInvoiceReportViewModel.loadCustomer()
     }
 
     private fun onClickItem(invoiceId: String) {
@@ -126,7 +141,12 @@ class SaleInvoiceReportFragment : BaseFragment(), KodeinAware {
 
         //Dialog sale history report of invoice detail recycler view
         saleInvoiceReportViewModel.saleInvoiceDetailReportSuccessState.observe(this, Observer {
-            saleInvoiceDetailReportAdapter.setNewList(it as java.util.ArrayList<SaleInvoiceDetailReport>)
+            for (data in it!!) {
+                if (data != null) {
+                    saleInvoiceDetailReportAdapter.setNewList(it as ArrayList<SaleInvoiceDetailReport>)
+                }
+            }
+
         })
 
         saleInvoiceReportViewModel.reportErrorState.observe(this, Observer {

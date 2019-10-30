@@ -55,8 +55,6 @@ class CreditCollectionCheckoutActivity : AppCompatActivity(), KodeinAware {
             true
         }
         save_img.setOnClickListener {
-
-
             Utils.askConfirmationDialog("Save", "Do you want to confirm?", "", this) {
 
                 if (receipt_person_edit.text.toString().isEmpty()) {
