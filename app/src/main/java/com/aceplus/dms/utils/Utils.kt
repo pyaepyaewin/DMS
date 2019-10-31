@@ -20,19 +20,26 @@ import com.aceplus.data.utils.Constant
 import com.aceplus.dms.R
 import com.aceplus.dms.ui.activities.CreditCollectionCheckoutActivity
 import com.aceplus.dms.ui.activities.LoginActivity
+import com.aceplus.domain.entity.CompanyInformation
+import com.aceplus.domain.entity.invoice.Invoice
+import com.aceplus.domain.entity.promotion.Promotion
 import com.aceplus.domain.model.INVOICECANCEL
 import com.aceplus.domain.model.forApi.ConfirmRequestSuccess
+import com.aceplus.domain.vo.SoldProductInfo
 import com.google.gson.Gson
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.*
+import java.lang.StringBuilder
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 
 @SuppressLint("StaticFieldLeak")
 object Utils {
 
+    private val decimalFormatterWithoutComma = DecimalFormat("##0.##")
     private val decimalFormatterWithComma = DecimalFormat("###,##0")
     private val decimalFormatterWithComma1 = DecimalFormat("###,##0.##")
 
@@ -1272,21 +1279,164 @@ object Utils {
 //    }
 
 
-//    fun printDeliverWithHSPOS(activity: Activity, customerName:String, cus_address:String, orderInvoiceNo:String, orderSaleManName:String, invoiceNumber:String, salePersonName:String, routeId:Int, townshipName:String, invoice:Invoice, soldProductList:List<SoldProduct>, presentList:List<Promotion>, printFor:String, mode:String, mBTService:BluetoothService) {
-//        try
-//        {
-//
-//
-//            val printDataByteArray = convertFromListByteArrayTobyteArray(
-//                getPrintDataByteArrayListDeliver(
-//                    activity, customerName, cus_address, orderInvoiceNo, orderSaleManName, invoiceNumber, salePersonName, routeId, townshipName, invoice, soldProductList, presentList, printFor, mode))
-//            sendDataByte2BT(activity, mBTService, printDataByteArray)
-//        }
-//        catch (e: UnsupportedEncodingException) {
-//            e.printStackTrace()
-//        }
-//
-//    }
+    fun printWithHSPOS(
+        activity: Activity,
+        customerName: String,
+        cus_address: String,
+        invoiceNumber: String,
+        salePersonName: String?,
+        routeId: Int,
+        townshipName: String,
+        invoice: Invoice,
+        soldProductList: ArrayList<SoldProductInfo>,
+        presentList: ArrayList<Promotion>,
+        printFor: String,
+        mode: String,
+        mBTService: BluetoothService,
+        companyInfo: CompanyInformation
+    ) {
+        try {
+            /*val printDataByteArray = convertFromListByteArrayToByteArray(
+                getPrintDataByteArrayList(
+                    activity,
+                    customerName,
+                    cus_address,
+                    invoiceNumber,
+                    salePersonName,
+                    routeId,
+                    townshipName,
+                    invoice,
+                    soldProductList,
+                    presentList,
+                    printFor,
+                    mode,
+                    ByteArray(7),
+                    companyInfo
+                )
+            )*/
+            //sendDataByte2BT(activity, mBTService, printDataByteArray)
+        } catch (e: UnsupportedEncodingException) {
+            e.printStackTrace()
+        }
+    }
+
+    @Throws(UnsupportedEncodingException::class)
+    private fun convertFromListByteArrayToByteArray(ByteArray: List<ByteArray>): ByteArray {
+        var dataLength = 0
+        for (i in ByteArray.indices) {
+            dataLength += ByteArray[i].size
+        }
+
+        var distPosition = 0
+        val byteArray = ByteArray(dataLength)
+        for (i in ByteArray.indices) {
+            System.arraycopy(ByteArray[i], 0, byteArray, distPosition, ByteArray[i].size)
+            distPosition += ByteArray[i].size
+        }
+
+        return byteArray
+    }
+
+    @Throws(UnsupportedEncodingException::class)
+    private fun getPrintDataByteArrayList(
+        activity: Activity,
+        customerName: String,
+        cus_address: String,
+        invoiceNumber: String,
+        salePersonName: String?,
+        routeId: Int,
+        townshipName: String,
+        invoice: Invoice,
+        soldProductList: ArrayList<SoldProductInfo>,
+        presentList: ArrayList<Promotion>,
+        printFor: String,
+        mode: String,
+        imgByte: ByteArray,
+        companyInfo: CompanyInformation,
+        printMode: String
+    ){
+
+        val printDataByteArrayList: ArrayList<ByteArray> = ArrayList()
+        printDataByteArrayList.add(imgByte)
+        printDataByteArrayList.add("\n".toByteArray())
+
+        val FocProductList: ArrayList<SoldProductInfo> = ArrayList()
+
+        var totalAmount = 0.0
+        var totalNetAmount = 0.0
+        totalDiscountAmt = 0.0
+
+        val companyName = companyInfo.company_name
+        val address = companyInfo.address
+        val txtForFooter = companyInfo.pos_voucher_footer1
+        val commTaxRegNo = companyInfo.company_tax_reg_no
+        val phNo = companyInfo.phone_number
+
+        printDataByteArrayList.add((address + "\n").toByteArray())
+        printDataByteArrayList.add("Ph No         :   $phNo\n".toByteArray(charset("UTF-8")))
+        printDataByteArrayList.add("Tax Reg No    :   $commTaxRegNo\n".toByteArray(charset("UTF-8")))
+        printDataByteArrayList.add("Customer      :   $customerName\n".toByteArray(charset("UTF-8")))
+        printDataByteArrayList.add("Township      :   $townshipName\n".toByteArray(charset("UTF-8")))
+        printDataByteArrayList.add("Address       :   $cus_address\n".toByteArray(charset("UTF-8")))
+        printDataByteArrayList.add("Invoice No    :   $invoiceNumber\n".toByteArray())
+        printDataByteArrayList.add("Sale Person   :   $salePersonName\n".toByteArray())
+        printDataByteArrayList.add("RouteNo       :   Need to get by id\n".toByteArray()) // ToDo
+        printDataByteArrayList.add(("Sale Date     :   " + SimpleDateFormat("dd/MM/yyyy hh:mm", Locale.US).format(Date()) + "\n").toByteArray())
+
+        if (invoice.due_date != null && printMode.equals("sale", true))
+            printDataByteArrayList.add("Delivery Date :   ${invoice.due_date}\n".toByteArray())
+
+        printDataByteArrayList.add("------------------------------------------------\n".toByteArray())
+
+        var promoFlg = false
+
+        for (soldProduct in soldProductList){
+            if (soldProduct.promotionPrice == 0.0){
+                promoFlg = false
+                break
+            } else{
+                promoFlg = true
+                break
+            }
+        }
+
+        if (promoFlg){
+            formatter = Formatter(StringBuilder(), Locale.US)
+            printDataByteArrayList.add(
+                formatter!!.format(
+                    "%1$-20s \t \t %2$4s \t \t %3$4s \t \t \t %4$9s\n",
+                    "Item",
+                    "Qty",
+                    "Price",
+                    "Amount"
+                ).toString().toByteArray()
+            )
+            formatter!!.close()
+
+            printDataByteArrayList.add("------------------------------------------------\n".toByteArray())
+
+            for (soldProduct in soldProductList){
+                val quantity = soldProduct.quantity
+                var pricePerUnit = 0.0
+
+                pricePerUnit = if (soldProduct.promotionPrice == 0.0)
+                    soldProduct.product.selling_price?.toDouble() ?: 0.0
+                else
+                    soldProduct.promotionPrice
+
+                val amount = soldProduct.totalAmt
+                val pricePerUnitWithDiscount = soldProduct.discountAmount
+                val netAmount = amount - pricePerUnitWithDiscount
+                val itemFocPercent = soldProduct.focPercent
+                val itemFocAmount = soldProduct.focAmount
+                val itemFocDiscountAmt = soldProduct.itemDiscountAmount
+
+                totalAmount += amount
+                totalNetAmount += netAmount
+            }
+        }
+
+    }
 
 //    fun printDeliver(activity: Activity, customerName:String, cus_address:String, orderInvoiceNo:String, orderSaleManName:String, invoiceNumber:String, salePersonName:String, routeId:Int, townshipName:String, invoice:Invoice, soldProductList:List<SoldProduct>, presentList:List<Promotion>, printFor:String, mode:String) {
 //
@@ -2391,25 +2541,6 @@ object Utils {
 //        printDataByteArrayList.add(byteArrayOf(0x07)) // Kick cash drawer
 //
 //        return printDataByteArrayList
-//    }
-
-//    @Throws(UnsupportedEncodingException::class)
-//    private fun convertFromListByteArrayTobyteArray(ByteArray:List<ByteArray>):ByteArray {
-//        var dataLength = 0
-//        for (i in ByteArray.indices)
-//        {
-//            dataLength += ByteArray[i].size
-//        }
-//
-//        var distPosition = 0
-//        val byteArray = ByteArray(dataLength)
-//        for (i in ByteArray.indices)
-//        {
-//            System.arraycopy(ByteArray[i], 0, byteArray, distPosition, ByteArray[i].size)
-//            distPosition += ByteArray[i].size
-//        }
-//
-//        return byteArray
 //    }
 
 //    internal fun getTaxAmount() {

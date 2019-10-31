@@ -2,8 +2,10 @@ package com.aceplus.dms.viewmodel
 
 import android.arch.lifecycle.MutableLiveData
 import android.util.Log
+import com.aceplus.domain.entity.CompanyInformation
 import com.aceplus.domain.entity.customer.Customer
 import com.aceplus.domain.repo.CustomerVisitRepo
+import com.aceplus.domain.vo.RelatedDataForPrint
 import com.aceplus.shared.viewmodel.BaseViewModel
 import com.kkk.githubpaging.network.rx.SchedulerProvider
 
@@ -11,7 +13,8 @@ class PrintInvoiceViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
 
     var taxInfo = MutableLiveData<Triple<String, Int, Int>>()
     var salePersonName = MutableLiveData<String>()
-    var relatedDataForPrint = MutableLiveData<Triple<Customer, Int, String>>()
+//    var relatedDataForPrint1 = MutableLiveData<Triple<Customer, Int, String>>()
+    var relatedDataForPrint = MutableLiveData<RelatedDataForPrint>()
 
     fun getSalePersonName(salePersonID: String){
         launch {
@@ -52,6 +55,7 @@ class PrintInvoiceViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
         var customer: Customer? = null
         var routeID = 0
         var customerTownShipName: String? = null
+        var companyInfo: CompanyInformation? = null
 
         launch {
             customerVisitRepo.getCustomerByID(customerID.toInt())
@@ -65,15 +69,21 @@ class PrintInvoiceViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
                     }
                     return@flatMap customerVisitRepo.getCustomerTownshipName(customerID.toInt())
                 }
+                .flatMap {
+                    customerTownShipName = it
+                    return@flatMap customerVisitRepo.getCompanyInfo()
+                }
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.mainThread())
                 .subscribe{
-                    customerTownShipName = it
+                    for (i in it){
+                        companyInfo = i
+                    }
                 }
         }
 
-        if (customer != null && customerTownShipName != null)
-            relatedDataForPrint.postValue(Triple(customer!!, routeID, customerTownShipName!!))
+        if (customer != null && customerTownShipName != null && companyInfo != null)
+            relatedDataForPrint.postValue(RelatedDataForPrint(customer!!, routeID, customerTownShipName!!, companyInfo!!))
 
     }
 

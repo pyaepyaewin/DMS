@@ -20,6 +20,7 @@ import com.aceplus.domain.entity.invoice.Invoice
 import com.aceplus.domain.entity.product.Product
 import com.aceplus.domain.entity.promotion.Promotion
 import com.aceplus.domain.model.credit.CreditInvoice
+import com.aceplus.domain.vo.RelatedDataForPrint
 import com.aceplus.domain.vo.SoldProductInfo
 import com.aceplussolutions.rms.ui.activities.BaseActivity
 import kotlinx.android.synthetic.main.activity_sale_print.*
@@ -84,7 +85,8 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
     private var taxPercent: Int = 0
     private var branchCode: Int = 0
     private var creditFlg: String? = null
-    private var relatedDataForPrint: Triple<Customer, Int, String>? = null
+    private var relatedDataForPrint: RelatedDataForPrint? = null
+    private var salePersonName: String? = null
 
     private var mBluetoothAdapter: BluetoothAdapter? = null
     private var mBluetoothService: BluetoothService? = null
@@ -145,6 +147,7 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
 
         printInvoiceViewModel.salePersonName.observe(this, Observer {
             saleMan.text = it
+            salePersonName = it
         })
 
         print_img.setOnClickListener {onConnecting()}
@@ -234,6 +237,9 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
 
             Utils.saveInvoiceImageIntoGallery(invoice!!.invoice_id, this, myBitmap, "Sale") // Doesn't work
             val editProductList = arrangeProductList()
+            val customerData: Customer = relatedDataForPrint!!.customer
+            //invoice!!.printMode = "sale" // Doesn't exist
+            // ToDo - print
 
         } else if (printMode == "RP"){
 
