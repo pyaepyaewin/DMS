@@ -1,21 +1,23 @@
 package com.aceplus.dms.viewmodel.creditcollection
 
 import android.arch.lifecycle.MutableLiveData
+import android.content.SharedPreferences
 import android.util.Log
+import com.aceplus.data.utils.Constant
 import com.aceplus.domain.entity.Location
 import com.aceplus.domain.entity.cash.CashReceive
 import com.aceplus.domain.entity.cash.CashReceiveItem
 import com.aceplus.domain.entity.credit.Credit
-import com.aceplus.domain.model.credit.CreditInvoice
-import com.aceplus.domain.model.customer.CustomerCredit
 import com.aceplus.domain.repo.creditcollectionrepo.CreditCollectionCheckOutRepo
 import com.aceplus.shared.viewmodel.BaseViewModel
+import com.aceplussolutions.rms.constants.AppUtils
 import com.kkk.githubpaging.network.rx.SchedulerProvider
 import io.reactivex.android.schedulers.AndroidSchedulers
 
 class CreditCollectionCheckOutViewModel(
     private val creditCollectionCheckOutRepo: CreditCollectionCheckOutRepo,
-    private val schedulerProvider: SchedulerProvider
+    private val schedulerProvider: SchedulerProvider,
+    private val shf:SharedPreferences
 ) : BaseViewModel() {
     var creditList = listOf<Credit>()
     var creditCollectionCheckOutSuccessState = MutableLiveData<List<Credit>>()
@@ -71,11 +73,13 @@ class CreditCollectionCheckOutViewModel(
             } else {
                 cashReceive.payment_type = "CR"
             }
+            val saleManId = AppUtils.getStringFromShp(Constant.SALEMAN_ID,shf)
+
             cashReceive.location_id = ""
             cashReceive.status = ""
             cashReceive.cash_receive_type = ""
             cashReceive.sale_id = credit.id.toString()
-            cashReceive.sale_man_id = ""
+            cashReceive.sale_man_id = saleManId
             cashReceiveItem.receive_no = credit.invoice_no?.replace("W", "CR")
             cashReceiveItem.sale_id = credit.id.toString()
 

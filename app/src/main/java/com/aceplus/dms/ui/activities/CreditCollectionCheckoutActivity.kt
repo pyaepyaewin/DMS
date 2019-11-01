@@ -10,12 +10,14 @@ import android.support.v7.widget.LinearLayoutManager
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
+import com.aceplus.data.utils.Constant
 import com.aceplus.dms.R
 import com.aceplus.dms.ui.adapters.creditcollectionadapters.CreditCollectionCheckOutAdapter
 import com.aceplus.dms.utils.Utils
 import com.aceplus.dms.viewmodel.creditcollection.CreditCollectionCheckOutViewModel
 import com.aceplus.dms.viewmodel.factory.KodeinViewModelFactory
 import com.aceplus.domain.entity.credit.Credit
+import com.aceplussolutions.rms.constants.AppUtils
 import kotlinx.android.synthetic.main.activity_credit_collection.*
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
@@ -24,6 +26,8 @@ import org.kodein.di.android.kodein
 class CreditCollectionCheckoutActivity : AppCompatActivity(), KodeinAware {
     private var invoiceNo: String? = null
     private var date: String? = null
+   // val saleManId = AppUtils.getStringFromShp(Constant.SALEMAN_ID,this)
+
     var calculateList = mutableListOf<Credit>()
     override val kodein: Kodein by kodein()
     private val creditCollectionCheckOutAdapter: CreditCollectionCheckOutAdapter by lazy {
@@ -153,7 +157,6 @@ class CreditCollectionCheckoutActivity : AppCompatActivity(), KodeinAware {
         var customerAddress = intent.getSerializableExtra("CustomerAddress") as String
 
 
-
         cancel_img.setOnClickListener {
             onBackPressed()
             true
@@ -181,58 +184,56 @@ class CreditCollectionCheckoutActivity : AppCompatActivity(), KodeinAware {
                         calculateList =
                             creditCollectionCheckOutViewModel.calculatePayAmount(payment_amount_edit.text.toString()) as MutableList<Credit>
                         creditCollectionCheckOutViewModel.insertCashReceiveData(calculateList)
-
+                       // startActivity(PrintInvoiceActivity.getIntent(this,customerName,customerAddress,invoiceNo!!,saleManId!!,date,amount,discount,))
 
                     }
                 }
             }
         }
-                    creditCollectionCheckOutViewModel.creditCollectionCheckOutSuccessState.observe(
-                        this,
-                        android.arch.lifecycle.Observer {
-                            creditCollectionCheckOutAdapter.setNewList(it as ArrayList<Credit>)
-                            var totalUnpaid = 0.0
-                            var total = 0.0
-                            var totalPaid = 0.0
+        creditCollectionCheckOutViewModel.creditCollectionCheckOutSuccessState.observe(
+            this,
+            android.arch.lifecycle.Observer {
+                creditCollectionCheckOutAdapter.setNewList(it as ArrayList<Credit>)
+                var totalUnpaid = 0.0
+                var total = 0.0
+                var totalPaid = 0.0
 
-                            for (i in it) {
-                                var amt = i.amount
-                                var paid = i.pay_amount
-                                var unpaid = amt - paid
-                                total += amt
-                                totalPaid += paid
-                                totalUnpaid += unpaid
-                           //creditCollectionCheckOutViewModel.updatePayAmount(payment_amount_edit.text.toString().toDouble(),i.invoice_no!!)
-
-
-                            }
-                            total_amount_txt.text = Utils.formatAmount(total)
-                            total_advance_pay_txt.text = Utils.formatAmount(totalPaid)
-                            remaining_pay_amount_txt.text = Utils.formatAmount(totalUnpaid)
-                            customer_name_txt.text = customerName
-                            payment_amount_edit!!.text = null
-                            item_pay_edit!!.text = null
-
-
-
-
-                        })
-
-
-
-                    creditCollectionCheckOutViewModel.creditCollectionCheckOutErrorState.observe(
-                        this,
-                        android.arch.lifecycle.Observer {
-                        })
-                    rvCreditCheckOut.apply {
-                        layoutManager = LinearLayoutManager(context)
-                        adapter = creditCollectionCheckOutAdapter
-                    }
-                    creditCollectionCheckOutViewModel.loadCreditCollectionCheckOut(customerId)
+                for (i in it) {
+                    var amt = i.amount
+                    var paid = i.pay_amount
+                    var unpaid = amt - paid
+                    total += amt
+                    totalPaid += paid
+                    totalUnpaid += unpaid
+                    //creditCollectionCheckOutViewModel.updatePayAmount(payment_amount_edit.text.toString().toDouble(),i.invoice_no!!)
 
 
                 }
-            }
+                total_amount_txt.text = Utils.formatAmount(total)
+                total_advance_pay_txt.text = Utils.formatAmount(totalPaid)
+                remaining_pay_amount_txt.text = Utils.formatAmount(totalUnpaid)
+                customer_name_txt.text = customerName
+                payment_amount_edit!!.text = null
+                item_pay_edit!!.text = null
+
+
+            })
+
+
+
+        creditCollectionCheckOutViewModel.creditCollectionCheckOutErrorState.observe(
+            this,
+            android.arch.lifecycle.Observer {
+            })
+        rvCreditCheckOut.apply {
+            layoutManager = LinearLayoutManager(context)
+            adapter = creditCollectionCheckOutAdapter
+        }
+        creditCollectionCheckOutViewModel.loadCreditCollectionCheckOut(customerId)
+
+
+    }
+}
 
 
 
