@@ -6,6 +6,7 @@ import android.arch.persistence.room.Dao
 import android.arch.persistence.room.Insert
 import android.arch.persistence.room.OnConflictStrategy
 import android.arch.persistence.room.Query
+import com.aceplus.domain.model.credit.CreditInvoice
 import com.aceplus.domain.model.creditcollectiondataclass.CreditCollectionCheckoutDataClass
 import com.aceplus.domain.model.creditcollectiondataclass.CreditCollectionDataClass
 
@@ -33,5 +34,9 @@ interface CreditDao {
 
     @Query("select * from credit where credit.customer_id=:customerId")
     fun getCreditCheckout(customerId:String):List<Credit>
+
+   @Query("UPDATE credit SET pay_amount = pay_amount+:payAmt WHERE invoice_no=:invoiceNo")
+   fun update(payAmt:Double,invoiceNo:String)
+
 
 }
