@@ -1,7 +1,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:orientation="vertical">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
     <RelativeLayout
             android:layout_width="match_parent"
@@ -16,7 +16,7 @@
                 android:layout_alignParentLeft="true"
                 android:gravity="center"
                 android:src="@drawable/ic_cancel_xh_btn"
-                android:layout_marginLeft="20dp"/>
+                android:layout_marginLeft="20dp" />
 
         <TextView
                 android:layout_width="wrap_content"
@@ -26,7 +26,7 @@
                 android:text="@string/customer_title"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textColor="#ffffff"
-                android:textSize="23sp"/>
+                android:textSize="23sp" />
 
     </RelativeLayout>
 
@@ -49,13 +49,13 @@
                     android:layout_marginTop="3dp"
                     android:paddingLeft="10dp"
                     android:drawableRight="@drawable/search"
-                    android:paddingRight="10dp"/>
+                    android:paddingRight="10dp" />
 
             <android.support.v7.widget.RecyclerView
                     android:id="@+id/rvCustomer"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:scrollbars="vertical"/>
+                    android:scrollbars="vertical" />
         </LinearLayout>
 
         <LinearLayout
@@ -80,14 +80,14 @@
                             android:layout_width="120dp"
                             android:layout_height="wrap_content"
                             android:gravity="left"
-                            android:text="@string/customer_name_label"/>
+                            android:text="@string/customer_name_label" />
 
                     <TextView
                             android:id="@+id/tvCustomerNameCA"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="10dp"
-                            android:layout_marginRight="10dp"/>
+                            android:layout_marginRight="10dp" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -99,14 +99,14 @@
                             android:layout_width="120dp"
                             android:layout_height="wrap_content"
                             android:gravity="left"
-                            android:text="@string/address_label"/>
+                            android:text="@string/address_label" />
 
                     <TextView
                             android:id="@+id/tvAddress"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="10dp"
-                            android:layout_marginRight="10dp"/>
+                            android:layout_marginRight="10dp" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -118,14 +118,14 @@
                             android:layout_width="120dp"
                             android:layout_height="wrap_content"
                             android:gravity="left"
-                            android:text="@string/phone_label"/>
+                            android:text="@string/phone_label" />
 
                     <TextView
                             android:id="@+id/tvPhone"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="10dp"
-                            android:layout_marginRight="10dp"/>
+                            android:layout_marginRight="10dp" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -137,14 +137,14 @@
                             android:layout_width="120dp"
                             android:layout_height="wrap_content"
                             android:gravity="left"
-                            android:text="@string/township_label"/>
+                            android:text="@string/township_label" />
 
                     <TextView
                             android:id="@+id/tvTownship"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="10dp"
-                            android:layout_marginRight="10dp"/>
+                            android:layout_marginRight="10dp" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -156,14 +156,14 @@
                             android:layout_width="120dp"
                             android:layout_height="wrap_content"
                             android:gravity="left"
-                            android:text="@string/credit_terms_label"/>
+                            android:text="@string/credit_terms_label" />
 
                     <TextView
                             android:id="@+id/tvCreditTerms"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="10dp"
-                            android:layout_marginRight="10dp"/>
+                            android:layout_marginRight="10dp" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -175,14 +175,14 @@
                             android:layout_width="120dp"
                             android:layout_height="wrap_content"
                             android:gravity="left"
-                            android:text="@string/credit_limit_label"/>
+                            android:text="@string/credit_limit_label" />
 
                     <TextView
                             android:id="@+id/tvCreditLimit"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="10dp"
-                            android:layout_marginRight="10dp"/>
+                            android:layout_marginRight="10dp" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -194,14 +194,14 @@
                             android:layout_width="120dp"
                             android:layout_height="wrap_content"
                             android:gravity="left"
-                            android:text="@string/credit_amount_label"/>
+                            android:text="@string/credit_amount_label" />
 
                     <TextView
                             android:id="@+id/tvCreditAmount"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="10dp"
-                            android:layout_marginRight="10dp"/>
+                            android:layout_marginRight="10dp" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -213,14 +213,14 @@
                             android:layout_width="120dp"
                             android:layout_height="wrap_content"
                             android:gravity="left"
-                            android:text="@string/due_amount_label"/>
+                            android:text="@string/due_amount_label" />
 
                     <TextView
                             android:id="@+id/tvDueAmount"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="10dp"
-                            android:layout_marginRight="10dp"/>
+                            android:layout_marginRight="10dp" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -232,14 +232,14 @@
                             android:layout_width="120dp"
                             android:layout_height="wrap_content"
                             android:gravity="left"
-                            android:text="@string/prepaid_amount_label"/>
+                            android:text="@string/prepaid_amount_label" />
 
                     <TextView
                             android:id="@+id/tvPrepaidAmount"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="10dp"
-                            android:layout_marginRight="10dp"/>
+                            android:layout_marginRight="10dp" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -251,14 +251,14 @@
                             android:layout_width="120dp"
                             android:layout_height="wrap_content"
                             android:gravity="left"
-                            android:text="@string/payment_type_label"/>
+                            android:text="@string/payment_type_label" />
 
                     <TextView
                             android:id="@+id/tvPaymentType"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="10dp"
-                            android:layout_marginRight="10dp"/>
+                            android:layout_marginRight="10dp" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -270,14 +270,14 @@
                             android:layout_width="120dp"
                             android:layout_height="wrap_content"
                             android:gravity="left"
-                            android:text="@string/latitude"/>
+                            android:text="@string/latitude" />
 
                     <TextView
                             android:id="@+id/tvLatitude"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="10dp"
-                            android:layout_marginRight="10dp"/>
+                            android:layout_marginRight="10dp" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -289,14 +289,14 @@
                             android:layout_width="120dp"
                             android:layout_height="wrap_content"
                             android:gravity="left"
-                            android:text="@string/longitude"/>
+                            android:text="@string/longitude" />
 
                     <TextView
                             android:id="@+id/tvLongitude"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="10dp"
-                            android:layout_marginRight="10dp"/>
+                            android:layout_marginRight="10dp" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -308,14 +308,13 @@
                             android:layout_width="120dp"
                             android:layout_height="wrap_content"
                             android:gravity="left"
-                            android:text="@string/remark_label"/>
+                            android:text="@string/remark_label" />
 
                     <TextView
                             android:id="@+id/tvCustomerRemark"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginLeft="10dp"
-                            />
+                            android:layout_marginLeft="10dp" />
                 </LinearLayout>
             </LinearLayout>
 
@@ -341,7 +340,7 @@
                             android:layout_height="wrap_content"
                             android:background="@color/colorAccent"
                             android:text="@string/sale"
-                            android:textColor="#FFFFFF"/>
+                            android:textColor="#FFFFFF" />
 
                     <Button
                             android:id="@+id/btnSaleOrder"
@@ -351,7 +350,7 @@
                             android:layout_marginTop="10dp"
                             android:background="@color/colorAccent"
                             android:text="@string/sale_order"
-                            android:textColor="#FFFFFF"/>
+                            android:textColor="#FFFFFF" />
 
                     <Button
                             android:id="@+id/btnUnsellReason"
@@ -361,7 +360,7 @@
                             android:layout_marginTop="10dp"
                             android:background="@color/colorAccent"
                             android:text="@string/unsell_reason"
-                            android:textColor="#FFFFFF"/>
+                            android:textColor="#FFFFFF" />
 
                     <Button
                             android:id="@+id/btnSaleReturn"
@@ -371,7 +370,7 @@
                             android:layout_marginTop="10dp"
                             android:background="@color/colorAccent"
                             android:text="@string/sale_return"
-                            android:textColor="#FFFFFF"/>
+                            android:textColor="#FFFFFF" />
 
                     <Button
                             android:id="@+id/btnVisitRecord"
@@ -382,7 +381,7 @@
                             android:background="@color/colorAccent"
                             android:text="@string/visit_record"
                             android:visibility="gone"
-                            android:textColor="#FFFFFF"/>
+                            android:textColor="#FFFFFF" />
 
                     <Button
                             android:id="@+id/btnPosm"
@@ -392,7 +391,7 @@
                             android:layout_marginTop="10dp"
                             android:background="@color/colorAccent"
                             android:text="@string/posm"
-                            android:textColor="#FFFFFF"/>
+                            android:textColor="#FFFFFF" />
 
                     <Button
                             android:id="@+id/btnLocation"
@@ -402,7 +401,7 @@
                             android:layout_marginTop="10dp"
                             android:background="@color/colorAccent"
                             android:text="@string/location"
-                            android:textColor="#FFFFFF"/>
+                            android:textColor="#FFFFFF" />
 
                 </LinearLayout>
 
@@ -419,7 +418,7 @@
                             android:layout_marginTop="10dp"
                             android:background="@color/colorAccent"
                             android:text="OK"
-                            android:textColor="#FFFFFF"/>
+                            android:textColor="#FFFFFF" />
 
                 </LinearLayout>
 

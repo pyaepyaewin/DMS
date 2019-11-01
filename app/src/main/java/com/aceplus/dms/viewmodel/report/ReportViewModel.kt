@@ -132,11 +132,36 @@ class ReportViewModel(
         }
     }
 
+    // sale history report
+    var saleInvoiceReportForDateList = MutableLiveData<List<SaleInvoiceReport>>()
+
+    fun loadHistoryInvoiceList() {
+        launch {
+            reportRepo.saleHistoryReport()
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.mainThread())
+                .subscribe {
+                    saleInvoiceReportList.postValue(it)
+                }
+        }
+    }
+
+    fun loadHistoryInvoiceForDateList(fromDate: String, toDate: String) {
+        launch {
+            reportRepo.saleHistoryReportForDate(fromDate, toDate)
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.mainThread())
+                .subscribe {
+                    saleInvoiceReportForDateList.postValue(it)
+                }
+        }
+    }
+
     fun loadSaleInvoiceReport() {
         var customerDataList: List<Customer>
         var saleInvoiceReport = listOf<SaleInvoiceReport>()
         launch {
-            reportRepo.saleInvoiceReport()
+            reportRepo.saleHistoryReport()
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.mainThread())
                 .subscribe {
@@ -168,7 +193,7 @@ class ReportViewModel(
                 .observeOn(schedulerProvider.mainThread())
                 .subscribe({
                     saleInvoiceDetailReportSuccessState.postValue(it)
-                    Log.d("Testing", "$it")
+                    Log.d("Invoice List", "${it.size}")
                 }, {
                     reportErrorState.value = it.localizedMessage
                 })
@@ -704,5 +729,4 @@ class ReportViewModel(
                 }
         }
     }
-
 }

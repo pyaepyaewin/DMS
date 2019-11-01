@@ -1,100 +1,100 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical">
-
-    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#898989"
-        android:padding="10dp">
+        android:orientation="vertical">
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#898989"
+            android:padding="10dp">
 
         <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="2"
-            android:gravity="center_horizontal"
-            android:text="Product Name"
-            android:textColor="#FFFFFF"
-            android:textStyle="bold" />
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:gravity="center_horizontal"
+                android:text="Product Name"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold" />
 
         <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center_horizontal"
-            android:text="Receipt QTY"
-            android:textColor="#FFFFFF"
-            android:textStyle="bold" />
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
+                android:text="Receipt QTY"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold" />
 
         <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center_horizontal"
-            android:text="Order QTY"
-            android:textColor="#FFFFFF"
-            android:textStyle="bold" />
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
+                android:text="Order QTY"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold" />
 
         <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center_horizontal"
-            android:text="Sold QTY"
-            android:textColor="#FFFFFF"
-            android:textStyle="bold" />
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
+                android:text="Sold QTY"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold" />
 
         <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center_horizontal"
-            android:text="Exchange Qty"
-            android:textColor="#FFFFFF"
-            android:textStyle="bold" />
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
+                android:text="Exchange Qty"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold" />
 
         <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center_horizontal"
-            android:text="Return Qty"
-            android:textColor="#FFFFFF"
-            android:textStyle="bold" />
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
+                android:text="Return Qty"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold" />
 
         <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center_horizontal"
-            android:text="Delivery Qty"
-            android:textColor="#FFFFFF"
-            android:textStyle="bold" />
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
+                android:text="Delivery Qty"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold" />
 
         <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center_horizontal"
-            android:text="Present Qty"
-            android:textColor="#FFFFFF"
-            android:textStyle="bold" />
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
+                android:text="Present Qty"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold" />
 
 
         <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center_horizontal"
-            android:text="Remaining QTY"
-            android:textColor="#FFFFFF"
-            android:textStyle="bold" />
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
+                android:text="Remaining QTY"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold" />
     </LinearLayout>
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/productBalanceReports"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+            android:id="@+id/productBalanceReports"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
 </LinearLayout>

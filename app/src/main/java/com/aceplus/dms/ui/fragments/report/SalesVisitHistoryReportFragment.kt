@@ -3,12 +3,10 @@ package com.aceplus.dms.ui.fragments.report
 import android.arch.lifecycle.Observer
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
-import android.widget.Spinner
 import android.widget.Toast
 import com.aceplus.dms.R
 import com.aceplus.dms.ui.adapters.report.SalesVisitHistoryReportAdapter
@@ -35,7 +33,9 @@ class SalesVisitHistoryReportFragment : BaseFragment(), KodeinAware {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        btn_sale_visit_search.setOnClickListener {  }
+        btn_sale_visit_search.setOnClickListener { }
+
+        //sale visit history list
         salesVisitHistoryReportViewModel.salesVisitHistoryReportSuccessState.observe(
             this,
             Observer {
@@ -55,7 +55,7 @@ class SalesVisitHistoryReportFragment : BaseFragment(), KodeinAware {
 
             }
             //Add customer name in spinner in this fragment
-             val customerNameSpinnerAdapter =
+            val customerNameSpinnerAdapter =
                 ArrayAdapter(context, android.R.layout.simple_spinner_item, customerNameList)
             customerNameSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             fragment_sale_visit_spinner_from_customer.adapter = customerNameSpinnerAdapter

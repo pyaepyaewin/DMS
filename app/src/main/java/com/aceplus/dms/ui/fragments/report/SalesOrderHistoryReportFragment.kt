@@ -57,6 +57,7 @@ class SalesOrderHistoryReportFragment : BaseFragment(), KodeinAware {
         table_row_advance_amt.visibility = View.VISIBLE
         sale_order_report_advanced_amount_label.visibility = View.VISIBLE
         var saleInvoiceReports = view.findViewById(R.id.saleInvoceReports) as RecyclerView
+        //sale order history list and customer list
         salesOrderHistoryReportViewModel.salesOrderHistoryReportSuccessState.observe(
             this,
             Observer {

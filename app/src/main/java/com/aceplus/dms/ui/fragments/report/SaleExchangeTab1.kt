@@ -1,5 +1,6 @@
 package com.aceplus.dms.ui.fragments.report
 
+import android.app.AlertDialog
 import android.app.Dialog
 import android.arch.lifecycle.Observer
 import android.os.Bundle
@@ -18,7 +19,9 @@ import com.aceplus.dms.viewmodel.report.ReportViewModel
 import com.aceplus.domain.vo.report.SalesReturnDetailReport
 import com.aceplus.domain.vo.report.SalesReturnReport
 import com.aceplus.shared.ui.activities.BaseFragment
+import kotlinx.android.synthetic.main.dialog_box_sale_invoice_report.view.*
 import kotlinx.android.synthetic.main.dialog_box_sale_return_detail.*
+import kotlinx.android.synthetic.main.dialog_box_sale_return_detail.view.*
 import kotlinx.android.synthetic.main.fragment_sale_return_report.*
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
@@ -28,6 +31,7 @@ class SaleExchangeTab1 : BaseFragment(),KodeinAware {
     override val kodein: Kodein by kodein()
     private val salesReturnReportAdapter: SalesReturnReportAdapter by lazy { SalesReturnReportAdapter(this::onClickItem) }
     private val salesReturnReportViewModel: ReportViewModel by viewModel()
+    private val salesReturnDetailReportAdapter: SalesReturnDetailReportAdapter by lazy { SalesReturnDetailReportAdapter() }
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -37,6 +41,7 @@ class SaleExchangeTab1 : BaseFragment(),KodeinAware {
         return view
     }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        //sale exchange tab1 report list
          salesReturnReportViewModel.salesReturnReportSuccessState.observe(this, Observer {
             salesReturnReportAdapter.setNewList(it as ArrayList<SalesReturnReport>)
         })
@@ -49,36 +54,42 @@ class SaleExchangeTab1 : BaseFragment(),KodeinAware {
             adapter = salesReturnReportAdapter
         }
         salesReturnReportViewModel.loadSalesReturnReport()
-    }
 
-    private fun onClickItem(invoiceId: String) {
-        val salesReturnDetailReportAdapter: SalesReturnDetailReportAdapter by lazy { SalesReturnDetailReportAdapter() }
-         val dialog = Dialog(context)
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setCancelable(true)
-        dialog.setCanceledOnTouchOutside(false)
-        dialog.setContentView(R.layout.dialog_box_sale_return_detail)
-
+        //sale exchange tab1 report detail list
         salesReturnReportViewModel.salesReturnDetailReportSuccessState.observe(this, Observer {
             salesReturnDetailReportAdapter.setNewList(it as ArrayList<SalesReturnDetailReport>)
         })
 
-        salesReturnReportViewModel.reportErrorState.observe(this, Observer {
-            Toast.makeText(activity, it, Toast.LENGTH_LONG).show()
-        })
-        saleReturnReportDetail.apply {
+    }
+
+    private fun onClickItem(invoiceId: String) {
+        //layout inflate for sale exchange tab1 report detail
+        val dialogBoxView =
+            activity!!.layoutInflater.inflate(
+                R.layout.dialog_box_sale_return_detail,
+                null
+            )
+        val builder = AlertDialog.Builder(activity)
+        builder.setView(dialogBoxView)
+        builder.setCancelable(false)
+        val dialog = builder.create()
+
+        dialogBoxView.saleReturnReportDetail.apply {
             layoutManager = LinearLayoutManager(activity)
             adapter = salesReturnDetailReportAdapter
         }
         salesReturnReportViewModel.loadSalesReturnDetailReport(invoiceId = invoiceId)
 
         //Action of dialog button
-        dialog.findViewById<Button>(R.id.btn_print).setOnClickListener {
+        dialogBoxView.btn_print.setOnClickListener {
+            Toast.makeText(activity, "Continue to print", Toast.LENGTH_SHORT).show()
             dialog.dismiss()
         }
-        dialog.findViewById<Button>(R.id.btn_ok).setOnClickListener {
+        dialogBoxView.btn_ok.setOnClickListener {
             dialog.dismiss()
         }
+
+        dialog.show()
 
 
     }

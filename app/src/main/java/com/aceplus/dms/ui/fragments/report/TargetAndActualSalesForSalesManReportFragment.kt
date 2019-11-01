@@ -21,6 +21,7 @@ import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
 import com.github.mikephil.charting.formatter.PercentFormatter
 import com.github.mikephil.charting.formatter.ValueFormatter
+import kotlinx.android.synthetic.main.activity_van_issue.*
 import kotlinx.android.synthetic.main.fragment_sale_comparison_report.*
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
@@ -30,8 +31,8 @@ import org.kodein.di.android.support.kodein
 class TargetAndActualSalesForSalesManReportFragment : BaseFragment(), KodeinAware {
 
     override val kodein: Kodein by kodein()
-    var groupNameList = mutableListOf<String>()
-    var categoryNameList = mutableListOf<String>()
+    private var groupNameList = mutableListOf<String>()
+    private var categoryNameList = mutableListOf<String>()
     private val targetAndActualSalesForSalesManReportViewModel: ReportViewModel by viewModel()
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -129,9 +130,9 @@ class TargetAndActualSalesForSalesManReportFragment : BaseFragment(), KodeinAwar
     private fun piChart(first: List<SaleTargetSaleMan>, second: List<Invoice>) {
         var targetAmount = 0.0
         var saleAmount = 0.0
-        val sumAmount: Double
-        val tAmount: Int
-        val sAmount: Int
+        val sumAmount :Double
+        val tAmount :Int
+        val sAmount :Int
         Log.d("First List", "${first.size}")
         Log.d("Second List", "${second.size}")
         for (target in first) {
@@ -148,10 +149,8 @@ class TargetAndActualSalesForSalesManReportFragment : BaseFragment(), KodeinAwar
             sAmount = 50
         } else {
             sumAmount = targetAmount + saleAmount
-            Log.d("Sum Amount", "$sumAmount")
             tAmount = (targetAmount.toInt() * 100) / sumAmount.toInt()
-            Log.d("Multiply Amount", "$tAmount")
-            sAmount = (saleAmount.toInt() / sumAmount.toInt()) * 100
+            sAmount = (saleAmount.toInt() * 100) / sumAmount.toInt()
         }
         piChartShow(tAmount, sAmount, targetAmount, saleAmount)
     }
@@ -178,10 +177,8 @@ class TargetAndActualSalesForSalesManReportFragment : BaseFragment(), KodeinAwar
             sAmount = 50
         } else {
             sumAmount = targetAmount + saleAmount
-            Log.d("Sum Amount", "$sumAmount")
             tAmount = (targetAmount.toInt() * 100) / sumAmount.toInt()
-            Log.d("Multiply Amount", "$tAmount")
-            sAmount = (saleAmount.toInt() / sumAmount.toInt()) * 100
+            sAmount = (saleAmount.toInt() * 100) / sumAmount.toInt()
         }
         piChartShow(tAmount, sAmount, targetAmount, saleAmount)
     }

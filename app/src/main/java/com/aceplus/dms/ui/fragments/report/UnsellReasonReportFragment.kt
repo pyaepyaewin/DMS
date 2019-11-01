@@ -2,7 +2,6 @@ package com.aceplus.dms.ui.fragments.report
 
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,9 +15,9 @@ import kotlinx.android.synthetic.main.fragment_customer_feedback_report.*
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.support.kodein
-import java.util.ArrayList
+import java.util.*
 
-class UnsellReasonReportFragment : BaseFragment(),KodeinAware {
+class UnsellReasonReportFragment : BaseFragment(), KodeinAware {
     override val kodein: Kodein by kodein()
     private val unSellReasonReportAdapter: UnsellReasonReportAdapter by lazy { UnsellReasonReportAdapter() }
 
@@ -33,10 +32,13 @@ class UnsellReasonReportFragment : BaseFragment(),KodeinAware {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        unSellReasonReportViewModel.unSellReasonReportSuccessState.observe(this,android.arch.lifecycle.Observer {
-            unSellReasonReportAdapter.setNewList(it as ArrayList<UnsellReasonReport>)
-        })
-        unSellReasonReportViewModel.reportErrorState.observe(this,android.arch.lifecycle.Observer {
+        //unSell reason report list
+        unSellReasonReportViewModel.unSellReasonReportSuccessState.observe(
+            this,
+            android.arch.lifecycle.Observer {
+                unSellReasonReportAdapter.setNewList(it as ArrayList<UnsellReasonReport>)
+            })
+        unSellReasonReportViewModel.reportErrorState.observe(this, android.arch.lifecycle.Observer {
             Toast.makeText(activity, it, Toast.LENGTH_LONG).show()
         })
 

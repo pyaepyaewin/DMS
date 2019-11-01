@@ -19,7 +19,7 @@ class SaleInvoiceReportViewHolder(
             val discountAmount = data.totalDiscountAmount
             discount.text = discountAmount.toString()
             netAmount.text = (amount - discountAmount).toString()
-            view.setOnClickListener { onClick(data.invoiceId) }
+            setOnClickListener { onClick(data.invoiceId) }
         }
     }
 }

@@ -1,74 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical">
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
     <Spinner
-        android:id="@+id/townshipspinner"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="20dp">
+            android:id="@+id/townshipspinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="20dp">
 
     </Spinner>
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="10dp"
-        android:background="#898989">
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:background="#898989">
 
 
         <TextView
-            android:id="@+id/tvCustomerName"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="left"
-            android:padding="10dp"
-            android:text="Customer Name"
-            android:textStyle="bold"
-            android:textColor="#FFFFFF" />
+                android:id="@+id/tvCustomerName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="left"
+                android:padding="10dp"
+                android:text="Customer Name"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF" />
 
         <TextView
-            android:id="@+id/shopType"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="left"
-            android:padding="10dp"
-            android:text="Township"
-            android:textStyle="bold"
-            android:textColor="#FFFFFF" />
+                android:id="@+id/shopType"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="left"
+                android:padding="10dp"
+                android:text="Township"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF" />
 
         <TextView
-            android:id="@+id/phoneNo"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="left"
-            android:padding="10dp"
-            android:text="Phone No"
-            android:textStyle="bold"
-            android:textColor="#FFFFFF" />
+                android:id="@+id/phoneNo"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="left"
+                android:padding="10dp"
+                android:text="Phone No"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF" />
 
         <TextView
-            android:id="@+id/tvAddress"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="left"
-            android:padding="10dp"
-            android:text="Address"
-            android:textStyle="bold"
-            android:textColor="#FFFFFF" />
+                android:id="@+id/tvAddress"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="left"
+                android:padding="10dp"
+                android:text="Address"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF" />
 
 
     </LinearLayout>
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/rvViewByList"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+            android:id="@+id/rvViewByList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
 
 </LinearLayout>

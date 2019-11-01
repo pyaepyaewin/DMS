@@ -26,22 +26,26 @@ class EndOfDayReportFragment : BaseFragment(), KodeinAware {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         fragment_daily_report_date.text = endOfDayReportViewModel.setCurrentDate()
+        //sale man name list
         endOfDayReportViewModel.saleManDataList.observe(this, Observer {
             for (i in it!!) {
                 fragment_daily_report_sale_man.text = i.user_name
             }
         })
+        //route name list
         endOfDayReportViewModel.saleManRouteNameDataList.observe(this, Observer {
             for (i in it!!) {
                 fragment_daily_report_route.text = i.route_name
             }
         })
+        //start time and end time list
         endOfDayReportViewModel.startTimeAndEndTimeList.observe(this, Observer {
             for (i in it!!) {
                 fragment_daily_report_start_time.text = i.start_time
                 fragment_daily_report_end_time.text = i.end_time
             }
         })
+        //get total exchange and sale count from Pair List
         endOfDayReportViewModel.saleTargetAndSaleManReportSuccessState.observe(this, Observer {
             if (it != null) {
                 var saleAmount = 0.0
@@ -57,6 +61,7 @@ class EndOfDayReportFragment : BaseFragment(), KodeinAware {
                 fragment_daily_report_total_sale_count.text = "0"
             }
         })
+        //customer list
         endOfDayReportViewModel.customerDataList.observe(this, Observer {
             if (it != null) {
                 fragment_daily_report_total_customer.text = it!!.size.toString()
@@ -64,9 +69,11 @@ class EndOfDayReportFragment : BaseFragment(), KodeinAware {
                 fragment_daily_report_total_customer.text = "0"
             }
         })
+        //new customer list
         endOfDayReportViewModel.dataForNewCustomerList.observe(this, Observer {
             fragment_daily_report_new_customer.text = it!!.size.toString()
         })
+        //total sale order list
         endOfDayReportViewModel.totalSaleOrderList.observe(this, Observer {
             var orderAmount = 0
             if (it != null) {
@@ -80,6 +87,7 @@ class EndOfDayReportFragment : BaseFragment(), KodeinAware {
                 fragment_daily_report_total_order_sale.text = "0"
             }
         })
+        //total sale exchange list
         endOfDayReportViewModel.totalSaleExchangeList.observe(this, Observer {
             if (it != null) {
                 fragment_daily_report_sale_exchange.text = it.size.toString()
@@ -87,6 +95,7 @@ class EndOfDayReportFragment : BaseFragment(), KodeinAware {
                 fragment_daily_report_sale_exchange.text = "0"
             }
         })
+        //total sale return list
         endOfDayReportViewModel.totalSaleReturnList.observe(this, Observer {
             var returnAmount = 0
             if (it != null) {
@@ -100,6 +109,7 @@ class EndOfDayReportFragment : BaseFragment(), KodeinAware {
                 fragment_daily_report_sale_return.text = "0"
             }
         })
+        //total cash receive list
         endOfDayReportViewModel.totalCashReceiptList.observe(this, Observer {
             if (it != null) {
                 var netCash = 0
@@ -114,11 +124,13 @@ class EndOfDayReportFragment : BaseFragment(), KodeinAware {
                 fragment_daily_report_total_cash_receipt_count.text = "0"
             }
         })
+        //plan customer list
         endOfDayReportViewModel.planCustomerList.observe(this, Observer {
             if (it != null) {
                 fragment_daily_report_plan_customer.text = it.size.toString()
             }
         })
+        //not visited count list
         endOfDayReportViewModel.dataNotVisitedCountList.observe(this, Observer {
             if (it != null) {
                 fragment_daily_report_not_visited_count.text = it.size.toString()

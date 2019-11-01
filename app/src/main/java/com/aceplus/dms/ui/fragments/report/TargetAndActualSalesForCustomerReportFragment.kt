@@ -173,10 +173,8 @@ class TargetAndActualSalesForCustomerReportFragment : BaseFragment(), KodeinAwar
             sAmount = 50
         } else {
             sumAmount = targetAmount + saleAmount
-            Log.d("Target Amount", "$sumAmount")
             tAmount = (targetAmount.toInt() * 100) / sumAmount.toInt()
-            Log.d("Multiply Amount", "$tAmount")
-            sAmount = (saleAmount.toInt() / sumAmount.toInt()) * 100
+            sAmount = (saleAmount.toInt() * 100) / sumAmount.toInt()
         }
         showChart(tAmount, sAmount, targetAmount, saleAmount)
 
@@ -204,10 +202,8 @@ class TargetAndActualSalesForCustomerReportFragment : BaseFragment(), KodeinAwar
             sAmount = 50
         } else {
             sumAmount = targetAmount + saleAmount
-            Log.d("Target Amount", "$sumAmount")
             tAmount = (targetAmount.toInt() * 100) / sumAmount.toInt()
-            Log.d("Multiply Amount", "$tAmount")
-            sAmount = (saleAmount.toInt() / sumAmount.toInt()) * 100
+            sAmount = (saleAmount.toInt() * 100) / sumAmount.toInt()
         }
         showChart(tAmount, sAmount, targetAmount, saleAmount)
 

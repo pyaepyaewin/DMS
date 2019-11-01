@@ -1,15 +1,12 @@
 package com.aceplus.dms.ui.fragments.report
 
-import android.app.Dialog
+import android.app.AlertDialog
 import android.arch.lifecycle.Observer
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.Window
-import android.widget.Button
 import android.widget.Toast
 import com.aceplus.dms.R
 import com.aceplus.dms.ui.adapters.report.DeliverDetailReportAdapter
@@ -18,7 +15,8 @@ import com.aceplus.dms.viewmodel.report.ReportViewModel
 import com.aceplus.domain.vo.report.DeliverDetailReport
 import com.aceplus.domain.vo.report.DeliverReport
 import com.aceplus.shared.ui.activities.BaseFragment
-import kotlinx.android.synthetic.main.dialog_box_deliveryinvoice_report.*
+import kotlinx.android.synthetic.main.dialog_box_deliveryinvoice_report.view.*
+import kotlinx.android.synthetic.main.dialog_box_sale_invoice_report.view.*
 import kotlinx.android.synthetic.main.fragment_deliveryinvoice_report.*
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
@@ -41,6 +39,7 @@ class DeliverReportFragment : BaseFragment(), KodeinAware {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        //delivery report list
         deliverReportViewModel.deliverReportSuccessState.observe(this, Observer {
             deliveryReportAdapter.setNewList(it as ArrayList<DeliverReport>)
         })
@@ -53,35 +52,42 @@ class DeliverReportFragment : BaseFragment(), KodeinAware {
             adapter = deliveryReportAdapter
         }
         deliverReportViewModel.loadDeliverReport()
-    }
 
-    private fun onClickItem(invoiceId: String) {
-        val dialog = Dialog(context)
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setCancelable(true)
-        dialog.setCanceledOnTouchOutside(false)
-        dialog.setContentView(R.layout.dialog_box_deliveryinvoice_report)
-
+        //delivery report detail list
         deliverReportViewModel.deliverDetailReportSuccessState.observe(this, Observer {
             deliverDetailReportAdapter.setNewList(it as ArrayList<DeliverDetailReport>)
         })
 
-        deliverReportViewModel.reportErrorState.observe(this, Observer {
-            Toast.makeText(activity, it, Toast.LENGTH_LONG).show()
-        })
-        deliveryInvoiceDetailRecycleView.apply {
+    }
+
+    private fun onClickItem(invoiceId: String) {
+        //layout inflate for delivery report detail
+        val dialogBoxView =
+            activity!!.layoutInflater.inflate(
+                R.layout.dialog_box_deliveryinvoice_report,
+                null
+            )
+        val builder = AlertDialog.Builder(activity)
+        builder.setView(dialogBoxView)
+        builder.setCancelable(false)
+        val dialog = builder.create()
+
+        dialogBoxView.deliveryInvoiceDetailRecycleView.apply {
             layoutManager = LinearLayoutManager(activity)
             adapter = deliverDetailReportAdapter
         }
         deliverReportViewModel.loadDeliverDetailReport(invoiceId = invoiceId)
 
         //Action of dialog button
-        dialog.findViewById<Button>(R.id.btn_print).setOnClickListener {
+        dialogBoxView.btn_print.setOnClickListener {
+            Toast.makeText(activity, "Continue to print", Toast.LENGTH_SHORT).show()
             dialog.dismiss()
         }
-        dialog.findViewById<Button>(R.id.btn_ok).setOnClickListener {
+        dialogBoxView.btn_ok.setOnClickListener {
             dialog.dismiss()
         }
+
+        dialog.show()
 
     }
 

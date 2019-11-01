@@ -366,9 +366,8 @@ class AddNewCustomerActivity : BaseActivity(), KodeinAware {
                 AlertDialog.Builder(this)
                     .setTitle("")
                     .setMessage("Need to customer information")
-                    .setPositiveButton("Yes") { _, _ ->
-                        val intent = Intent(application, CustomerVisitActivity::class.java)
-                        startActivity(intent)
+                    .setPositiveButton("Yes") { dialog, _ ->
+                       dialog.dismiss()
                     }
                     .show()
             } else {
@@ -384,15 +383,31 @@ class AddNewCustomerActivity : BaseActivity(), KodeinAware {
         }
 
         next_img.setOnClickListener {
-            val intent = AddNewCustomerLocationActivity.newIntentFromAddNewCustomerActivity(
-                applicationContext,
-                tvCustomerName.text.toString(),
-                contactPerson.text.toString(),
-                phoneNumber.text.toString(),
-                tvAddress.text.toString()
-            )
-            startActivity(intent)
-            finish()
+            if (tvCustomerName.text.isNullOrEmpty() ||
+                contactPerson.text.isNullOrEmpty() ||
+                phoneNumber.text.isNullOrEmpty() ||
+                tvAddress.text.isNullOrEmpty() ||
+                customer_location.text.isNullOrEmpty()
+
+            ) {
+                AlertDialog.Builder(this)
+                    .setTitle("")
+                    .setMessage("Need to customer information")
+                    .setPositiveButton("Yes") { dialog, _ ->
+                        dialog.dismiss()
+                    }
+                    .show()
+            } else {
+                val intent = AddNewCustomerLocationActivity.newIntentFromAddNewCustomerActivity(
+                    applicationContext,
+                    tvCustomerName.text.toString(),
+                    contactPerson.text.toString(),
+                    phoneNumber.text.toString(),
+                    tvAddress.text.toString()
+                )
+                startActivity(intent)
+                finish()
+            }
         }
 
 

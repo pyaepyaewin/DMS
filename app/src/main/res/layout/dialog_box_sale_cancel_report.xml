@@ -1,84 +1,84 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical" >
-
-    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="10dp">
+        android:orientation="vertical">
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp">
 
         <TextView
-            android:id="@+id/productNameTextView"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="2"
-            android:gravity="center_horizontal"
-            android:text="Product name"
-            android:textStyle="bold"
-            android:textColor="#FFFFFF" />
+                android:id="@+id/productNameTextView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:gravity="center_horizontal"
+                android:text="Product name"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF" />
 
         <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center_horizontal"
-            android:text="Quantity"
-            android:textStyle="bold"
-            android:textColor="#FFFFFF" />
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
+                android:text="Quantity"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF" />
 
         <TextView
-            android:id="@+id/discount"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center_horizontal"
-            android:text="Discount Amount"
-            android:textStyle="bold"
-            android:textColor="#FFFFFF" />
+                android:id="@+id/discount"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
+                android:text="Discount Amount"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF" />
 
 
         <TextView
-            android:id="@+id/amount"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center_horizontal"
-            android:text="Amount"
-            android:textStyle="bold"
-            android:textColor="#FFFFFF" />
+                android:id="@+id/amount"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
+                android:text="Amount"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF" />
     </LinearLayout>
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/saleCancelDialog"
-        android:layout_width="match_parent"
-        android:padding="10dp"
-        android:layout_height="300dp"/>
+            android:id="@+id/saleCancelDialog"
+            android:layout_width="match_parent"
+            android:padding="10dp"
+            android:layout_height="300dp" />
 
     <RelativeLayout
-        android:id="@+id/rl_reprint"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:layout_margin="20dp">
+            android:id="@+id/rl_reprint"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:layout_margin="20dp">
 
         <Button
-            android:id="@+id/btn_print"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:background="@android:color/transparent"
-            android:textColor="@color/colorPrimaryDark"
-            android:text="Print" />
+                android:id="@+id/btn_print"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:background="@android:color/transparent"
+                android:textColor="@color/colorPrimaryDark"
+                android:text="Print" />
 
         <Button
-            android:id="@+id/btn_ok"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:background="@android:color/transparent"
-            android:textColor="@color/colorPrimaryDark"
-            android:text="OK" />
+                android:id="@+id/btn_ok"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:background="@android:color/transparent"
+                android:textColor="@color/colorPrimaryDark"
+                android:text="OK" />
     </RelativeLayout>
 </LinearLayout>

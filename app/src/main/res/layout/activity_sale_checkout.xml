@@ -1,302 +1,301 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
     <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/appbar_height"
-        android:background="@color/colorAccent">
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/appbar_height"
+            android:background="@color/colorAccent">
 
         <ImageView
-            android:id="@+id/back_img"
-            android:layout_width="@dimen/btn_appbar_width"
-            android:layout_height="@dimen/btn_appbar_height"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="20dp"
-            android:src="@drawable/ic_cancel_xh_btn" />
+                android:id="@+id/back_img"
+                android:layout_width="@dimen/btn_appbar_width"
+                android:layout_height="@dimen/btn_appbar_height"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="20dp"
+                android:src="@drawable/ic_cancel_xh_btn" />
 
         <ImageView
-            android:id="@+id/confirmAndPrint_img"
-            android:layout_width="@dimen/btn_appbar_width"
-            android:layout_height="@dimen/btn_appbar_height"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="20dp"
-            android:layout_toRightOf="@+id/back_img"
-            android:src="@drawable/ic_done_hx_btn" />
+                android:id="@+id/confirmAndPrint_img"
+                android:layout_width="@dimen/btn_appbar_width"
+                android:layout_height="@dimen/btn_appbar_height"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="20dp"
+                android:layout_toRightOf="@+id/back_img"
+                android:src="@drawable/ic_done_hx_btn" />
 
         <TextView
-            android:id="@+id/title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
-            android:text="@string/sale_checkout"
-            android:textColor="#ffffff"
-            android:textSize="@dimen/appbar_title_size" />
+                android:id="@+id/title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:text="@string/sale_checkout"
+                android:textColor="#ffffff"
+                android:textSize="@dimen/appbar_title_size" />
     </RelativeLayout>
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:baselineAligned="false">
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:baselineAligned="false">
 
         <RelativeLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1">
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1">
 
             <LinearLayout
-                android:id="@+id/headerLayout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="10dp"
-                android:background="#898989"
-                android:paddingTop="10dp"
-                android:paddingBottom="10dp">
+                    android:id="@+id/headerLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:background="#898989"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp">
 
                 <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="3"
-                    android:gravity="center_horizontal"
-                    android:layout_gravity="center_vertical"
-                    android:text="@string/product"
-                    android:textColor="#FFFFFF"
-                    android:textStyle="bold" />
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="3"
+                        android:gravity="center_horizontal"
+                        android:layout_gravity="center_vertical"
+                        android:text="@string/product"
+                        android:textColor="#FFFFFF"
+                        android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/tableHeaderUM"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center_horizontal"
-                    android:layout_gravity="center_vertical"
-                    android:text="@string/um"
-                    android:textColor="#FFFFFF"
-                    android:textStyle="bold" />
+                        android:id="@+id/tableHeaderUM"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center_horizontal"
+                        android:layout_gravity="center_vertical"
+                        android:text="@string/um"
+                        android:textColor="#FFFFFF"
+                        android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/tableHeaderQty"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center_horizontal"
-                    android:layout_gravity="center_vertical"
-                    android:text="@string/qty"
-                    android:textColor="#FFFFFF"
-                    android:textStyle="bold" />
+                        android:id="@+id/tableHeaderQty"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center_horizontal"
+                        android:layout_gravity="center_vertical"
+                        android:text="@string/qty"
+                        android:textColor="#FFFFFF"
+                        android:textStyle="bold" />
 
                 <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center_horizontal"
-                    android:layout_gravity="center_vertical"
-                    android:text="@string/price"
-                    android:textColor="#FFFFFF"
-                    android:textStyle="bold" />
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center_horizontal"
+                        android:layout_gravity="center_vertical"
+                        android:text="@string/price"
+                        android:textColor="#FFFFFF"
+                        android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/tableHeaderDiscount"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center_horizontal"
-                    android:layout_gravity="center_vertical"
-                    android:text="@string/discount"
-                    android:textColor="#FFFFFF"
-                    android:textStyle="bold" />
+                        android:id="@+id/tableHeaderDiscount"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center_horizontal"
+                        android:layout_gravity="center_vertical"
+                        android:text="@string/discount"
+                        android:textColor="#FFFFFF"
+                        android:textStyle="bold" />
 
                 <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="2"
-                    android:gravity="center_horizontal"
-                    android:layout_gravity="center_vertical"
-                    android:text="@string/amount"
-                    android:textColor="#FFFFFF"
-                    android:textStyle="bold" />
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="2"
+                        android:gravity="center_horizontal"
+                        android:layout_gravity="center_vertical"
+                        android:text="@string/amount"
+                        android:textColor="#FFFFFF"
+                        android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/tableHeaderFoc"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center_horizontal"
-                    android:layout_gravity="center_vertical"
-                    android:text="@string/foc"
-                    android:textColor="#FFFFFF"
-                    android:textStyle="bold"
-                    android:visibility="gone" />
+                        android:id="@+id/tableHeaderFoc"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center_horizontal"
+                        android:layout_gravity="center_vertical"
+                        android:text="@string/foc"
+                        android:textColor="#FFFFFF"
+                        android:textStyle="bold"
+                        android:visibility="gone" />
             </LinearLayout>
 
             <ScrollView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/soldProductList">
-
-                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:layout_below="@+id/soldProductList">
 
-                    <android.support.v7.widget.RecyclerView
-                        android:id="@+id/promotion_plan_item_rv"
+                <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:padding="10dp" />
+                        android:orientation="vertical">
 
                     <android.support.v7.widget.RecyclerView
-                        android:id="@+id/promotion_plan_gift_rv"
-                        android:layout_width="match_parent"
-                        android:layout_height="150dp"
-                        android:padding="10dp" />
+                            android:id="@+id/promotion_plan_item_rv"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:padding="10dp" />
+
+                    <android.support.v7.widget.RecyclerView
+                            android:id="@+id/promotion_plan_gift_rv"
+                            android:layout_width="match_parent"
+                            android:layout_height="150dp"
+                            android:padding="10dp" />
 
                 </LinearLayout>
 
             </ScrollView>
 
             <android.support.v7.widget.RecyclerView
-                android:id="@+id/rvSoldProductList"
-                android:layout_width="match_parent"
-                android:layout_height="300dp"
-                android:layout_below="@+id/headerLayout"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentLeft="true"
-                android:padding="10dp" />
+                    android:id="@+id/rvSoldProductList"
+                    android:layout_width="match_parent"
+                    android:layout_height="300dp"
+                    android:layout_below="@+id/headerLayout"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentLeft="true"
+                    android:padding="10dp" />
 
         </RelativeLayout>
 
         <ScrollView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
 
             <LinearLayout
-                android:layout_width="300dp"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
+                    android:layout_width="300dp"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
 
                 <LinearLayout
-                    android:id="@+id/saleDateLayout"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:orientation="horizontal"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginBottom="10dp">
+                        android:id="@+id/saleDateLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginBottom="10dp">
 
                     <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/sale_date"
-                        android:textAppearance="?android:attr/textAppearanceMedium" />
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/sale_date"
+                            android:textAppearance="?android:attr/textAppearanceMedium" />
 
                     <TextView
-                        android:id="@+id/saleDateTextView"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:padding="7dp"
-                        android:text="25/05/2015"
-                        android:textAppearance="?android:attr/textAppearanceMedium" />
+                            android:id="@+id/saleDateTextView"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:padding="7dp"
+                            android:text="25/05/2015"
+                            android:textAppearance="?android:attr/textAppearanceMedium" />
                 </LinearLayout>
 
                 <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp">
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp">
 
                     <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginRight="10dp"
-                        android:layout_weight="2"
-                        android:gravity="right"
-                        android:text="@string/invoice_id" />
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="10dp"
+                            android:layout_weight="2"
+                            android:gravity="right"
+                            android:text="@string/invoice_id" />
 
                     <TextView
-                        android:id="@+id/tvInvoiceId"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="3" />
+                            android:id="@+id/tvInvoiceId"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="3" />
                     <!--android:text="inv-00000000001"-->
                 </LinearLayout>
 
                 <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <LinearLayout
-                        android:id="@+id/advancedPaidAmountLayout"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp">
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginRight="10dp"
-                            android:layout_weight="2"
-                            android:gravity="right"
-                            android:text="Advanced Paid:" />
-
-                        <TextView
-                            android:id="@+id/advancedPaidAmount"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="3"
-                            android:text="0" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp">
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginRight="10dp"
-                            android:layout_weight="2"
-                            android:gravity="right"
-                            android:text="@string/total_amount_" />
-
-                        <TextView
-                            android:id="@+id/tvTotalAmount"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="3"
-                            android:text="0" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/totalInfoForGeneralSale"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical">
 
-                        <LinearLayout
-                            android:id="@+id/llNormalCustomer"
+                    <LinearLayout
+                            android:id="@+id/advancedPaidAmountLayout"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp">
+
+                        <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginRight="10dp"
+                                android:layout_weight="2"
+                                android:gravity="right"
+                                android:text="Advanced Paid:" />
+
+                        <TextView
+                                android:id="@+id/advancedPaidAmount"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="3"
+                                android:text="0" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp">
+
+                        <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginRight="10dp"
+                                android:layout_weight="2"
+                                android:gravity="right"
+                                android:text="@string/total_amount_" />
+
+                        <TextView
+                                android:id="@+id/tvTotalAmount"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="3"
+                                android:text="0" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                            android:id="@+id/totalInfoForGeneralSale"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="vertical">
 
-                            <LinearLayout
-                                android:id="@+id/volumeDiscountLayout"
+                        <LinearLayout
+                                android:id="@+id/llNormalCustomer"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="5dp">
+                                android:orientation="vertical">
+
+                            <LinearLayout
+                                    android:id="@+id/volumeDiscountLayout"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="5dp">
 
                                 <TextView
-                                    android:layout_width="0dp"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginRight="10dp"
-                                    android:layout_weight="2"
-                                    android:gravity="right"
-                                    android:text="@string/volume_discount" />
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginRight="10dp"
+                                        android:layout_weight="2"
+                                        android:gravity="right"
+                                        android:text="@string/volume_discount" />
 
                                 <!-- <TextView
                                     android:id="@+id/volumeDiscount"
@@ -306,274 +305,274 @@
                                     android:text="0" />-->
 
                                 <EditText
-                                    android:id="@+id/edtVolumeDiscountPercent"
-                                    android:layout_width="0dp"
-                                    android:layout_height="wrap_content"
-                                    android:layout_weight="2"
-                                    android:hint="0"
-                                    android:imeOptions="actionDone"
-                                    android:inputType="numberDecimal"
-                                    android:selectAllOnFocus="true" />
+                                        android:id="@+id/edtVolumeDiscountPercent"
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="2"
+                                        android:hint="0"
+                                        android:imeOptions="actionDone"
+                                        android:inputType="numberDecimal"
+                                        android:selectAllOnFocus="true" />
 
                                 <Button
-                                    android:id="@+id/btn_disOk"
-                                    android:layout_width="0dp"
-                                    android:layout_height="wrap_content"
-                                    android:layout_weight="1"
-                                    android:text="Ok" />
+                                        android:id="@+id/btn_disOk"
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:text="Ok" />
                             </LinearLayout>
 
                             <LinearLayout
-                                android:id="@+id/totalvolumeDiscountLayout"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="3dp"
-                                android:layout_marginBottom="5dp">
+                                    android:id="@+id/totalvolumeDiscountLayout"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="3dp"
+                                    android:layout_marginBottom="5dp">
 
                                 <TextView
-                                    android:layout_width="0dp"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginRight="10dp"
-                                    android:layout_weight="2"
-                                    android:gravity="right"
-                                    android:text="@string/t_volume_discount" />
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginRight="10dp"
+                                        android:layout_weight="2"
+                                        android:gravity="right"
+                                        android:text="@string/t_volume_discount" />
 
                                 <EditText
-                                    android:id="@+id/edtVolumeDiscountAmt"
-                                    android:layout_width="0dp"
-                                    android:layout_height="wrap_content"
-                                    android:layout_weight="2"
-                                    android:hint="0"
-                                    android:imeOptions="actionDone"
-                                    android:inputType="numberDecimal"
-                                    android:selectAllOnFocus="true" />
+                                        android:id="@+id/edtVolumeDiscountAmt"
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="2"
+                                        android:hint="0"
+                                        android:imeOptions="actionDone"
+                                        android:inputType="numberDecimal"
+                                        android:selectAllOnFocus="true" />
 
                                 <Button
-                                    android:id="@+id/btn_amtOk"
-                                    android:layout_width="0dp"
-                                    android:layout_height="wrap_content"
-                                    android:layout_weight="1"
-                                    android:text="Ok" />
+                                        android:id="@+id/btn_amtOk"
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:text="Ok" />
                             </LinearLayout>
 
                         </LinearLayout>
 
                         <LinearLayout
-                            android:id="@+id/llPromotionCustomer"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:visibility="gone">
-
-                            <LinearLayout
+                                android:id="@+id/llPromotionCustomer"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="10dp">
+                                android:orientation="vertical"
+                                android:visibility="gone">
+
+                            <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="10dp">
 
                                 <TextView
-                                    android:layout_width="0dp"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginRight="10dp"
-                                    android:layout_weight="2"
-                                    android:gravity="right"
-                                    android:text="@string/product_discount_percent" />
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginRight="10dp"
+                                        android:layout_weight="2"
+                                        android:gravity="right"
+                                        android:text="@string/product_discount_percent" />
 
                                 <EditText
-                                    android:id="@+id/edtProductDiscountPercent"
-                                    android:layout_width="0dp"
-                                    android:layout_height="wrap_content"
-                                    android:layout_weight="3"
-                                    android:focusableInTouchMode="false"
-                                    android:inputType="numberDecimal" />
+                                        android:id="@+id/edtProductDiscountPercent"
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="3"
+                                        android:focusableInTouchMode="false"
+                                        android:inputType="numberDecimal" />
                             </LinearLayout>
 
                             <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="10dp">
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="10dp">
 
                                 <TextView
-                                    android:layout_width="0dp"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginRight="10dp"
-                                    android:layout_weight="2"
-                                    android:gravity="right"
-                                    android:text="@string/product_discount_amount" />
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginRight="10dp"
+                                        android:layout_weight="2"
+                                        android:gravity="right"
+                                        android:text="@string/product_discount_amount" />
 
                                 <EditText
-                                    android:id="@+id/edtProductDiscountAmount"
-                                    android:layout_width="0dp"
-                                    android:layout_height="wrap_content"
-                                    android:layout_weight="3"
-                                    android:focusableInTouchMode="false"
-                                    android:inputType="numberDecimal" />
+                                        android:id="@+id/edtProductDiscountAmount"
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="3"
+                                        android:focusableInTouchMode="false"
+                                        android:inputType="numberDecimal" />
                             </LinearLayout>
 
                             <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="10dp">
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="10dp">
 
                                 <TextView
-                                    android:layout_width="0dp"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginRight="10dp"
-                                    android:layout_weight="2"
-                                    android:gravity="right"
-                                    android:text="@string/net_amount1" />
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginRight="10dp"
+                                        android:layout_weight="2"
+                                        android:gravity="right"
+                                        android:text="@string/net_amount1" />
 
                                 <TextView
-                                    android:id="@+id/netAmount1"
-                                    android:layout_width="0dp"
-                                    android:layout_height="wrap_content"
-                                    android:layout_weight="3"
-                                    android:text="10000" />
+                                        android:id="@+id/netAmount1"
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="3"
+                                        android:text="10000" />
 
                             </LinearLayout>
 
                             <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="10dp">
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="10dp">
 
                                 <TextView
-                                    android:layout_width="0dp"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginRight="10dp"
-                                    android:layout_weight="2"
-                                    android:gravity="right"
-                                    android:text="@string/delivery_discount_percent" />
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginRight="10dp"
+                                        android:layout_weight="2"
+                                        android:gravity="right"
+                                        android:text="@string/delivery_discount_percent" />
 
                                 <EditText
-                                    android:id="@+id/edtDeliveryDiscountPercent"
-                                    android:layout_width="0dp"
-                                    android:layout_height="wrap_content"
-                                    android:layout_weight="3"
-                                    android:focusableInTouchMode="false"
-                                    android:inputType="numberDecimal" />
+                                        android:id="@+id/edtDeliveryDiscountPercent"
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="3"
+                                        android:focusableInTouchMode="false"
+                                        android:inputType="numberDecimal" />
                             </LinearLayout>
 
                             <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="10dp">
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="10dp">
 
                                 <TextView
-                                    android:layout_width="0dp"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginRight="10dp"
-                                    android:layout_weight="2"
-                                    android:gravity="right"
-                                    android:text="@string/delivery_discount_amount" />
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginRight="10dp"
+                                        android:layout_weight="2"
+                                        android:gravity="right"
+                                        android:text="@string/delivery_discount_amount" />
 
                                 <EditText
-                                    android:id="@+id/edtDeliveryDiscountAmount"
-                                    android:layout_width="0dp"
-                                    android:layout_height="wrap_content"
-                                    android:layout_weight="3"
-                                    android:focusableInTouchMode="false"
-                                    android:inputType="numberDecimal" />
+                                        android:id="@+id/edtDeliveryDiscountAmount"
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="3"
+                                        android:focusableInTouchMode="false"
+                                        android:inputType="numberDecimal" />
                             </LinearLayout>
                         </LinearLayout>
 
                         <LinearLayout
-                            android:id="@+id/netAmountLayout"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="12dp">
+                                android:id="@+id/netAmountLayout"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="12dp">
 
                             <TextView
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_marginRight="10dp"
-                                android:layout_weight="2"
-                                android:gravity="right"
-                                android:text="@string/net_amount" />
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginRight="10dp"
+                                    android:layout_weight="2"
+                                    android:gravity="right"
+                                    android:text="@string/net_amount" />
 
                             <TextView
-                                android:id="@+id/tvNetAmount"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="3"
-                                android:text="0" />
+                                    android:id="@+id/tvNetAmount"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="3"
+                                    android:text="0" />
 
                         </LinearLayout>
 
                         <LinearLayout
-                            android:id="@+id/SaleExchangeLayout"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:visibility="gone">
-
-                            <LinearLayout
-                                android:id="@+id/SaleReturnAmountLayout"
+                                android:id="@+id/SaleExchangeLayout"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="10dp">
+                                android:orientation="vertical"
+                                android:visibility="gone">
+
+                            <LinearLayout
+                                    android:id="@+id/SaleReturnAmountLayout"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="10dp">
 
                                 <TextView
-                                    android:layout_width="0dp"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginRight="10dp"
-                                    android:layout_weight="2"
-                                    android:gravity="right"
-                                    android:text="Sale Return Amount" />
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginRight="10dp"
+                                        android:layout_weight="2"
+                                        android:gravity="right"
+                                        android:text="Sale Return Amount" />
 
                                 <TextView
-                                    android:id="@+id/salereturnAmount"
-                                    android:layout_width="0dp"
-                                    android:layout_height="wrap_content"
-                                    android:layout_weight="3"
-                                    android:text="100,000" />
+                                        android:id="@+id/salereturnAmount"
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="3"
+                                        android:text="100,000" />
 
 
                             </LinearLayout>
 
                             <LinearLayout
-                                android:id="@+id/PayAmountFromCustomerLayout"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="10dp">
+                                    android:id="@+id/PayAmountFromCustomerLayout"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="10dp">
 
                                 <TextView
-                                    android:layout_width="0dp"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginRight="10dp"
-                                    android:layout_weight="2"
-                                    android:gravity="right"
-                                    android:text="PayAmount From Customer" />
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginRight="10dp"
+                                        android:layout_weight="2"
+                                        android:gravity="right"
+                                        android:text="PayAmount From Customer" />
 
                                 <TextView
-                                    android:id="@+id/payamountfromcustomer"
-                                    android:layout_width="0dp"
-                                    android:layout_height="wrap_content"
-                                    android:layout_weight="3"
-                                    android:text="100,000" />
+                                        android:id="@+id/payamountfromcustomer"
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="3"
+                                        android:text="100,000" />
 
 
                             </LinearLayout>
 
                             <LinearLayout
-                                android:id="@+id/RefundtoCutomerLayout"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="10dp">
+                                    android:id="@+id/RefundtoCutomerLayout"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="10dp">
 
                                 <TextView
-                                    android:layout_width="0dp"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginRight="10dp"
-                                    android:layout_weight="2"
-                                    android:gravity="right"
-                                    android:text="Refund to Customer" />
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginRight="10dp"
+                                        android:layout_weight="2"
+                                        android:gravity="right"
+                                        android:text="Refund to Customer" />
 
                                 <TextView
-                                    android:id="@+id/refundtocustomer"
-                                    android:layout_width="0dp"
-                                    android:layout_height="wrap_content"
-                                    android:layout_weight="3"
-                                    android:text="100,000" />
+                                        android:id="@+id/refundtocustomer"
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="3"
+                                        android:text="100,000" />
 
 
                             </LinearLayout>
@@ -582,350 +581,350 @@
                         </LinearLayout>
 
                         <LinearLayout
-                            android:id="@+id/payAmountLayout"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="10dp">
+                                android:id="@+id/payAmountLayout"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="10dp">
 
                             <TextView
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_marginRight="10dp"
-                                android:layout_weight="2"
-                                android:gravity="right"
-                                android:text="@string/pay_amount" />
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginRight="10dp"
+                                    android:layout_weight="2"
+                                    android:gravity="right"
+                                    android:text="@string/pay_amount" />
 
                             <EditText
-                                android:id="@+id/payAmount"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="3"
-                                android:inputType="numberDecimal" />
+                                    android:id="@+id/payAmount"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="3"
+                                    android:inputType="numberDecimal" />
                         </LinearLayout>
 
                         <LinearLayout
-                            android:id="@+id/paymentMethodLayout"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="10dp">
+                                android:id="@+id/paymentMethodLayout"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="10dp">
 
                             <TextView
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_marginRight="10dp"
-                                android:layout_weight="2"
-                                android:gravity="right"
-                                android:layout_gravity="center_vertical"
-                                android:text="@string/payment_method" />
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginRight="10dp"
+                                    android:layout_weight="2"
+                                    android:gravity="right"
+                                    android:layout_gravity="center_vertical"
+                                    android:text="@string/payment_method" />
 
                             <RadioGroup
-                                android:id="@+id/activity_sale_checkout_radio_group"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="3"
-                                android:orientation="horizontal">
+                                    android:id="@+id/activity_sale_checkout_radio_group"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="3"
+                                    android:orientation="horizontal">
 
                                 <RadioButton
-                                    android:id="@+id/activity_sale_checkout_radio_bank"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Bank" />
+                                        android:id="@+id/activity_sale_checkout_radio_bank"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="Bank" />
 
                                 <RadioButton
-                                    android:id="@+id/activity_sale_checkout_radio_cash"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:checked="true"
-                                    android:layout_marginLeft="5dp"
-                                    android:text="Cash" />
+                                        android:id="@+id/activity_sale_checkout_radio_cash"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:checked="true"
+                                        android:layout_marginLeft="5dp"
+                                        android:text="Cash" />
 
                             </RadioGroup>
                         </LinearLayout>
 
                         <LinearLayout
-                            android:id="@+id/bank_branch_layout"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="10dp"
-                            android:visibility="gone">
+                                android:id="@+id/bank_branch_layout"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="10dp"
+                                android:visibility="gone">
 
                             <TextView
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_marginRight="10dp"
-                                android:layout_weight="2"
-                                android:gravity="right"
-                                android:text="Bank Name : " />
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginRight="10dp"
+                                    android:layout_weight="2"
+                                    android:gravity="right"
+                                    android:text="Bank Name : " />
 
                             <EditText
-                                android:id="@+id/edit_txt_branch_name"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="3"
-                                android:text="" />
+                                    android:id="@+id/edit_txt_branch_name"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="3"
+                                    android:text="" />
                         </LinearLayout>
 
                         <LinearLayout
-                            android:id="@+id/bank_account_layout"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="10dp"
-                            android:visibility="gone">
+                                android:id="@+id/bank_account_layout"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="10dp"
+                                android:visibility="gone">
 
                             <TextView
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_marginRight="10dp"
-                                android:layout_weight="2"
-                                android:gravity="right"
-                                android:text="Account No. :" />
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginRight="10dp"
+                                    android:layout_weight="2"
+                                    android:gravity="right"
+                                    android:text="Account No. :" />
 
                             <EditText
-                                android:id="@+id/edit_txt_account_name"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="3"
-                                android:text="" />
+                                    android:id="@+id/edit_txt_account_name"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="3"
+                                    android:text="" />
                         </LinearLayout>
 
                         <LinearLayout
-                            android:id="@+id/refundLayout"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="10dp">
+                                android:id="@+id/refundLayout"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="10dp">
 
                             <TextView
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_marginRight="10dp"
-                                android:layout_weight="2"
-                                android:gravity="right"
-                                android:text="@string/refund" />
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginRight="10dp"
+                                    android:layout_weight="2"
+                                    android:gravity="right"
+                                    android:text="@string/refund" />
 
                             <TextView
-                                android:id="@+id/refund"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="3"
-                                android:text="0" />
+                                    android:id="@+id/refund"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="3"
+                                    android:text="0" />
                         </LinearLayout>
 
                         <LinearLayout
-                            android:id="@+id/layout_receipt_person"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="10dp">
+                                android:id="@+id/layout_receipt_person"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="10dp">
 
                             <TextView
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_marginRight="7dp"
-                                android:layout_weight="2"
-                                android:gravity="right"
-                                android:text="@string/receipt_person" />
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginRight="7dp"
+                                    android:layout_weight="2"
+                                    android:gravity="right"
+                                    android:text="@string/receipt_person" />
 
                             <EditText
-                                android:id="@+id/receiptPerson"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="3"
-                                android:hint="" />
+                                    android:id="@+id/receiptPerson"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="3"
+                                    android:hint="" />
                         </LinearLayout>
 
                         <LinearLayout
-                            android:id="@+id/duedateLayout"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="10dp">
+                                android:id="@+id/duedateLayout"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="10dp">
 
                             <TextView
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_marginRight="10dp"
-                                android:layout_weight="2"
-                                android:gravity="right"
-                                android:text="Due Date: " />
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginRight="10dp"
+                                    android:layout_weight="2"
+                                    android:gravity="right"
+                                    android:text="Due Date: " />
 
                             <EditText
-                                android:id="@+id/edt_dueDate"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="3"
-                                android:focusable="false"
-                                android:hint="" />
+                                    android:id="@+id/edt_dueDate"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="3"
+                                    android:focusable="false"
+                                    android:hint="" />
 
                         </LinearLayout>
                     </LinearLayout>
 
                     <LinearLayout
-                        android:id="@+id/totalInfoForPreOrder"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:orientation="vertical">
+                            android:id="@+id/totalInfoForPreOrder"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:orientation="vertical">
 
                         <LinearLayout
-                            android:id="@+id/volDisForPreOrderLayout"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content">
+                                android:id="@+id/volDisForPreOrderLayout"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content">
 
                             <TextView
-                                android:layout_width="122dp"
-                                android:layout_height="match_parent"
+                                    android:layout_width="122dp"
+                                    android:layout_height="match_parent"
+                                    android:layout_marginRight="10dp"
+                                    android:layout_weight="2"
+                                    android:gravity="right"
+                                    android:text="Vol: Discount: " />
+
+                            <TextView
+                                    android:id="@+id/volDisForPreOrder"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="3" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                                android:id="@+id/volumeDiscountLayout2"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content">
+
+                            <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginRight="10dp"
+                                    android:layout_weight="2"
+                                    android:gravity="right"
+                                    android:text="Prepaid Amt: " />
+
+                            <EditText
+                                    android:id="@+id/tvPrepaidAmount"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="3"
+                                    android:hint=""
+                                    android:inputType="numberDecimal" />
+
+                        </LinearLayout>
+
+
+                        <LinearLayout
+                                android:id="@+id/checkout_delivery_date_layout"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:visibility="gone">
+
+                            <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginRight="10dp"
+                                    android:layout_weight="2"
+                                    android:gravity="right"
+                                    android:text="Delivery Date : " />
+
+                            <EditText
+                                    android:id="@+id/checkout_delivery_date_chooser_text"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="3"
+                                    android:focusable="false" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                                android:id="@+id/checkout_remark_layout"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:visibility="gone">
+
+                            <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginRight="10dp"
+                                    android:layout_weight="2"
+                                    android:gravity="right"
+                                    android:text="Remark : " />
+
+                            <EditText
+                                    android:id="@+id/checkout_remark_edit_text"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="3" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                            android:id="@+id/tax_layout"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:visibility="visible">
+
+                        <TextView
+                                android:id="@+id/tax_label_saleCheckout"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
                                 android:layout_marginRight="10dp"
                                 android:layout_weight="2"
                                 android:gravity="right"
-                                android:text="Vol: Discount: " />
+                                android:text="Tax : " />
 
-                            <TextView
-                                android:id="@+id/volDisForPreOrder"
+                        <TextView
+                                android:id="@+id/tax_txtView"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="3" />
 
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:id="@+id/volumeDiscountLayout2"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content">
-
-                            <TextView
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_marginRight="10dp"
-                                android:layout_weight="2"
-                                android:gravity="right"
-                                android:text="Prepaid Amt: " />
-
-                            <EditText
-                                android:id="@+id/tvPrepaidAmount"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="3"
-                                android:hint=""
-                                android:inputType="numberDecimal" />
-
-                        </LinearLayout>
-
-
-                        <LinearLayout
-                            android:id="@+id/checkout_delivery_date_layout"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:visibility="gone">
-
-                            <TextView
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_marginRight="10dp"
-                                android:layout_weight="2"
-                                android:gravity="right"
-                                android:text="Delivery Date : " />
-
-                            <EditText
-                                android:id="@+id/checkout_delivery_date_chooser_text"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="3"
-                                android:focusable="false" />
-
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:id="@+id/checkout_remark_layout"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:visibility="gone">
-
-                            <TextView
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_marginRight="10dp"
-                                android:layout_weight="2"
-                                android:gravity="right"
-                                android:text="Remark : " />
-
-                            <EditText
-                                android:id="@+id/checkout_remark_edit_text"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="3" />
-
-                        </LinearLayout>
-
                     </LinearLayout>
 
                     <LinearLayout
-                        android:id="@+id/tax_layout"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:visibility="visible">
+                            android:id="@+id/llSaleStatus"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:weightSum="4">
 
                         <TextView
-                            android:id="@+id/tax_label_saleCheckout"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginRight="10dp"
-                            android:layout_weight="2"
-                            android:gravity="right"
-                            android:text="Tax : " />
-
-                        <TextView
-                            android:id="@+id/tax_txtView"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="3" />
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/llSaleStatus"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:weightSum="4">
-
-                        <TextView
-                            android:id="@+id/tvSaleStatus"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginRight="10dp"
-                            android:layout_weight="2"
-                            android:gravity="center"
-                            android:text="@string/direct_sale"
-                            android:textColor="@color/colorRed" />
+                                android:id="@+id/tvSaleStatus"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginRight="10dp"
+                                android:layout_weight="2"
+                                android:gravity="center"
+                                android:text="@string/direct_sale"
+                                android:textColor="@color/colorRed" />
 
                     </LinearLayout>
 
                 </LinearLayout>
 
                 <LinearLayout
-                    android:id="@+id/llPromotionCustomer1"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:visibility="gone">
-
-                    <LinearLayout
+                        android:id="@+id/llPromotionCustomer1"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp">
+                        android:orientation="vertical"
+                        android:visibility="gone">
+
+                    <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp">
 
                         <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginRight="10dp"
-                            android:layout_weight="2"
-                            android:gravity="right"
-                            android:text="@string/total_amount" />
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginRight="10dp"
+                                android:layout_weight="2"
+                                android:gravity="right"
+                                android:text="@string/total_amount" />
 
                         <TextView
-                            android:id="@+id/totalAmount1"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="3"
-                            android:text="10000" />
+                                android:id="@+id/totalAmount1"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="3"
+                                android:text="10000" />
 
                     </LinearLayout>
 
@@ -1036,195 +1035,195 @@
                     <!--</LinearLayout>-->
 
                     <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp">
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp">
 
                         <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginRight="10dp"
-                            android:layout_weight="2"
-                            android:gravity="right"
-                            android:text="@string/net_amount" />
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginRight="10dp"
+                                android:layout_weight="2"
+                                android:gravity="right"
+                                android:text="@string/net_amount" />
 
                         <TextView
-                            android:id="@+id/netAmount11"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="3"
-                            android:text="10000" />
+                                android:id="@+id/netAmount11"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="3"
+                                android:text="10000" />
 
                     </LinearLayout>
 
                     <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp">
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp">
 
                         <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginRight="10dp"
-                            android:layout_weight="2"
-                            android:gravity="right"
-                            android:text="@string/pay_amount" />
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginRight="10dp"
+                                android:layout_weight="2"
+                                android:gravity="right"
+                                android:text="@string/pay_amount" />
 
                         <EditText
-                            android:id="@+id/productDiscount"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="3"
-                            android:inputType="numberDecimal" />
+                                android:id="@+id/productDiscount"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="3"
+                                android:inputType="numberDecimal" />
                     </LinearLayout>
 
                     <LinearLayout
-                        android:id="@+id/refundLayout1"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp">
+                            android:id="@+id/refundLayout1"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp">
 
                         <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginRight="10dp"
-                            android:layout_weight="2"
-                            android:gravity="right"
-                            android:text="@string/refund" />
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginRight="10dp"
+                                android:layout_weight="2"
+                                android:gravity="right"
+                                android:text="@string/refund" />
 
                         <TextView
-                            android:id="@+id/refund1"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="3"
-                            android:text="0" />
+                                android:id="@+id/refund1"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="3"
+                                android:text="0" />
                     </LinearLayout>
 
                     <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp">
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp">
 
                         <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginRight="10dp"
-                            android:layout_weight="2"
-                            android:gravity="right"
-                            android:text="@string/payment_method" />
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginRight="10dp"
+                                android:layout_weight="2"
+                                android:gravity="right"
+                                android:text="@string/payment_method" />
 
                         <RadioGroup
-                            android:id="@+id/activity_sale_checkout_radio_group1"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="3"
-                            android:orientation="horizontal">
+                                android:id="@+id/activity_sale_checkout_radio_group1"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="3"
+                                android:orientation="horizontal">
 
                             <RadioButton
-                                android:id="@+id/activity_sale_checkout_radio_bank1"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Bank" />
+                                    android:id="@+id/activity_sale_checkout_radio_bank1"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Bank" />
 
                             <RadioButton
-                                android:id="@+id/activity_sale_checkout_radio_cash1"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:checked="true"
-                                android:text="Cash" />
+                                    android:id="@+id/activity_sale_checkout_radio_cash1"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:checked="true"
+                                    android:text="Cash" />
 
                         </RadioGroup>
                     </LinearLayout>
 
                     <LinearLayout
-                        android:id="@+id/bank_branch_layout1"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:visibility="gone">
+                            android:id="@+id/bank_branch_layout1"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:visibility="gone">
 
                         <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginRight="10dp"
-                            android:layout_weight="2"
-                            android:gravity="right"
-                            android:text="Bank Name : " />
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginRight="10dp"
+                                android:layout_weight="2"
+                                android:gravity="right"
+                                android:text="Bank Name : " />
 
                         <EditText
-                            android:id="@+id/edit_txt_branch_name1"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="3"
-                            android:text="" />
+                                android:id="@+id/edit_txt_branch_name1"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="3"
+                                android:text="" />
                     </LinearLayout>
 
                     <LinearLayout
-                        android:id="@+id/bank_account_layout1"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:visibility="gone">
+                            android:id="@+id/bank_account_layout1"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:visibility="gone">
 
                         <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginRight="10dp"
-                            android:layout_weight="2"
-                            android:gravity="right"
-                            android:text="Account No. :" />
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginRight="10dp"
+                                android:layout_weight="2"
+                                android:gravity="right"
+                                android:text="Account No. :" />
 
                         <EditText
-                            android:id="@+id/edit_txt_account_name1"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="3"
-                            android:text="" />
+                                android:id="@+id/edit_txt_account_name1"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="3"
+                                android:text="" />
                     </LinearLayout>
 
                     <LinearLayout
-                        android:id="@+id/duedateLayout1"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp">
+                            android:id="@+id/duedateLayout1"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp">
 
                         <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginRight="10dp"
-                            android:layout_weight="2"
-                            android:gravity="right"
-                            android:text="Due Date: " />
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginRight="10dp"
+                                android:layout_weight="2"
+                                android:gravity="right"
+                                android:text="Due Date: " />
 
                         <EditText
-                            android:id="@+id/et_dueDate1"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="3"
-                            android:focusable="false"
-                            android:hint="" />
+                                android:id="@+id/et_dueDate1"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="3"
+                                android:focusable="false"
+                                android:hint="" />
 
                     </LinearLayout>
 
                     <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp">
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp">
 
                         <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginRight="10dp"
-                            android:layout_weight="2"
-                            android:gravity="right"
-                            android:text="@string/tax" />
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginRight="10dp"
+                                android:layout_weight="2"
+                                android:gravity="right"
+                                android:text="@string/tax" />
 
                         <TextView
-                            android:id="@+id/tvTaxAmount"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="3"
-                            android:text="10000" />
+                                android:id="@+id/tvTaxAmount"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="3"
+                                android:text="10000" />
 
                     </LinearLayout>
 

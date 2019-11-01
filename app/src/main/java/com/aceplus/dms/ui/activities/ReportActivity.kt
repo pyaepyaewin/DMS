@@ -70,11 +70,19 @@ class ReportActivity : BaseActivity() {
                 transaction.addToBackStack(null)
                 transaction.commit()
             }
+
             override fun onNothingSelected(p0: AdapterView<*>?) {
 
             }
 
         }
+        cancel_img.setOnClickListener {
+            onBackPressed()
+        }
+    }
+
+    override fun onBackPressed() {
+        finish()
     }
 
 }

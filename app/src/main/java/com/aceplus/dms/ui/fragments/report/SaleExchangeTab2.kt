@@ -1,14 +1,12 @@
 package com.aceplus.dms.ui.fragments.report
 
-import android.app.Dialog
+import android.app.AlertDialog
 import android.arch.lifecycle.Observer
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.Window
-import android.widget.Button
 import android.widget.Toast
 import com.aceplus.dms.R
 import com.aceplus.dms.ui.adapters.report.SaleInvoiceDetailReportAdapter
@@ -17,7 +15,7 @@ import com.aceplus.dms.viewmodel.report.ReportViewModel
 import com.aceplus.domain.vo.report.SaleInvoiceDetailReport
 import com.aceplus.domain.vo.report.SaleInvoiceReport
 import com.aceplus.shared.ui.activities.BaseFragment
-import kotlinx.android.synthetic.main.dialog_box_sale_invoice_report.*
+import kotlinx.android.synthetic.main.dialog_box_sale_invoice_report.view.*
 import kotlinx.android.synthetic.main.fragment_sale_invoice_report.*
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
@@ -54,6 +52,7 @@ class SaleExchangeTab2 : BaseFragment(), KodeinAware {
         txt_view_to_date.visibility = View.GONE
         btn_sale_report_search.visibility = View.GONE
         btn_sale_report_clear.visibility = View.GONE
+        // //sale exchange tab2 report list
         saleInvoiceReportViewModel.saleInvoiceReportSuccessState.observe(this, Observer {
             saleInvoiceReportAdapter.setNewList(it!!.first as ArrayList<SaleInvoiceReport>)
         })
@@ -67,34 +66,37 @@ class SaleExchangeTab2 : BaseFragment(), KodeinAware {
             adapter = saleInvoiceReportAdapter
         }
         saleInvoiceReportViewModel.loadSaleInvoiceReport()
-    }
 
-    private fun onClickItem(invoiceId: String) {
-        val dialog = Dialog(context)
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setCancelable(true)
-        dialog.setCanceledOnTouchOutside(false)
-        dialog.setContentView(R.layout.dialog_box_sale_invoice_report)
-
-        //Dialog sale history report of invoice detail recycler view
+        //sale exchange tab2 report detail list
         saleInvoiceReportViewModel.saleInvoiceDetailReportSuccessState.observe(this, Observer {
             saleInvoiceDetailReportAdapter.setNewList(it as java.util.ArrayList<SaleInvoiceDetailReport>)
         })
+    }
 
-        saleInvoiceReportViewModel.reportErrorState.observe(this, Observer {
-            Toast.makeText(activity, it, Toast.LENGTH_LONG).show()
-        })
-        saleInvoiceDialog.apply {
+    private fun onClickItem(invoiceId: String) {
+        //layout inflate for sale exchange tab2 report detail
+        val dialogBoxView =
+            activity!!.layoutInflater.inflate(
+                R.layout.dialog_box_sale_invoice_report,
+                null
+            )
+        val builder = AlertDialog.Builder(activity)
+        builder.setView(dialogBoxView)
+        builder.setCancelable(false)
+        val dialog = builder.create()
+
+        dialogBoxView.saleInvoiceDialog.apply {
             layoutManager = LinearLayoutManager(activity)
             adapter = saleInvoiceDetailReportAdapter
         }
         saleInvoiceReportViewModel.loadSaleInvoiceDetailReport(invoiceId = invoiceId)
 
         //Action of dialog button
-        dialog.findViewById<Button>(R.id.btn_print).setOnClickListener {
+        dialogBoxView.btn_print.setOnClickListener {
+            Toast.makeText(activity, "Continue to print", Toast.LENGTH_SHORT).show()
             dialog.dismiss()
         }
-        dialog.findViewById<Button>(R.id.btn_ok).setOnClickListener {
+        dialogBoxView.btn_ok.setOnClickListener {
             dialog.dismiss()
         }
 

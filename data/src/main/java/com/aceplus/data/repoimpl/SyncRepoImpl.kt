@@ -1590,7 +1590,9 @@ class SyncRepoImpl(
         }
 
         db.invoiceDao().deleteAll()
+        db.invoiceProductDao().deleteAll()
         db.invoiceDao().insertAll(saleHistoryEntityList)
+        db.invoiceProductDao().insertAll(saleHistoryDetailEntityList)
     }
 
     override fun saveIncentiveData(incentiveList: List<DataForIncentive>) {

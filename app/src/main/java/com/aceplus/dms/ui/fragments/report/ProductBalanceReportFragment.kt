@@ -32,6 +32,7 @@ class ProductBalanceReportFragment : BaseFragment(), KodeinAware {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        //product list
            productBalanceReportViewModel.productBalanceReportSuccessState.observe(this, Observer {
             productBalanceReportAdapter.setNewList(it as ArrayList<Product>)
         })

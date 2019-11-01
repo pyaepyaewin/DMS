@@ -1,7 +1,7 @@
 package com.aceplus.dms.ui.fragments.report
 
+import android.app.AlertDialog
 import android.app.DatePickerDialog
-import android.app.Dialog
 import android.arch.lifecycle.Observer
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
@@ -9,7 +9,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.Window
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
@@ -20,7 +19,7 @@ import com.aceplus.dms.viewmodel.report.ReportViewModel
 import com.aceplus.domain.vo.report.SaleInvoiceDetailReport
 import com.aceplus.domain.vo.report.SaleInvoiceReport
 import com.aceplus.shared.ui.activities.BaseFragment
-import kotlinx.android.synthetic.main.dialog_box_sale_invoice_report.*
+import kotlinx.android.synthetic.main.dialog_box_sale_invoice_report.view.*
 import kotlinx.android.synthetic.main.fragment_sale_invoice_report.*
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
@@ -28,11 +27,12 @@ import org.kodein.di.android.support.kodein
 import java.text.SimpleDateFormat
 import java.util.*
 
+
 class SalesHistoryReportFragment : BaseFragment(), KodeinAware {
     override val kodein: Kodein by kodein()
     private var myCalendar = Calendar.getInstance()
-    private lateinit var fromDate: Date
-    private lateinit var toDate: Date
+    private var fromDate: String? = null
+    private var toDate: String? = null
     var saleHistoryDataList: List<SaleInvoiceReport> = listOf()
     private val saleHistoryReportAdapter: SaleInvoiceReportAdapter by lazy {
         SaleInvoiceReportAdapter(
@@ -40,6 +40,7 @@ class SalesHistoryReportFragment : BaseFragment(), KodeinAware {
         )
     }
     private val saleHistoryDetailReportAdapter: SaleInvoiceDetailReportAdapter by lazy { SaleInvoiceDetailReportAdapter() }
+
     private val saleHistoryReportViewModel: ReportViewModel by viewModel()
 
     override fun onCreateView(
@@ -47,7 +48,11 @@ class SalesHistoryReportFragment : BaseFragment(), KodeinAware {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_sale_invoice_report, container, false)
+        return inflater.inflate(
+            R.layout.fragment_sale_invoice_report,
+            container,
+            false
+        )
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -58,13 +63,21 @@ class SalesHistoryReportFragment : BaseFragment(), KodeinAware {
         edit_text_sale_report_to_date.setOnClickListener {
             chooseDob(2)
         }
-        btn_sale_report_search.setOnClickListener { }
+        btn_sale_report_search.setOnClickListener {
+            saleHistoryReportViewModel.saleInvoiceReportForDateList.observe(this, Observer {
+                saleHistoryReportAdapter.setNewList(it as ArrayList<SaleInvoiceReport>)
+                saleHistoryDataList = it!!
+                //Calculate and setText for total,discount and net amounts
+                calculateAmount(it)
+            })
+        }
         btn_sale_report_clear.setOnClickListener {
             edit_text_sale_report_from_date.setText("")
             edit_text_sale_report_from_date.error = null
             edit_text_sale_report_to_date.setText("")
             edit_text_sale_report_to_date.error = null
         }
+        //sale invoice list
         saleHistoryReportViewModel.saleInvoiceReportList.observe(this, Observer {
             saleHistoryReportAdapter.setNewList(it as ArrayList<SaleInvoiceReport>)
             saleHistoryDataList = it
@@ -121,40 +134,50 @@ class SalesHistoryReportFragment : BaseFragment(), KodeinAware {
             layoutManager = LinearLayoutManager(activity)
             adapter = saleHistoryReportAdapter
         }
-        saleHistoryReportViewModel.loadSaleInvoiceList()
+        saleHistoryReportViewModel.loadHistoryInvoiceList()
+        saleHistoryReportViewModel.loadHistoryInvoiceForDateList(
+            "$fromDate",
+            "$toDate"
+        )
         saleHistoryReportViewModel.loadCustomer()
-    }
 
-    private fun onClickItem(invoiceId: String) {
-        val dialog = Dialog(context)
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setCancelable(true)
-        dialog.setCanceledOnTouchOutside(false)
-        dialog.setContentView(R.layout.dialog_box_sale_invoice_report)
-
-        //Dialog sale history report of invoice detail recycler view
+        //sale history detail list
         saleHistoryReportViewModel.saleInvoiceDetailReportSuccessState.observe(this, Observer {
             saleHistoryDetailReportAdapter.setNewList(it as ArrayList<SaleInvoiceDetailReport>)
         })
 
-        saleHistoryReportViewModel.reportErrorState.observe(this, Observer {
-            Toast.makeText(activity, it, Toast.LENGTH_LONG).show()
-        })
-        saleInvoiceDialog.apply {
+    }
+
+    private fun onClickItem(invoiceId: String) {
+        val dialogBoxView =
+            activity!!.layoutInflater.inflate(
+                R.layout.dialog_box_sale_invoice_report,
+                null
+            )
+        val builder = AlertDialog.Builder(activity)
+        builder.setView(dialogBoxView)
+        builder.setCancelable(false)
+        val dialog = builder.create()
+
+        //Dialog sale history report of invoice detail recycler view
+        dialogBoxView.saleInvoiceDialog.apply {
             layoutManager = LinearLayoutManager(activity)
             adapter = saleHistoryDetailReportAdapter
         }
         saleHistoryReportViewModel.loadSaleInvoiceDetailReport(invoiceId = invoiceId)
 
         //Action of dialog button
-        dialog.btn_print.setOnClickListener {
+        dialogBoxView.btn_print.setOnClickListener {
+            Toast.makeText(activity, "Continue to print", Toast.LENGTH_SHORT).show()
             dialog.dismiss()
         }
-        dialog.btn_ok.setOnClickListener {
+        dialogBoxView.btn_ok.setOnClickListener {
             dialog.dismiss()
         }
+        dialog.show()
 
     }
+
 
     private fun calculateAmount(allItems: List<SaleInvoiceReport>) {
         var totalAmount = 0.0
@@ -171,7 +194,7 @@ class SalesHistoryReportFragment : BaseFragment(), KodeinAware {
     }
 
     private fun chooseDob(choice: Int) {
-        val sdf = SimpleDateFormat("yyyy/MM/dd")
+        val sdf = SimpleDateFormat("yyyy-MM-dd")
         val datePicker =
             DatePickerDialog.OnDateSetListener { _, year, monthOfYear, dayOfMonth ->
                 myCalendar.set(Calendar.YEAR, year)
@@ -180,10 +203,10 @@ class SalesHistoryReportFragment : BaseFragment(), KodeinAware {
 
                 if (choice == 1) {
                     edit_text_sale_report_from_date.setText(sdf.format(myCalendar.time))
-                    fromDate = myCalendar.time
+                    fromDate = sdf.format(myCalendar.time)
                 } else if (choice == 2) {
                     edit_text_sale_report_to_date.setText(sdf.format(myCalendar.time))
-                    toDate = myCalendar.time
+                    toDate = sdf.format(myCalendar.time)
                 }
             }
         val dateDialog = DatePickerDialog(
@@ -195,4 +218,5 @@ class SalesHistoryReportFragment : BaseFragment(), KodeinAware {
         )
         dateDialog.show()
     }
+
 }

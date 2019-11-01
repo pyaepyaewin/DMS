@@ -19,7 +19,6 @@ abstract class BaseRecyclerViewAdapter<V : BaseViewHolder<O>, O> : RecyclerView.
     }
 
     override fun getItemCount(): Int {
-        Log.d("Name Size","${mDataList.size}")
         return mDataList.size
     }
 

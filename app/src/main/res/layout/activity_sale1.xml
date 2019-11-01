@@ -1,7 +1,6 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        xmlns:tools="http://schemas.android.com/tools"
         android:orientation="vertical">
 
     <RelativeLayout
@@ -17,7 +16,7 @@
                 android:layout_centerVertical="true"
                 android:layout_marginLeft="20dp"
                 android:gravity="center"
-                android:src="@drawable/ic_cancel_xh_btn"/>
+                android:src="@drawable/ic_cancel_xh_btn" />
 
         <ImageView
                 android:id="@+id/checkoutImg"
@@ -27,7 +26,7 @@
                 android:layout_marginLeft="20dp"
                 android:layout_toRightOf="@+id/cancelImg"
                 android:gravity="center"
-                android:src="@drawable/ic_done_hx_btn"/>
+                android:src="@drawable/ic_done_hx_btn" />
 
         <TextView
                 android:id="@+id/tvTitle"
@@ -37,7 +36,7 @@
                 android:layout_centerVertical="true"
                 android:text="@string/sale"
                 android:textColor="#ffffff"
-                android:textSize="23sp"/>
+                android:textSize="23sp" />
     </RelativeLayout>
 
     <LinearLayout
@@ -192,14 +191,14 @@
                         android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/tableHeaderOrderedQty"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="2"
-                    android:gravity="center_horizontal"
-                    android:text="@string/ordered_qty"
-                    android:textColor="#FFFFFF"
-                    android:textStyle="bold" />
+                        android:id="@+id/tableHeaderOrderedQty"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="2"
+                        android:gravity="center_horizontal"
+                        android:text="@string/ordered_qty"
+                        android:textColor="#FFFFFF"
+                        android:textStyle="bold" />
 
                 <TextView
                         android:id="@+id/tableHeaderQty"

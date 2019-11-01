@@ -32,8 +32,11 @@ interface InvoiceDao {
     @Query("Delete from invoice")
     fun deleteAll()
 
-    @Query("select invoice.invoice_id,customer_name,address,total_amount,total_discount_amount,invoice.sale_date from invoice inner join customer on customer.id = invoice.customer_id")
-    fun getSaleInvoiceReport(): List<SaleInvoiceReport>
+    @Query("select invoice.invoice_id,customer_name,address,total_amount,total_discount_amount,invoice.sale_date from invoice inner join customer on customer.id = invoice.customer_id where invoice.sale_flag = 0 and invoice.invoice_id not like 'SX%' and invoice.invoice_id not like 'OS%'")
+    fun getSaleHistoryReport(): List<SaleInvoiceReport>
+
+    @Query("select invoice.invoice_id,customer_name,address,total_amount,total_discount_amount,invoice.sale_date from invoice inner join customer on customer.id = invoice.customer_id where date(invoice.sale_date) between date(:fromDate) and date(:toDate)")
+    fun getSaleHistoryReportForDate(fromDate: String, toDate: String): List<SaleInvoiceReport>
 
     @Query("select count(*) from invoice where invoice_id = :invoiceId")
     fun getInvoiceCountByID(invoiceId: String): Int

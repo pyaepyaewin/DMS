@@ -1,15 +1,11 @@
 package com.aceplus.domain.repo.report
 
 import com.aceplus.domain.entity.CompanyInformation
-import com.aceplus.domain.entity.GroupCode
-import com.aceplus.domain.entity.cash.CashReceive
 import com.aceplus.domain.entity.credit.Credit
 import com.aceplus.domain.entity.customer.Customer
-import com.aceplus.domain.entity.customer.CustomerBalance
 import com.aceplus.domain.entity.invoice.Invoice
-import com.aceplus.domain.entity.invoice.InvoicePresent
+import com.aceplus.domain.entity.invoice.InvoiceProduct
 import com.aceplus.domain.entity.preorder.PreOrder
-import com.aceplus.domain.entity.preorder.PreOrderPresent
 import com.aceplus.domain.entity.product.ProductCategory
 import com.aceplus.domain.entity.product.ProductGroup
 import com.aceplus.domain.entity.route.Route
@@ -22,6 +18,8 @@ import com.aceplus.domain.entity.sale.saletarget.SaleTargetSaleMan
 import com.aceplus.domain.entity.sale.salevisit.SaleVisitRecordUpload
 import com.aceplus.domain.vo.report.*
 import io.reactivex.Observable
+import java.sql.Date
+import java.util.*
 
 interface ReportRepo {
     //deliver report
@@ -39,6 +37,10 @@ interface ReportRepo {
 
     //sale invoice report
     fun saleInvoiceReport(): Observable<List<SaleInvoiceReport>>
+
+    //sale history report
+    fun saleHistoryReport(): Observable<List<SaleInvoiceReport>>
+    fun saleHistoryReportForDate(fromDate: String,toDate:String ): Observable<List<SaleInvoiceReport>>
 
     fun saleInvoiceDetailReport(invoiceId: String): Observable<List<SaleInvoiceDetailReport>>
     //spinner data

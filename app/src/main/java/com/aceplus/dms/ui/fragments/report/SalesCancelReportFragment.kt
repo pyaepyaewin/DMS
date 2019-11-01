@@ -1,13 +1,12 @@
 package com.aceplus.dms.ui.fragments.report
 
+import android.app.AlertDialog
 import android.app.DatePickerDialog
-import android.app.Dialog
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.Window
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
@@ -18,7 +17,7 @@ import com.aceplus.dms.viewmodel.report.ReportViewModel
 import com.aceplus.domain.vo.report.SaleCancelInvoiceDetailReport
 import com.aceplus.domain.vo.report.SalesCancelReport
 import com.aceplus.shared.ui.activities.BaseFragment
-import kotlinx.android.synthetic.main.dialog_box_sale_cancel_report.*
+import kotlinx.android.synthetic.main.dialog_box_sale_cancel_report.view.*
 import kotlinx.android.synthetic.main.fragment_sale_cancel_report.*
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
@@ -63,6 +62,7 @@ class SalesCancelReportFragment : BaseFragment(), KodeinAware {
             edit_text_sale_cancel_report_to_date.setText("")
             edit_text_sale_cancel_report_to_date.error = null
         }
+        //sale cancel report list and customer list
         salesCancelReportViewModel.salesCancelReportSuccessState.observe(
             this,
             android.arch.lifecycle.Observer {
@@ -120,38 +120,40 @@ class SalesCancelReportFragment : BaseFragment(), KodeinAware {
             adapter = salesCancelReportAdapter
         }
         salesCancelReportViewModel.loadSalesCancelReport()
-    }
 
-    private fun onClickItem(invoiceId: String) {
-        val dialog = Dialog(context)
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setCancelable(true)
-        dialog.setCanceledOnTouchOutside(false)
-        dialog.setContentView(R.layout.dialog_box_sale_cancel_report)
-
-        //Dialog sale history report of invoice detail recycler view
+        //sale cancel report detail list
         salesCancelReportViewModel.saleCancelDetailReportSuccessState.observe(
             this,
             android.arch.lifecycle.Observer {
                 saleCancelDetailReportAdapter.setNewList(it as ArrayList<SaleCancelInvoiceDetailReport>)
             })
+    }
 
-        salesCancelReportViewModel.reportErrorState.observe(
-            this,
-            android.arch.lifecycle.Observer {
-                Toast.makeText(activity, it, Toast.LENGTH_LONG).show()
-            })
-        saleCancelDialog.apply {
+    private fun onClickItem(invoiceId: String) {
+        //layout inflate for sale exchange tab2 report detail
+        val dialogBoxView =
+            activity!!.layoutInflater.inflate(
+                R.layout.dialog_box_sale_cancel_report,
+                null
+            )
+        val builder = AlertDialog.Builder(activity)
+        builder.setView(dialogBoxView)
+        builder.setCancelable(false)
+        val dialog = builder.create()
+
+        //Dialog sale history report of invoice detail recycler view
+        dialogBoxView.saleCancelDialog.apply {
             layoutManager = LinearLayoutManager(activity)
             adapter = saleCancelDetailReportAdapter
         }
         salesCancelReportViewModel.loadSaleCancelDetailReport(invoiceId = invoiceId)
 
         //Action of dialog button
-        dialog.btn_print.setOnClickListener {
+        dialogBoxView.btn_print.setOnClickListener {
+            Toast.makeText(activity, "Continue to print", Toast.LENGTH_SHORT).show()
             dialog.dismiss()
         }
-        dialog.btn_ok.setOnClickListener {
+        dialogBoxView.btn_ok.setOnClickListener {
             dialog.dismiss()
         }
 

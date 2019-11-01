@@ -29,14 +29,14 @@
             android:textStyle="bold" />
 
     <TextView
-        android:id="@+id/orderedQuantity"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="2"
-        android:gravity="center_horizontal"
-        android:paddingLeft="5dp"
-        android:paddingRight="5dp"
-        android:text="Ordered Qty" />
+            android:id="@+id/orderedQuantity"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:gravity="center_horizontal"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:text="Ordered Qty" />
 
     <Button
             android:id="@+id/qty"
@@ -52,34 +52,34 @@
             android:textColor="#FFFFFF" />
 
     <TextView
-        android:id="@+id/price"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="2"
-        android:gravity="center_horizontal"
-        android:paddingLeft="5dp"
-        android:paddingRight="5dp"
-        android:text="0" />
+            android:id="@+id/price"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:gravity="center_horizontal"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:text="0" />
 
     <TextView
-        android:id="@+id/promotionPrice"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="2"
-        android:gravity="center_horizontal"
-        android:paddingLeft="5dp"
-        android:paddingRight="5dp"
-        android:text="0" />
+            android:id="@+id/promotionPrice"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:gravity="center_horizontal"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:text="0" />
 
     <TextView
-        android:id="@+id/amount"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="2"
-        android:gravity="center_horizontal"
-        android:paddingLeft="5dp"
-        android:paddingRight="5dp"
-        android:text="0" />
+            android:id="@+id/amount"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:gravity="center_horizontal"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:text="0" />
 
     <LinearLayout
             android:layout_width="0dp"

@@ -1,68 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_gravity="center_horizontal"
-    android:paddingTop="10dp"
-    android:paddingBottom="10dp">
-
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp">
 
 
     <TextView
-        android:id="@+id/customer_Name"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:gravity="left"
-        android:layout_marginLeft="7dp"
-        android:padding="3dp"
-        android:text="Text"
-        android:textStyle="bold"
-        />
+            android:id="@+id/customer_Name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="left"
+            android:layout_marginLeft="7dp"
+            android:padding="3dp"
+            android:text="Text"
+            android:textStyle="bold" />
 
-   <!-- <TextView
-        android:id="@+id/shop_Type"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:gravity="left"
-        android:layout_marginLeft="7dp"
-        android:padding="3dp"
-        android:textStyle="bold"
-        />-->
+    <!-- <TextView
+         android:id="@+id/shop_Type"
+         android:layout_width="0dp"
+         android:layout_height="wrap_content"
+         android:layout_weight="1"
+         android:gravity="left"
+         android:layout_marginLeft="7dp"
+         android:padding="3dp"
+         android:textStyle="bold"
+         />-->
 
     <TextView
-        android:id="@+id/township_name"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:gravity="left"
-        android:layout_marginLeft="7dp"
-        android:padding="3dp"
-        android:textStyle="bold"
-        />
+            android:id="@+id/township_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="left"
+            android:layout_marginLeft="7dp"
+            android:padding="3dp"
+            android:textStyle="bold" />
 
 
     <TextView
-        android:id="@+id/tvPhone"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:gravity="left"
-        android:layout_marginLeft="7dp"
-        android:padding="3dp"
-        android:textStyle="bold"
-        />
+            android:id="@+id/tvPhone"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="left"
+            android:layout_marginLeft="7dp"
+            android:padding="3dp"
+            android:textStyle="bold" />
 
     <TextView
-        android:id="@+id/tvAddress"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:gravity="left"
-        android:layout_marginLeft="7dp"
-        android:padding="3dp"
-        android:textStyle="bold"
-        />
+            android:id="@+id/tvAddress"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="left"
+            android:layout_marginLeft="7dp"
+            android:padding="3dp"
+            android:textStyle="bold" />
 
 </LinearLayout>

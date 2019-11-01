@@ -1,15 +1,12 @@
 package com.aceplus.dms.ui.fragments.report
 
-import android.app.Dialog
+import android.app.AlertDialog
 import android.arch.lifecycle.Observer
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.Window
-import android.widget.Button
 import android.widget.Toast
 import com.aceplus.dms.R
 import com.aceplus.dms.ui.adapters.report.PreOrderDetailReportAdapter
@@ -18,6 +15,8 @@ import com.aceplus.dms.viewmodel.report.ReportViewModel
 import com.aceplus.domain.vo.report.PreOrderDetailReport
 import com.aceplus.domain.vo.report.PreOrderReport
 import com.aceplus.shared.ui.activities.BaseFragment
+import kotlinx.android.synthetic.main.dialog_box_pre_order_products.view.*
+import kotlinx.android.synthetic.main.dialog_box_sale_invoice_report.view.*
 import kotlinx.android.synthetic.main.fragment_pre_order_report.*
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
@@ -40,7 +39,8 @@ class PreOrderReportFragment : BaseFragment(), KodeinAware {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-           preOrderReportViewModel.preOrderReportSuccessState.observe(this, Observer {
+        //pre order report list
+        preOrderReportViewModel.preOrderReportSuccessState.observe(this, Observer {
             preOrderReportAdapter.setNewList(it as ArrayList<PreOrderReport>)
         })
 
@@ -52,35 +52,41 @@ class PreOrderReportFragment : BaseFragment(), KodeinAware {
             adapter = preOrderReportAdapter
         }
         preOrderReportViewModel.loadPreOrderReport()
-    }
 
-    private fun onClickItem(invoiceId: String) {
-        val preOrderProducts = view!!.findViewById(R.id.preOrderProducts) as RecyclerView
-        val dialog = Dialog(context)
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setCancelable(true)
-        dialog.setCanceledOnTouchOutside(false)
-        dialog.setContentView(R.layout.dialog_box_pre_order_products)
+        //pre order report detail list
         preOrderReportViewModel.preOrderDetailReportSuccessState.observe(this, Observer {
             preOrderDetailReportAdapter.setNewList(it as ArrayList<PreOrderDetailReport>)
         })
 
-        preOrderReportViewModel.reportErrorState.observe(this, Observer {
-            Toast.makeText(activity, it, Toast.LENGTH_LONG).show()
-        })
-        preOrderProducts.apply {
+    }
+
+    private fun onClickItem(invoiceId: String) {
+        //layout inflate for pre order report detail
+        val dialogBoxView =
+            activity!!.layoutInflater.inflate(
+                R.layout.dialog_box_pre_order_products,
+                null
+            )
+        val builder = AlertDialog.Builder(activity)
+        builder.setView(dialogBoxView)
+        builder.setCancelable(false)
+        val dialog = builder.create()
+
+        dialogBoxView.preOrderProducts.apply {
             layoutManager = LinearLayoutManager(activity)
             adapter = preOrderDetailReportAdapter
         }
         preOrderReportViewModel.loadPreOrderDetailReport(invoiceId = invoiceId)
 
         //Action of dialog button
-        dialog.findViewById<Button>(R.id.btn_print).setOnClickListener {
+        dialogBoxView.btn_print.setOnClickListener {
+            Toast.makeText(activity, "Continue to print", Toast.LENGTH_SHORT).show()
             dialog.dismiss()
         }
-        dialog.findViewById<Button>(R.id.btn_ok).setOnClickListener {
+        dialogBoxView.btn_ok.setOnClickListener {
             dialog.dismiss()
         }
+        dialog.show()
 
     }
 
