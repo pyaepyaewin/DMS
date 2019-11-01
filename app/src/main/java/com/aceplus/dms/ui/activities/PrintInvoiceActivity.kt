@@ -80,6 +80,7 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
     private var promotionList: ArrayList<Promotion> = ArrayList()
     private var saleReturnList: ArrayList<SoldProductInfo> = ArrayList()
     private var creditList: ArrayList<CreditInvoice> = ArrayList()
+    private var pos = 0
     private var printMode: String = ""
     private var taxType: String = ""
     private var taxPercent: Int = 0
@@ -233,19 +234,98 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
 
         if (printMode == "C" && !creditFlg.isNullOrBlank()){
 
+            Utils.saveInvoiceImageIntoGallery(creditList[pos].invoiceNo, this, myBitmap, "Credit Collect") // Doesn't work
+            if (creditList.isNotEmpty()){
+                val customerData: Customer = relatedDataForPrint!!.customer
+                Utils.printCreditWithHSPOS(
+                    this,
+                    customerData.customer_name,
+                    customerData.address,
+                    creditList[pos].invoiceNo,
+                    salePersonName,
+                    relatedDataForPrint!!.routeName,
+                    relatedDataForPrint!!.customerTownShipName,
+                    creditList[pos],
+                    mBluetoothService!!,
+                    relatedDataForPrint!!.companyInfo
+                )
+            }
+
         } else if (printMode == "S"){
 
             Utils.saveInvoiceImageIntoGallery(invoice!!.invoice_id, this, myBitmap, "Sale") // Doesn't work
             val editProductList = arrangeProductList()
             val customerData: Customer = relatedDataForPrint!!.customer
-            //invoice!!.printMode = "sale" // Doesn't exist
-            // ToDo - print
+            //invoice!!.printMode = "sale" // ToDo - Doesn't exist in invoice, in all condition ?? add or param pass?
+            Utils.printWithHSPOS(
+                this,
+                customerData.customer_name,
+                customerData.address,
+                invoice!!.invoice_id,
+                salePersonName,
+                relatedDataForPrint!!.routeName,
+                relatedDataForPrint!!.customerTownShipName,
+                invoice!!,
+                editProductList,
+                promotionList,
+                Utils.PRINT_FOR_NORMAL_SALE,
+                Utils.FOR_OTHERS,
+                mBluetoothService!!,
+                relatedDataForPrint!!.companyInfo,
+                "sale"
+            )
 
         } else if (printMode == "RP"){
 
+            Utils.saveInvoiceImageIntoGallery(invoice!!.invoice_id, this, myBitmap, "Sale") // Doesn't work
+            val editProductList = arrangeProductList()
+            val customerData: Customer = relatedDataForPrint!!.customer
+            Utils.printWithHSPOS(
+                this,
+                customerData.customer_name,
+                customerData.address,
+                invoice!!.invoice_id,
+                salePersonName,
+                relatedDataForPrint!!.routeName,
+                relatedDataForPrint!!.customerTownShipName,
+                invoice!!,
+                editProductList,
+                promotionList,
+                Utils.PRINT_FOR_NORMAL_SALE,
+                Utils.FOR_OTHERS,
+                mBluetoothService!!,
+                relatedDataForPrint!!.companyInfo,
+                "report"
+            )
+
         } else if (printMode == "D"){
 
+            Utils.saveInvoiceImageIntoGallery(invoice!!.invoice_id, this, myBitmap, "Deliver") // Doesn't work
+            val editProductList = arrangeProductList()
+            val customerData: Customer = relatedDataForPrint!!.customer
+
         } else if (printMode == "SR"){
+
+            Utils.saveInvoiceImageIntoGallery(invoice!!.invoice_id, this, myBitmap, "Sale") // Doesn't work
+            val editProductList = arrangeProductList()
+            val customerData: Customer = relatedDataForPrint!!.customer
+            Utils.printWithHSPOS(
+                this,
+                customerData.customer_name,
+                customerData.address,
+                invoice!!.invoice_id,
+                salePersonName,
+                relatedDataForPrint!!.routeName,
+                relatedDataForPrint!!.customerTownShipName,
+                invoice!!,
+                editProductList,
+                promotionList,
+                Utils.PRINT_FOR_NORMAL_SALE,
+                Utils.FOR_OTHERS,
+                mBluetoothService!!,
+                relatedDataForPrint!!.companyInfo,
+                null
+            )
 
         }
 

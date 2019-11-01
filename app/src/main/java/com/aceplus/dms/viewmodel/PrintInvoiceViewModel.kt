@@ -13,7 +13,6 @@ class PrintInvoiceViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
 
     var taxInfo = MutableLiveData<Triple<String, Int, Int>>()
     var salePersonName = MutableLiveData<String>()
-//    var relatedDataForPrint1 = MutableLiveData<Triple<Customer, Int, String>>()
     var relatedDataForPrint = MutableLiveData<RelatedDataForPrint>()
 
     fun getSalePersonName(salePersonID: String){
@@ -54,6 +53,7 @@ class PrintInvoiceViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
 
         var customer: Customer? = null
         var routeID = 0
+        var routeName: String? = "Temporary route name"
         var customerTownShipName: String? = null
         var companyInfo: CompanyInformation? = null
 
@@ -83,7 +83,7 @@ class PrintInvoiceViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
         }
 
         if (customer != null && customerTownShipName != null && companyInfo != null)
-            relatedDataForPrint.postValue(RelatedDataForPrint(customer!!, routeID, customerTownShipName!!, companyInfo!!))
+            relatedDataForPrint.postValue(RelatedDataForPrint(customer!!, routeID, routeName!!,customerTownShipName!!, companyInfo!!))
 
     }
 

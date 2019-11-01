@@ -6,6 +6,7 @@ import com.aceplus.domain.entity.customer.Customer
 data class RelatedDataForPrint(
     var customer: Customer,
     var routeID: Int,
+    var routeName: String,
     var customerTownShipName: String,
     var companyInfo: CompanyInformation
 )
