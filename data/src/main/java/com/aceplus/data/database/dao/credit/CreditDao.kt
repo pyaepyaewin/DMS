@@ -6,6 +6,8 @@ import android.arch.persistence.room.Dao
 import android.arch.persistence.room.Insert
 import android.arch.persistence.room.OnConflictStrategy
 import android.arch.persistence.room.Query
+import com.aceplus.domain.model.credit.CreditInvoice
+import com.aceplus.domain.model.creditcollectiondataclass.CreditCollectionCheckoutDataClass
 import com.aceplus.domain.model.creditcollectiondataclass.CreditCollectionDataClass
 
 
@@ -27,7 +29,14 @@ interface CreditDao {
 //    @Query("select Cus.customer_id,Cus.customer_name,sum(Cb.balance),sum(C.pay_amount),C.amount from customer as Cus,credit as C,customer_balance as Cb where Cus.id=Cb.customer_id and C.customer_id=Cb.customer_id GROUP BY Cus.customer_id")
 //    fun getCreditCollection():List<CreditCollectionDataClass>
 
-    @Query("select Cus.id,Cus.customer_name,SUM(balance) as balance,SUM(pay_amount) as pay_amount,SUM(C.amount) as amount from customer as Cus,credit as C,customer_balance as Cb where Cus.id=Cb.customer_id and C.customer_id=Cb.customer_id GROUP BY Cus.customer_id")
+    @Query("select Cus.id,Cus.customer_name,Cus.address,SUM(balance) as balance,SUM(pay_amount) as pay_amount,SUM(C.amount) as amount from customer as Cus,credit as C,customer_balance as Cb where Cus.id=Cb.customer_id and C.customer_id=Cb.customer_id GROUP BY Cus.customer_id")
     fun getCreditCollection():List<CreditCollectionDataClass>
+
+    @Query("select * from credit where credit.customer_id=:customerId")
+    fun getCreditCheckout(customerId:String):List<Credit>
+
+   @Query("UPDATE credit SET pay_amount = pay_amount+:payAmt WHERE invoice_no=:invoiceNo")
+   fun update(payAmt:Double,invoiceNo:String)
+
 
 }

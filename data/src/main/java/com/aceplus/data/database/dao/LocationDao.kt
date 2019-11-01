@@ -23,4 +23,6 @@ interface LocationDao{
     @Query("Delete from location")
     fun deleteAll()
 
+    @Query("select * from location")
+    fun getLocation():List<Location>
 }

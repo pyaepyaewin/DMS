@@ -10,7 +10,7 @@ import com.google.gson.annotations.SerializedName
 @Entity(tableName = "credit")
 class Credit {
 
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id")
     @SerializedName("id")
     @Expose

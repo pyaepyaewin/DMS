@@ -419,22 +419,16 @@
             android:layout_margin="10dp"
             android:baselineAligned="false">
 
-        <LinearLayout
-                android:layout_width="0dp"
+        <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1">
+                android:text="@string/sale_date" />
 
-            <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/sale_date" />
-
-            <TextView
-                    android:id="@+id/saleDate"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp" />
-        </LinearLayout>
+        <TextView
+                android:id="@+id/saleDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp" />
 
         <LinearLayout
                 android:layout_width="0dp"

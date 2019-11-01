@@ -145,7 +145,7 @@ val vmModule = Kodein.Module {
     bind() from singleton { ViewByListViewModel(instance(), instance()) }
     bind() from singleton { CustomerLocationViewModel(instance(), instance()) }
     bind() from singleton { CreditCollectionViewModel(instance(), instance()) }
-    bind() from singleton { CreditCollectionCheckOutViewModel(instance(), instance()) }
+    bind() from singleton { CreditCollectionCheckOutViewModel(instance(), instance(),instance()) }
 
 
 }

@@ -1,5 +1,7 @@
 package com.aceplus.domain.model.credit;
 
+import android.arch.persistence.room.Ignore;
+
 import java.io.Serializable;
 
 /**
@@ -15,31 +17,32 @@ public class CreditInvoice implements Serializable{
     /**
      * invoiceNo
      */
-    private String invoiceNo;
+    private String invoice_no;
 
     /**
      * invoiceDate
      */
-    private String invoiceDate;
+    private String invoice_date;
 
     /**
      * customerId
      */
-    private int customerId;
+    private int customer_id;
 
     /**
      * amt
      */
-    private double amt;
+    private double amount;
 
     /**
      * payAmt
      */
-    private double payAmt;
+    private double pay_amount;
 
     /**
      * creditAmt
      */
+    @Ignore
     private double creditAmt;
 
     /**
@@ -60,7 +63,7 @@ public class CreditInvoice implements Serializable{
     /**
      * saleManId
      */
-    private int saleManId;
+    private int sale_man_id;
 
     public int getId() {
         return id;
@@ -71,43 +74,43 @@ public class CreditInvoice implements Serializable{
     }
 
     public String getInvoiceNo() {
-        return invoiceNo;
+        return invoice_no;
     }
 
     public void setInvoiceNo(String invoiceNo) {
-        this.invoiceNo = invoiceNo;
+        this.invoice_no = invoiceNo;
     }
 
     public String getInvoiceDate() {
-        return invoiceDate;
+        return invoice_date;
     }
 
     public void setInvoiceDate(String invoiceDate) {
-        this.invoiceDate = invoiceDate;
+        this.invoice_date = invoiceDate;
     }
 
     public int getCustomerId() {
-        return customerId;
+        return customer_id;
     }
 
     public void setCustomerId(int customerId) {
-        this.customerId = customerId;
+        this.customer_id = customerId;
     }
 
     public double getAmt() {
-        return amt;
+        return amount;
     }
 
     public void setAmt(double amt) {
-        this.amt = amt;
+        this.amount = amt;
     }
 
     public double getPayAmt() {
-        return payAmt;
+        return pay_amount;
     }
 
     public void setPayAmt(double payAmt) {
-        this.payAmt = payAmt;
+        this.pay_amount = payAmt;
     }
 
     public double getCreditAmt() {
@@ -143,11 +146,11 @@ public class CreditInvoice implements Serializable{
     }
 
     public int getSaleManId() {
-        return saleManId;
+        return sale_man_id;
     }
 
     public void setSaleManId(int saleManId) {
-        this.saleManId = saleManId;
+        this.sale_man_id = saleManId;
     }
 
     /*

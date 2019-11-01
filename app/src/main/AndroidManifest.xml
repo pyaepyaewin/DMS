@@ -32,8 +32,13 @@
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
             android:theme="@style/AppTheme">
+
         <activity android:name=".ui.activities.customer.sale.SaleCheckoutActivity"></activity>
         <activity android:name=".ui.activities.PrintInvoiceActivity"></activity>
+
+        <activity android:name=".ui.activities.DeviceListActivity" />
+        <activity android:name=".ui.activities.customer.sale.SaleCheckoutActivity" />
+        <activity android:name=".ui.activities.PrintInvoiceActivity" />
         <activity
                 android:name=".ui.activities.CreditCollectionCheckoutActivity"
                 android:screenOrientation="landscape" />
@@ -113,6 +118,63 @@
         <activity
                 android:name=".ui.activities.customer.PosmActivity"
                 android:screenOrientation="landscape"></activity>
+        =======
+        android:screenOrientation="landscape" />
+        <activity
+                android:name=".ui.activities.LoginActivity"
+                android:screenOrientation="landscape" />
+        <activity
+                android:name=".ui.activities.SyncActivity"
+                android:screenOrientation="landscape" />
+        <activity
+                android:name=".ui.activities.RouteActivity"
+                android:screenOrientation="landscape" />
+        <activity
+                android:name=".ui.activities.CustomerVisitActivity"
+                android:screenOrientation="landscape" />
+        <activity
+                android:name=".ui.activities.PromotionActivity"
+                android:screenOrientation="landscape" />
+        <activity
+                android:name=".ui.activities.VanIssueActivity"
+                android:screenOrientation="landscape" />
+        <activity
+                android:name=".ui.activities.ReportActivity"
+                android:screenOrientation="landscape" />
+        <activity
+                android:name=".ui.activities.customer.CustomerActivity"
+                android:screenOrientation="landscape" />
+        <activity
+                android:name=".ui.activities.customer.AddNewCustomerActivity"
+                android:screenOrientation="landscape" />
+        <activity
+                android:name=".ui.activities.customer.CreditCollectionActivity"
+                android:screenOrientation="landscape" />
+        <activity
+                android:name=".ui.activities.customer.DeliveryActivity"
+                android:screenOrientation="landscape" />
+        <activity
+                android:name=".ui.activities.customer.sale.SaleCancelActivity"
+                android:screenOrientation="landscape" />
+        <activity
+                android:name=".ui.activities.customer.CustomerLocationActivity"
+                android:screenOrientation="landscape" />
+        <activity
+                android:name=".ui.activities.customer.sale.SaleReturnActivity"
+                android:screenOrientation="landscape" />
+        <activity
+                android:name=".ui.activities.customer.AddNewCustomerLocationActivity"
+                android:screenOrientation="landscape" />
+        <activity
+                android:name=".ui.activities.customer.sale.SaleActivity"
+                android:screenOrientation="landscape" />
+        <activity
+                android:name=".ui.activities.customer.SaleOrderActivity"
+                android:screenOrientation="landscape" />
+        <activity
+                android:name=".ui.activities.customer.PosmActivity"
+                android:screenOrientation="landscape" />
+        >>>>>>> a2242563c244c9bd95ecabedc51351fa62f971ec
     </application>
 
 </manifest>
