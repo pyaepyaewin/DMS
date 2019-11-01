@@ -29,5 +29,7 @@ interface SaleVisitRecordUploadDao {
     @Delete
     fun deleteData(selectedCustomer: Customer)
 
+    @Query("update sale_visit_record_upload set visit_flag = :visitFlag, sale_flag = :saleFlag where customer_id = :customerId")
+    fun updateSaleVisitRecord(customerId: Int, visitFlag: String, saleFlag: String)
 
 }

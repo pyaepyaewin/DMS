@@ -13,10 +13,12 @@ import android.view.View
 import android.view.WindowManager
 import com.aceplus.data.utils.Constant
 import com.aceplus.dms.R
+import com.aceplus.dms.ui.activities.PrintInvoiceActivity
 import com.aceplus.dms.ui.adapters.sale.CheckoutSoldProductListAdapter
 import com.aceplus.dms.utils.Utils
 import com.aceplus.dms.viewmodel.customer.sale.SaleCheckoutViewModel
 import com.aceplus.domain.entity.customer.Customer
+import com.aceplus.domain.entity.invoice.Invoice
 import com.aceplus.domain.entity.promotion.Promotion
 import com.aceplus.domain.vo.SoldProductInfo
 import com.aceplussolutions.rms.constants.AppUtils
@@ -70,8 +72,9 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
     private var invoiceId: String = ""
     private var taxAmt: Double = 0.0
     private var isSaleExchange: String? = null
-    private var locationData: Pair<Int, String> = Pair(0, "")
+    private var locationCode: Int = 0
     private var salePersonId: String? = null
+    private var invoice: Invoice? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -80,14 +83,11 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
 
         getIntentData()
+        initializeData()
         setupUI()
         catchEvents()
 
-        saleCheckoutViewModel.getLocation()
         checkoutSoldProductListAdapter.setNewList(soldProductList)
-        calculateTotalAmount()
-        calculateTax() // Just temporary
-        saleCheckoutViewModel.calculateFinalAmount() // Need to update
         setPromotionProductList()
 
     }
@@ -106,6 +106,16 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
 
     }
 
+    private fun initializeData(){
+
+        calculateTotalAmount()
+        calculateTax() // Just temporary
+        saleCheckoutViewModel.calculateFinalAmount() // Need to update
+        salePersonId = saleCheckoutViewModel.getSaleManID()
+        locationCode = saleCheckoutViewModel.getRouteID()
+
+    }
+
     private fun catchEvents(){
 
         back_img.setOnClickListener { onBackPressed() }
@@ -118,8 +128,8 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
         }
 
         payAmount.addTextChangedListener(object :TextWatcher{
-            override fun afterTextChanged(p0: Editable?) {}
-            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+            override fun afterTextChanged(p0: Editable?) { "Nothing to do" }
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) { "Nothing to do" }
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
                 calculateRefundAmount()
             }
@@ -130,8 +140,12 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
             bank_account_layout.visibility = if (isChecked) View.VISIBLE else View.GONE
         }
 
-        saleCheckoutViewModel.locationData.observe(this, android.arch.lifecycle.Observer {
-            if (it != null) locationData = it
+        saleCheckoutViewModel.invoice.observe(this, android.arch.lifecycle.Observer {
+            if (it != null){
+                invoice = it
+                saleCheckoutViewModel.invoice.value = null
+                saleOrExchange()
+            }
         })
 
     }
@@ -217,8 +231,6 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
 
     private fun setInvoiceId(){
 
-        salePersonId = AppUtils.getStringFromShp(Constant.SALEMAN_ID, this) ?: ""
-
         try {
             if (isSaleExchange != null && !isSaleExchange.equals("yes", true)){
                 val invoiceCount = AppUtils.getIntFromShp(Constant.INVOICE_COUNT, this) ?: 0
@@ -227,9 +239,7 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
                     AppUtils.saveIntToShp(Constant.INVOICE_COUNT, invoiceCount + 1, this)
 
                 try {
-                    //val format = SimpleDateFormat("mmMMddyyss")
-                    //val invoiceID = format.format(Calendar.getInstance().time) // get invoice id from utils
-                    val invoiceID = Utils.getInvoiceNo(salePersonId!!, locationData.first.toString(), Constant.FOR_SALE, "1")
+                    val invoiceID = Utils.getInvoiceNo(salePersonId!!, locationCode.toString(), Constant.FOR_SALE, "1")
                     tvInvoiceId.text = invoiceID
                     this.invoiceId = invoiceID
                 } catch (e: NullPointerException){
@@ -280,14 +290,14 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
 
             if (validationInput(paymentMethod == "B")){
 
-                if (refundAmount < 0){
+                if (refundAmount < 0 || payAmount.text.isBlank()){
                     setInvoiceId()
                     saveData("CR")
-                    // saleOrExchange() ToDo
+                    //saleOrExchange()
                 } else{
                     setInvoiceId()
                     saveData("CA")
-                    // saleOrExchange() ToDo
+                    //saleOrExchange()
                 }
 
             }
@@ -370,6 +380,23 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
             edit_txt_account_name.text.toString()
         )
 
+    }
+
+    private fun saleOrExchange(){
+
+        if (isSaleExchange.equals("yes", true)){
+            toSaleExchange()
+        } else{
+            saleCheckoutViewModel.updateDepartureTimeForSaleManRoute( salePersonId!!, customer!!.id.toString())
+            saleCheckoutViewModel.updateSaleVisitRecord(customer!!.id) // Need to check
+            val intent = PrintInvoiceActivity.newIntentFromSaleCheckout(this, invoice!!, soldProductList, promotionList)
+            startActivity(intent)
+        }
+
+    }
+
+    private fun toSaleExchange(){
+        // ToDo - go to sale exchange
     }
 
 }

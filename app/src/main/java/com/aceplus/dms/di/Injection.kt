@@ -20,6 +20,7 @@ import com.aceplus.data.repoimpl.routrepoimpl.CustomerLocationRepoImpl
 import com.aceplus.data.repoimpl.routrepoimpl.ViewByListRepoImpl
 import com.aceplus.data.utils.Constant
 import com.aceplus.dms.viewmodel.LoginViewModel
+import com.aceplus.dms.viewmodel.PrintInvoiceViewModel
 import com.aceplus.dms.viewmodel.SyncViewModel
 import com.aceplus.dms.viewmodel.creditcollection.CreditCollectionCheckOutViewModel
 import com.aceplus.dms.viewmodel.creditcollection.CreditCollectionViewModel
@@ -146,6 +147,8 @@ val vmModule = Kodein.Module {
     bind() from singleton { CustomerLocationViewModel(instance(), instance()) }
     bind() from singleton { CreditCollectionViewModel(instance(), instance()) }
     bind() from singleton { CreditCollectionCheckOutViewModel(instance(), instance(),instance()) }
+
+    bind() from singleton { PrintInvoiceViewModel(instance(), instance()) }
 
 
 }

@@ -117,6 +117,7 @@ dependencies {
     //stario printer
     implementation files('libs/starioextension.jar')
     implementation files('libs/StarIOPort3.1.jar')
+    implementation files('libs/Baby380SDK.jar')
 
     //module
     implementation project(':data')
