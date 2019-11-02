@@ -14,7 +14,9 @@ import com.aceplus.domain.entity.product.Product
 import com.aceplus.domain.entity.promotion.PromotionDate
 import com.aceplus.domain.entity.promotion.PromotionGift
 import com.aceplus.domain.entity.promotion.PromotionPrice
+import com.aceplus.domain.entity.route.RouteScheduleV2
 import com.aceplus.domain.entity.sale.SaleMan
+import com.aceplus.domain.model.routeSchedule_v2.RouteSchedule_v2
 import com.aceplus.shared.utils.GPSTracker
 import io.reactivex.Observable
 
@@ -23,7 +25,9 @@ interface CustomerVisitRepo {
     fun getLocationCode(): Int
     fun getSaleManData(): SaleMan
     fun getSaleManName(saleManId: String): Observable<List<String?>>
-    fun getRouteID(saleManId: String): Observable<List<Int>>
+    fun getRouteID(saleManId: String): Observable<List<String>>
+    fun getRouteScheduleByID(saleManId: String): Observable<RouteScheduleV2>
+    fun getRouteNameByID(routeID: Int): Observable<String?>
     fun getRouteScheduleIDV2(): Int
     fun getLastCountForInvoiceNumber(mode: String): Int
 

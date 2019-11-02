@@ -17,6 +17,7 @@ import com.aceplus.dms.utils.BluetoothService
 import com.aceplus.dms.utils.Utils
 import com.aceplus.dms.viewmodel.PrintInvoiceViewModel
 import com.aceplus.domain.entity.customer.Customer
+import com.aceplus.domain.entity.delivery.Delivery
 import com.aceplus.domain.entity.invoice.Invoice
 import com.aceplus.domain.entity.product.Product
 import com.aceplus.domain.entity.promotion.Promotion
@@ -43,6 +44,7 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
         private const val IE_PROMOTION_LIST = "IE_PROMOTION_LIST"
         private const val IE_PRINT_MODE = "IE_PRINT_MODE"
         private const val IE_SALE_RETURN_LIST = "IE_SALE_RETURN_LIST"
+        private const val IE_CREDIT_LIST = "IE_CREDIT_LIST"
 
         private const val IR_REQUEST_CONNECT_DEVICE = 1
         private const val IR_REQUEST_ENABLE_BT = 2
@@ -116,9 +118,11 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
     private var creditFlg: String? = null
     private var relatedDataForPrint: RelatedDataForPrint? = null
     private var salePersonName: String? = null
+    private var orderedInvoice: Delivery? = null
 
     private var mBluetoothAdapter: BluetoothAdapter? = null
     private var mBluetoothService: BluetoothService? = null
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -186,7 +190,6 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
             if (it != null){
                 relatedDataForPrint = it
                 onPrint()
-                Log.d("Testing", "Printing Function Started")
             }
         })
 
@@ -197,6 +200,7 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
         soldProductList = intent.getParcelableArrayListExtra(IE_SOLD_PRODUCT_LIST)
         promotionList = intent.getParcelableArrayListExtra(IE_PROMOTION_LIST)
         printMode = intent.getStringExtra(IE_PRINT_MODE)
+        saleReturnList = intent.getParcelableArrayListExtra(IE_SALE_RETURN_LIST)
     }
 
     private fun getTaxInfoAndSetData(){
@@ -332,6 +336,25 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
             Utils.saveInvoiceImageIntoGallery(invoice!!.invoice_id, this, myBitmap, "Deliver") // Doesn't work
             val editProductList = arrangeProductList()
             val customerData: Customer = relatedDataForPrint!!.customer
+            Utils.printDeliverWithHSPOS(
+                this,
+                customerData.customer_name,
+                customerData.address,
+                orderedInvoice!!.invoice_no!!,
+                relatedDataForPrint!!.orderSalePersonName,
+                invoice!!.invoice_id,
+                salePersonName,
+                relatedDataForPrint!!.routeName,
+                relatedDataForPrint!!.customerTownShipName,
+                invoice!!,
+                editProductList,
+                promotionList,
+                orderedInvoice!!.paid_amount?.toDouble() ?: 0.0,
+                Utils.PRINT_FOR_NORMAL_SALE,
+                Utils.FOR_OTHERS,
+                mBluetoothService!!,
+                relatedDataForPrint!!.companyInfo
+            )
 
         } else if (printMode == "SR"){
 
@@ -402,8 +425,7 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
             HM_MESSAGE_DEVICE_NAME -> {
                 val connectedDeviceName = it.data.getString(DEVICE_NAME)
                 Toast.makeText(this, "Connected to $connectedDeviceName", Toast.LENGTH_SHORT).show()
-                printInvoiceViewModel.getRelatedDataAndPrint(invoice!!.customer_id!!, invoice!!.sale_person_id!!)
-                //onPrint()
+                printInvoiceViewModel.getRelatedDataAndPrint(invoice!!.customer_id!!, invoice!!.sale_person_id!!, orderedInvoice?.sale_man_id)
             }
             HM_MESSAGE_TOAST -> {
                 Toast.makeText(this, it.data.getString(TOAST), Toast.LENGTH_SHORT).show()
@@ -433,7 +455,7 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
             for ((indexForNew, promotion) in newPresentList.withIndex()){
                 var stockId = promotion.promotion_product_id
                 if (stockId != stockId1 && (indexForNew + 1) == newPresentList.size){
-                    val newPromotion = Promotion() // Check currency_id, price, promoPlanId, promotion price, product name
+                    val newPromotion = Promotion() // Check currency_id, price, promoPlanId, promotion price, product name // ToDo - Check point !!!
                     newPromotion.promotion_quantity = 0
                     newPromotion.promotion_product_id = promotionList[i].promotion_product_id
 
@@ -442,7 +464,7 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
             }
 
             if (newPresentList.size == 0){
-                val newPromotion = Promotion() // Check currency_id, price, promoPlanId, promotion price, product name
+                val newPromotion = Promotion() // Check currency_id, price, promoPlanId, promotion price, product name // ToDo - Check point !!!
                 newPromotion.promotion_quantity = 0
                 newPromotion.promotion_product_id = promotionList[i].promotion_product_id
 
@@ -481,7 +503,7 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
                         promoProduct.quantity = newPresentList[j].promotion_quantity
                         promoProduct.product.purchase_price = "0.0"
                         promoProduct.product.selling_price = "0.0"
-                        //promoProduct.product.product_name = newPresentList[j].promotion_product_name
+                        //promoProduct.product.product_name = newPresentList[j].promotion_product_name // ToDo - Check point !!!
                         promoProduct.promotionPrice = 0.0
 
                         newSoldProductList.add(promoProduct)

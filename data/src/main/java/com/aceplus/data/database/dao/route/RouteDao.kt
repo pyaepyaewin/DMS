@@ -29,9 +29,11 @@ interface RouteDao {
     @Query("select township.id,township.township_name from township")
     fun getTownShipList(): List<TownshipDataClass>
 
-    @Query(
-        "select C.customer_name,T.township_name,C.phone,C.address from customer as C,township as T where C.township_number=T.id")
-        fun getCustomerDetail(): List<ViewByListDataClass>
+    @Query("select C.customer_name,T.township_name,C.phone,C.address from customer as C,township as T where C.township_number=T.id")
+    fun getCustomerDetail(): List<ViewByListDataClass>
+
+    @Query("select route_name from route where id = :routeID")
+    fun getRouteNameByID(routeID: Int): String?
 
 
 //    @Query("select C.customer_name,T.township_name,C.phone,C.address from customer as C,township as T where C.township_number=T.id and C.township_number=:id")

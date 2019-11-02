@@ -17,6 +17,7 @@ import com.aceplus.domain.entity.product.Product
 import com.aceplus.domain.entity.promotion.PromotionDate
 import com.aceplus.domain.entity.promotion.PromotionGift
 import com.aceplus.domain.entity.promotion.PromotionPrice
+import com.aceplus.domain.entity.route.RouteScheduleV2
 import com.aceplus.domain.entity.route.TempForSaleManRoute
 import com.aceplus.domain.entity.sale.SaleMan
 import com.aceplus.domain.repo.CustomerVisitRepo
@@ -48,8 +49,16 @@ class CustomerVisitRepoImpl(
         return Observable.just(db.saleManDao().getSaleManNameByID(saleManId))
     }
 
-    override fun getRouteID(saleManId: String): Observable<List<Int>> {
+    override fun getRouteID(saleManId: String): Observable<List<String>> {
         return Observable.just(db.routeScheduleV2Dao().getRouteId(saleManId))
+    }
+
+    override fun getRouteScheduleByID(saleManId: String): Observable<RouteScheduleV2> {
+        return Observable.just(db.routeScheduleV2Dao().dataBySaleManId(saleManId))
+    }
+
+    override fun getRouteNameByID(routeID: Int): Observable<String?> {
+        return Observable.just(db.routeDao().getRouteNameByID(routeID))
     }
 
     override fun getRouteScheduleIDV2(): Int {
