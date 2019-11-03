@@ -127,8 +127,6 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-//        crditPrintHeaderLayout1.visibility= View.VISIBLE
-
         try {
             mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
         } catch (e: Exception){
@@ -196,11 +194,11 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
     }
 
     private fun getIntentData(){
-        invoice = intent.getParcelableExtra(IE_INVOICE)
-        soldProductList = intent.getParcelableArrayListExtra(IE_SOLD_PRODUCT_LIST)
-        promotionList = intent.getParcelableArrayListExtra(IE_PROMOTION_LIST)
-        printMode = intent.getStringExtra(IE_PRINT_MODE)
-        saleReturnList = intent.getParcelableArrayListExtra(IE_SALE_RETURN_LIST)
+        if (intent.getParcelableExtra<Invoice>(IE_INVOICE) != null) invoice = intent.getParcelableExtra(IE_INVOICE)
+        if (intent.getParcelableArrayListExtra<SoldProductInfo>(IE_SOLD_PRODUCT_LIST) != null) soldProductList = intent.getParcelableArrayListExtra(IE_SOLD_PRODUCT_LIST)
+        if (intent.getParcelableArrayListExtra<Promotion>(IE_PROMOTION_LIST) != null) promotionList = intent.getParcelableArrayListExtra(IE_PROMOTION_LIST)
+        if (intent.getStringExtra(IE_PRINT_MODE) != null) printMode = intent.getStringExtra(IE_PRINT_MODE)
+        if (intent.getParcelableArrayListExtra<SoldProductInfo>(IE_SALE_RETURN_LIST) != null) saleReturnList = intent.getParcelableArrayListExtra(IE_SALE_RETURN_LIST)
     }
 
     private fun getTaxInfoAndSetData(){
@@ -245,11 +243,18 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
             print_discountAmount.text = "${Utils.formatAmount(invoice!!.total_discount_amount)} (${invoice!!.total_discount_percent}%)"
 
         } else if (printMode == "C"){
-            // ToDo
+
+            printForSaleLayout.visibility = View.GONE
+            // ToDo - Who develop credit
+
         } else if (printMode == "D"){
-            // ToDo
+
+            // ToDo - Who develop delivery
+
         } else if (printMode == "SR"){
-            // ToDo
+
+            // ToDo - Who develop ??
+
         }
 
     }
@@ -289,7 +294,7 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
             Utils.saveInvoiceImageIntoGallery(invoice!!.invoice_id, this, myBitmap, "Sale") // Doesn't work
             val editProductList = arrangeProductList()
             val customerData: Customer = relatedDataForPrint!!.customer
-            //invoice!!.printMode = "sale" // ToDo - Doesn't exist in invoice, in all condition ?? add or param pass?
+            //invoice!!.printMode = "sale" // Doesn't exist in invoice, in all condition ?? add or param pass?
             Utils.printWithHSPOS(
                 this,
                 customerData.customer_name,
@@ -523,6 +528,11 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
 
         return newSoldProductList
 
+    }
+
+    override fun onBackPressed() {
+        setResult(Activity.RESULT_OK)
+        finish()
     }
 
 }

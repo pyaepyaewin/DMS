@@ -20,6 +20,9 @@ interface VolumeDiscountFilterItemDao{
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(list: List<VolumeDiscountFilterItem>)
 
+    @Query("select * from volume_discount_filter_item where volume_discount_id = :volDisFilterId")
+    fun getDataByID(volDisFilterId: String): List<VolumeDiscountFilterItem>
+
     @Query("Delete from volume_discount_filter_item")
     fun deleteAll()
 

@@ -65,8 +65,10 @@ object Utils {
 
     var progressDialog: ProgressDialog? = null
 
-    val MODE_CUSTOMER_FEEDBACK = "mode_customer_feedback"
-    val MODE_GENERAL_SALE = "mode_general_sale"
+    const val MODE_CUSTOMER_FEEDBACK = "mode_customer_feedback"
+    const val MODE_GENERAL_SALE = "mode_general_sale"
+
+    const val RQ_BACK_TO_CUSTOMER = 2
 
     private var formatter: Formatter? = null
     private var act: Activity? = null

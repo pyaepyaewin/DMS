@@ -1,5 +1,6 @@
 package com.aceplus.dms.ui.activities.customer.sale
 
+import android.app.Activity
 import android.app.AlertDialog
 import android.arch.lifecycle.Observer
 import android.content.Context
@@ -24,7 +25,6 @@ import com.aceplus.domain.vo.SoldProductInfo
 import com.aceplussolutions.rms.ui.activities.BaseActivity
 import kotlinx.android.synthetic.main.activity_sale1.*
 import kotlinx.android.synthetic.main.dialog_box_sale_quantity.*
-import okhttp3.internal.Util
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.kodein
@@ -146,7 +146,7 @@ class SaleActivity : BaseActivity(), KodeinAware {
         }
 
         cancelImg.setOnClickListener { onBackPressed() }
-        checkoutImg.setOnClickListener { saveSaleData() }
+        checkoutImg.setOnClickListener { checkoutSale() }
 
         saleViewModel.updatedSoldProduct.observe(this, Observer {
             if (it != null){
@@ -400,7 +400,7 @@ class SaleActivity : BaseActivity(), KodeinAware {
 
     }
 
-    private fun saveSaleData() {
+    private fun checkoutSale() {
 
         if (mSoldProductListAdapter.getDataList().isEmpty()) {
             AlertDialog.Builder(this@SaleActivity)
@@ -425,7 +425,8 @@ class SaleActivity : BaseActivity(), KodeinAware {
 
         if (isFocPass){
 
-            startActivity(SaleCheckoutActivity.newIntentFromSale(this, customer!!, mSoldProductListAdapter.getDataList() as ArrayList, this.promotionList))
+            val intent = SaleCheckoutActivity.newIntentFromSale(this, customer!!, mSoldProductListAdapter.getDataList() as ArrayList, this.promotionList)
+            startActivityForResult(intent, Utils.RQ_BACK_TO_CUSTOMER)
 
         }
 
@@ -472,15 +473,20 @@ class SaleActivity : BaseActivity(), KodeinAware {
     }
 
     private fun getIntentData() {
-
-        customer = intent.getParcelableExtra(IE_CUSTOMER_DATA)
-
+        if (intent.getParcelableExtra<Customer>(IE_CUSTOMER_DATA) != null) customer = intent.getParcelableExtra(IE_CUSTOMER_DATA)
         // ToDo - get intent data
-
     }
 
     private fun updatePromotionProductList(){
         mPromotionGiftPresentListAdapter.setNewList(promotionList)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == Utils.RQ_BACK_TO_CUSTOMER)
+            if (resultCode == Activity.RESULT_OK){
+                setResult(Activity.RESULT_OK)
+                finish()
+            }
     }
 
 }

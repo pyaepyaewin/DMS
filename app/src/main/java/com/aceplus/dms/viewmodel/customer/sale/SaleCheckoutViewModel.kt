@@ -1,5 +1,6 @@
 package com.aceplus.dms.viewmodel.customer.sale
 
+import android.annotation.SuppressLint
 import android.arch.lifecycle.MutableLiveData
 import android.util.Log
 import com.aceplus.dms.utils.Utils
@@ -26,15 +27,71 @@ class SaleCheckoutViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
         return customerVisitRepo.getRouteScheduleIDV2()
     }
 
-    fun calculateFinalAmount(){
+    @SuppressLint("CheckResult")
+    fun calculateFinalAmount(soldProductList: ArrayList<SoldProductInfo>){
 
         var amountAndPercentage: Map<String, Double> = mapOf()
         var sameCategoryProducts: ArrayList<SoldProductInfo> = ArrayList()
 
-        // ToDo - show final amount
+        var exclude = 0
+        var volDisFilterId = 0
+        var soldPrice = 0.0
+        var totalBuyAmtInclude = 0.0
+        var totalBuyAmtExclude = 0.0
+        var discountPercent = 0.0
+
+        launch {
+            customerVisitRepo.getVolumeDiscountFilterByDate(Utils.getCurrentDate(true))
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.mainThread())
+                .subscribe{
+                    for (i in it){
+
+                        volDisFilterId = i.id
+                        exclude = i.exclude?.toInt() ?: 0
+
+                        for (soldProduct in soldProductList){
+
+                            var categoryProduct: String? = null
+                            var category: String? = null
+
+                            customerVisitRepo.getProductByID(soldProduct.product.id)
+                                .subscribeOn(schedulerProvider.io())
+                                .observeOn(schedulerProvider.mainThread())
+                                .subscribe{ productList ->
+                                    for ( p in productList){
+                                        categoryProduct = p.category_id
+                                    }
+                                }
+
+                            customerVisitRepo.getVolumeDiscountFilterItem(volDisFilterId)
+                                .subscribeOn(schedulerProvider.io())
+                                .observeOn(schedulerProvider.mainThread())
+                                .subscribe{ volumeDiscFilterItemList ->
+                                    for (v in volumeDiscFilterItemList){
+                                        category = v.category_id
+                                    }
+                                }
+
+                            if (category == categoryProduct)
+                                sameCategoryProducts.add(soldProduct)
+
+                        }
+
+                        for (aSameCategoryProduct in sameCategoryProducts){
+
+                            var buy_amt = 0.0
+                            // ToDo
+
+                        }
+
+                    }
+                }
+        }
 
     }
 
+    @SuppressLint("CheckResult")
     fun saveCheckoutData(
         customerId: Int,
         saleDate: String,

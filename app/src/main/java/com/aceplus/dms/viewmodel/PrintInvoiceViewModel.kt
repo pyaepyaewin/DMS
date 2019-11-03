@@ -78,30 +78,24 @@ class PrintInvoiceViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
                     customerTownShipName = it
                     return@flatMap customerVisitRepo.getCompanyInfo()
                 }
-                .subscribeOn(schedulerProvider.io())
-                .observeOn(schedulerProvider.mainThread())
-                .subscribe{
+                .flatMap {
                     for (i in it){
                         companyInfo = i
                     }
+                    return@flatMap customerVisitRepo.getSaleManName(orderSaleManID!!)
                 }
-        }
-
-        if (!orderSaleManID.isNullOrBlank()){
-            launch {
-                customerVisitRepo.getSaleManName(orderSaleManID!!)
-                    .subscribeOn(schedulerProvider.io())
-                    .observeOn(schedulerProvider.mainThread())
-                    .subscribe{
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.mainThread())
+                .subscribe{
+                    if (!orderSaleManID.isNullOrBlank()){
                         for (i in it){
                             orderSalePersonName = i
                         }
                     }
-            }
+                    if (customer != null && customerTownShipName != null && companyInfo != null)
+                        relatedDataForPrint.postValue(RelatedDataForPrint(customer!!, routeName, customerTownShipName!!, companyInfo!!, orderSalePersonName))
+                }
         }
-
-        if (customer != null && customerTownShipName != null && companyInfo != null)
-            relatedDataForPrint.postValue(RelatedDataForPrint(customer!!, routeName, customerTownShipName!!, companyInfo!!, orderSalePersonName))
 
     }
 

@@ -1,5 +1,6 @@
 package com.aceplus.dms.ui.activities.customer.sale
 
+import android.app.Activity
 import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.content.Context
@@ -92,6 +93,16 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
 
     }
 
+    private fun initializeData(){
+
+        calculateTotalAmount()
+        calculateTax() // Just temporary
+        //saleCheckoutViewModel.calculateFinalAmount(soldProductList) // Need to update
+        salePersonId = saleCheckoutViewModel.getSaleManID()
+        locationCode = saleCheckoutViewModel.getRouteID() // Check point
+
+    }
+
     private fun setupUI(){
 
         saleDateTextView.text = Utils.getDate(false)
@@ -103,16 +114,6 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
 
         rvSoldProductList.adapter = checkoutSoldProductListAdapter
         rvSoldProductList.layoutManager = LinearLayoutManager(this)
-
-    }
-
-    private fun initializeData(){
-
-        calculateTotalAmount()
-        calculateTax() // Just temporary
-        saleCheckoutViewModel.calculateFinalAmount() // Need to update
-        salePersonId = saleCheckoutViewModel.getSaleManID()
-        locationCode = saleCheckoutViewModel.getRouteID()
 
     }
 
@@ -293,11 +294,9 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
                 if (refundAmount < 0 || payAmount.text.isBlank()){
                     setInvoiceId()
                     saveData("CR")
-                    //saleOrExchange()
                 } else{
                     setInvoiceId()
                     saveData("CA")
-                    //saleOrExchange()
                 }
 
             }
@@ -388,11 +387,19 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
             toSaleExchange()
         } else{
             saleCheckoutViewModel.updateDepartureTimeForSaleManRoute( salePersonId!!, customer!!.id.toString())
-            saleCheckoutViewModel.updateSaleVisitRecord(customer!!.id) // Need to check
+            saleCheckoutViewModel.updateSaleVisitRecord(customer!!.id) // ToDo - Need to check
             val intent = PrintInvoiceActivity.newIntentFromSaleCheckout(this, invoice!!, soldProductList, promotionList)
-            startActivity(intent)
+            startActivityForResult(intent, Utils.RQ_BACK_TO_CUSTOMER)
         }
 
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == Utils.RQ_BACK_TO_CUSTOMER)
+            if (resultCode == Activity.RESULT_OK){
+                setResult(Activity.RESULT_OK)
+                finish()
+            }
     }
 
     private fun toSaleExchange(){

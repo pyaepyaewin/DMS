@@ -20,6 +20,8 @@ import com.aceplus.domain.entity.promotion.PromotionPrice
 import com.aceplus.domain.entity.route.RouteScheduleV2
 import com.aceplus.domain.entity.route.TempForSaleManRoute
 import com.aceplus.domain.entity.sale.SaleMan
+import com.aceplus.domain.entity.volumediscount.VolumeDiscountFilter
+import com.aceplus.domain.entity.volumediscount.VolumeDiscountFilterItem
 import com.aceplus.domain.repo.CustomerVisitRepo
 import com.aceplus.shared.utils.GPSTracker
 import com.aceplussolutions.rms.constants.AppUtils
@@ -300,6 +302,14 @@ class CustomerVisitRepoImpl(
 
     override fun getCompanyInfo(): Observable<List<CompanyInformation>> {
         return Observable.just(db.companyInformationDao().allData)
+    }
+
+    override fun getVolumeDiscountFilterByDate(currentDate: String): Observable<List<VolumeDiscountFilter>> {
+        return Observable.just(db.volumeDiscountFilterDao().getVolumeDiscountFilterByDate(currentDate))
+    }
+
+    override fun getVolumeDiscountFilterItem(volDisFilterId: Int): Observable<List<VolumeDiscountFilterItem>> {
+        return Observable.just(db.volumeDiscountFilterItemDao().getDataByID(volDisFilterId.toString()))
     }
 
 }
