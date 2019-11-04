@@ -231,7 +231,9 @@ class SaleCheckoutViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
         totalAmount: Double,
         taxAmt: Double,
         bank: String,
-        acc: String
+        acc: String,
+        totalDiscountAmount: Double,
+        totalVolumeDiscountPercent: Double
     ){
 
         var totalQtyForInvoice = 0
@@ -307,20 +309,18 @@ class SaleCheckoutViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
                             // ToDo - insert invoice present
                         }
 
-                        /*totalDiscountAmount = volDisAmount
-                        totalVolumeDiscountPercent = volDisPercent*/
                         invoice.invoice_id = invoiceId
                         invoice.customer_id = customerId.toString()
                         invoice.sale_date = saleDate
                         invoice.total_amount = totalAmount.toString()
-                        invoice.total_discount_amount = 0.0 // Need to check
+                        invoice.total_discount_amount = totalDiscountAmount // Need to check
                         invoice.pay_amount = payAmount.toString()
                         invoice.refund_amount = refundAmount.toString()
                         invoice.receipt_person_name = receiptPerson
                         invoice.sale_person_id = salePersonId
                         invoice.due_date = dueDate
                         invoice.cash_or_credit = cashOrLoanOrBank
-                        invoice.location_code = "" // Need to add
+                        invoice.location_code = "" // Need to add - route id
                         invoice.device_id = deviceId
                         invoice.invoice_time = invoiceTime
                         invoice.package_invoice_number = 0 // Need to add
@@ -330,7 +330,7 @@ class SaleCheckoutViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
                         invoice.invoice_product_id = 0 // Need to check
                         invoice.total_quantity = totalQtyForInvoice.toDouble() // Check int or double
                         invoice.invoice_status = cashOrLoanOrBank
-                        invoice.total_discount_percent = "0.0"  // Need to check
+                        invoice.total_discount_percent = totalVolumeDiscountPercent.toString()  // Need to check
                         invoice.rate = "1"
                         invoice.tax_amount = taxAmt
                         invoice.bank_name = bank
@@ -343,13 +343,10 @@ class SaleCheckoutViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
                         // ToDo - for sale return
 
                         customerVisitRepo.getAllInvoice()
-                            .subscribeOn(schedulerProvider.io())
-                            .observeOn(schedulerProvider.mainThread())
-                            .subscribe{ invoiceList ->
+                            .flatMap { invoiceList ->
                                 Log.d("Testing", "Invoice count = ${invoiceList.size}")
+                                return@flatMap customerVisitRepo.getAllInvoiceProduct()
                             }
-
-                        customerVisitRepo.getAllInvoiceProduct()
                             .subscribeOn(schedulerProvider.io())
                             .observeOn(schedulerProvider.mainThread())
                             .subscribe{ invoiceProductList ->

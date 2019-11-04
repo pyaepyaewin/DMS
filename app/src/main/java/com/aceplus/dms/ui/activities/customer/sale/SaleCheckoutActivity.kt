@@ -79,6 +79,8 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
     private var totalVolumeDiscount: Double = 0.0
     private var totalVolumeDiscountPercent:Double = 0.0
     private var totalDiscountAmount:Double = 0.0
+    private var volDisPercent: Double = 0.0
+    private var volDisAmount:Double = 0.0
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -99,7 +101,6 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
     private fun initializeData(){
 
         calculateTotalAmount()
-        //calculateTax() // Just temporary
         saleCheckoutViewModel.calculateFinalAmount(soldProductList, totalAmount)
         salePersonId = saleCheckoutViewModel.getSaleManID()
         locationCode = saleCheckoutViewModel.getRouteID() // Check point
@@ -195,7 +196,16 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
             netAmount = totalAmount - totalDiscountAmount
         }
 
-        // ToDo
+        if (volDisAmount != 0.0) netAmount -= volDisAmount
+
+        this.netAmount = netAmount
+        tvNetAmount.text = Utils.formatAmount(netAmount)
+
+        if (volDisPercent != 0.0) edtVolumeDiscountPercent.setText(volDisPercent.toString())
+        else edtVolumeDiscountPercent.setText(totalVolumeDiscountPercent.toString())
+
+        if (volDisAmount != 0.0) edtVolumeDiscountAmt.setText(volDisAmount.toString())
+        else edtVolumeDiscountAmt.setText(totalDiscountAmount.toString())
 
         tax_txtView.text = df.format(taxAmt)
 
@@ -231,6 +241,7 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
             edtVolumeDiscountAmt.setText(discountAmount.toString())
             tvNetAmount.text = netAmount.toString()
             this.netAmount = netAmount
+            this.volDisAmount = discountAmount
             calculateRefundAmount()
         }
 
@@ -249,6 +260,7 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
             edtVolumeDiscountPercent.setText(discountPercent.toString())
             tvNetAmount.text = netAmount.toString()
             this.netAmount = netAmount
+            this.volDisAmount = discountAmount
             calculateRefundAmount()
         }
 
@@ -306,9 +318,6 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
 
         return taxAmt
 
-        /*tax_label_saleCheckout.text = "Tax (Include) : "
-        tax_txtView.text = df.format(taxAmt)
-        this.taxAmt = taxAmt*/
     }
 
     private fun chooseDueDate(){
@@ -422,7 +431,9 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
             totalAmount,
             taxAmt,
             edit_txt_branch_name.text.toString(),
-            edit_txt_account_name.text.toString()
+            edit_txt_account_name.text.toString(),
+            volDisAmount,
+            volDisPercent
         )
 
     }
