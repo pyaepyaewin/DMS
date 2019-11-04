@@ -13,6 +13,7 @@ import com.aceplus.dms.R
 import com.aceplus.dms.ui.activities.CreditCollectionCheckoutActivity
 import com.aceplus.dms.ui.activities.CustomerVisitActivity
 import com.aceplus.dms.ui.adapters.creditcollectionadapters.CreditCollectionAdapter
+import com.aceplus.dms.viewmodel.PrintInvoiceViewModel
 import com.aceplus.dms.viewmodel.creditcollection.CreditCollectionViewModel
 import com.aceplus.dms.viewmodel.factory.KodeinViewModelFactory
 import com.aceplus.domain.model.creditcollectiondataclass.CreditCollectionDataClass
@@ -38,13 +39,14 @@ class CreditCollectionActivity : BaseActivity(), KodeinAware {
             "You clicked at ${data.customer_name}",
             Toast.LENGTH_SHORT
         ).show()
-        startActivity(CreditCollectionCheckoutActivity.getIntent(this,data.id,data.customer_name,data.address))
+        startActivity(CreditCollectionCheckoutActivity.getIntent(this,data.id,data.customer_name))
     }
 
     private val creditCollectionViewModel: CreditCollectionViewModel by lazy {
         ViewModelProviders.of(this, KodeinViewModelFactory((kodein)))
             .get(CreditCollectionViewModel::class.java)
     }
+
 
     companion object {
         fun newIntent(context: Context): Intent {
@@ -59,7 +61,6 @@ class CreditCollectionActivity : BaseActivity(), KodeinAware {
             onBackPressed()
             true
         }
-
         creditCollectionViewModel.creditCollectionSuccessState.observe(
             this,
             android.arch.lifecycle.Observer {

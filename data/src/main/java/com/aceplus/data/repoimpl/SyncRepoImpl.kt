@@ -138,7 +138,7 @@ class SyncRepoImpl(
     }
 
     override fun getCustomerIdList(): List<Int> {
-        return db.customerDao().allID.map { it.data.toInt() }
+        return db.customerDao().allID.map { it.data!!.toInt() }
     }
 
     override fun getCustomerList(): List<CustomerForApi> {

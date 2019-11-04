@@ -29,4 +29,6 @@ interface SaleManDao {
     @Query("Delete from sale_man")
     fun deleteAll()
 
+    @Query("select * from sale_man where id=:saleManId")
+    fun getSaleManName(saleManId:String):List<SaleMan>
 }

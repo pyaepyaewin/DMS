@@ -52,5 +52,8 @@ interface CustomerDao {
     @Query("select customer.latitude,customer.longitude from customer where customer.route_schedule_status=1")
     fun getCustomerLocation():List<CustomerLocationDataClass>
 
+    @Query("select * from customer where customer_id=:customerID")
+    fun getCustomerName(customerID: String):List<Customer>
+
 
 }

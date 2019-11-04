@@ -4,6 +4,9 @@ import com.aceplus.domain.entity.Location
 import com.aceplus.domain.entity.cash.CashReceive
 import com.aceplus.domain.entity.cash.CashReceiveItem
 import com.aceplus.domain.entity.credit.Credit
+import com.aceplus.domain.entity.customer.Customer
+import com.aceplus.domain.entity.sale.SaleMan
+import com.aceplus.domain.model.forApi.other.Township
 import io.reactivex.Observable
 
 interface CreditCollectionCheckOutRepo {
@@ -11,6 +14,7 @@ interface CreditCollectionCheckOutRepo {
     fun saveCashReceiveDataIntoDatabase(creditData: MutableList<CashReceive>,creditItem:MutableList<CashReceiveItem>)
     fun updatePayAmount(payAmt:Double,invoiceNo:String)
     fun getLocation():Observable<List<Location>>
+    fun getTownShipName(customerID:Int):String
 
 
 }

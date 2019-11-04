@@ -102,7 +102,7 @@ class CustomerVisitRepoImpl(
     }
 
     override fun getCustomerTownshipName(customerID: Int): Observable<String> {
-        return Observable.just(db.townshipDao().townshipNameByID(customerID))
+        return Observable.just(db.townshipDao().townshipNameByID(customerID)?.data)
     }
 
     override fun updateCustomerData(customer: Customer) {
@@ -110,7 +110,7 @@ class CustomerVisitRepoImpl(
     }
 
     override fun getAllDidFeedback(): Observable<List<String>> {
-        val idList = db.didCustomerFeedbackDao().getAllCustomerIdList().map { it.data }
+        val idList = db.didCustomerFeedbackDao().getAllCustomerIdList().map { it.data!! }
         return Observable.just(idList)
     }
 

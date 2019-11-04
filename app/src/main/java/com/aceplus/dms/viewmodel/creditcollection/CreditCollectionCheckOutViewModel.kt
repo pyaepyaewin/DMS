@@ -8,6 +8,7 @@ import com.aceplus.domain.entity.Location
 import com.aceplus.domain.entity.cash.CashReceive
 import com.aceplus.domain.entity.cash.CashReceiveItem
 import com.aceplus.domain.entity.credit.Credit
+import com.aceplus.domain.entity.customer.Customer
 import com.aceplus.domain.repo.creditcollectionrepo.CreditCollectionCheckOutRepo
 import com.aceplus.shared.viewmodel.BaseViewModel
 import com.aceplussolutions.rms.constants.AppUtils
@@ -17,7 +18,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 class CreditCollectionCheckOutViewModel(
     private val creditCollectionCheckOutRepo: CreditCollectionCheckOutRepo,
     private val schedulerProvider: SchedulerProvider,
-    private val shf:SharedPreferences
+    private val shf: SharedPreferences
 ) : BaseViewModel() {
     var creditList = listOf<Credit>()
     var creditCollectionCheckOutSuccessState = MutableLiveData<List<Credit>>()
@@ -73,9 +74,9 @@ class CreditCollectionCheckOutViewModel(
             } else {
                 cashReceive.payment_type = "CR"
             }
-            val saleManId = AppUtils.getStringFromShp(Constant.SALEMAN_ID,shf)
-
-            cashReceive.location_id = ""
+            val saleManId = AppUtils.getStringFromShp(Constant.SALEMAN_ID, shf)
+            var locationId = getLocationID()
+            cashReceive.location_id = locationId.toString()
             cashReceive.status = ""
             cashReceive.cash_receive_type = ""
             cashReceive.sale_id = credit.id.toString()
@@ -85,21 +86,22 @@ class CreditCollectionCheckOutViewModel(
 
             cashList.add(cashReceive)
             cashItemList.add(cashReceiveItem)
-            updatePayAmount(credit.pay_amount,credit.invoice_no!!)
+            updatePayAmount(credit.pay_amount, credit.invoice_no!!)
 
         }
-        creditCollectionCheckOutRepo.saveCashReceiveDataIntoDatabase(cashList,cashItemList)
+        creditCollectionCheckOutRepo.saveCashReceiveDataIntoDatabase(cashList, cashItemList)
     }
-
-
 
 
     fun updatePayAmount(payAmt: Double, invoiceNo: String) {
 
-            creditCollectionCheckOutRepo.updatePayAmount(payAmt, invoiceNo)
+        creditCollectionCheckOutRepo.updatePayAmount(payAmt, invoiceNo)
 
-        }
+    }
 
+    fun getTownShipName(customerId: Int) :String{
+        return  creditCollectionCheckOutRepo.getTownShipName(customerId)
+    }
 
     fun calculatePayAmount(payAmt: String): List<Credit> {
 
@@ -138,4 +140,7 @@ class CreditCollectionCheckOutViewModel(
         return remainList
     }
 
+
 }
+
+

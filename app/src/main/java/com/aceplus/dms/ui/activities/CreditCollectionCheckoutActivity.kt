@@ -17,17 +17,17 @@ import com.aceplus.dms.utils.Utils
 import com.aceplus.dms.viewmodel.creditcollection.CreditCollectionCheckOutViewModel
 import com.aceplus.dms.viewmodel.factory.KodeinViewModelFactory
 import com.aceplus.domain.entity.credit.Credit
+import com.aceplus.domain.model.credit.CreditInvoice
 import com.aceplussolutions.rms.constants.AppUtils
 import kotlinx.android.synthetic.main.activity_credit_collection.*
+import kotlinx.android.synthetic.main.list_row_route.*
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.kodein
 
 class CreditCollectionCheckoutActivity : AppCompatActivity(), KodeinAware {
-    private var invoiceNo: String? = null
-    private var date: String? = null
-   // val saleManId = AppUtils.getStringFromShp(Constant.SALEMAN_ID,this)
 
+    private var listViewPosition = 0
     var calculateList = mutableListOf<Credit>()
     override val kodein: Kodein by kodein()
     private val creditCollectionCheckOutAdapter: CreditCollectionCheckOutAdapter by lazy {
@@ -42,13 +42,13 @@ class CreditCollectionCheckoutActivity : AppCompatActivity(), KodeinAware {
         fun getIntent(
             context: Context,
             customerId: String,
-            customerName: String,
-            address: String
+            customerName: String
+
         ): Intent {
             val creditCheckOutIntent = Intent(context, CreditCollectionCheckoutActivity::class.java)
             creditCheckOutIntent.putExtra("CustomerID", customerId)
             creditCheckOutIntent.putExtra("CustomerName", customerName)
-            creditCheckOutIntent.putExtra("CustomerAddress", address)
+
             return creditCheckOutIntent
         }
     }
@@ -147,15 +147,18 @@ class CreditCollectionCheckoutActivity : AppCompatActivity(), KodeinAware {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_credit_collection)
-
+        val saleManId = AppUtils.getStringFromShp(Constant.SALEMAN_ID, this)
+        val salePersonName = AppUtils.getStringFromShp(Constant.SALEMAN_NAME,this)
         side_total_amt_layout!!.visibility = View.GONE
         side_credit_amt_layout!!.visibility = View.GONE
         side_pay_amt_layout!!.visibility = View.GONE
 
         var customerId = intent.getSerializableExtra("CustomerID") as String
         var customerName = intent.getSerializableExtra("CustomerName") as String
-        var customerAddress = intent.getSerializableExtra("CustomerAddress") as String
+        var townShipName=creditCollectionCheckOutViewModel.getTownShipName(customerId.toInt())
 
+
+        //val customerName=creditCollectionCheckOutViewModel.getCustomerName(customerId)
 
         cancel_img.setOnClickListener {
             onBackPressed()
@@ -182,8 +185,32 @@ class CreditCollectionCheckoutActivity : AppCompatActivity(), KodeinAware {
                         calculateList =
                             creditCollectionCheckOutViewModel.calculatePayAmount(payment_amount_edit.text.toString()) as MutableList<Credit>
                         creditCollectionCheckOutViewModel.insertCashReceiveData(calculateList)
-                       // startActivity(PrintInvoiceActivity.getIntent(this,customerName,customerAddress,invoiceNo!!,saleManId!!,date,amount,discount,))
+                        val creditInvoiceList = mutableListOf<CreditInvoice>()
+                        calculateList.map {
+                            val creditInvoice = CreditInvoice()
+                            creditInvoice.id = it.id
+                            creditInvoice.amt = it.amount
+                            creditInvoice.customerId = it.customer_id
+                            creditInvoice.creditAmt = it.amount - it.pay_amount
+                            creditInvoice.invoiceDate = it.invoice_date
+                            creditInvoice.invoiceNo = it.invoice_no
+                            creditInvoice.invoiceStatus = it.invoice_status
+                            creditInvoice.payAmt = it.pay_amount
+                            creditInvoice.refund = it.refund
+                            creditInvoice.saleManId = it.sale_man_id!!.toInt()
+                            creditInvoice.saleStatus = it.sale_status
+                            creditInvoiceList.add(creditInvoice)
+                        }
 
+                        startActivity(
+                            PrintInvoiceActivity.getIntentFromCredit(
+                                this,
+                                creditInvoiceList,
+                                listViewPosition,
+                                townShipName,
+                                salePersonName.toString(),
+                                customerName)
+                        )
                     }
                 }
             }

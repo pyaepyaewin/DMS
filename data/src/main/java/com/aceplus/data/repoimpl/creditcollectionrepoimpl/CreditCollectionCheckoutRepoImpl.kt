@@ -5,11 +5,20 @@ import com.aceplus.domain.entity.Location
 import com.aceplus.domain.entity.cash.CashReceive
 import com.aceplus.domain.entity.cash.CashReceiveItem
 import com.aceplus.domain.entity.credit.Credit
+import com.aceplus.domain.entity.customer.Customer
+import com.aceplus.domain.entity.sale.SaleMan
+import com.aceplus.domain.model.forApi.other.Township
 import com.aceplus.domain.repo.creditcollectionrepo.CreditCollectionCheckOutRepo
 import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
 
 class CreditCollectionCheckoutRepoImpl(val database:MyDatabase):CreditCollectionCheckOutRepo {
+    override fun getTownShipName(customerID: Int): String {
+        val township = database.townshipDao().townshipNameByID(customerID)
+        return township?.data ?: ""
+    }
+
+
     override fun updatePayAmount(payAmt: Double, invoiceNo: String){
              return database.creditDao().update(payAmt,invoiceNo)
 
@@ -29,8 +38,6 @@ class CreditCollectionCheckoutRepoImpl(val database:MyDatabase):CreditCollection
             .subscribe()
     }
 
-//    override fun updatePayAmount(payAmt: Double, invoiceNo: String) {
-//    }
 
 
 
