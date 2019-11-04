@@ -8,15 +8,14 @@ import com.aceplus.domain.entity.Location
 import com.aceplus.domain.entity.cash.CashReceive
 import com.aceplus.domain.entity.cash.CashReceiveItem
 import com.aceplus.domain.entity.credit.Credit
-import com.aceplus.domain.entity.customer.Customer
-import com.aceplus.domain.repo.creditcollectionrepo.CreditCollectionCheckOutRepo
+import com.aceplus.domain.repo.creditcollectionrepo.CreditCollectionRepo
 import com.aceplus.shared.viewmodel.BaseViewModel
 import com.aceplussolutions.rms.constants.AppUtils
 import com.kkk.githubpaging.network.rx.SchedulerProvider
 import io.reactivex.android.schedulers.AndroidSchedulers
 
 class CreditCollectionCheckOutViewModel(
-    private val creditCollectionCheckOutRepo: CreditCollectionCheckOutRepo,
+    private val creditCollectionCheckOutRepo: CreditCollectionRepo,
     private val schedulerProvider: SchedulerProvider,
     private val shf: SharedPreferences
 ) : BaseViewModel() {

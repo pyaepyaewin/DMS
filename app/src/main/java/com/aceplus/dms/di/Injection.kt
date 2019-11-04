@@ -11,7 +11,6 @@ import com.aceplus.data.remote.UploadApiService
 import com.aceplus.data.repoimpl.CustomerVisitRepoImpl
 import com.aceplus.data.repoimpl.LoginRepoImpl
 import com.aceplus.data.repoimpl.SyncRepoImpl
-import com.aceplus.data.repoimpl.creditcollectionrepoimpl.CreditCollectionCheckoutRepoImpl
 import com.aceplus.data.repoimpl.creditcollectionrepoimpl.CreditCollectionRepoImpl
 import com.aceplus.data.repoimpl.report.ReportRepoImpl
 import com.aceplus.data.repoimpl.promotionrepoImpl.*
@@ -36,7 +35,6 @@ import com.aceplus.dms.viewmodel.routeviewmodels.ViewByListViewModel
 import com.aceplus.domain.repo.CustomerVisitRepo
 import com.aceplus.domain.repo.LoginRepo
 import com.aceplus.domain.repo.SyncRepo
-import com.aceplus.domain.repo.creditcollectionrepo.CreditCollectionCheckOutRepo
 import com.aceplus.domain.repo.creditcollectionrepo.CreditCollectionRepo
 import com.aceplus.domain.repo.report.ReportRepo
 import com.aceplus.domain.repo.promotionrepo.*
@@ -123,9 +121,7 @@ val repoModule = Kodein.Module {
     bind<CreditCollectionRepo>() with singleton {
         CreditCollectionRepoImpl(instance())
     }
-    bind<CreditCollectionCheckOutRepo>() with singleton {
-        CreditCollectionCheckoutRepoImpl(instance())
-    }
+   
 }
 
 //ViewModel Module
