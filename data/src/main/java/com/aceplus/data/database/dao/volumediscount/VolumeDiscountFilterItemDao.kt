@@ -23,6 +23,9 @@ interface VolumeDiscountFilterItemDao{
     @Query("select * from volume_discount_filter_item where volume_discount_id = :volDisFilterId")
     fun getDataByID(volDisFilterId: String): List<VolumeDiscountFilterItem>
 
+    @Query("select * from volume_discount_filter_item where volume_discount_id = :volDisFilterId and from_sale_amount <= :buyAmt and to_sale_amount >= :buyAmt")
+    fun getDiscountPercent(volDisFilterId: String, buyAmt: Double): List<VolumeDiscountFilterItem>
+
     @Query("Delete from volume_discount_filter_item")
     fun deleteAll()
 

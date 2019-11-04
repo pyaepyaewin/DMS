@@ -4,12 +4,12 @@ import android.annotation.SuppressLint
 import android.arch.lifecycle.MutableLiveData
 import android.util.Log
 import com.aceplus.dms.utils.Utils
-import com.aceplus.domain.entity.customer.Customer
 import com.aceplus.domain.entity.invoice.Invoice
 import com.aceplus.domain.entity.invoice.InvoiceProduct
 import com.aceplus.domain.entity.promotion.Promotion
 import com.aceplus.domain.model.forApi.invoice.InvoiceDetail
 import com.aceplus.domain.repo.CustomerVisitRepo
+import com.aceplus.domain.vo.CalculatedFinalData
 import com.aceplus.domain.vo.SoldProductInfo
 import com.aceplus.shared.viewmodel.BaseViewModel
 import com.kkk.githubpaging.network.rx.SchedulerProvider
@@ -17,6 +17,7 @@ import com.kkk.githubpaging.network.rx.SchedulerProvider
 class SaleCheckoutViewModel(private val customerVisitRepo: CustomerVisitRepo, private val schedulerProvider: SchedulerProvider): BaseViewModel() {
 
     var invoice = MutableLiveData<Invoice>()
+    var finalData = MutableLiveData<CalculatedFinalData>()
 
     fun getSaleManID(): String{
         val saleManData = customerVisitRepo.getSaleManData()
@@ -28,27 +29,32 @@ class SaleCheckoutViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
     }
 
     @SuppressLint("CheckResult")
-    fun calculateFinalAmount(soldProductList: ArrayList<SoldProductInfo>){
+    fun calculateFinalAmount(soldProductList: ArrayList<SoldProductInfo>, totalAmount: Double){
 
-        var amountAndPercentage: Map<String, Double> = mapOf()
+        var amountAndPercentage: MutableMap<String, Double> = mutableMapOf()
         var sameCategoryProducts: ArrayList<SoldProductInfo> = ArrayList()
 
-        var exclude = 0
+        var exclude: Int? = 0
         var volDisFilterId = 0
         var soldPrice = 0.0
         var totalBuyAmtInclude = 0.0
         var totalBuyAmtExclude = 0.0
         var discountPercent = 0.0
 
+        var totalVolumeDiscount = 0.0
+        var totalVolumeDiscountPercent = 0.0
+
+        var taxType = ""
+        var taxPercent = 0
+
         launch {
             customerVisitRepo.getVolumeDiscountFilterByDate(Utils.getCurrentDate(true))
-                .subscribeOn(schedulerProvider.io())
-                .observeOn(schedulerProvider.mainThread())
-                .subscribe{
+                .flatMap {
+
                     for (i in it){
 
                         volDisFilterId = i.id
-                        exclude = i.exclude?.toInt() ?: 0
+                        exclude = i.exclude?.toInt()
 
                         for (soldProduct in soldProductList){
 
@@ -80,12 +86,128 @@ class SaleCheckoutViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
 
                         for (aSameCategoryProduct in sameCategoryProducts){
 
-                            var buy_amt = 0.0
-                            // ToDo
+                            soldPrice = if (aSameCategoryProduct.promotionPrice == 0.0){
+                                aSameCategoryProduct.product.selling_price?.toDouble() ?: 0.0
+                            } else{
+                                aSameCategoryProduct.promotionPrice
+                            }
+
+                            var buyAmt = soldPrice * aSameCategoryProduct.quantity
+                            aSameCategoryProduct.totalAmt = buyAmt
+
+                            totalBuyAmtInclude += aSameCategoryProduct.totalAmt
+
+                            if (aSameCategoryProduct.promotionPrice == 0.0)
+                                totalBuyAmtExclude += aSameCategoryProduct.totalAmt
+
+                        }
+
+                        if (exclude == 0){
+
+                            customerVisitRepo.getDiscountPercentFromVolumeDiscountFilterItem(volDisFilterId, totalBuyAmtInclude)
+                                .subscribeOn(schedulerProvider.io())
+                                .observeOn(schedulerProvider.mainThread())
+                                .subscribe{ discList ->
+                                    if (discList.isEmpty()) exclude = null
+                                    for (disc in discList){
+                                        discountPercent = disc.discount_percent?.toDouble() ?: 0.0
+                                    }
+                                }
+
+                            amountAndPercentage["Percentage"] = discountPercent
+                            var itemTotalDis = totalBuyAmtInclude * (discountPercent / 100)
+                            amountAndPercentage["Amount"] = itemTotalDis
+
+                            // Check what's this for
+                            if (discountPercent > 0){
+                                for (soldProduct in sameCategoryProducts){
+                                    soldProduct.exclude = exclude
+                                    val discountAmount = soldProduct.totalAmt * (discountPercent / 100)
+                                    soldProduct.discountPercent = discountPercent
+                                    soldProduct.discountAmount = discountAmount
+                                    //soldProduct.totalAmt = soldProduct.totalAmount // Check point
+                                }
+                            }
+
+                        } else{
+
+                            customerVisitRepo.getDiscountPercentFromVolumeDiscountFilterItem(volDisFilterId, totalBuyAmtExclude)
+                                .subscribeOn(schedulerProvider.io())
+                                .observeOn(schedulerProvider.mainThread())
+                                .subscribe{ discList ->
+                                    if (discList.isEmpty()) exclude = null
+                                    for (disc in discList){
+                                        discountPercent = disc.discount_percent?.toDouble() ?: 0.0
+                                    }
+                                }
+
+                            amountAndPercentage["Percentage"] = discountPercent
+                            var itemTotalDis = totalBuyAmtInclude * (discountPercent / 100)
+                            amountAndPercentage["Amount"] = itemTotalDis
+
+                            // Check what's this for
+                            if (discountPercent > 0){
+                                for (soldProduct in sameCategoryProducts){
+                                    soldProduct.exclude = exclude
+                                    val discountAmount = soldProduct.totalAmt * (discountPercent / 100)
+                                    soldProduct.discountPercent = discountPercent
+                                    soldProduct.discountAmount = discountAmount
+                                    //soldProduct.totalAmt = soldProduct.totalAmount // Check point
+                                }
+                            }
 
                         }
 
                     }
+
+                    return@flatMap customerVisitRepo.getVolumeDiscountByDate(Utils.getCurrentDate(true))
+                }
+                .flatMap {
+
+                    var volDisId = 0
+                    var buyAmt = 0.0
+
+                    for (i in it){
+                        volDisId = i.id
+                        exclude = i.exclude?.toInt()
+
+                        if (exclude == 0){
+                            buyAmt = totalAmount
+                        } else{
+                            var noPromoBuyAmt = 0.0
+                            for (soldProduct in soldProductList){
+                                if (soldProduct.promotionPrice == 0.0 && soldProduct.discountPercent == 0.0)
+                                    noPromoBuyAmt += soldProduct.totalAmt
+                            }
+                            buyAmt = noPromoBuyAmt
+                        }
+
+                        customerVisitRepo.getDiscountPercentFromVolumeDiscountFilterItem(volDisId, buyAmt)
+                            .subscribeOn(schedulerProvider.io())
+                            .observeOn(schedulerProvider.mainThread())
+                            .subscribe{ volDiscFilterItemList ->
+                                for (volDiscFilterItem in volDiscFilterItemList){
+                                    val discountPercentForVolDis = volDiscFilterItem.discount_percent?.toDouble() ?: 0.0
+                                    totalVolumeDiscount = buyAmt * (discountPercentForVolDis / 100)
+                                    totalVolumeDiscountPercent = discountPercentForVolDis
+                                }
+                            }
+                    }
+
+                    return@flatMap customerVisitRepo.getCompanyInfo()
+                }
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.mainThread())
+                .subscribe{ companyInfoList ->
+
+                    for(company in companyInfoList){
+                        taxPercent = company.tax ?: 0
+                        taxType = company.tax_type ?: ""
+                    }
+
+                    val finalData = CalculatedFinalData(amountAndPercentage, totalVolumeDiscount, totalVolumeDiscountPercent, taxType, taxPercent)
+                    this.finalData.postValue(finalData)
+
                 }
         }
 

@@ -16,6 +16,7 @@ import com.aceplus.domain.entity.promotion.PromotionGift
 import com.aceplus.domain.entity.promotion.PromotionPrice
 import com.aceplus.domain.entity.route.RouteScheduleV2
 import com.aceplus.domain.entity.sale.SaleMan
+import com.aceplus.domain.entity.volumediscount.VolumeDiscount
 import com.aceplus.domain.entity.volumediscount.VolumeDiscountFilter
 import com.aceplus.domain.entity.volumediscount.VolumeDiscountFilterItem
 import com.aceplus.domain.model.routeSchedule_v2.RouteSchedule_v2
@@ -77,5 +78,8 @@ interface CustomerVisitRepo {
 
     fun getVolumeDiscountFilterByDate(currentDate: String): Observable<List<VolumeDiscountFilter>>
     fun getVolumeDiscountFilterItem(volDisFilterId: Int): Observable<List<VolumeDiscountFilterItem>>
+    fun getDiscountPercentFromVolumeDiscountFilterItem(volDisFilterId: Int, buyAmt: Double): Observable<List<VolumeDiscountFilterItem>>
+
+    fun getVolumeDiscountByDate(currentDate: String): Observable<List<VolumeDiscount>>
 
 }

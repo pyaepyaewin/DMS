@@ -20,6 +20,7 @@ import com.aceplus.domain.entity.promotion.PromotionPrice
 import com.aceplus.domain.entity.route.RouteScheduleV2
 import com.aceplus.domain.entity.route.TempForSaleManRoute
 import com.aceplus.domain.entity.sale.SaleMan
+import com.aceplus.domain.entity.volumediscount.VolumeDiscount
 import com.aceplus.domain.entity.volumediscount.VolumeDiscountFilter
 import com.aceplus.domain.entity.volumediscount.VolumeDiscountFilterItem
 import com.aceplus.domain.repo.CustomerVisitRepo
@@ -310,6 +311,14 @@ class CustomerVisitRepoImpl(
 
     override fun getVolumeDiscountFilterItem(volDisFilterId: Int): Observable<List<VolumeDiscountFilterItem>> {
         return Observable.just(db.volumeDiscountFilterItemDao().getDataByID(volDisFilterId.toString()))
+    }
+
+    override fun getDiscountPercentFromVolumeDiscountFilterItem(volDisFilterId: Int, buyAmt: Double): Observable<List<VolumeDiscountFilterItem>> {
+        return Observable.just(db.volumeDiscountFilterItemDao().getDiscountPercent(volDisFilterId.toString(), buyAmt))
+    }
+
+    override fun getVolumeDiscountByDate(currentDate: String): Observable<List<VolumeDiscount>> {
+        return Observable.just(db.volumeDiscountDao().getVolumeDiscountByDate(currentDate))
     }
 
 }
