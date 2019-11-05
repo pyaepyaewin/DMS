@@ -9,7 +9,7 @@
             android:background="@color/colorAccent">
 
         <ImageView
-                android:id="@+id/cancel_img"
+                android:id="@+id/cancelImg"
                 android:layout_width="@dimen/btn_appbar_width"
                 android:layout_height="@dimen/btn_appbar_height"
                 android:layout_alignParentLeft="true"
@@ -19,18 +19,17 @@
                 android:src="@drawable/ic_cancel_xh_btn" />
 
         <ImageView
-                android:id="@+id/checkout_img"
-
+                android:id="@+id/checkoutImg"
                 android:layout_width="@dimen/btn_appbar_width"
                 android:layout_height="@dimen/btn_appbar_height"
                 android:layout_centerVertical="true"
                 android:layout_marginLeft="20dp"
-                android:layout_toRightOf="@+id/cancel_img"
+                android:layout_toRightOf="@+id/cancelImg"
                 android:gravity="center"
                 android:src="@drawable/ic_done_hx_btn" />
 
         <TextView
-                android:id="@+id/title"
+                android:id="@+id/tvTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
@@ -49,7 +48,7 @@
                 android:id="@+id/searchAndSelectProductsLayout"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="0.9"
+                android:layout_weight="2"
                 android:orientation="vertical"
                 android:padding="5dp">
 
@@ -58,9 +57,13 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:drawableRight="@drawable/search"
+                    android:dropDownWidth="350dp"
+                    android:dropDownHeight="wrap_content"
                     android:hint="@string/search"
+                    android:inputType="textMultiLine"
                     android:paddingLeft="10dp"
-                    android:paddingRight="10dp" />
+                    android:paddingRight="10dp"
+                    android:singleLine="false" />
 
             <RelativeLayout
                     android:layout_width="match_parent"
@@ -98,18 +101,19 @@
                         android:textSize="30sp" />
             </RelativeLayout>
 
-            <ListView
-                    android:id="@+id/productsListView"
+            <android.support.v7.widget.RecyclerView
+                    android:id="@+id/rvProductList"
                     android:layout_width="match_parent"
                     android:layout_height="fill_parent"
-                    android:divider="#000000"></ListView>
+                    android:divider="#000000"
+                    android:scrollbars="vertical" />
 
         </LinearLayout>
 
         <RelativeLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="2">
+                android:layout_weight="5">
 
             <LinearLayout
                     android:id="@+id/saleDateLayout"
@@ -122,6 +126,8 @@
                         android:id="@+id/invoiceIdLayout"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:layout_gravity="center_vertical"
                         android:orientation="horizontal">
 
                     <TextView
@@ -133,19 +139,22 @@
                             android:id="@+id/invoiceId"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:padding="7dp" />
+                            android:padding="5dp" />
                 </LinearLayout>
 
                 <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
                         android:text="@string/sale_date" />
 
                 <TextView
                         android:id="@+id/saleDateTextView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:padding="7dp"
+                        android:padding="5dp"
+                        android:layout_marginRight="5dp"
+                        android:layout_gravity="center_vertical"
                         android:text="25/05/2015" />
             </LinearLayout>
 
@@ -154,14 +163,17 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/saleDateLayout"
-                    android:layout_margin="4dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
                     android:background="#898989"
-                    android:padding="10dp">
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp">
 
                 <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_weight="3"
+                        android:layout_gravity="center"
+                        android:layout_weight="4"
                         android:gravity="center_horizontal"
                         android:text="@string/product"
                         android:textColor="#FFFFFF"
@@ -171,8 +183,9 @@
                         android:id="@+id/tableHeaderUM"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_gravity="center"
                         android:layout_weight="2"
-                        android:gravity="center_horizontal"
+                        android:gravity="center"
                         android:text="@string/um"
                         android:textColor="#FFFFFF"
                         android:textStyle="bold" />
@@ -191,6 +204,7 @@
                         android:id="@+id/tableHeaderQty"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_gravity="center"
                         android:layout_weight="2"
                         android:gravity="center_horizontal"
                         android:text="@string/qty"
@@ -200,6 +214,7 @@
                 <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_gravity="center"
                         android:layout_weight="2"
                         android:gravity="center_horizontal"
                         android:text="@string/price"
@@ -210,6 +225,7 @@
                         android:id="@+id/tableHeaderDiscount"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_gravity="center"
                         android:layout_weight="2"
                         android:gravity="center_horizontal"
                         android:text="Promo: Price"
@@ -219,6 +235,7 @@
                 <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_gravity="center"
                         android:layout_weight="2"
                         android:gravity="center_horizontal"
                         android:text="@string/amount"
@@ -229,6 +246,7 @@
                         android:id="@+id/headerFoc"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_gravity="center"
                         android:layout_weight="2"
                         android:gravity="center_horizontal"
                         android:text="@string/foc"
@@ -239,6 +257,7 @@
                         android:id="@+id/headerDiscount"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_gravity="center"
                         android:layout_weight="2"
                         android:gravity="center_horizontal"
                         android:text="@string/discount"
@@ -246,23 +265,12 @@
                         android:textStyle="bold" />
             </LinearLayout>
 
-            <!--<ScrollView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_below="@id/headerLayout"
-                android:layout_alignParentBottom="true">
-
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_alignParentBottom="true">-->
-
             <LinearLayout
                     android:id="@+id/netAmountLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_alignParentBottom="true"
-                    android:layout_margin="10dp">
+                    android:layout_margin="4dp">
 
                 <TextView
                         android:layout_width="0dp"
@@ -273,7 +281,7 @@
                         android:textStyle="bold" />
 
                 <TextView
-                        android:id="@+id/totalAmountTextView"
+                        android:id="@+id/tvNetAmount"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="2"
@@ -287,10 +295,12 @@
                     android:layout_height="wrap_content"
                     android:layout_above="@+id/netAmountLayout"
                     android:layout_below="@id/headerLayout"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="10dp">
 
-                <ListView
-                        android:id="@+id/soldProductList"
+                <android.support.v7.widget.RecyclerView
+                        android:id="@+id/rvSoldProductList"
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
                         android:layout_weight="3" />
@@ -298,31 +308,31 @@
                 <ScrollView
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
-                        android:layout_above="@+id/netAmountLayout"
-                        android:layout_below="@+id/soldProductList"
-                        android:layout_alignParentStart="true"
-                        android:layout_alignParentLeft="true"
                         android:layout_weight="2">
 
                     <LinearLayout
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content">
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
 
-                        <ListView
-                                android:id="@+id/promotion_plan_gift_listview"
+                        <android.support.v7.widget.RecyclerView
+                                android:id="@+id/rvPromotionPlanItemList"
                                 android:layout_width="match_parent"
-                                android:layout_height="200dp" />
+                                android:layout_height="wrap_content" />
+
+                        <android.support.v7.widget.RecyclerView
+                                android:id="@+id/rvPromotionPlanGiftList"
+                                android:layout_width="match_parent"
+                                android:layout_height="150dp" />
 
                     </LinearLayout>
+
                 </ScrollView>
 
             </LinearLayout>
-            <!--
-                            </RelativeLayout>
-
-                        </ScrollView>-->
 
         </RelativeLayout>
 
     </LinearLayout>
+
 </LinearLayout>

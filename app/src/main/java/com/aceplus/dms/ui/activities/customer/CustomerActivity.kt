@@ -20,6 +20,7 @@ import com.aceplus.data.utils.Constant
 import com.aceplus.dms.R
 import com.aceplus.dms.ui.activities.customer.sale.SaleActivity
 import com.aceplus.dms.ui.activities.customer.sale.SaleReturnActivity
+import com.aceplus.dms.ui.activities.customer.saleorder.SaleOrderActivity
 import com.aceplus.dms.ui.adapters.CustomerListAdapter
 import com.aceplus.dms.utils.Utils
 import com.aceplus.dms.viewmodel.customer.CustomerViewModel
@@ -209,20 +210,17 @@ class CustomerActivity : BaseActivity(), KodeinAware {
         }
 
         btnSale.setOnClickListener { onClickSaleButton() }
-//        btnSaleOrder.setOnClickListener { onClickSaleOrderButton() }
+        btnSaleOrder.setOnClickListener { onClickSaleOrderButton() }
         btnUnsellReason.setOnClickListener { onClickUnSellReasonButton() }
         btnSaleReturn.setOnClickListener { onClickSaleReturnButton() }
-//        btnPosm.setOnClickListener { onClickPosmButton() }
+        //btnPosm.setOnClickListener { onClickPosmButton() }
         btnLocation.setOnClickListener { onClickBtnLocation() }
     }
 
     private fun onClickSaleButton() {
 
         if (didCustomerSelected()) {
-            //insert arrival & departure time for temp for sale man route
-            customerViewModel.insertDataForTempSaleManRoute(
-                selectedCustomer!!, Utils.getCurrentDate(true)
-            )
+            customerViewModel.insertDataForTempSaleManRoute(selectedCustomer!!, Utils.getCurrentDate(true))
             val intent = SaleActivity.newIntentFromCustomer(applicationContext, "no", selectedCustomer!!)
             startActivity(intent)
         }
@@ -231,16 +229,8 @@ class CustomerActivity : BaseActivity(), KodeinAware {
 
     private fun onClickSaleOrderButton() {
         if (didCustomerSelected()) {
-            //insert arrival & departure time for temp for sale man route
-            customerViewModel.insertDataForTempSaleManRoute(
-                selectedCustomer!!,
-                Utils.getCurrentDate(true)
-            )
-            val intent = SaleOrderActivity.newIntentFromCustomer(
-                applicationContext,
-                true,
-                selectedCustomer!!
-            )
+            customerViewModel.insertDataForTempSaleManRoute(selectedCustomer!!, Utils.getCurrentDate(true))
+            val intent = SaleOrderActivity.newIntentFromCustomer(applicationContext, true, selectedCustomer!!)
             startActivity(intent)
         }
     }
@@ -249,7 +239,6 @@ class CustomerActivity : BaseActivity(), KodeinAware {
 
         if (didCustomerSelected()) {
 
-            //insert arrival & departure time for temp for sale man route
             customerViewModel.insertDataForTempSaleManRoute(selectedCustomer!!, Utils.getCurrentDate(true))
 
             customerViewModel.loadDidCustomerFeedback(selectedCustomer!!,
@@ -315,34 +304,26 @@ class CustomerActivity : BaseActivity(), KodeinAware {
     private fun onClickSaleReturnButton() {
 
         if (didCustomerSelected()) {
-            //insert arrival & departure time for temp for sale man route
             customerViewModel.insertDataForTempSaleManRoute(selectedCustomer!!, Utils.getCurrentDate(true))
-            val intent = SaleReturnActivity.newIntentFromCustomer(
-                applicationContext,
-                "no",
-                selectedCustomer!!
-            )
+            val intent = SaleReturnActivity.newIntentFromCustomer(applicationContext, "no", selectedCustomer!!)
             startActivity(intent)
         }
 
     }
 
     private fun onClickPosmButton() {
+
         if (didCustomerSelected()) {
-            //insert arrival & departure time for temp for sale man route
-            customerViewModel.insertDataForTempSaleManRoute(
-                selectedCustomer!!,
-                Utils.getCurrentDate(true)
-            )
+            customerViewModel.insertDataForTempSaleManRoute(selectedCustomer!!, Utils.getCurrentDate(true))
             val intent = PosmActivity.newIntentFromCustomer(applicationContext, selectedCustomer!!)
             startActivity(intent)
         }
+
     }
 
     private fun onClickBtnLocation() {
 
         if (didCustomerSelected()) {
-            //insert arrival & departure time for temp for sale man route
             customerViewModel.insertDataForTempSaleManRoute(selectedCustomer!!, Utils.getCurrentDate(true))
             val intent = AddNewCustomerLocationActivity.newIntentFromCustomerActivity(
                 applicationContext,

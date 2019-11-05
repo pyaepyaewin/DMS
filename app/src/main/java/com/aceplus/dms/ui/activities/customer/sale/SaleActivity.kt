@@ -134,7 +134,7 @@ class SaleActivity : BaseActivity(), KodeinAware {
 
         searchAndSelectProductsLayout.visibility = if (this.isDelivery) View.GONE else View.VISIBLE
         tableHeaderOrderedQty.visibility = if (this.isDelivery) View.VISIBLE else View.GONE
-        tableHeaderDiscount.visibility = if (this.isPreOrder) View.GONE else View.VISIBLE
+        //tableHeaderDiscount.visibility = if (this.isPreOrder) View.GONE else View.VISIBLE
 
     }
 
@@ -177,7 +177,6 @@ class SaleActivity : BaseActivity(), KodeinAware {
     private fun onSelectAtMostTwoSameProduct(tempProduct: Product){
 
         var sameProduct = false
-
 
         for (tempSoldProduct in mSoldProductListAdapter.getDataList()) {
             if (tempSoldProduct.product.product_id === tempProduct.product_id) {

@@ -104,7 +104,7 @@
                 android:name=".ui.activities.customer.sale.SaleActivity"
                 android:screenOrientation="landscape"></activity>
         <activity
-                android:name=".ui.activities.customer.SaleOrderActivity"
+                android:name=".ui.activities.customer.saleorder.SaleOrderActivity"
                 android:screenOrientation="landscape"></activity>
         <activity
             android:name=".ui.activities.customer.PosmActivity"

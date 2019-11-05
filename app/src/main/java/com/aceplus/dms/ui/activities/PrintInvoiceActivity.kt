@@ -14,6 +14,7 @@ import android.widget.Toast
 import com.aceplus.dms.R
 import com.aceplus.dms.ui.adapters.sale.SoldProductPrintListAdapter
 import com.aceplus.dms.utils.BluetoothService
+import com.aceplus.dms.utils.PrintUtils
 import com.aceplus.dms.utils.Utils
 import com.aceplus.dms.viewmodel.PrintInvoiceViewModel
 import com.aceplus.domain.entity.customer.Customer
@@ -275,7 +276,7 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
             Utils.saveInvoiceImageIntoGallery(creditList[pos].invoiceNo, this, myBitmap, "Credit Collect") // Doesn't work
             if (creditList.isNotEmpty()){
                 val customerData: Customer = relatedDataForPrint!!.customer
-                Utils.printCreditWithHSPOS(
+                PrintUtils.printCreditWithHSPOS(
                     this,
                     customerData.customer_name,
                     customerData.address,
@@ -295,7 +296,7 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
             val editProductList = arrangeProductList()
             val customerData: Customer = relatedDataForPrint!!.customer
             //invoice!!.printMode = "sale" // Doesn't exist in invoice, in all condition ?? add or param pass?
-            Utils.printWithHSPOS(
+            PrintUtils.printWithHSPOS(
                 this,
                 customerData.customer_name,
                 customerData.address,
@@ -306,8 +307,8 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
                 invoice!!,
                 editProductList,
                 promotionList,
-                Utils.PRINT_FOR_NORMAL_SALE,
-                Utils.FOR_OTHERS,
+                PrintUtils.PRINT_FOR_NORMAL_SALE,
+                PrintUtils.FOR_OTHERS,
                 mBluetoothService!!,
                 relatedDataForPrint!!.companyInfo,
                 "sale"
@@ -318,7 +319,7 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
             Utils.saveInvoiceImageIntoGallery(invoice!!.invoice_id, this, myBitmap, "Sale") // Doesn't work
             val editProductList = arrangeProductList()
             val customerData: Customer = relatedDataForPrint!!.customer
-            Utils.printWithHSPOS(
+            PrintUtils.printWithHSPOS(
                 this,
                 customerData.customer_name,
                 customerData.address,
@@ -329,8 +330,8 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
                 invoice!!,
                 editProductList,
                 promotionList,
-                Utils.PRINT_FOR_NORMAL_SALE,
-                Utils.FOR_OTHERS,
+                PrintUtils.PRINT_FOR_NORMAL_SALE,
+                PrintUtils.FOR_OTHERS,
                 mBluetoothService!!,
                 relatedDataForPrint!!.companyInfo,
                 "report"
@@ -341,7 +342,7 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
             Utils.saveInvoiceImageIntoGallery(invoice!!.invoice_id, this, myBitmap, "Deliver") // Doesn't work
             val editProductList = arrangeProductList()
             val customerData: Customer = relatedDataForPrint!!.customer
-            Utils.printDeliverWithHSPOS(
+            PrintUtils.printDeliverWithHSPOS(
                 this,
                 customerData.customer_name,
                 customerData.address,
@@ -355,8 +356,8 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
                 editProductList,
                 promotionList,
                 orderedInvoice!!.paid_amount?.toDouble() ?: 0.0,
-                Utils.PRINT_FOR_NORMAL_SALE,
-                Utils.FOR_OTHERS,
+                PrintUtils.PRINT_FOR_NORMAL_SALE,
+                PrintUtils.FOR_OTHERS,
                 mBluetoothService!!,
                 relatedDataForPrint!!.companyInfo
             )
@@ -366,7 +367,7 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
             Utils.saveInvoiceImageIntoGallery(invoice!!.invoice_id, this, myBitmap, "Sale") // Doesn't work
             val editProductList = arrangeProductList()
             val customerData: Customer = relatedDataForPrint!!.customer
-            Utils.printWithHSPOS(
+            PrintUtils.printWithHSPOS(
                 this,
                 customerData.customer_name,
                 customerData.address,
@@ -377,8 +378,8 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
                 invoice!!,
                 editProductList,
                 promotionList,
-                Utils.PRINT_FOR_NORMAL_SALE,
-                Utils.FOR_OTHERS,
+                PrintUtils.PRINT_FOR_NORMAL_SALE,
+                PrintUtils.FOR_OTHERS,
                 mBluetoothService!!,
                 relatedDataForPrint!!.companyInfo,
                 null
