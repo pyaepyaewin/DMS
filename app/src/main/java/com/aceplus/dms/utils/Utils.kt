@@ -669,7 +669,7 @@ object Utils {
 //        return invoiceNo + String.format("%0" + (idLength - invoiceNo.length) + "d", next)
 //    }
 
-    fun getInvoiceNo(saleManId: String, locationCode: String, mode: String, nextCount: String): String {
+    fun getInvoiceNo(saleManId: String, locationCode: String, mode: String, nextCount: Int): String {
 
         val idLength = 18
         var invoiceNo = String()
@@ -716,11 +716,13 @@ object Utils {
 
         invoiceNo += locationCode
         invoiceNo += saleManId
-        invoiceNo += SimpleDateFormat("yyMMddHHmmss").format(Date())
+        invoiceNo += SimpleDateFormat("yyMMdd").format(Date())
 
-        //return invoiceNo + String.format("%0" + (idLength - invoiceNo.length) + "d", nextCount) //To Check ERROR
+        val formatString = "%0${(idLength - invoiceNo.length)}d"
+        val nextString = String.format(formatString, nextCount)
+        return invoiceNo + nextString //To Check ERROR
 
-        return invoiceNo //To Check ERROR
+//        return invoiceNo //To Check ERROR
     }
 
     /*fun getInvoiceNoForPOSM(context: Context, saleManId:String, locationCode:String):String {

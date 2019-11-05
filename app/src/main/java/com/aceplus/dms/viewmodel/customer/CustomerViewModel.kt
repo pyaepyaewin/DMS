@@ -67,12 +67,12 @@ class CustomerViewModel(
                                         saleManId,
                                         locationNumber.toString(),
                                         Constant.FOR_OTHERS,
-                                        customerVisitRepo.getLastCountForInvoiceNumber(Constant.FOR_OTHERS).toString()
+                                        customerVisitRepo.getLastCountForInvoiceNumber(Constant.FOR_OTHERS)
                                     )
 
                                     val didCustomerFeedbackEntity = DidCustomerFeedback()
                                     didCustomerFeedbackEntity.sale_man_id = saleManId.toInt()
-                                    didCustomerFeedbackEntity.dev_id = deviceId.toInt()
+                                    didCustomerFeedbackEntity.dev_id = deviceId
                                     didCustomerFeedbackEntity.invoice_no = invoiceNumber
                                     didCustomerFeedbackEntity.invoice_date = invoiceDate
                                     didCustomerFeedbackEntity.customer_no = customerNumber

@@ -293,7 +293,8 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
                     AppUtils.saveIntToShp(Constant.INVOICE_COUNT, invoiceCount + 1, this)
 
                 try {
-                    val invoiceID = Utils.getInvoiceNo(salePersonId!!, locationCode.toString(), Constant.FOR_SALE, "1")
+//                    val invoiceID = Utils.getInvoiceNo(salePersonId!!, locationCode.toString(), Constant.FOR_SALE, "1")
+                    val invoiceID = saleCheckoutViewModel.getInvoiceNumber(salePersonId!!,locationCode,Constant.FOR_SALE);
                     tvInvoiceId.text = invoiceID
                     this.invoiceId = invoiceID
                 } catch (e: NullPointerException){

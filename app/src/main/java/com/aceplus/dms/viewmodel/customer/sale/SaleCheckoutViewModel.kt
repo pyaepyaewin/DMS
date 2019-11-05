@@ -3,6 +3,7 @@ package com.aceplus.dms.viewmodel.customer.sale
 import android.annotation.SuppressLint
 import android.arch.lifecycle.MutableLiveData
 import android.util.Log
+import com.aceplus.data.utils.Constant
 import com.aceplus.dms.utils.Utils
 import com.aceplus.domain.entity.invoice.Invoice
 import com.aceplus.domain.entity.invoice.InvoiceProduct
@@ -26,6 +27,15 @@ class SaleCheckoutViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
 
     fun getRouteID(): Int{
         return customerVisitRepo.getRouteScheduleIDV2()
+    }
+
+    fun getInvoiceNumber(saleManId:String,locationNumber:Int,invoiceMode:String):String{
+        return Utils.getInvoiceNo(
+            saleManId,
+            locationNumber.toString(),
+            invoiceMode,
+            customerVisitRepo.getLastCountForInvoiceNumber(invoiceMode)
+        )
     }
 
     @SuppressLint("CheckResult")
