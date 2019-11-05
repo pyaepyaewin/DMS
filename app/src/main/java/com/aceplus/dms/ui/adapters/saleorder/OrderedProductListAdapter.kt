@@ -23,4 +23,10 @@ class OrderedProductListAdapter(
 
     }
 
+    override fun onBindViewHolder(holder: OrderedProductListViewHolder, position: Int) {
+
+        holder.setData(mDataList[position], position)
+
+    }
+
 }

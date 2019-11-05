@@ -14,7 +14,9 @@ class OrderedProductListViewHolder(
     private val isDelivery: Boolean
 ): BaseViewHolder<SoldProductInfo>(itemView) {
 
-    override fun setData(data: SoldProductInfo) {
+    override fun setData(data: SoldProductInfo) { "Nothing" }
+
+    fun setData(data: SoldProductInfo, position: Int){
 
         itemView.apply {
 
@@ -25,6 +27,7 @@ class OrderedProductListViewHolder(
             if (isDelivery) orderedQuantity.text = data.orderedQuantity.toString()
 
             qty.text = data.quantity.toString()
+            qty.setOnClickListener { onClickQtyButton(data, position) }
 
             val sellingPrice = data.product.selling_price?.toDouble()
             price.text = Utils.formatAmount(sellingPrice)
@@ -34,6 +37,18 @@ class OrderedProductListViewHolder(
             promotionPrice.text = Utils.formatAmount(promoPrice)
 
             amount.text = Utils.formatAmount(data.totalAmt)
+
+            FocCheck.isChecked = data.isFocIsChecked
+            FocCheck.setOnClickListener { onFocCheckChange(data, FocCheck.isChecked, position) }
+
+            btnfocPercent.visibility = View.GONE
+
+            // ToDo - if it's delivery
+
+            setOnLongClickListener {
+                onLongClickProduct(data, position)
+                true
+            }
 
         }
 
