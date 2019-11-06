@@ -1,37 +1,43 @@
 package com.aceplus.dms.ui.activities.customer.saleorder
 
+import android.app.AlertDialog
 import android.arch.lifecycle.Observer
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.widget.GridLayoutManager
+import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.Toast
+import android.widget.*
 import com.aceplus.data.utils.Constant
 import com.aceplus.dms.R
+import com.aceplus.dms.ui.activities.customer.sale.SaleCheckoutActivity
 import com.aceplus.dms.ui.adapters.sale.ProductListAdapter
 import com.aceplus.dms.ui.adapters.saleorder.OrderedProductListAdapter
 import com.aceplus.dms.utils.Utils
 import com.aceplus.dms.viewmodel.customer.sale.SaleViewModel
 import com.aceplus.domain.entity.customer.Customer
 import com.aceplus.domain.entity.product.Product
+import com.aceplus.domain.entity.promotion.Promotion
 import com.aceplus.domain.vo.SoldProductInfo
 import com.aceplussolutions.rms.ui.activities.BaseActivity
 import kotlinx.android.synthetic.main.activity_sale.*
 import kotlinx.android.synthetic.main.activity_sale.saleDateTextView
 import kotlinx.android.synthetic.main.activity_sale.tableHeaderQty
 import kotlinx.android.synthetic.main.activity_sale1.*
+import kotlinx.android.synthetic.main.dialog_box_sale_quantity.*
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.kodein
+import java.util.*
+import kotlin.collections.ArrayList
 import kotlinx.android.synthetic.main.activity_sale.cancelImg as cancelImg1
 import kotlinx.android.synthetic.main.activity_sale.checkoutImg as checkoutImg1
 import kotlinx.android.synthetic.main.activity_sale.headerDiscount as headerDiscount1
 import kotlinx.android.synthetic.main.activity_sale.rvSoldProductList as rvSoldProductList1
 import kotlinx.android.synthetic.main.activity_sale.searchAutoCompleteTextView as searchAutoCompleteTextView1
+import kotlinx.android.synthetic.main.activity_sale.tvNetAmount as tvNetAmount1
 import kotlinx.android.synthetic.main.activity_sale1.rvProductList as rvProductList1
 import kotlinx.android.synthetic.main.activity_sale1.searchAndSelectProductsLayout as searchAndSelectProductsLayout1
 
@@ -68,6 +74,7 @@ class SaleOrderActivity : BaseActivity(), KodeinAware {
     private val mSearchProductAdapter by lazy { ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, ArrayList<String>()) }
 
     private val duplicateProductList = mutableListOf<Product>()
+    private var promotionList: ArrayList<Promotion> = ArrayList()
     private var isPreOrder: Boolean = false
     private var isDelivery: Boolean = false
     private var customer: Customer? = null
@@ -122,7 +129,7 @@ class SaleOrderActivity : BaseActivity(), KodeinAware {
         }
 
         cancelImg.setOnClickListener { onBackPressed() }
-        checkoutImg.setOnClickListener { onBackPressed() }
+        checkoutImg.setOnClickListener { checkoutOrder() }
 
         saleViewModel.productDataList.observe(this, Observer {
             it?.let {
@@ -132,6 +139,14 @@ class SaleOrderActivity : BaseActivity(), KodeinAware {
                 mSearchProductAdapter.notifyDataSetChanged()
             }
                 ?: Utils.commonDialog("No issued product", this, 2)
+        })
+
+        saleViewModel.calculatedSoldProductList.observe(this, Observer {
+            if (it != null){
+                mOrderedProductListAdapter.setNewList(it.first)
+                tvNetAmount.text = Utils.formatAmount(it.second)
+                saleViewModel.calculatedSoldProductList.value = null
+            }
         })
 
     }
@@ -181,12 +196,155 @@ class SaleOrderActivity : BaseActivity(), KodeinAware {
 
     private fun onLongClickOrderedProductListItem(soldProduct: SoldProductInfo, position: Int){
 
+        AlertDialog.Builder(this)
+            .setTitle("Delete sold product")
+            .setMessage("Are you sure you want to delete ${soldProduct.product.product_name}?")
+            .setPositiveButton("Yes") { arg0, arg1 ->
+
+                for (i in duplicateProductList.indices) {
+                    if (duplicateProductList[i].product_id == soldProduct.product.product_id) {
+                        duplicateProductList.removeAt(i)
+                        break
+                    }
+                }
+
+                val oldList = mOrderedProductListAdapter.getDataList() as ArrayList
+                oldList.remove(soldProduct)
+                saleViewModel.calculateSoldProductData(oldList, this.promotionList)
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+
     }
 
     private fun onClickQtyButton(soldProduct: SoldProductInfo, position: Int){
 
+        val layoutInflater = getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        val view = layoutInflater.inflate(R.layout.dialog_box_sale_quantity, null)
+
+        val quantityEditText = view.findViewById(R.id.quantity) as EditText
+        val messageTextView = view.findViewById(R.id.message) as TextView
+        val availableQuantityLayout = view.findViewById(R.id.availableQuantityLayout) as LinearLayout
+
+        val alertDialog = AlertDialog.Builder(this)
+            .setView(view)
+            .setTitle("Sale Quantity")
+            .setPositiveButton("Confirm") { arg0, arg1 ->
+
+                if (quantityEditText.text.toString().isBlank()) {
+                    messageTextView.text = "You must specify quantity."
+                    return@setPositiveButton
+                }
+
+                val quantity = quantityEditText.text.toString().toInt()
+
+                if (isDelivery){
+                    if (quantity != soldProduct.orderedQuantity){
+                        messageTextView.text = "Your quantity must be equal to order quantity."
+                        return@setPositiveButton
+                    }
+                }
+
+                soldProduct.quantity = quantity
+
+                // ToDo - calculate promotion if it's not delivery
+
+                val newList = mOrderedProductListAdapter.getDataList() as ArrayList
+                newList[position] = soldProduct
+                saleViewModel.calculateSoldProductData(newList, this.promotionList)
+
+            }
+            .setNegativeButton("Cancel", null)
+            .create()
+
+        alertDialog.setOnShowListener {
+            availableQuantityLayout.visibility = View.GONE
+        }
+
+        alertDialog.show()
+
     }
 
-    private fun onFocCheckChange(data: SoldProductInfo, isChecked: Boolean, position: Int){}
+    private fun onFocCheckChange(data: SoldProductInfo, isChecked: Boolean, position: Int){
+
+        data.isFocIsChecked = isChecked
+        val newList = mOrderedProductListAdapter.getDataList() as ArrayList
+        newList[position] = data
+        saleViewModel.calculateSoldProductData(newList, this.promotionList)
+
+    }
+
+    private fun checkoutOrder(){
+
+        if (mOrderedProductListAdapter.getDataList().isEmpty()) {
+
+            AlertDialog.Builder(this)
+                .setTitle("Alert")
+                .setMessage("You must specify at least one product.")
+                .setPositiveButton("OK", null)
+                .show()
+
+            return
+        }
+
+        if (tvNetAmount.text == "0" || tvNetAmount.text == "0.0") {
+
+            AlertDialog.Builder(this)
+                .setTitle("Alert")
+                .setMessage("Net amount should be more than zero.")
+                .setPositiveButton("OK", null)
+                .show()
+
+            return
+        }
+
+        val isFocPass = toEnableFocSameProduct()
+
+        if (isFocPass){
+            val intent = SaleOrderCheckoutActivity.getIntentFromSaleOrder(this, customer!!, mOrderedProductListAdapter.getDataList() as ArrayList, this.promotionList)
+            startActivity(intent)
+        }
+
+    }
+
+    private fun toEnableFocSameProduct(): Boolean{
+
+        for (product in duplicateProductList){
+
+            val arrList = ArrayList<String>()
+            for (soldProduct in mOrderedProductListAdapter.getDataList()){
+
+                if (soldProduct.quantity == 0){
+                    AlertDialog.Builder(this)
+                        .setTitle("Alert")
+                        .setMessage("Quantity must not be zero.")
+                        .setPositiveButton("OK", null)
+                        .show()
+                    return false
+                } else{
+                    val stockId = soldProduct.product.id
+                    val tempStockId = product.id
+                    if (stockId == tempStockId){
+                        val isFoc = soldProduct.isFocIsChecked
+                        if (isFoc) arrList.add("T")
+                        else arrList.add("F")
+                    }
+                }
+
+            }
+
+            val freq = Collections.frequency(arrList, "T")
+            if (freq == 2 || freq == 0){
+                AlertDialog.Builder(this)
+                    .setTitle("Alert")
+                    .setMessage("Need to enable one of FOC in the same product: ${product.product_name}")
+                    .setPositiveButton("OK", null)
+                    .show()
+                return false
+            }
+
+        }
+        return true
+    }
 
 }

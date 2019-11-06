@@ -94,16 +94,6 @@ class SaleActivity : BaseActivity(), KodeinAware {
         setupUI()
         catchEvents()
 
-        saleViewModel.productDataList.observe(this, Observer {
-            it?.let {
-                mProductListAdapter.setNewList(it.first as ArrayList<Product>)
-                mSearchProductAdapter.clear()
-                mSearchProductAdapter.addAll(it.second)
-                mSearchProductAdapter.notifyDataSetChanged()
-            }
-                ?: Utils.commonDialog("No issued product", this, 2)
-        })
-
         saleViewModel.loadProductList()
         saleViewModel.calculateClassDiscountByPrice()
         updatePromotionProductList()
@@ -148,6 +138,16 @@ class SaleActivity : BaseActivity(), KodeinAware {
         cancelImg.setOnClickListener { onBackPressed() }
         checkoutImg.setOnClickListener { checkoutSale() }
 
+        saleViewModel.productDataList.observe(this, Observer {
+            it?.let {
+                mProductListAdapter.setNewList(it.first as ArrayList<Product>)
+                mSearchProductAdapter.clear()
+                mSearchProductAdapter.addAll(it.second)
+                mSearchProductAdapter.notifyDataSetChanged()
+            }
+                ?: Utils.commonDialog("No issued product", this, 2)
+        })
+
         saleViewModel.updatedSoldProduct.observe(this, Observer {
             if (it != null){
                 mSoldProductListAdapter.updateList(it.first, it.second)
@@ -165,6 +165,7 @@ class SaleActivity : BaseActivity(), KodeinAware {
             if (it != null){
                 mSoldProductListAdapter.setNewList(it.first)
                 tvNetAmount.text = Utils.formatAmount(it.second)
+                saleViewModel.calculatedSoldProductList.value = null
             }
         })
 
@@ -307,13 +308,14 @@ class SaleActivity : BaseActivity(), KodeinAware {
         val remainingQtyTextView = view.findViewById(R.id.availableQuantity) as TextView
         val quantityEditText = view.findViewById(R.id.quantity) as EditText
         val messageTextView = view.findViewById(R.id.message) as TextView
+        val availableQuantityLayout = view.findViewById(R.id.availableQuantityLayout) as LinearLayout
 
         val alertDialog = AlertDialog.Builder(this@SaleActivity)
             .setView(view)
             .setTitle("Sale Quantity")
             .setPositiveButton("Confirm") { arg0, arg1 ->
 
-                if (quantityEditText.text.toString().isEmpty()) {
+                if (quantityEditText.text.toString().isBlank()) {
                     messageTextView.text = "You must specify quantity."
                 } else{
 
