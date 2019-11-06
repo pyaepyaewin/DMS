@@ -12,10 +12,12 @@ import android.os.Environment
 import android.os.Handler
 import android.provider.Settings
 import android.support.v7.app.AlertDialog
+import android.telephony.TelephonyManager
 import android.util.Base64
 import android.util.Log
 import android.widget.TextView
 import android.widget.Toast
+import com.aceplus.data.database.MyDatabase
 import com.aceplus.data.utils.Constant
 import com.aceplus.dms.R
 import com.aceplus.dms.ui.activities.LoginActivity
@@ -26,6 +28,7 @@ import com.aceplus.domain.model.INVOICECANCEL
 import com.aceplus.domain.model.credit.CreditInvoice
 import com.aceplus.domain.model.forApi.ConfirmRequestSuccess
 import com.aceplus.domain.vo.SoldProductInfo
+import com.aceplussolutions.rms.constants.AppUtils
 import com.google.gson.Gson
 import org.json.JSONException
 import org.json.JSONObject
@@ -430,10 +433,13 @@ object Utils {
     }
 
     fun getDeviceId(activity: Activity): String {
-        return Settings.Secure.getString(
-            activity.contentResolver,
-            Settings.Secure.ANDROID_ID
-        )
+//        return Settings.Secure.getString(
+//            activity.contentResolver,
+//            Settings.Secure.ANDROID_ID
+//        )
+        val telephonyManager =
+            activity.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+        return telephonyManager.imei
 
     }
 
@@ -2664,6 +2670,48 @@ object Utils {
             amountArray[2] += invoiceCancel.getNetAmount()
         }
         return amountArray
+    }
+
+
+    fun backupDatabase(context: Context) {
+        val database = MyDatabase.getInstance(context)
+        database!!.close()
+        val today = AppUtils.getCurrentDate(true)
+
+        try {
+            val sd = Environment.getExternalStorageDirectory()
+            val data = Environment.getDataDirectory()
+
+            if (sd.canWrite()) {
+                Toast.makeText(
+                    context, "Backup database is starting...",
+                    Toast.LENGTH_SHORT
+                ).show()
+                val currentDBPath = "/data/" + context.packageName + "/databases/dms.db"
+
+                val backupDBPath = "DMS_DB_Backup_$today.db"
+                val currentDB = File(data, currentDBPath)
+
+                val folderPath = "mnt/sdcard/DMS_DB_BACKUP"
+                val f = File(folderPath)
+                f.mkdir()
+                val backupDB = File(f, backupDBPath)
+                val source = FileInputStream(currentDB).channel
+                val destination = FileOutputStream(backupDB).channel
+                destination.transferFrom(source, 0, source.size())
+                source.close()
+                destination.close()
+                Toast.makeText(
+                    context, "Backup database Successful!",
+                    Toast.LENGTH_SHORT
+                ).show()
+            } else {
+                Toast.makeText(context, "Please set Permission for Storage in Setting!", Toast.LENGTH_SHORT).show()
+            }
+        } catch (e: Exception) {
+            Toast.makeText(context, "Cannot Backup!", Toast.LENGTH_SHORT).show()
+        }
+
     }
 
 }

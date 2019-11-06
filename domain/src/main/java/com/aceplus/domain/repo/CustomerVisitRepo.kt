@@ -45,9 +45,9 @@ interface CustomerVisitRepo {
     fun getProductByID(productID: Int): Observable<List<Product>>
     fun updateProductRemainingQty(soldProductInfo: SoldProductInfo)
 
-    fun saveDataForTempSaleManRoute(selectedCustomer: Customer, currentDate: String)
+    fun saveDataForTempSaleManRoute(selectedCustomer: Customer, currentDate: String,arrivalStatus:Int)
     fun saveCustomerFeedback(didCustomerFeedbackEntity: DidCustomerFeedback)
-    fun saveSaleVisitRecord(selectedCustomer: Customer, gpsTracker: GPSTracker)
+    fun saveSaleVisitRecord(selectedCustomer: Customer,arrivalStatus: Int)
     fun updateSaleVisitRecord(customerId: Int, visitFlag: String, saleFlag: String)
 
     fun updateDepartureTimeForSaleManRoute(saleManId: String, customerId: String, currentDate: String)

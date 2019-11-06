@@ -59,7 +59,7 @@ class DidCustomerFeedback {
     @ColumnInfo(name = "serial_no")
     @SerializedName("serial_no")
     @Expose
-    var serial_no: Int = 0
+    var serial_no: String? = null
 
     @ColumnInfo(name = "description")
     @SerializedName("description")

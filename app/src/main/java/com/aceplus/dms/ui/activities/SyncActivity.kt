@@ -40,7 +40,7 @@ class SyncActivity : BaseActivity(), KodeinAware {
                     "download" -> {
                     }
                     "upload" -> {
-                        AppUtils.backupDatabase(this)
+                        Utils.backupDatabase(this)
                     }
                     "upload_sale_visit_record" -> {
                     }
