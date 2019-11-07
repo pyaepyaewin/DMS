@@ -50,19 +50,16 @@ class SaleOrderActivity : BaseActivity(), KodeinAware {
 
     companion object {
 
-        private const val IE_PRE_ORDER = "IE_PRE_ORDER"
         private const val IE_CUSTOMER_DATA = "IE_CUSTOMER_DATA"
 
-        fun newIntentFromCustomer(context: Context, isPreOrder: Boolean, customerData: Customer): Intent {
+        fun newIntentFromCustomer(context: Context, customerData: Customer): Intent {
             val intent = Intent(context, SaleOrderActivity::class.java)
-            intent.putExtra(IE_PRE_ORDER, isPreOrder)
             intent.putExtra(IE_CUSTOMER_DATA, customerData)
             return intent
         }
 
-        fun newIntentFromSaleExchange(context: Context, isPreOrder: String, customerId: String): Intent {
+        fun newIntentFromSaleExchange(context: Context, customerId: String): Intent {
             val intent = Intent(context, SaleOrderActivity::class.java)
-            intent.putExtra(IE_PRE_ORDER, isPreOrder)
             intent.putExtra(IE_CUSTOMER_DATA, customerId)
             return intent
         }
@@ -75,7 +72,6 @@ class SaleOrderActivity : BaseActivity(), KodeinAware {
 
     private val duplicateProductList = mutableListOf<Product>()
     private var promotionList: ArrayList<Promotion> = ArrayList()
-    private var isPreOrder: Boolean = false
     private var isDelivery: Boolean = false
     private var customer: Customer? = null
 
@@ -95,7 +91,6 @@ class SaleOrderActivity : BaseActivity(), KodeinAware {
     }
 
     private fun getIntentData(){
-        isPreOrder = intent.getBooleanExtra(IE_PRE_ORDER, false)
         if (intent.getParcelableExtra<Customer>(IE_CUSTOMER_DATA) != null) customer = intent.getParcelableExtra(IE_CUSTOMER_DATA)
     }
 

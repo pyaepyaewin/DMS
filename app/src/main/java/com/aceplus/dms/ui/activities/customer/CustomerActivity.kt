@@ -230,7 +230,7 @@ class CustomerActivity : BaseActivity(), KodeinAware {
     private fun onClickSaleOrderButton() {
         if (didCustomerSelected()) {
             customerViewModel.insertDataForTempSaleManRoute(selectedCustomer!!, Utils.getCurrentDate(true))
-            val intent = SaleOrderActivity.newIntentFromCustomer(applicationContext, true, selectedCustomer!!)
+            val intent = SaleOrderActivity.newIntentFromCustomer(applicationContext, selectedCustomer!!)
             startActivity(intent)
         }
     }
