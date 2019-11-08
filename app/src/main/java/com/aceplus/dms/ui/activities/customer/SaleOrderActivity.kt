@@ -77,13 +77,10 @@ class SaleOrderActivity : BaseActivity(), KodeinAware {
         customer = intent.getSerializableExtra(IE_CUSTOMER_INFO_KEY) as Customer
 
         if (intent.getSerializableExtra(IE_SOLD_PROUDCT_LIST_KEY) != null) {
-            soldProductList =
-                intent.getSerializableExtra(IE_SOLD_PROUDCT_LIST_KEY) as ArrayList<SoldProduct>
+            soldProductList = intent.getSerializableExtra(IE_SOLD_PROUDCT_LIST_KEY) as ArrayList<SoldProduct>
         }
         if (intent.getSerializableExtra(IE_ORDERED_INVOICE_KEY) != null) {
-
-            orderedInvoice =
-                intent.getSerializableExtra(IE_ORDERED_INVOICE_KEY) as Deliver
+            orderedInvoice = intent.getSerializableExtra(IE_ORDERED_INVOICE_KEY) as Deliver
         }
     }
 }
