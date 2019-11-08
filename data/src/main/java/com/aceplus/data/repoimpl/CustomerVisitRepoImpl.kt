@@ -84,7 +84,7 @@ class CustomerVisitRepoImpl(
         if (mode == Constant.FOR_SALE) {
 //            next += context.getSharedPreferences("PREFERENCE",
 //                Activity.MODE_PRIVATE).getInt("INVOICE_COUNT", -1)
-            next += AppUtils.getIntFromShp("INVOICE_COUNT", shf)//todo check here to sure
+            next += AppUtils.getIntFromShp(Constant.INVOICE_COUNT, shf)//todo check here to sure
         } else if (mode == Constant.FOR_OTHERS || mode == Constant.FOR_PACKAGE_SALE) {
             next += db.didCustomerFeedbackDao().dataCount//todo check here to sure
         } else if (mode == Constant.FOR_PRE_ORDER_SALE) {

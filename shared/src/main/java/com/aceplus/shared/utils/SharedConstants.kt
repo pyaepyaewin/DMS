@@ -6,7 +6,7 @@ object SharedConstants {
     const val SHP_NAME = "dms"
     const val SHP_ACT_KEY = ""
     const val SHP_STRING_ERR = ""
-    const val SHP_INT_ERR = -1
+    const val SHP_INT_ERR = 0
 
     const val PROGRESS_TEXT = "Loading..."
 
