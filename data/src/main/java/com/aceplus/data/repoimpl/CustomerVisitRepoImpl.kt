@@ -196,7 +196,7 @@ class CustomerVisitRepoImpl(
             val sdf = SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSS")
             val currentDate = sdf.format(Date())
             saleVisitRecordUpload.record_date = currentDate
-//            saleVisitRecordUpload.routeId = getRouteScheduleIDV2()//todo (to work with BI2 new API)
+            //saleVisitRecordUpload.routeId = getRouteScheduleIDV2() //todo (to work with BI2 new API)
         }
         db.saleVisitRecordUploadDao().deleteData(saleVisitRecordUpload)
         db.saleVisitRecordUploadDao().saveData(saleVisitRecordUpload)
