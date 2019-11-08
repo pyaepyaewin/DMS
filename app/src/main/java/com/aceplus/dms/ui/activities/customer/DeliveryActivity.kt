@@ -78,7 +78,7 @@ class DeliveryActivity : BaseActivity(), KodeinAware {
                     deliverItem.sPrice = i.s_price!!.toDouble()
                     deliverItem.receivedQty = i.received_quantity!!.toInt()
                 }
-                if (deliverItem.deliverId === deliver.deliverId) {
+                if (deliverItem.deliverId == deliver.deliverId) {
                     deliverItemList.add(deliverItem)
                 }
             })

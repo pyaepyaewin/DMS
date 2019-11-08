@@ -4,6 +4,7 @@ import android.app.AlertDialog
 import android.arch.lifecycle.Observer
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -44,7 +45,8 @@ class FragmentDeliveryReport : BaseFragment(), KodeinAware {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
-
+        deliveryActivityAdapter.setNewList(deliveryReportsArrayList as ArrayList<DeliveryVO>)
+        Log.d("Delivery List is:","${deliveryReportsArrayList.size}")
         deliveryReports.apply {
             layoutManager = LinearLayoutManager(activity)
             adapter = deliveryActivityAdapter
@@ -129,26 +131,10 @@ class FragmentDeliveryReport : BaseFragment(), KodeinAware {
 
     private fun getCustomerFromDB(customerId: Int): Customer {
         var customer: Customer? = null
-        fragmentDeliveryViewModel.deliveryCustomerDataList.observe(this, Observer {
-            customer = Customer(
-                it!!.customer_id,
-                it!!.customer_name,
-                it!!.customer_type_id,
-                it!!.customer_type_name,
-                it!!.address,
-                it!!.phone,
-                it!!.township,
-                it!!.credit_term,
-                it!!.credit_limit!!.toDouble(),
-                it!!.credit_amount!!.toDouble(),
-                it!!.due_amount!!.toDouble(),
-                it!!.prepaid_amount!!.toDouble(),
-                it!!.payment_type,
-                "false",
-                it!!.latitude!!.toDouble(),
-                it!!.longitude!!.toDouble(),
-                it!!.visit_record!!.toInt()
-            )
+        fragmentDeliveryViewModel.deliveryCustomerDataList.observe(this, Observer { it ->
+            if (it != null) {
+                customer = Customer(it.customer_id, it.customer_name, it.customer_type_id, it.customer_type_name, it.address, it.phone, it.township, it.credit_term, it.credit_limit!!.toDouble(), it.credit_amount!!.toDouble(), it.due_amount!!.toDouble(), it.prepaid_amount!!.toDouble(), it.payment_type, "false", it.latitude!!.toDouble(), it.longitude!!.toDouble(), it.visit_record!!.toInt())
+            }
             customer!!.shopTypeId = it!!.shop_type_id
             customer!!.id = it!!.id
         })
