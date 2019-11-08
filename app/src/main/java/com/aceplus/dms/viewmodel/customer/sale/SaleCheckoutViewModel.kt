@@ -118,7 +118,7 @@ class SaleCheckoutViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
                             var itemTotalDis = totalBuyAmtInclude * (discountPercent / 100)
                             amountAndPercentage["Amount"] = itemTotalDis
 
-                            // Check what's this for
+                            // Check what's this for ... exceed?
                             if (discountPercent > 0){
                                 for (soldProduct in sameCategoryProducts){
                                     soldProduct.exclude = exclude
@@ -145,7 +145,7 @@ class SaleCheckoutViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
                             var itemTotalDis = totalBuyAmtInclude * (discountPercent / 100)
                             amountAndPercentage["Amount"] = itemTotalDis
 
-                            // Check what's this for
+                            // Check what's this for ... exceed?
                             if (discountPercent > 0){
                                 for (soldProduct in sameCategoryProducts){
                                     soldProduct.exclude = exclude

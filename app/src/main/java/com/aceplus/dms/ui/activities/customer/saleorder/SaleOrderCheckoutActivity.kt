@@ -8,6 +8,7 @@ import android.view.View
 import android.widget.Toast
 import com.aceplus.dms.R
 import com.aceplus.dms.utils.Utils
+import com.aceplus.dms.viewmodel.customer.sale.SaleCheckoutViewModel
 import com.aceplus.domain.entity.customer.Customer
 import com.aceplus.domain.entity.promotion.Promotion
 import com.aceplus.domain.vo.SoldProductInfo
@@ -38,8 +39,10 @@ import kotlinx.android.synthetic.main.activity_sale_checkout.tableHeaderDiscount
 import kotlinx.android.synthetic.main.activity_sale_checkout.tableHeaderQty as tableHeaderQty1
 import kotlinx.android.synthetic.main.activity_sale_checkout.tax_layout as tax_layout1
 import kotlinx.android.synthetic.main.activity_sale_checkout.edt_dueDate as edt_dueDate1
+import kotlinx.android.synthetic.main.activity_sale_checkout.tax_label_saleCheckout as tax_label_saleCheckout1
 import kotlinx.android.synthetic.main.activity_sale_checkout.tvNetAmount as tvNetAmount1
 import kotlinx.android.synthetic.main.activity_sale_checkout.tvTotalAmount as tvTotalAmount1
+import kotlinx.android.synthetic.main.activity_sale_checkout.tax_txtView as tax_txtView1
 import kotlinx.android.synthetic.main.activity_sale_order_checkout.advancedPaidAmountLayout as advancedPaidAmountLayout1
 import kotlinx.android.synthetic.main.activity_sale_order_checkout.bank_branch_layout as bank_branch_layout1
 import kotlinx.android.synthetic.main.activity_sale_order_checkout.duedateLayout as duedateLayout1
@@ -76,6 +79,8 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
 
     }
 
+    private val saleCheckoutViewModel: SaleCheckoutViewModel by viewModel()
+
     private val df = DecimalFormat(".##")
     private var customer: Customer? = null
     private var isDelivery: Boolean = false
@@ -83,8 +88,14 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
     private var promotionList: ArrayList<Promotion> = ArrayList()
     private var totalAmount: Double = 0.0
     private var netAmount: Double = 0.0
+    private var totalVolumeDiscount: Double = 0.0
+    private var totalVolumeDiscountPercent:Double = 0.0
+    private var totalDiscountAmount:Double = 0.0
     private var volDisPercent: Double = 0.0
     private var volDisAmount:Double = 0.0
+    private var taxType: String = ""
+    private var taxPercent: Int = 0
+    private var taxAmt: Double = 0.0
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -119,7 +130,7 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
     private fun initializeData(){
 
         calculateTotalAmount()
-//        saleCheckoutViewModel.calculateFinalAmount(soldProductList, totalAmount)
+        saleCheckoutViewModel.calculateFinalAmount(soldProductList, totalAmount) // Check - should do only for pre-order
 //        salePersonId = saleCheckoutViewModel.getSaleManID()
 //        locationCode = saleCheckoutViewModel.getRouteID() // Check point
 
@@ -139,6 +150,23 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
             bank_branch_layout.visibility = if (isChecked) View.VISIBLE else View.GONE
             bank_account_layout.visibility = if (isChecked) View.VISIBLE else View.GONE
         }
+
+        saleCheckoutViewModel.finalData.observe(this, android.arch.lifecycle.Observer {
+            if (it != null){
+                totalVolumeDiscount = it.totalVolumeDiscount
+                totalVolumeDiscountPercent = it.totalVolumeDiscountPercent
+                taxType = it.taxType
+                taxPercent = it.taxPercent
+
+                val totalItemDisAmt = it.amountAndPercentage["Amount"] ?: 0.0
+
+                if (!isDelivery)
+                    displayFinalAmount(totalItemDisAmt)
+                else
+                    displayFinalDataForDelivery() // ToDo - need to update for delivery
+
+            }
+        })
 
     }
 
@@ -168,7 +196,7 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
 
         val dateDialog = DatePickerDialog(this, DatePickerDialog.OnDateSetListener { view, year, month, dayOfMonth ->
             myCalendar.set(year, month, dayOfMonth)
-            edt_dueDate.setText(sdf.format(myCalendar.time))
+            checkout_delivery_date_chooser_text.setText(sdf.format(myCalendar.time))
         }, myCalendar.get(Calendar.YEAR), myCalendar.get(Calendar.MONTH), myCalendar.get(Calendar.DAY_OF_MONTH))
 
         dateDialog.show()
@@ -220,6 +248,65 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
         netAmount = total
         tvTotalAmount.text = Utils.formatAmount(total)
         tvNetAmount.text = total.toString()
+    }
+
+    private fun displayFinalAmount(itemDisAmt: Double){
+
+        val taxAmt = calculateTax()
+        var netAmount = 0.0
+
+        totalDiscountAmount = totalVolumeDiscount + itemDisAmt
+
+        if (totalAmount != 0.0)
+            totalVolumeDiscountPercent = totalDiscountAmount * 100 / totalAmount
+
+        if (taxType.equals("E", true)){
+            tax_label_saleCheckout.text = "Tax (Exclude) : "
+            netAmount = totalAmount - totalDiscountAmount + taxAmt
+        } else{
+            tax_label_saleCheckout.text = "Tax (Include) : "
+            netAmount = totalAmount - totalDiscountAmount
+        }
+
+        if (volDisAmount != 0.0) netAmount -= volDisAmount
+
+        this.netAmount = netAmount
+        tvNetAmount.text = Utils.formatAmount(netAmount)
+
+        if (volDisPercent != 0.0) edtVolumeDiscountPercent.setText(volDisPercent.toString())
+        else edtVolumeDiscountPercent.setText(totalVolumeDiscountPercent.toString())
+
+        if (volDisAmount != 0.0) edtVolumeDiscountAmt.setText(volDisAmount.toString())
+        else edtVolumeDiscountAmt.setText(totalDiscountAmount.toString())
+
+        tax_txtView.text = df.format(taxAmt)
+
+    }
+
+    private fun displayFinalDataForDelivery(){
+
+        if (taxType.equals("E", true)){
+            tax_label_saleCheckout.text = "Tax (Exclude) : "
+            netAmount = totalAmount + taxAmt
+        } else{
+            tax_label_saleCheckout.text = "Tax (Include) : "
+            netAmount = totalAmount
+        }
+
+        // ToDo - for delivery
+
+    }
+
+    private fun calculateTax(): Double{
+
+        var taxAmt = 0.0
+        if (taxPercent != 0)
+            taxAmt = netAmount / 21
+
+        this.taxAmt = taxAmt
+
+        return taxAmt
+
     }
 
 }
