@@ -20,6 +20,7 @@ import com.aceplus.domain.entity.product.Product
 import com.aceplus.domain.model.sale.salecancel.SoldProductDataClass
 import com.aceplus.domain.vo.SoldProductInfo
 import kotlinx.android.synthetic.main.activity_sale.*
+import kotlinx.android.synthetic.main.activity_sale_cancel_checkout.*
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.kodein
@@ -94,10 +95,10 @@ class SaleCancelDetailActivity : AppCompatActivity(), KodeinAware {
             })
 
 
-        soldProductList.apply {
-            layoutManager = LinearLayoutManager(this@SaleCancelDetailActivity)
-            adapter = saleCancelDetailAdapter
-        }
+//        soldProductList.apply {
+//            layoutManager = LinearLayoutManager(this@SaleCancelDetailActivity)
+//            adapter = saleCancelDetailAdapter
+//        }
 
 
     }

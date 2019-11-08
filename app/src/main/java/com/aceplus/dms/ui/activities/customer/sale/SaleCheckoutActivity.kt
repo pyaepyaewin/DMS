@@ -171,10 +171,10 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
 
     private fun getIntentData(){
 
-        customer = intent.getParcelableExtra(IE_CUSTOMER_DATA)
-        soldProductList = intent.getParcelableArrayListExtra(IE_SOLD_PRODUCT_LIST)
-        promotionList = intent.getParcelableArrayListExtra(IE_PROMOTION_LIST)
-        isSaleExchange = intent.getStringExtra(IE_SALE_EXCHANGE)
+        if (intent.getParcelableExtra<Customer>(IE_CUSTOMER_DATA) != null) customer = intent.getParcelableExtra(IE_CUSTOMER_DATA)
+        if (intent.getParcelableArrayListExtra<SoldProductInfo>(IE_SOLD_PRODUCT_LIST) != null) soldProductList = intent.getParcelableArrayListExtra(IE_SOLD_PRODUCT_LIST)
+        if (intent.getParcelableArrayListExtra<Promotion>(IE_PROMOTION_LIST) != null) promotionList = intent.getParcelableArrayListExtra(IE_PROMOTION_LIST)
+        if (intent.getStringExtra(IE_SALE_EXCHANGE) != null) isSaleExchange = intent.getStringExtra(IE_SALE_EXCHANGE)
 
     }
 

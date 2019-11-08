@@ -20,6 +20,7 @@ import com.aceplus.data.utils.Constant
 import com.aceplus.dms.R
 import com.aceplus.dms.ui.activities.customer.sale.SaleActivity
 import com.aceplus.dms.ui.activities.customer.sale.SaleReturnActivity
+import com.aceplus.dms.ui.activities.customer.saleorder.SaleOrderActivity
 import com.aceplus.dms.ui.adapters.CustomerListAdapter
 import com.aceplus.dms.utils.Utils
 import com.aceplus.dms.viewmodel.customer.CustomerViewModel
@@ -212,10 +213,10 @@ class CustomerActivity : BaseActivity(), KodeinAware {
         }
 
         btnSale.setOnClickListener { onClickSaleButton() }
-//        btnSaleOrder.setOnClickListener { onClickSaleOrderButton() }
+        btnSaleOrder.setOnClickListener { onClickSaleOrderButton() }
         btnUnsellReason.setOnClickListener { onClickUnSellReasonButton() }
         btnSaleReturn.setOnClickListener { onClickSaleReturnButton() }
-//        btnPosm.setOnClickListener { onClickPosmButton() }
+        //btnPosm.setOnClickListener { onClickPosmButton() }
         btnLocation.setOnClickListener { onClickBtnLocation() }
     }
 
@@ -227,6 +228,7 @@ class CustomerActivity : BaseActivity(), KodeinAware {
                 selectedCustomer!!, Utils.getCurrentDate(true),
                 gspTracker
             )
+            customerViewModel.insertDataForTempSaleManRouteAndSaleVisitRecord(selectedCustomer!!, Utils.getCurrentDate(true),gspTracker)
             val intent = SaleActivity.newIntentFromCustomer(applicationContext, "no", selectedCustomer!!)
             startActivity(intent)
         }
@@ -241,11 +243,8 @@ class CustomerActivity : BaseActivity(), KodeinAware {
                 Utils.getCurrentDate(true),
                 gspTracker
             )
-            val intent = SaleOrderActivity.newIntentFromCustomer(
-                applicationContext,
-                true,
-                selectedCustomer!!
-            )
+            customerViewModel.insertDataForTempSaleManRouteAndSaleVisitRecord(selectedCustomer!!, Utils.getCurrentDate(true),gspTracker)
+            val intent = SaleOrderActivity.newIntentFromCustomer(applicationContext, selectedCustomer!!)
             startActivity(intent)
         }
     }
@@ -253,10 +252,8 @@ class CustomerActivity : BaseActivity(), KodeinAware {
     private fun onClickUnSellReasonButton() {
 
         if (didCustomerSelected()) {
-
             //insert arrival & departure time for temp for sale man route
             customerViewModel.insertDataForTempSaleManRouteAndSaleVisitRecord(selectedCustomer!!, Utils.getCurrentDate(true),gspTracker)
-
             customerViewModel.loadDidCustomerFeedback(selectedCustomer!!,
                 {
                     AlertDialog.Builder(this@CustomerActivity)
@@ -326,21 +323,25 @@ class CustomerActivity : BaseActivity(), KodeinAware {
                 "no",
                 selectedCustomer!!
             )
+            customerViewModel.insertDataForTempSaleManRouteAndSaleVisitRecord(selectedCustomer!!, Utils.getCurrentDate(true),gspTracker)
             startActivity(intent)
         }
 
     }
 
     private fun onClickPosmButton() {
+
         if (didCustomerSelected()) {
             //insert arrival & departure time for temp for sale man route
             customerViewModel.insertDataForTempSaleManRouteAndSaleVisitRecord(
                 selectedCustomer!!,
                 Utils.getCurrentDate(true),
                         gspTracker)
+            customerViewModel.insertDataForTempSaleManRouteAndSaleVisitRecord(selectedCustomer!!, Utils.getCurrentDate(true),gspTracker)
             val intent = PosmActivity.newIntentFromCustomer(applicationContext, selectedCustomer!!)
             startActivity(intent)
         }
+
     }
 
     private fun onClickBtnLocation() {
