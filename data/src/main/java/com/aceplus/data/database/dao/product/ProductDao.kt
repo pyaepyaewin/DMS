@@ -36,4 +36,7 @@ interface ProductDao {
     @Query("select product_name,total_quantity,order_quantity,sold_quantity,exchange_quantity,return_quantity,delivery_quantity,present_quantity,remaining_quantity from product")
     fun getProductBalanceReport(): List<ProductBalanceReport>
 
+    @Query("select * from product where id = :stockId")
+    fun deliveryProductDataList(stockId:String): List<Product>
+
 }

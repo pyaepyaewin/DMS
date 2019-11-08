@@ -7,7 +7,8 @@ import com.aceplus.dms.ui.viewholders.sale.SoldProductPrintListViewHolder
 import com.aceplus.domain.vo.SoldProductInfo
 import com.aceplus.shared.ui.adapter.BaseRecyclerViewAdapter
 
-class SoldProductPrintListAdapter(private val printMode: String): BaseRecyclerViewAdapter<SoldProductPrintListViewHolder, SoldProductInfo>(){
+class SoldProductPrintListAdapter(private val printMode: String) :
+    BaseRecyclerViewAdapter<SoldProductPrintListViewHolder, SoldProductInfo>() {
 
     override fun onCreateViewHolder(p0: ViewGroup, p1: Int): SoldProductPrintListViewHolder {
 

@@ -42,6 +42,8 @@ public class Deliver implements Serializable{
      * paidAmount
      */
     private double paidAmount;
+    private double discount;
+    private double discountPercent;
 
     /**
      * deliverItemList
@@ -54,6 +56,8 @@ public class Deliver implements Serializable{
     private List<DeliveryPresentForApi> deliveryPresentForApiList;
 
     private int saleManId;
+    private String customerAddres;
+    private String remark;
 
     /**
      * Getter method for deliverId
@@ -162,7 +166,21 @@ public class Deliver implements Serializable{
     public void setPaidAmount(double paidAmount) {
         this.paidAmount = paidAmount;
     }
+    public double getDiscount() {
+        return discount;
+    }
 
+    public void setDiscount(double discount) {
+        this.discount = discount;
+    }
+
+    public double getDiscountPercent() {
+        return discountPercent;
+    }
+
+    public void setDiscountPercent(double discountPercent) {
+        this.discountPercent = discountPercent;
+    }
     /**
      * Getter method for deliverItemList
      *
@@ -205,5 +223,20 @@ public class Deliver implements Serializable{
 
     public void setSaleManId(int saleManId) {
         this.saleManId = saleManId;
+    }
+    public String getCustomerAddres() {
+        return customerAddres;
+    }
+
+    public void setCustomerAddres(String customerAddres) {
+        this.customerAddres = customerAddres;
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
     }
 }

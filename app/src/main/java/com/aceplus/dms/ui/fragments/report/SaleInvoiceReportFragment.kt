@@ -5,7 +5,6 @@ import android.app.DatePickerDialog
 import android.arch.lifecycle.Observer
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,9 +12,11 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import com.aceplus.dms.R
+import com.aceplus.dms.ui.activities.PrintInvoiceActivity
 import com.aceplus.dms.ui.adapters.report.SaleInvoiceDetailReportAdapter
 import com.aceplus.dms.ui.adapters.report.SaleInvoiceReportAdapter
 import com.aceplus.dms.viewmodel.report.ReportViewModel
+import com.aceplus.domain.entity.invoice.Invoice
 import com.aceplus.domain.vo.report.SaleInvoiceDetailReport
 import com.aceplus.domain.vo.report.SaleInvoiceReport
 import com.aceplus.shared.ui.activities.BaseFragment
@@ -26,13 +27,16 @@ import org.kodein.di.KodeinAware
 import org.kodein.di.android.support.kodein
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 
 class SaleInvoiceReportFragment : BaseFragment(), KodeinAware {
     private var myCalendar = Calendar.getInstance()
-    private var fromDate:String? = null
+    private var fromDate: String? = null
     private var toDate: String? = null
     override val kodein: Kodein by kodein()
+    private var invoice: Invoice? = null
     var saleInvoiceDataList: List<SaleInvoiceReport> = listOf()
+    var saleInvoiceDetailList: List<SaleInvoiceDetailReport> = listOf()
     private val saleInvoiceReportAdapter: SaleInvoiceReportAdapter by lazy {
         SaleInvoiceReportAdapter(
             this::onClickItem
@@ -83,9 +87,6 @@ class SaleInvoiceReportFragment : BaseFragment(), KodeinAware {
                 for (customer in it) {
                     customerNameList.add(customer.customer_name.toString())
                 }
-
-                Log.d("Customer Size", "${it.size}")
-
             }
             //Add customer name in spinner in this fragment
             val customerNameSpinnerAdapter =
@@ -112,9 +113,6 @@ class SaleInvoiceReportFragment : BaseFragment(), KodeinAware {
                             saleInvoiceReportAdapter.setNewList(filterList)
                             calculateAmount(filterList)
                         }
-                        Log.d("Filter List:", "$filterList")
-
-
                     }
 
                     override fun onNothingSelected(p0: AdapterView<*>?) {
@@ -143,9 +141,13 @@ class SaleInvoiceReportFragment : BaseFragment(), KodeinAware {
 
         //Dialog sale history report of invoice detail recycler view
         saleInvoiceReportViewModel.saleInvoiceDetailReportSuccessState.observe(this, Observer {
-                it?.let {detailList->
-                    saleInvoiceDetailReportAdapter.setNewList(detailList as ArrayList<SaleInvoiceDetailReport>)
-                }
+            it?.let { detailList ->
+                saleInvoiceDetailReportAdapter.setNewList(detailList as ArrayList<SaleInvoiceDetailReport>)
+                saleInvoiceDetailList = it
+            }
+        })
+        saleInvoiceReportViewModel.saleHistoryForPrintData.observe(this, Observer {
+            invoice = it
         })
 
     }
@@ -166,10 +168,19 @@ class SaleInvoiceReportFragment : BaseFragment(), KodeinAware {
             adapter = saleInvoiceDetailReportAdapter
         }
         saleInvoiceReportViewModel.loadSaleInvoiceDetailReport(invoiceId = invoiceId)
+        saleInvoiceReportViewModel.loadSaleInvoiceDetailPrint(invoiceId = invoiceId)
+
 
         //Action of dialog button
         dialogBoxView.btn_print.setOnClickListener {
+            val intent = PrintInvoiceActivity.newIntentFromSaleHistoryActivity(
+                context!!,
+                invoice,
+                saleInvoiceDetailList
+            )
+            startActivity(intent)
             dialog.dismiss()
+
         }
         dialogBoxView.btn_ok.setOnClickListener {
             dialog.dismiss()

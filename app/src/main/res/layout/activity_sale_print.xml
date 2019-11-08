@@ -567,20 +567,11 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
-                android:gravity="center_horizontal|left"
+                android:gravity="center_horizontal"
                 android:text="@string/product"
                 android:textColor="#FFFFFF"
                 android:textStyle="bold"
                 android:paddingLeft="10dp"/>
-
-            <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="2"
-                    android:gravity="center_horizontal|left"
-                    android:text="@string/product"
-                    android:textColor="#FFFFFF"
-                    android:textStyle="bold" />
 
             <TextView
                     android:layout_width="0dp"

@@ -38,6 +38,9 @@ interface InvoiceDao {
     @Query("select invoice.invoice_id,customer_name,address,total_amount,total_discount_amount,invoice.sale_date from invoice inner join customer on customer.id = invoice.customer_id where date(invoice.sale_date) between date(:fromDate) and date(:toDate)")
     fun getSaleHistoryReportForDate(fromDate: String, toDate: String): List<SaleInvoiceReport>
 
+    @Query("select * from invoice where invoice_id = :invoiceId")
+    fun getSaleHistoryReportForPrint(invoiceId:String):Invoice
+
     @Query("select count(*) from invoice where invoice_id = :invoiceId")
     fun getInvoiceCountByID(invoiceId: String): Int
 

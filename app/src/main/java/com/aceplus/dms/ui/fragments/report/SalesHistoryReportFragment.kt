@@ -4,6 +4,7 @@ import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.arch.lifecycle.Observer
 import android.os.Bundle
+import android.support.v4.app.FragmentActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
 import android.view.LayoutInflater
@@ -13,9 +14,11 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import com.aceplus.dms.R
+import com.aceplus.dms.ui.activities.PrintInvoiceActivity
 import com.aceplus.dms.ui.adapters.report.SaleInvoiceDetailReportAdapter
 import com.aceplus.dms.ui.adapters.report.SaleInvoiceReportAdapter
 import com.aceplus.dms.viewmodel.report.ReportViewModel
+import com.aceplus.domain.entity.invoice.Invoice
 import com.aceplus.domain.vo.report.SaleInvoiceDetailReport
 import com.aceplus.domain.vo.report.SaleInvoiceReport
 import com.aceplus.shared.ui.activities.BaseFragment
@@ -33,7 +36,10 @@ class SalesHistoryReportFragment : BaseFragment(), KodeinAware {
     private var myCalendar = Calendar.getInstance()
     private var fromDate: String? = null
     private var toDate: String? = null
+    private var invoice: Invoice? = null
     var saleHistoryDataList: List<SaleInvoiceReport> = listOf()
+    var saleHistoryDetailList: List<SaleInvoiceDetailReport> = listOf()
+
     private val saleHistoryReportAdapter: SaleInvoiceReportAdapter by lazy {
         SaleInvoiceReportAdapter(
             this::onClickItem
@@ -144,6 +150,11 @@ class SalesHistoryReportFragment : BaseFragment(), KodeinAware {
         //sale history detail list
         saleHistoryReportViewModel.saleInvoiceDetailReportSuccessState.observe(this, Observer {
             saleHistoryDetailReportAdapter.setNewList(it as ArrayList<SaleInvoiceDetailReport>)
+            saleHistoryDetailList = it
+        })
+
+        saleHistoryReportViewModel.saleHistoryForPrintData.observe(this, Observer {
+            invoice = it
         })
 
     }
@@ -165,11 +176,17 @@ class SalesHistoryReportFragment : BaseFragment(), KodeinAware {
             adapter = saleHistoryDetailReportAdapter
         }
         saleHistoryReportViewModel.loadSaleInvoiceDetailReport(invoiceId = invoiceId)
+        saleHistoryReportViewModel.loadSaleInvoiceDetailPrint(invoiceId = invoiceId)
 
         //Action of dialog button
         dialogBoxView.btn_print.setOnClickListener {
-            Toast.makeText(activity, "Continue to print", Toast.LENGTH_SHORT).show()
+            val intent = PrintInvoiceActivity.newIntentFromSaleHistoryActivity(
+                context!!,
+                invoice,
+                saleHistoryDetailList)
+            startActivity(intent)
             dialog.dismiss()
+
         }
         dialogBoxView.btn_ok.setOnClickListener {
             dialog.dismiss()

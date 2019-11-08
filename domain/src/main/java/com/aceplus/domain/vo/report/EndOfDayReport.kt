@@ -1,24 +1,23 @@
 package com.aceplus.domain.vo.report
 
-import android.arch.persistence.room.ColumnInfo
-
 class EndOfDayReport(
-    @ColumnInfo(name = "user_name")
-    val userName: String,
-    @ColumnInfo(name = "route_name")
-    val routeName: String,
-    @ColumnInfo(name = "start_time")
-    val startTime: String,
-    @ColumnInfo(name = "end_time")
-    val endTime: String,
-    @ColumnInfo(name = "total_amount")
-    val totalSaleAmount: String,
-    @ColumnInfo(name = "net_amount")
-    val totalSaleOrderAmount: String,
-    @ColumnInfo(name = "amount")
-    val totalReturnAmount: String,
-    @ColumnInfo(name = "amount")
-    val totalCashReceiptAmount: String
-
-
+    var userName: String,
+    var routeName: String,
+    var startTime: String,
+    var endTime: String,
+    var totalSales: String,
+    var totalSalesOrder: String,
+    var totalExchange: String,
+    var totalReturn: String,
+    var totalCashReceive: String,
+    var netCash: String,
+    var totalCustomer: String,
+    var newCustomer: String,
+    var planCustomer: String,
+    var totalSalesCount: String,
+    var totalOrderCount: String,
+    var totalSalesExchangeOnly: String,
+    var totalSalesReturnOnly: String,
+    var totalCashReceiptCount: String,
+    var notVisitedCount: String
 )

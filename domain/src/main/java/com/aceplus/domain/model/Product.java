@@ -44,7 +44,6 @@ public class Product implements Cloneable, Serializable {
         this.purchasePrice = purchasePrice;
         this.discountType = discountType;
         this.remainingQty = remainingQty;
-
         soldQty = 0;
     }
 

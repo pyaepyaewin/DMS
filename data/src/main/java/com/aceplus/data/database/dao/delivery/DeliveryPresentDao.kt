@@ -6,6 +6,7 @@ import android.arch.persistence.room.Dao
 import android.arch.persistence.room.Insert
 import android.arch.persistence.room.OnConflictStrategy
 import android.arch.persistence.room.Query
+import com.aceplus.domain.model.delivery.DeliverItem
 
 
 @Dao
@@ -22,5 +23,8 @@ interface DeliveryPresentDao {
 
     @Query("Delete from delivery_present")
     fun deleteAll()
+
+    @Query("select * from delivery_present where sale_order_id = :deliveryId and delivery_flag = 0")
+    fun getDeliveryPresentDataList(deliveryId:Int): List<DeliveryPresent>
 
 }
