@@ -24,7 +24,7 @@ class DidCustomerFeedback {
     @ColumnInfo(name = "dev_id")
     @SerializedName("dev_id")
     @Expose
-    var dev_id: Int = 0
+    var dev_id: String? = ""
 
     @ColumnInfo(name = "invoice_no")
     @SerializedName("invoice_no")
@@ -59,7 +59,7 @@ class DidCustomerFeedback {
     @ColumnInfo(name = "serial_no")
     @SerializedName("serial_no")
     @Expose
-    var serial_no: Int = 0
+    var serial_no: String? = null
 
     @ColumnInfo(name = "description")
     @SerializedName("description")

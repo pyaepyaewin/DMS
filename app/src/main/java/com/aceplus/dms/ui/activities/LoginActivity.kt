@@ -82,7 +82,7 @@ class LoginActivity : BaseActivity(), KodeinAware {
             askPermission()
         }
 
-        imageView.setOnClickListener { AppUtils.backupDatabase(this) }
+        imageView.setOnClickListener { Utils.backupDatabase(this) }
         textViewChangeIP.setOnClickListener { showDialogToChangeIP() }
         buttonLogin.setOnClickListener { doLoginAction() }
 
@@ -102,13 +102,14 @@ class LoginActivity : BaseActivity(), KodeinAware {
     }
 
     private fun askPermission() {
-        val permissionArr = arrayOfNulls<String>(6)
+        val permissionArr = arrayOfNulls<String>(7)
         permissionArr[0] = android.Manifest.permission.READ_EXTERNAL_STORAGE
         permissionArr[1] = Manifest.permission.ACCESS_COARSE_LOCATION
         permissionArr[2] = Manifest.permission.ACCESS_FINE_LOCATION
         permissionArr[3] = Manifest.permission.ACCESS_NETWORK_STATE
         permissionArr[4] = Manifest.permission.ACCESS_WIFI_STATE
         permissionArr[5] = Manifest.permission.SEND_SMS
+        permissionArr[6] = Manifest.permission.READ_PHONE_STATE
 
         permissionRequest = PermissionHelper.with(this@LoginActivity)
             .build(*permissionArr)

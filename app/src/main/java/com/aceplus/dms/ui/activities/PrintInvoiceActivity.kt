@@ -19,6 +19,7 @@ import com.aceplus.dms.utils.Utils
 import com.aceplus.dms.viewmodel.PrintInvoiceViewModel
 import com.aceplus.domain.entity.credit.Credit
 import com.aceplus.domain.entity.customer.Customer
+import com.aceplus.domain.entity.delivery.Delivery
 import com.aceplus.domain.entity.invoice.Invoice
 import com.aceplus.domain.entity.product.Product
 import com.aceplus.domain.entity.promotion.Promotion
@@ -50,6 +51,7 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
         private const val CUSTOMER_TOWNSHIP = "CUSTOMER_TOWNSHIP"
 
         private const val IE_SALE_RETURN_LIST = "IE_SALE_RETURN_LIST"
+        private const val IE_CREDIT_LIST = "IE_CREDIT_LIST"
 
         private const val IR_REQUEST_CONNECT_DEVICE = 1
         private const val IR_REQUEST_ENABLE_BT = 2
@@ -127,14 +129,13 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
     private var salePersonName: String? = null
     private var customerName: String? = null
     private var customerTownShip: String? = null
-
+    private var orderedInvoice: Delivery? = null
     private var mBluetoothAdapter: BluetoothAdapter? = null
     private var mBluetoothService: BluetoothService? = null
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-
         try {
             mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
         } catch (e: Exception) {
@@ -196,11 +197,11 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
             if (it != null) {
                 relatedDataForPrint = it
                 onPrint()
-                Log.d("Testing", "Printing Function Started")
             }
         })
 
     }
+
 
     private fun getIntentData() {
 
@@ -218,12 +219,11 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
             intent.getStringExtra(CUSTOMER_NAME)
         if (intent.getStringExtra(CUSTOMER_TOWNSHIP) != null) customerTownShip =
             intent.getStringExtra(CUSTOMER_TOWNSHIP)
-
+        if (intent.getParcelableArrayListExtra<SoldProductInfo>(IE_SALE_RETURN_LIST) != null) saleReturnList =
+            intent.getParcelableArrayListExtra(IE_SALE_RETURN_LIST)
         if (intent.getStringExtra(IE_PRINT_MODE) != null) printMode =
             intent.getStringExtra(IE_PRINT_MODE)
 
-        if (intent.getParcelableArrayListExtra<SoldProductInfo>(IE_SALE_RETURN_LIST) != null) saleReturnList =
-            intent.getParcelableArrayListExtra(IE_SALE_RETURN_LIST)
     }
 
     private fun getTaxInfoAndSetData() {
@@ -267,6 +267,7 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
             }
 
             print_prepaidAmount.text = Utils.formatAmount(invoice!!.pay_amount?.toDouble() ?: 0.0)
+
             print_discountAmount.text =
                 "${Utils.formatAmount(invoice!!.total_discount_amount)} (${invoice!!.total_discount_percent}%)"
 
@@ -285,7 +286,7 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
             credit_sale_man.text = salePersonName
             credit_customer_name.text = customerName
 //            val address =
-           credit_township_name.text = customerTownShip
+            credit_township_name.text = customerTownShip
             credit_receive_no.text = creditList[0].invoiceNo
 
             credit_total_amt.textSize = 30f
@@ -302,7 +303,6 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
         } else if (printMode == "SR") {
             // ToDo
         }
-
     }
 
     private fun onConnecting() {
@@ -353,7 +353,7 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
             ) // Doesn't work
             val editProductList = arrangeProductList()
             val customerData: Customer = relatedDataForPrint!!.customer
-            //invoice!!.printMode = "sale" // ToDo - Doesn't exist in invoice, in all condition ?? add or param pass?
+            //invoice!!.printMode = "sale" // Doesn't exist in invoice, in all condition ?? add or param pass?
             Utils.printWithHSPOS(
                 this,
                 customerData.customer_name,
@@ -410,6 +410,25 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
             ) // Doesn't work
             val editProductList = arrangeProductList()
             val customerData: Customer = relatedDataForPrint!!.customer
+            Utils.printDeliverWithHSPOS(
+                this,
+                customerData.customer_name,
+                customerData.address,
+                orderedInvoice!!.invoice_no!!,
+                relatedDataForPrint!!.orderSalePersonName,
+                invoice!!.invoice_id,
+                salePersonName,
+                relatedDataForPrint!!.routeName,
+                relatedDataForPrint!!.customerTownShipName,
+                invoice!!,
+                editProductList,
+                promotionList,
+                orderedInvoice!!.paid_amount?.toDouble() ?: 0.0,
+                Utils.PRINT_FOR_NORMAL_SALE,
+                Utils.FOR_OTHERS,
+                mBluetoothService!!,
+                relatedDataForPrint!!.companyInfo
+            )
 
         } else if (printMode == "SR") {
 
@@ -489,11 +508,13 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
             HM_MESSAGE_DEVICE_NAME -> {
                 val connectedDeviceName = it.data.getString(DEVICE_NAME)
                 Toast.makeText(this, "Connected to $connectedDeviceName", Toast.LENGTH_SHORT).show()
+                //onPrint()
+
                 printInvoiceViewModel.getRelatedDataAndPrint(
                     invoice!!.customer_id!!,
-                    invoice!!.sale_person_id!!
+                    invoice!!.sale_person_id!!,
+                    orderedInvoice?.sale_man_id
                 )
-                //onPrint()
             }
             HM_MESSAGE_TOAST -> {
                 Toast.makeText(this, it.data.getString(TOAST), Toast.LENGTH_SHORT).show()
@@ -524,77 +545,80 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
                 var stockId = promotion.promotion_product_id
                 if (stockId != stockId1 && (indexForNew + 1) == newPresentList.size) {
                     val newPromotion =
-                        Promotion() // Check currency_id, price, promoPlanId, promotion price, product name
+                        Promotion() // Check currency_id, price, promoPlanId, promotion price, product name // ToDo - Check point !!!
                     newPromotion.promotion_quantity = 0
                     newPromotion.promotion_product_id = promotionList[i].promotion_product_id
 
                     newPresentList.add(newPromotion)
                 }
             }
-
-            if (newPresentList.size == 0) {
-                val newPromotion =
-                    Promotion() // Check currency_id, price, promoPlanId, promotion price, product name
-                newPromotion.promotion_quantity = 0
-                newPromotion.promotion_product_id = promotionList[i].promotion_product_id
-
-                newPresentList.add(newPromotion)
-            }
-
-        }
-
-        for (promotion in promotionList) {
-
-            val stockId = promotion.promotion_product_id
-
-            for (i in newPresentList.indices) {
-                val stockId1 = newPresentList[i].promotion_product_id
-                if (stockId == stockId1) {
-                    val promotionQty = promotion.promotion_quantity
-                    newPresentList[i].promotion_quantity += promotionQty
+                if (newPresentList.size == 0) {
+                    val newPromotion =
+                        Promotion() // Check currency_id, price, promoPlanId, promotion price, product name // ToDo - Check point !!!
+                    newPromotion.promotion_quantity = 0
+                    newPromotion.promotion_product_id = promotionList[i].promotion_product_id
+                    newPresentList.add(newPromotion)
                 }
+
             }
 
-        }
+            for (promotion in promotionList) {
 
-        for (i in soldProductList.indices) {
+                val stockId = promotion.promotion_product_id
 
-            val soldProductStockId = soldProductList[i].product.id
-
-            newSoldProductList.add(soldProductList[i])
-
-            if (newPresentList.isNotEmpty()) {
-                for (j in newPresentList.indices) {
-                    val promoProductId = newPresentList[j].promotion_product_id
-
-                    if (soldProductStockId == promoProductId) {
-                        val promoProduct = SoldProductInfo(Product(), false)
-                        promoProduct.product.id = promoProductId
-                        promoProduct.quantity = newPresentList[j].promotion_quantity
-                        promoProduct.product.purchase_price = "0.0"
-                        promoProduct.product.selling_price = "0.0"
-                        //promoProduct.product.product_name = newPresentList[j].promotion_product_name
-                        promoProduct.promotionPrice = 0.0
-
-                        newSoldProductList.add(promoProduct)
-                        positionList.add(j)
-                        break
+                for (i in newPresentList.indices) {
+                    val stockId1 = newPresentList[i].promotion_product_id
+                    if (stockId == stockId1) {
+                        val promotionQty = promotion.promotion_quantity
+                        newPresentList[i].promotion_quantity += promotionQty
                     }
-
                 }
+
             }
 
+            for (i in soldProductList.indices) {
+
+                val soldProductStockId = soldProductList[i].product.id
+
+                newSoldProductList.add(soldProductList[i])
+
+                if (newPresentList.isNotEmpty()) {
+                    for (j in newPresentList.indices) {
+                        val promoProductId = newPresentList[j].promotion_product_id
+
+                        if (soldProductStockId == promoProductId) {
+                            val promoProduct = SoldProductInfo(Product(), false)
+                            promoProduct.product.id = promoProductId
+                            promoProduct.quantity = newPresentList[j].promotion_quantity
+                            promoProduct.product.purchase_price = "0.0"
+                            promoProduct.product.selling_price = "0.0"
+                            //promoProduct.product.product_name = newPresentList[j].promotion_product_name // ToDo - Check point !!!
+                            promoProduct.promotionPrice = 0.0
+
+                            newSoldProductList.add(promoProduct)
+                            positionList.add(j)
+                            break
+                        }
+
+                    }
+                }
+
+            }
+
+            for (i in positionList.size downTo 0) {
+                val pos = positionList[i - 1]
+                newPresentList.removeAt(pos)
+            }
+
+            return newSoldProductList
+
         }
 
-        for (i in positionList.size downTo 0) {
-            val pos = positionList[i - 1]
-            newPresentList.removeAt(pos)
+        override fun onBackPressed() {
+            setResult(Activity.RESULT_OK)
+            finish()
         }
-
-        return newSoldProductList
 
     }
-
-}
 
 

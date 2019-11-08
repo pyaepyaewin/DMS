@@ -49,13 +49,14 @@ class PrintInvoiceViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
         }
     }
 
-    fun getRelatedDataAndPrint(customerID: String, saleManID: String){
+    fun getRelatedDataAndPrint(customerID: String, saleManID: String, orderSaleManID: String?){
 
         var customer: Customer? = null
         var routeID = 0
-        var routeName: String? = "Temporary route name"
+        var routeName: String? = "...."
         var customerTownShipName: String? = null
         var companyInfo: CompanyInformation? = null
+        var orderSalePersonName: String? = null
 
         launch {
             customerVisitRepo.getCustomerByID(customerID.toInt())
@@ -65,25 +66,36 @@ class PrintInvoiceViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
                 }
                 .flatMap {
                     for (i in it){
-                        routeID = i
+                        routeID = i.toInt()
                     }
+                    return@flatMap customerVisitRepo.getRouteNameByID(routeID)
+                }
+                .flatMap {
+                    routeName = it
                     return@flatMap customerVisitRepo.getCustomerTownshipName(customerID.toInt())
                 }
                 .flatMap {
                     customerTownShipName = it
                     return@flatMap customerVisitRepo.getCompanyInfo()
                 }
-                .subscribeOn(schedulerProvider.io())
-                .observeOn(schedulerProvider.mainThread())
-                .subscribe{
+                .flatMap {
                     for (i in it){
                         companyInfo = i
                     }
+                    return@flatMap customerVisitRepo.getSaleManName(orderSaleManID!!)
+                }
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.mainThread())
+                .subscribe{
+                    if (!orderSaleManID.isNullOrBlank()){
+                        for (i in it){
+                            orderSalePersonName = i
+                        }
+                    }
+                    if (customer != null && customerTownShipName != null && companyInfo != null)
+                        relatedDataForPrint.postValue(RelatedDataForPrint(customer!!, routeName, customerTownShipName!!, companyInfo!!, orderSalePersonName))
                 }
         }
-
-        if (customer != null && customerTownShipName != null && companyInfo != null)
-            relatedDataForPrint.postValue(RelatedDataForPrint(customer!!, routeID, routeName!!,customerTownShipName!!, companyInfo!!))
 
     }
 

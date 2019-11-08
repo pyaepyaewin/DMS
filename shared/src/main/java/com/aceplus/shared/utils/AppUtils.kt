@@ -104,7 +104,7 @@ object AppUtils {
         return ""
     }
 
-    private fun getCurrentDate(withTime: Boolean): String {
+    fun getCurrentDate(withTime: Boolean): String {
         var dateFormat = "yyyy-MM-dd"
         if (withTime) {
             dateFormat += " HH:mm:ss"

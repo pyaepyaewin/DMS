@@ -1,5 +1,6 @@
 package com.aceplus.dms.ui.activities.customer.sale
 
+import android.app.Activity
 import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.content.Context
@@ -68,13 +69,18 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
     private var netAmount: Double = 0.0
     private var refundAmount: Double = 0.0
     private var taxType: String = ""
-    private var taxPercent: Double = 0.0
+    private var taxPercent: Int = 0
     private var invoiceId: String = ""
     private var taxAmt: Double = 0.0
     private var isSaleExchange: String? = null
     private var locationCode: Int = 0
     private var salePersonId: String? = null
     private var invoice: Invoice? = null
+    private var totalVolumeDiscount: Double = 0.0
+    private var totalVolumeDiscountPercent:Double = 0.0
+    private var totalDiscountAmount:Double = 0.0
+    private var volDisPercent: Double = 0.0
+    private var volDisAmount:Double = 0.0
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -92,6 +98,15 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
 
     }
 
+    private fun initializeData(){
+
+        calculateTotalAmount()
+        saleCheckoutViewModel.calculateFinalAmount(soldProductList, totalAmount)
+        salePersonId = saleCheckoutViewModel.getSaleManID()
+        locationCode = saleCheckoutViewModel.getRouteID() // Check point
+
+    }
+
     private fun setupUI(){
 
         saleDateTextView.text = Utils.getDate(false)
@@ -103,16 +118,6 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
 
         rvSoldProductList.adapter = checkoutSoldProductListAdapter
         rvSoldProductList.layoutManager = LinearLayoutManager(this)
-
-    }
-
-    private fun initializeData(){
-
-        calculateTotalAmount()
-        calculateTax() // Just temporary
-        saleCheckoutViewModel.calculateFinalAmount() // Need to update
-        salePersonId = saleCheckoutViewModel.getSaleManID()
-        locationCode = saleCheckoutViewModel.getRouteID()
 
     }
 
@@ -148,6 +153,20 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
             }
         })
 
+        saleCheckoutViewModel.finalData.observe(this, android.arch.lifecycle.Observer {
+            if (it != null){
+                totalVolumeDiscount = it.totalVolumeDiscount
+                totalVolumeDiscountPercent = it.totalVolumeDiscountPercent
+                taxType = it.taxType
+                taxPercent = it.taxPercent
+
+                val totalItemDisAmt = it.amountAndPercentage["Amount"] ?: 0.0
+                displayFinalAmount(totalItemDisAmt)
+
+                // ToDo - if it's sale exchange
+            }
+        })
+
     }
 
     private fun getIntentData(){
@@ -156,6 +175,39 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
         soldProductList = intent.getParcelableArrayListExtra(IE_SOLD_PRODUCT_LIST)
         promotionList = intent.getParcelableArrayListExtra(IE_PROMOTION_LIST)
         isSaleExchange = intent.getStringExtra(IE_SALE_EXCHANGE)
+
+    }
+
+    private fun displayFinalAmount(itemDisAmt: Double){
+
+        val taxAmt = calculateTax()
+        var netAmount = 0.0
+
+        totalDiscountAmount = totalVolumeDiscount + itemDisAmt
+
+        if (totalAmount != 0.0)
+            totalVolumeDiscountPercent = totalDiscountAmount * 100 / totalAmount
+
+        if (taxType.equals("E", true)){
+            tax_label_saleCheckout.text = "Tax (Exclude) : "
+            netAmount = totalAmount - totalDiscountAmount + taxAmt
+        } else{
+            tax_label_saleCheckout.text = "Tax (Include) : "
+            netAmount = totalAmount - totalDiscountAmount
+        }
+
+        if (volDisAmount != 0.0) netAmount -= volDisAmount
+
+        this.netAmount = netAmount
+        tvNetAmount.text = Utils.formatAmount(netAmount)
+
+        if (volDisPercent != 0.0) edtVolumeDiscountPercent.setText(volDisPercent.toString())
+        else edtVolumeDiscountPercent.setText(totalVolumeDiscountPercent.toString())
+
+        if (volDisAmount != 0.0) edtVolumeDiscountAmt.setText(volDisAmount.toString())
+        else edtVolumeDiscountAmt.setText(totalDiscountAmount.toString())
+
+        tax_txtView.text = df.format(taxAmt)
 
     }
 
@@ -189,6 +241,7 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
             edtVolumeDiscountAmt.setText(discountAmount.toString())
             tvNetAmount.text = netAmount.toString()
             this.netAmount = netAmount
+            this.volDisAmount = discountAmount
             calculateRefundAmount()
         }
 
@@ -207,6 +260,7 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
             edtVolumeDiscountPercent.setText(discountPercent.toString())
             tvNetAmount.text = netAmount.toString()
             this.netAmount = netAmount
+            this.volDisAmount = discountAmount
             calculateRefundAmount()
         }
 
@@ -239,7 +293,8 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
                     AppUtils.saveIntToShp(Constant.INVOICE_COUNT, invoiceCount + 1, this)
 
                 try {
-                    val invoiceID = Utils.getInvoiceNo(salePersonId!!, locationCode.toString(), Constant.FOR_SALE, "1")
+//                    val invoiceID = Utils.getInvoiceNo(salePersonId!!, locationCode.toString(), Constant.FOR_SALE, "1")
+                    val invoiceID = saleCheckoutViewModel.getInvoiceNumber(salePersonId!!,locationCode,Constant.FOR_SALE);
                     tvInvoiceId.text = invoiceID
                     this.invoiceId = invoiceID
                 } catch (e: NullPointerException){
@@ -254,14 +309,16 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
 
     }
 
-    private fun calculateTax(){
+    private fun calculateTax(): Double{
+
         var taxAmt = 0.0
-        //if (taxPercent != 0.0)
+        if (taxPercent != 0)
             taxAmt = netAmount / 21
 
-        tax_label_saleCheckout.text = "Tax (Include) : "
-        tax_txtView.text = df.format(taxAmt)
         this.taxAmt = taxAmt
+
+        return taxAmt
+
     }
 
     private fun chooseDueDate(){
@@ -293,11 +350,9 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
                 if (refundAmount < 0 || payAmount.text.isBlank()){
                     setInvoiceId()
                     saveData("CR")
-                    //saleOrExchange()
                 } else{
                     setInvoiceId()
                     saveData("CA")
-                    //saleOrExchange()
                 }
 
             }
@@ -377,7 +432,9 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
             totalAmount,
             taxAmt,
             edit_txt_branch_name.text.toString(),
-            edit_txt_account_name.text.toString()
+            edit_txt_account_name.text.toString(),
+            volDisAmount,
+            volDisPercent
         )
 
     }
@@ -388,11 +445,19 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
             toSaleExchange()
         } else{
             saleCheckoutViewModel.updateDepartureTimeForSaleManRoute( salePersonId!!, customer!!.id.toString())
-            saleCheckoutViewModel.updateSaleVisitRecord(customer!!.id) // Need to check
+            saleCheckoutViewModel.updateSaleVisitRecord(customer!!.id) // ToDo - Need to check - Wrong
             val intent = PrintInvoiceActivity.newIntentFromSaleCheckout(this, invoice!!, soldProductList, promotionList)
-            startActivity(intent)
+            startActivityForResult(intent, Utils.RQ_BACK_TO_CUSTOMER)
         }
 
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == Utils.RQ_BACK_TO_CUSTOMER)
+            if (resultCode == Activity.RESULT_OK){
+                setResult(Activity.RESULT_OK)
+                finish()
+            }
     }
 
     private fun toSaleExchange(){

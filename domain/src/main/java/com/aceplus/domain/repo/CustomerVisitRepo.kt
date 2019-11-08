@@ -14,7 +14,12 @@ import com.aceplus.domain.entity.product.Product
 import com.aceplus.domain.entity.promotion.PromotionDate
 import com.aceplus.domain.entity.promotion.PromotionGift
 import com.aceplus.domain.entity.promotion.PromotionPrice
+import com.aceplus.domain.entity.route.RouteScheduleV2
 import com.aceplus.domain.entity.sale.SaleMan
+import com.aceplus.domain.entity.volumediscount.VolumeDiscount
+import com.aceplus.domain.entity.volumediscount.VolumeDiscountFilter
+import com.aceplus.domain.entity.volumediscount.VolumeDiscountFilterItem
+import com.aceplus.domain.model.routeSchedule_v2.RouteSchedule_v2
 import com.aceplus.shared.utils.GPSTracker
 import io.reactivex.Observable
 
@@ -23,7 +28,9 @@ interface CustomerVisitRepo {
     fun getLocationCode(): Int
     fun getSaleManData(): SaleMan
     fun getSaleManName(saleManId: String): Observable<List<String?>>
-    fun getRouteID(saleManId: String): Observable<List<Int>>
+    fun getRouteID(saleManId: String): Observable<List<String>>
+    fun getRouteScheduleByID(saleManId: String): Observable<RouteScheduleV2>
+    fun getRouteNameByID(routeID: Int): Observable<String?>
     fun getRouteScheduleIDV2(): Int
     fun getLastCountForInvoiceNumber(mode: String): Int
 
@@ -38,9 +45,9 @@ interface CustomerVisitRepo {
     fun getProductByID(productID: Int): Observable<List<Product>>
     fun updateProductRemainingQty(soldProductInfo: SoldProductInfo)
 
-    fun saveDataForTempSaleManRoute(selectedCustomer: Customer, currentDate: String)
+    fun saveDataForTempSaleManRoute(selectedCustomer: Customer, currentDate: String,arrivalStatus:Int)
     fun saveCustomerFeedback(didCustomerFeedbackEntity: DidCustomerFeedback)
-    fun saveSaleVisitRecord(selectedCustomer: Customer, gpsTracker: GPSTracker)
+    fun saveSaleVisitRecord(selectedCustomer: Customer,arrivalStatus: Int)
     fun updateSaleVisitRecord(customerId: Int, visitFlag: String, saleFlag: String)
 
     fun updateDepartureTimeForSaleManRoute(saleManId: String, customerId: String, currentDate: String)
@@ -68,5 +75,11 @@ interface CustomerVisitRepo {
     fun getAllLocation(): Observable<List<Location>>
 
     fun getCompanyInfo(): Observable<List<CompanyInformation>>
+
+    fun getVolumeDiscountFilterByDate(currentDate: String): Observable<List<VolumeDiscountFilter>>
+    fun getVolumeDiscountFilterItem(volDisFilterId: Int): Observable<List<VolumeDiscountFilterItem>>
+    fun getDiscountPercentFromVolumeDiscountFilterItem(volDisFilterId: Int, buyAmt: Double): Observable<List<VolumeDiscountFilterItem>>
+
+    fun getVolumeDiscountByDate(currentDate: String): Observable<List<VolumeDiscount>>
 
 }

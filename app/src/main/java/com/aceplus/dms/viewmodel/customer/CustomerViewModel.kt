@@ -67,26 +67,30 @@ class CustomerViewModel(
                                         saleManId,
                                         locationNumber.toString(),
                                         Constant.FOR_OTHERS,
-                                        customerVisitRepo.getLastCountForInvoiceNumber(Constant.FOR_OTHERS).toString()
+                                        customerVisitRepo.getLastCountForInvoiceNumber(Constant.FOR_OTHERS)
                                     )
 
                                     val didCustomerFeedbackEntity = DidCustomerFeedback()
                                     didCustomerFeedbackEntity.sale_man_id = saleManId.toInt()
-                                    didCustomerFeedbackEntity.dev_id = deviceId.toInt()
+                                    didCustomerFeedbackEntity.dev_id = deviceId
                                     didCustomerFeedbackEntity.invoice_no = invoiceNumber
                                     didCustomerFeedbackEntity.invoice_date = invoiceDate
                                     didCustomerFeedbackEntity.customer_no = customerNumber
                                     didCustomerFeedbackEntity.location_no = locationNumber
                                     didCustomerFeedbackEntity.feedback_no = feedbackNumber
                                     didCustomerFeedbackEntity.feedback_date = feedbackDate
-                                    didCustomerFeedbackEntity.serial_no = serialNumber.toInt()
+                                    didCustomerFeedbackEntity.serial_no = serialNumber
                                     didCustomerFeedbackEntity.description = description
                                     didCustomerFeedbackEntity.remark = remark
                                     didCustomerFeedbackEntity.route_id = routeId
 
                                     customerVisitRepo.saveCustomerFeedback(didCustomerFeedbackEntity)
-
-                                    customerVisitRepo.saveSaleVisitRecord(selectedCustomer, gpsTracker)
+                                    val arrivalStatus = if (isSameCustomer(selectedCustomer,gpsTracker)){
+                                        1
+                                    }else{
+                                        0
+                                    }
+                                    customerVisitRepo.saveSaleVisitRecord(selectedCustomer, arrivalStatus)
 
                                     customerVisitRepo.updateDepartureTimeForSaleManRoute(
                                         saleManId,
@@ -101,9 +105,51 @@ class CustomerViewModel(
         }
     }
 
-    fun insertDataForTempSaleManRoute(selectedCustomer: Customer, currentDate: String) {
-        customerVisitRepo.saveDataForTempSaleManRoute(selectedCustomer, currentDate)
+    fun insertDataForTempSaleManRouteAndSaleVisitRecord(selectedCustomer: Customer, currentDate: String, gpsTracker: GPSTracker) {
+        val arrivalStatus = if (isSameCustomer(selectedCustomer,gpsTracker)){
+            1
+        }else{
+            0
+        }
+        customerVisitRepo.saveDataForTempSaleManRoute(selectedCustomer, currentDate,arrivalStatus)
+        customerVisitRepo.saveSaleVisitRecord(selectedCustomer, arrivalStatus)
     }
+
+    private fun isSameCustomer(customer: Customer, gpsTracker: GPSTracker): Boolean {
+        var arrivalStatus = false
+        if (gpsTracker.canGetLocation()) {
+            val customerLatitude = customer.latitude?.toDouble() ?: 0.0
+            val customerLongitude = customer.longitude?.toDouble() ?: 0.0
+            //            double customerLatitude = 16.850304;
+            //            double customerLongitude = 96.128192;
+
+            val saleManLatitude = gpsTracker.getLatitude()
+            val saleManLongitude = gpsTracker.getLongitude()
+
+            val startPoint = android.location.Location("locationA")
+            startPoint.latitude = customerLatitude
+            startPoint.longitude = customerLongitude
+
+            val endPoint = android.location.Location("locationB")
+            endPoint.latitude = saleManLatitude
+            endPoint.longitude = saleManLongitude
+
+            val distance = startPoint.distanceTo(endPoint).toDouble()
+            if (customerLatitude != 0.0 && customerLongitude != 0.0) {
+                if (distance < 50) {
+                    arrivalStatus = true
+                } else {
+//                    Utils.commonDialog("You are not near customer's shop", this@CustomerActivity, 2)//will show this alert?
+                }
+            } else {
+//                Utils.commonDialog("Customer's location is not detected", this@CustomerActivity, 2)//will show this alert?
+            }
+        } else {
+            gpsTracker.showSettingsAlert()
+        }
+        return arrivalStatus
+    }
+
 
     fun updateCustomerData(customer: Customer){
         customerVisitRepo.updateCustomerData(customer)

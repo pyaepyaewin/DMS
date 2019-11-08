@@ -13,14 +13,17 @@ import org.kodein.di.KodeinAware
 import org.kodein.di.android.kodein
 
 class SaleOrderActivity : BaseActivity(), KodeinAware {
+
     override val kodein: Kodein by kodein()
 
     override val layoutId: Int
         get() = R.layout.activity_sale
 
     companion object {
+
         private const val IE_PRE_ORDER = "IE_PRE_ORDER"
         private const val IE_CUSTOMER_DATA = "IE_CUSTOMER_DATA"
+
         fun newIntentFromCustomer(context: Context, isPreOrder: Boolean, customerData: Customer): Intent {
             val intent = Intent(context, SaleOrderActivity::class.java)
             intent.putExtra(IE_PRE_ORDER, isPreOrder)
@@ -35,7 +38,9 @@ class SaleOrderActivity : BaseActivity(), KodeinAware {
             return intent
         }
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
+
 }

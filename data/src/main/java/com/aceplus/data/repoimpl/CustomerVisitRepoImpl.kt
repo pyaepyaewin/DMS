@@ -1,5 +1,6 @@
 package com.aceplus.data.repoimpl
 
+import android.content.ContentValues
 import android.content.SharedPreferences
 import com.aceplus.data.database.MyDatabase
 import com.aceplus.data.utils.Constant
@@ -17,12 +18,20 @@ import com.aceplus.domain.entity.product.Product
 import com.aceplus.domain.entity.promotion.PromotionDate
 import com.aceplus.domain.entity.promotion.PromotionGift
 import com.aceplus.domain.entity.promotion.PromotionPrice
+import com.aceplus.domain.entity.route.RouteScheduleV2
 import com.aceplus.domain.entity.route.TempForSaleManRoute
 import com.aceplus.domain.entity.sale.SaleMan
+import com.aceplus.domain.entity.sale.salevisit.SaleVisitRecordUpload
+import com.aceplus.domain.entity.volumediscount.VolumeDiscount
+import com.aceplus.domain.entity.volumediscount.VolumeDiscountFilter
+import com.aceplus.domain.entity.volumediscount.VolumeDiscountFilterItem
 import com.aceplus.domain.repo.CustomerVisitRepo
 import com.aceplus.shared.utils.GPSTracker
 import com.aceplussolutions.rms.constants.AppUtils
 import io.reactivex.Observable
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.ArrayList
 
 class CustomerVisitRepoImpl(
     private val db: MyDatabase, private val shf: SharedPreferences
@@ -44,18 +53,27 @@ class CustomerVisitRepoImpl(
         return saleMan
     }
 
-    override fun getSaleManName(saleManId: String): Observable<List<String?>>{
+    override fun getSaleManName(saleManId: String): Observable<List<String?>> {
         return Observable.just(db.saleManDao().getSaleManNameByID(saleManId))
     }
 
-    override fun getRouteID(saleManId: String): Observable<List<Int>> {
+    override fun getRouteID(saleManId: String): Observable<List<String>> {
         return Observable.just(db.routeScheduleV2Dao().getRouteId(saleManId))
+    }
+
+    override fun getRouteScheduleByID(saleManId: String): Observable<RouteScheduleV2> {
+        return Observable.just(db.routeScheduleV2Dao().dataBySaleManId(saleManId))
+    }
+
+    override fun getRouteNameByID(routeID: Int): Observable<String?> {
+        return Observable.just(db.routeDao().getRouteNameByID(routeID))
     }
 
     override fun getRouteScheduleIDV2(): Int {
         val saleManId = AppUtils.getStringFromShp(Constant.SALEMAN_ID, shf)
         val routeSchedule = db.routeScheduleV2Dao().dataBySaleManId(saleManId!!)
-        val routeScheduleItems = db.routeScheduleItemV2Dao().allDataByRouteScheduleId(routeSchedule.id.toString())
+        val routeScheduleItems =
+            db.routeScheduleItemV2Dao().allDataByRouteScheduleId(routeSchedule.id.toString())
         return if (routeScheduleItems.count() > 0) routeScheduleItems[0].route_schedule_id
         else 0
     }
@@ -127,12 +145,21 @@ class CustomerVisitRepoImpl(
     }
 
     override fun updateProductRemainingQty(soldProductInfo: SoldProductInfo) {
-        db.productDao().updateProductRemainingQty(soldProductInfo.quantity, soldProductInfo.product.id)
+        db.productDao()
+            .updateProductRemainingQty(soldProductInfo.quantity, soldProductInfo.product.id)
     }
 
-    override fun saveDataForTempSaleManRoute(selectedCustomer: Customer, currentDate: String) {
+    override fun saveDataForTempSaleManRoute(
+        selectedCustomer: Customer,
+        currentDate: String,
+        arrivalStatus: Int
+    ) {
         val saleManId = AppUtils.getStringFromShp(Constant.SALEMAN_ID, shf)
-        if (db.tempForSaleManRouteDao().dataById(saleManId ?: "0", selectedCustomer.customer_id!!).isEmpty()) {
+        if (db.tempForSaleManRouteDao().dataById(
+                saleManId ?: "0",
+                selectedCustomer.customer_id!!
+            ).isEmpty()
+        ) {
             val tempForSaleManRoute = TempForSaleManRoute()
             tempForSaleManRoute.sale_man_id = saleManId?.toInt() ?: 0
             tempForSaleManRoute.customer_id = selectedCustomer.customer_id //To Check
@@ -155,18 +182,35 @@ class CustomerVisitRepoImpl(
         db.didCustomerFeedbackDao().insertData(didCustomerFeedbackEntity)
     }
 
-    override fun saveSaleVisitRecord(selectedCustomer: Customer, gpsTracker: GPSTracker) {
-        if (isSameCustomer(selectedCustomer.id, gpsTracker)) {
-            db.saleVisitRecordUploadDao().deleteData(selectedCustomer)
-            db.saleVisitRecordUploadDao().saveData(selectedCustomer)
+    override fun saveSaleVisitRecord(selectedCustomer: Customer, arrivalStatus: Int) {
+        val saleVisitRecordUpload = SaleVisitRecordUpload()
+        selectedCustomer.let {
+            saleVisitRecordUpload.customer_id = it.id
+            val saleManId = AppUtils.getStringFromShp(Constant.SALEMAN_ID, shf)
+            saleVisitRecordUpload.sale_man_id = saleManId?.toInt() ?: 0
+            saleVisitRecordUpload.latitude = it.latitude
+            saleVisitRecordUpload.longitude = it.longitude
+            saleVisitRecordUpload.visit_flag = "1"
+            saleVisitRecordUpload.sale_flag = "0"
+
+            val sdf = SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSS")
+            val currentDate = sdf.format(Date())
+            saleVisitRecordUpload.record_date = currentDate
+//            saleVisitRecordUpload.routeId = getRouteScheduleIDV2()//todo (to work with BI2 new API)
         }
+        db.saleVisitRecordUploadDao().deleteData(saleVisitRecordUpload)
+        db.saleVisitRecordUploadDao().saveData(saleVisitRecordUpload)
     }
 
     override fun updateSaleVisitRecord(customerId: Int, visitFlag: String, saleFlag: String) {
         db.saleVisitRecordUploadDao().updateSaleVisitRecord(customerId, visitFlag, saleFlag)
     }
 
-    override fun updateDepartureTimeForSaleManRoute(saleManId: String, customerId: String, currentDate: String) {
+    override fun updateDepartureTimeForSaleManRoute(
+        saleManId: String,
+        customerId: String,
+        currentDate: String
+    ) {
         db.tempForSaleManRouteDao().updateDepartureTime(saleManId, customerId, currentDate)
     }
 
@@ -229,23 +273,45 @@ class CustomerVisitRepoImpl(
     }
 
     override fun getClassDiscountByPriceOnClassID(currentClassId: String): Observable<List<ClassDiscountByPrice>> {
-        return Observable.just(db.classDiscountByPriceDao().getClassDiscountByPriceOnClassID(currentClassId))
+        return Observable.just(
+            db.classDiscountByPriceDao().getClassDiscountByPriceOnClassID(
+                currentClassId
+            )
+        )
     }
 
     override fun getClassDiscountByPriceItem(classDiscountId: Int): Observable<List<ClassDiscountByPriceItem>> {
-        return Observable.just(db.classDiscountByPriceItemDao().getClassDiscountByPriceItem(classDiscountId))
+        return Observable.just(
+            db.classDiscountByPriceItemDao().getClassDiscountByPriceItem(
+                classDiscountId
+            )
+        )
     }
 
     override fun getClassDiscountByPriceItemCountOnClassID(classID: String): Observable<Int> {
-        return Observable.just(db.classDiscountByPriceItemDao().getClassDiscountByPriceItemCountOnClassID(classID))
+        return Observable.just(
+            db.classDiscountByPriceItemDao().getClassDiscountByPriceItemCountOnClassID(
+                classID
+            )
+        )
     }
 
     override fun getCurrentDatePromotion(currentDate: String): Observable<List<PromotionDate>> {
         return Observable.just(db.promotionDateDao().getCurrentDatePromotion(currentDate))
     }
 
-    override fun getPromotionPriceByID(promotionPlanId: String, buy_qty: Int, stockID: String): Observable<List<PromotionPrice>> {
-        return Observable.just(db.promotionPriceDao().getPromotionPriceByID(promotionPlanId, buy_qty, stockID))
+    override fun getPromotionPriceByID(
+        promotionPlanId: String,
+        buy_qty: Int,
+        stockID: String
+    ): Observable<List<PromotionPrice>> {
+        return Observable.just(
+            db.promotionPriceDao().getPromotionPriceByID(
+                promotionPlanId,
+                buy_qty,
+                stockID
+            )
+        )
     }
 
     // Testing for promotion exist or not
@@ -257,8 +323,17 @@ class CustomerVisitRepoImpl(
         return Observable.just(db.promotionGiftDao().getPromotionGiftByPlanID(promotionPlanId))
     }
 
-    override fun getPromotionToBuyProduct(promotionPlanId: String, soldProductInfo: SoldProductInfo): Observable<List<PromotionGift>> {
-        return Observable.just(db.promotionGiftDao().getPromotionToBuyProduct(promotionPlanId, soldProductInfo.product.sold_quantity, soldProductInfo.product.id.toString()))
+    override fun getPromotionToBuyProduct(
+        promotionPlanId: String,
+        soldProductInfo: SoldProductInfo
+    ): Observable<List<PromotionGift>> {
+        return Observable.just(
+            db.promotionGiftDao().getPromotionToBuyProduct(
+                promotionPlanId,
+                soldProductInfo.product.sold_quantity,
+                soldProductInfo.product.id.toString()
+            )
+        )
     }
 
     override fun getInvoiceCountByID(invoiceId: String): Observable<Int> {
@@ -291,6 +366,34 @@ class CustomerVisitRepoImpl(
 
     override fun getCompanyInfo(): Observable<List<CompanyInformation>> {
         return Observable.just(db.companyInformationDao().allData)
+    }
+
+    override fun getVolumeDiscountFilterByDate(currentDate: String): Observable<List<VolumeDiscountFilter>> {
+        return Observable.just(
+            db.volumeDiscountFilterDao().getVolumeDiscountFilterByDate(
+                currentDate
+            )
+        )
+    }
+
+    override fun getVolumeDiscountFilterItem(volDisFilterId: Int): Observable<List<VolumeDiscountFilterItem>> {
+        return Observable.just(db.volumeDiscountFilterItemDao().getDataByID(volDisFilterId.toString()))
+    }
+
+    override fun getDiscountPercentFromVolumeDiscountFilterItem(
+        volDisFilterId: Int,
+        buyAmt: Double
+    ): Observable<List<VolumeDiscountFilterItem>> {
+        return Observable.just(
+            db.volumeDiscountFilterItemDao().getDiscountPercent(
+                volDisFilterId.toString(),
+                buyAmt
+            )
+        )
+    }
+
+    override fun getVolumeDiscountByDate(currentDate: String): Observable<List<VolumeDiscount>> {
+        return Observable.just(db.volumeDiscountDao().getVolumeDiscountByDate(currentDate))
     }
 
 }

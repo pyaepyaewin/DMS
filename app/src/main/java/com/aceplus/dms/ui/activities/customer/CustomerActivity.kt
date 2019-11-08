@@ -75,6 +75,9 @@ class CustomerActivity : BaseActivity(), KodeinAware {
 
     private var selectedCustomer: Customer? = null
     private var allCustomerDataList: ArrayList<Customer> = ArrayList()
+    private val gspTracker by lazy{
+        GPSTracker(applicationContext)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -220,8 +223,9 @@ class CustomerActivity : BaseActivity(), KodeinAware {
 
         if (didCustomerSelected()) {
             //insert arrival & departure time for temp for sale man route
-            customerViewModel.insertDataForTempSaleManRoute(
-                selectedCustomer!!, Utils.getCurrentDate(true)
+            customerViewModel.insertDataForTempSaleManRouteAndSaleVisitRecord(
+                selectedCustomer!!, Utils.getCurrentDate(true),
+                gspTracker
             )
             val intent = SaleActivity.newIntentFromCustomer(applicationContext, "no", selectedCustomer!!)
             startActivity(intent)
@@ -232,9 +236,10 @@ class CustomerActivity : BaseActivity(), KodeinAware {
     private fun onClickSaleOrderButton() {
         if (didCustomerSelected()) {
             //insert arrival & departure time for temp for sale man route
-            customerViewModel.insertDataForTempSaleManRoute(
+            customerViewModel.insertDataForTempSaleManRouteAndSaleVisitRecord(
                 selectedCustomer!!,
-                Utils.getCurrentDate(true)
+                Utils.getCurrentDate(true),
+                gspTracker
             )
             val intent = SaleOrderActivity.newIntentFromCustomer(
                 applicationContext,
@@ -250,7 +255,7 @@ class CustomerActivity : BaseActivity(), KodeinAware {
         if (didCustomerSelected()) {
 
             //insert arrival & departure time for temp for sale man route
-            customerViewModel.insertDataForTempSaleManRoute(selectedCustomer!!, Utils.getCurrentDate(true))
+            customerViewModel.insertDataForTempSaleManRouteAndSaleVisitRecord(selectedCustomer!!, Utils.getCurrentDate(true),gspTracker)
 
             customerViewModel.loadDidCustomerFeedback(selectedCustomer!!,
                 {
@@ -285,8 +290,7 @@ class CustomerActivity : BaseActivity(), KodeinAware {
                             makeFeedbackAction(
                                 deviceId,
                                 descriptionsSpinner.selectedItemPosition,
-                                remarkEditText.text.toString(),
-                                GPSTracker(applicationContext)
+                                remarkEditText.text.toString(),gspTracker
                             )
                         }
                         .setNegativeButton("Cancel", null)
@@ -316,7 +320,7 @@ class CustomerActivity : BaseActivity(), KodeinAware {
 
         if (didCustomerSelected()) {
             //insert arrival & departure time for temp for sale man route
-            customerViewModel.insertDataForTempSaleManRoute(selectedCustomer!!, Utils.getCurrentDate(true))
+            customerViewModel.insertDataForTempSaleManRouteAndSaleVisitRecord(selectedCustomer!!, Utils.getCurrentDate(true),gspTracker)
             val intent = SaleReturnActivity.newIntentFromCustomer(
                 applicationContext,
                 "no",
@@ -330,10 +334,10 @@ class CustomerActivity : BaseActivity(), KodeinAware {
     private fun onClickPosmButton() {
         if (didCustomerSelected()) {
             //insert arrival & departure time for temp for sale man route
-            customerViewModel.insertDataForTempSaleManRoute(
+            customerViewModel.insertDataForTempSaleManRouteAndSaleVisitRecord(
                 selectedCustomer!!,
-                Utils.getCurrentDate(true)
-            )
+                Utils.getCurrentDate(true),
+                        gspTracker)
             val intent = PosmActivity.newIntentFromCustomer(applicationContext, selectedCustomer!!)
             startActivity(intent)
         }
@@ -343,7 +347,7 @@ class CustomerActivity : BaseActivity(), KodeinAware {
 
         if (didCustomerSelected()) {
             //insert arrival & departure time for temp for sale man route
-            customerViewModel.insertDataForTempSaleManRoute(selectedCustomer!!, Utils.getCurrentDate(true))
+            customerViewModel.insertDataForTempSaleManRouteAndSaleVisitRecord(selectedCustomer!!, Utils.getCurrentDate(true),gspTracker)
             val intent = AddNewCustomerLocationActivity.newIntentFromCustomerActivity(
                 applicationContext,
                 salesmanId = AppUtils.getStringFromShp(Constant.SALEMAN_ID, applicationContext) ?: "",
