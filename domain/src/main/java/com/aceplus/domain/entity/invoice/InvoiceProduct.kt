@@ -72,7 +72,7 @@ class InvoiceProduct {
     @ColumnInfo(name = "promotion_price")
     @SerializedName("promotion_price")
     @Expose
-    var promotion_price: Double = 0.0
+    var promotion_price: Double? = 0.0
 
     @ColumnInfo(name = "volume_discount_percent")
     @SerializedName("volume_discount_percent")

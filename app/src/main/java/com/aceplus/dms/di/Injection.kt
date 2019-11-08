@@ -17,6 +17,7 @@ import com.aceplus.data.repoimpl.promotionrepoImpl.*
 import com.aceplus.data.repoimpl.prospectcustomet.ProspectCustomerRepoImpl
 import com.aceplus.data.repoimpl.routrepoimpl.CustomerLocationRepoImpl
 import com.aceplus.data.repoimpl.routrepoimpl.ViewByListRepoImpl
+import com.aceplus.data.repoimpl.salecancelrepoImpl.SaleCancelRepoImpl
 import com.aceplus.data.utils.Constant
 import com.aceplus.dms.viewmodel.LoginViewModel
 import com.aceplus.dms.viewmodel.PrintInvoiceViewModel
@@ -32,6 +33,8 @@ import com.aceplus.dms.viewmodel.promotionviewmodels.*
 import com.aceplus.dms.viewmodel.report.ReportViewModel
 import com.aceplus.dms.viewmodel.routeviewmodels.CustomerLocationViewModel
 import com.aceplus.dms.viewmodel.routeviewmodels.ViewByListViewModel
+import com.aceplus.dms.viewmodel.salecancelviewmodel.SaleCancelDetailViewModel
+import com.aceplus.dms.viewmodel.salecancelviewmodel.SaleCancelViewModel
 import com.aceplus.domain.repo.CustomerVisitRepo
 import com.aceplus.domain.repo.LoginRepo
 import com.aceplus.domain.repo.SyncRepo
@@ -41,6 +44,7 @@ import com.aceplus.domain.repo.promotionrepo.*
 import com.aceplus.domain.repo.prospectcustomer.ProspectCustomerRepo
 import com.aceplus.domain.repo.routerepo.CustomerLocationRepo
 import com.aceplus.domain.repo.routerepo.ViewByListRepo
+import com.aceplus.domain.repo.salecancelrepo.SaleCancelRepo
 import com.aceplussolutions.rms.constants.SharedConstants
 import okhttp3.OkHttpClient
 import org.kodein.di.Kodein
@@ -121,6 +125,9 @@ val repoModule = Kodein.Module {
     bind<CreditCollectionRepo>() with singleton {
         CreditCollectionRepoImpl(instance())
     }
+    bind<SaleCancelRepo>() with singleton {
+        SaleCancelRepoImpl(instance())
+    }
    
 }
 
@@ -145,6 +152,9 @@ val vmModule = Kodein.Module {
     bind() from singleton { CreditCollectionCheckOutViewModel(instance(), instance(),instance()) }
 
     bind() from singleton { PrintInvoiceViewModel(instance(), instance()) }
+    bind() from singleton { SaleCancelViewModel(instance(), instance()) }
+    bind() from singleton { SaleCancelDetailViewModel(instance(), instance()) }
+
 
 
 }
