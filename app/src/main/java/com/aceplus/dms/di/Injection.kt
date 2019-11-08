@@ -12,9 +12,10 @@ import com.aceplus.data.repoimpl.CustomerVisitRepoImpl
 import com.aceplus.data.repoimpl.LoginRepoImpl
 import com.aceplus.data.repoimpl.SyncRepoImpl
 import com.aceplus.data.repoimpl.creditcollectionrepoimpl.CreditCollectionRepoImpl
-import com.aceplus.data.repoimpl.report.ReportRepoImpl
-import com.aceplus.data.repoimpl.promotionrepoImpl.*
+import com.aceplus.data.repoimpl.deliveryrepoimpl.DeliveryRepoImpl
+import com.aceplus.data.repoimpl.promotionrepoImpl.PromotionRepoImpl
 import com.aceplus.data.repoimpl.prospectcustomet.ProspectCustomerRepoImpl
+import com.aceplus.data.repoimpl.report.ReportRepoImpl
 import com.aceplus.data.repoimpl.routrepoimpl.CustomerLocationRepoImpl
 import com.aceplus.data.repoimpl.routrepoimpl.ViewByListRepoImpl
 import com.aceplus.data.repoimpl.salecancelrepoImpl.SaleCancelRepoImpl
@@ -25,11 +26,12 @@ import com.aceplus.dms.viewmodel.SyncViewModel
 import com.aceplus.dms.viewmodel.creditcollection.CreditCollectionCheckOutViewModel
 import com.aceplus.dms.viewmodel.creditcollection.CreditCollectionViewModel
 import com.aceplus.dms.viewmodel.customer.CustomerViewModel
-import com.aceplus.dms.viewmodel.customer.sale.SaleCheckoutViewModel
+import com.aceplus.dms.viewmodel.customer.delivery.DeliveryViewModel
 import com.aceplus.dms.viewmodel.customer.prospectcustomer.ProspectCustomerViewModel
+import com.aceplus.dms.viewmodel.customer.sale.SaleCheckoutViewModel
 import com.aceplus.dms.viewmodel.customer.sale.SaleViewModel
 import com.aceplus.dms.viewmodel.customer.sale.SalesReturnViewModel
-import com.aceplus.dms.viewmodel.promotionviewmodels.*
+import com.aceplus.dms.viewmodel.promotionviewmodels.PromotionViewModel
 import com.aceplus.dms.viewmodel.report.ReportViewModel
 import com.aceplus.dms.viewmodel.routeviewmodels.CustomerLocationViewModel
 import com.aceplus.dms.viewmodel.routeviewmodels.ViewByListViewModel
@@ -39,9 +41,10 @@ import com.aceplus.domain.repo.CustomerVisitRepo
 import com.aceplus.domain.repo.LoginRepo
 import com.aceplus.domain.repo.SyncRepo
 import com.aceplus.domain.repo.creditcollectionrepo.CreditCollectionRepo
-import com.aceplus.domain.repo.report.ReportRepo
-import com.aceplus.domain.repo.promotionrepo.*
+import com.aceplus.domain.repo.deliveryrepo.DeliveryRepo
+import com.aceplus.domain.repo.promotionrepo.PromotionRepo
 import com.aceplus.domain.repo.prospectcustomer.ProspectCustomerRepo
+import com.aceplus.domain.repo.report.ReportRepo
 import com.aceplus.domain.repo.routerepo.CustomerLocationRepo
 import com.aceplus.domain.repo.routerepo.ViewByListRepo
 import com.aceplus.domain.repo.salecancelrepo.SaleCancelRepo
@@ -111,6 +114,9 @@ val repoModule = Kodein.Module {
         ProspectCustomerRepoImpl(instance())
     }
 
+    bind<DeliveryRepo>() with singleton {
+        DeliveryRepoImpl(instance())
+    }
 
     bind<PromotionRepo>() with singleton {
         PromotionRepoImpl(instance())
@@ -142,14 +148,15 @@ val vmModule = Kodein.Module {
     bind() from singleton { SaleCheckoutViewModel(instance(), instance()) }
     bind() from singleton { SalesReturnViewModel(instance(), instance()) }
     bind() from singleton { ReportViewModel(instance(), instance()) }
-    bind() from  singleton { ProspectCustomerViewModel(instance(),instance()) }
+    bind() from singleton { ProspectCustomerViewModel(instance(), instance()) }
+    bind() from singleton { DeliveryViewModel(instance(), instance()) }
 
     bind() from singleton { PromotionViewModel(instance(), instance()) }
 
     bind() from singleton { ViewByListViewModel(instance(), instance()) }
     bind() from singleton { CustomerLocationViewModel(instance(), instance()) }
     bind() from singleton { CreditCollectionViewModel(instance(), instance()) }
-    bind() from singleton { CreditCollectionCheckOutViewModel(instance(), instance(),instance()) }
+    bind() from singleton { CreditCollectionCheckOutViewModel(instance(), instance(), instance()) }
 
     bind() from singleton { PrintInvoiceViewModel(instance(), instance()) }
     bind() from singleton { SaleCancelViewModel(instance(), instance()) }

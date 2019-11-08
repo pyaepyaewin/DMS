@@ -152,5 +152,9 @@ object AppUtils {
 
     }
 
+    fun getStringFromShp(salemanId: String, s: String): String? {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
 
 }

@@ -13,6 +13,7 @@ import android.util.Log
 import android.view.View
 import android.widget.Toast
 import com.aceplus.dms.R
+import com.aceplus.dms.ui.adapters.report.HistorySoldProductPrintListAdapter
 import com.aceplus.dms.ui.adapters.sale.SoldProductPrintListAdapter
 import com.aceplus.dms.utils.BluetoothService
 import com.aceplus.dms.utils.PrintUtils
@@ -27,6 +28,7 @@ import com.aceplus.domain.entity.promotion.Promotion
 import com.aceplus.domain.model.credit.CreditInvoice
 import com.aceplus.domain.vo.RelatedDataForPrint
 import com.aceplus.domain.vo.SoldProductInfo
+import com.aceplus.domain.vo.report.SaleInvoiceDetailReport
 import com.aceplussolutions.rms.ui.activities.BaseActivity
 import kotlinx.android.synthetic.main.activity_sale_print.*
 import org.kodein.di.Kodein
@@ -45,6 +47,7 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
 
         private const val IE_SOLD_PRODUCT_LIST = "IE_SOLD_PRODUCT_LIST"
         private const val IE_INVOICE = "IE_INVOICE"
+        private const val HISTORY_REPORT_SOLD_PRODUCT_LIST = "HISTORY_REPORT_SOLD_PRODUCT_LIST"
         private const val IE_PROMOTION_LIST = "IE_PROMOTION_LIST"
         private const val IE_PRINT_MODE = "IE_PRINT_MODE"
         private const val SALE_MAN_NAME = "SALE_MAN_NAME"
@@ -91,9 +94,7 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
             customerTownShip: String,
             salePersonName: String,
             customerName: String
-        )
-
-                : Intent {
+        ): Intent {
             val printIntent = Intent(context, PrintInvoiceActivity::class.java)
             printIntent.putExtra("CREDIT", credit as Serializable)
             printIntent.putExtra("CURSOR_POSITION", position)
@@ -106,17 +107,31 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
             return printIntent
         }
 
+        fun newIntentFromSaleHistoryActivity(
+            context: Context,
+            invoice: Invoice?,
+            saleHistoryDetailList: List<SaleInvoiceDetailReport>
+        ): Intent? {
+            val intent = Intent(context, PrintInvoiceActivity::class.java)
+            intent.putExtra(IE_INVOICE, invoice)
+            intent.putExtra(
+                HISTORY_REPORT_SOLD_PRODUCT_LIST,
+                saleHistoryDetailList as ArrayList<SaleInvoiceDetailReport>
+            )
+            intent.putExtra(IE_PRINT_MODE, "RP")
+            return intent
+        }
+
+
     }
 
     private val printInvoiceViewModel: PrintInvoiceViewModel by viewModel()
-    private val soldProductPrintListAdapter: SoldProductPrintListAdapter by lazy {
-        SoldProductPrintListAdapter(
-            printMode
-        )
-    }
+    private val soldProductPrintListAdapter: SoldProductPrintListAdapter by lazy { SoldProductPrintListAdapter(printMode)}
+    private val historySoldProductPrintListAdapter: HistorySoldProductPrintListAdapter by lazy { HistorySoldProductPrintListAdapter() }
 
     private var invoice: Invoice? = null
     private var soldProductList: ArrayList<SoldProductInfo> = ArrayList()
+    private var historyReportSoldProductList: ArrayList<SaleInvoiceDetailReport> = ArrayList()
     private var promotionList: ArrayList<Promotion> = ArrayList()
     private var saleReturnList: ArrayList<SoldProductInfo> = ArrayList()
     private var creditList: ArrayList<CreditInvoice> = ArrayList()
@@ -147,7 +162,11 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
         catchEvents()
         getTaxInfoAndSetData()
 
-        print_soldProductList.adapter = soldProductPrintListAdapter
+        if (printMode == "S") {
+            print_soldProductList.adapter = soldProductPrintListAdapter
+        } else if (printMode == "RP") {
+            print_soldProductList.adapter = historySoldProductPrintListAdapter
+        }
         print_soldProductList.layoutManager = LinearLayoutManager(this)
 
     }
@@ -203,7 +222,6 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
 
     }
 
-
     private fun getIntentData() {
 
         if (intent.getSerializableExtra("CREDIT") != null) creditList =
@@ -224,13 +242,14 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
             intent.getParcelableArrayListExtra(IE_SALE_RETURN_LIST)
         if (intent.getStringExtra(IE_PRINT_MODE) != null) printMode =
             intent.getStringExtra(IE_PRINT_MODE)
+        if (intent.getParcelableArrayListExtra<SaleInvoiceDetailReport>(HISTORY_REPORT_SOLD_PRODUCT_LIST) != null)
+            historyReportSoldProductList = intent.getParcelableArrayListExtra(HISTORY_REPORT_SOLD_PRODUCT_LIST)
 
     }
 
     private fun getTaxInfoAndSetData() {
 
         printInvoiceViewModel.getTaxInfo()
-
         printInvoiceViewModel.taxInfo.observe(this, Observer {
             if (it != null) {
                 taxType = it.first
@@ -250,7 +269,12 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
             invoiceId.text = invoice!!.invoice_id
             printInvoiceViewModel.getSalePersonName(invoice!!.sale_person_id!!)
             branch.text = branchCode.toString()
-            soldProductPrintListAdapter.setNewList(soldProductList)
+
+            if (printMode == "S")
+                soldProductPrintListAdapter.setNewList(soldProductList)
+            else
+                historySoldProductPrintListAdapter.setNewList(historyReportSoldProductList)
+
             setPromotionProductListView()
             print_totalAmount.text = Utils.formatAmount(invoice!!.total_amount!!.toDouble())
 
@@ -259,19 +283,14 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
 
             if (taxType.equals("E", true)) {
                 if (invoice!!.total_amount!!.isNotBlank())
-                    print_net_amount.text =
-                        Utils.formatAmount(invoice!!.total_amount!!.toDouble() - invoice!!.total_discount_amount + invoice!!.tax_amount)
+                    print_net_amount.text = Utils.formatAmount(invoice!!.total_amount!!.toDouble() - invoice!!.total_discount_amount + invoice!!.tax_amount)
             } else {
                 if (invoice!!.total_amount!!.isNotBlank())
-                    print_net_amount.text =
-                        Utils.formatAmount(invoice!!.total_amount!!.toDouble() - invoice!!.total_discount_amount)
+                    print_net_amount.text = Utils.formatAmount(invoice!!.total_amount!!.toDouble() - invoice!!.total_discount_amount)
             }
 
             print_prepaidAmount.text = Utils.formatAmount(invoice!!.pay_amount?.toDouble() ?: 0.0)
-
-            print_discountAmount.text =
-                "${Utils.formatAmount(invoice!!.total_discount_amount)} (${invoice!!.total_discount_percent}%)"
-
+            print_discountAmount.text = "${Utils.formatAmount(invoice!!.total_discount_amount)} (${invoice!!.total_discount_percent}%)"
 
         } else if (printMode == "C") {
 
@@ -299,6 +318,9 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
             credit_net_amount.text = Utils.formatAmount(creditList[0].amt)
             credit_receive_amt.text = Utils.formatAmount(creditList[0].payAmt)
             credit_discount.text = "0.0 (0%)"
+
+        } else if (printMode == "C") {
+            // ToDo
         } else if (printMode == "D") {
             // ToDo
         } else if (printMode == "SR") {
@@ -314,21 +336,16 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
     }
 
     @Suppress("DEPRECATION")
-    private fun onPrint() {
+    private fun onPrint(){
 
         val v1 = window.decorView.rootView
         v1.isDrawingCacheEnabled = true
         val myBitmap = v1.drawingCache
 
-        if (printMode == "C" && !creditFlg.isNullOrBlank()) {
+        if (printMode == "C" && !creditFlg.isNullOrBlank()){
 
-            Utils.saveInvoiceImageIntoGallery(
-                creditList[pos].invoiceNo,
-                this,
-                myBitmap,
-                "Credit Collect"
-            ) // Doesn't work
-            if (creditList.isNotEmpty()) {
+            Utils.saveInvoiceImageIntoGallery(creditList[pos].invoiceNo, this, myBitmap, "Credit Collect") // Doesn't work
+            if (creditList.isNotEmpty()){
                 val customerData: Customer = relatedDataForPrint!!.customer
                 PrintUtils.printCreditWithHSPOS(
                     this,
@@ -344,7 +361,32 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
                 )
             }
 
-        } else if (printMode == "S") {
+        } else if (printMode == "S"){
+
+            Utils.saveInvoiceImageIntoGallery(invoice!!.invoice_id, this, myBitmap, "Sale") // Doesn't work
+            val editProductList = printInvoiceViewModel.arrangeProductList(soldProductList, promotionList)
+            val customerData: Customer = relatedDataForPrint!!.customer
+            //invoice!!.printMode = "sale" // Doesn't exist in invoice, in all condition ?? add or param pass?
+            PrintUtils.printWithHSPOS(
+                this,
+                customerData.customer_name,
+                customerData.address,
+                invoice!!.invoice_id,
+                salePersonName,
+                relatedDataForPrint!!.routeName,
+                relatedDataForPrint!!.customerTownShipName,
+                invoice!!,
+                editProductList,
+                promotionList,
+                PrintUtils.PRINT_FOR_NORMAL_SALE,
+                PrintUtils.FOR_OTHERS,
+                mBluetoothService!!,
+                relatedDataForPrint!!.companyInfo,
+                "sale"
+            )
+
+        } else if (printMode == "RP"){
+
             Utils.saveInvoiceImageIntoGallery(invoice!!.invoice_id, this, myBitmap, "Sale") // Doesn't work
             val editProductList = printInvoiceViewModel.arrangeProductList(soldProductList, promotionList)
             val customerData: Customer = relatedDataForPrint!!.customer
@@ -366,7 +408,8 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
                 "report"
             )
 
-        } else if (printMode == "D") {
+        } else if (printMode == "D"){
+
             Utils.saveInvoiceImageIntoGallery(invoice!!.invoice_id, this, myBitmap, "Deliver") // Doesn't work
             val editProductList = printInvoiceViewModel.arrangeProductList(soldProductList, promotionList)
             val customerData: Customer = relatedDataForPrint!!.customer
@@ -390,7 +433,8 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
                 relatedDataForPrint!!.companyInfo
             )
 
-        } else if (printMode == "SR") {
+        } else if (printMode == "SR"){
+
             Utils.saveInvoiceImageIntoGallery(invoice!!.invoice_id, this, myBitmap, "Sale") // Doesn't work
             val editProductList = printInvoiceViewModel.arrangeProductList(soldProductList, promotionList)
             val customerData: Customer = relatedDataForPrint!!.customer
@@ -425,7 +469,8 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
         when (requestCode) {
             IR_REQUEST_CONNECT_DEVICE -> {
                 if (resultCode == Activity.RESULT_OK) {
-                    val address = data?.getStringExtra(DeviceListActivity.IR_EXTRA_DEVICE_ADDRESS)
+                    val address =
+                        data?.getStringExtra(DeviceListActivity.IR_EXTRA_DEVICE_ADDRESS)
                     if (BluetoothAdapter.checkBluetoothAddress(address)) {
                         val device = mBluetoothAdapter!!.getRemoteDevice(address)
                         mBluetoothService?.connect(device)
@@ -452,23 +497,12 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
             HM_MESSAGE_STATE_CHANGE -> {
                 if (DEBUG) Log.i(TAG, "MESSAGE_STATE_CHANGE ${it.arg1}")
                 when (it.arg1) {
-                    BluetoothService.STATE_CONNECTED -> Toast.makeText(
-                        this,
-                        "Connected with device",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
+                    BluetoothService.STATE_CONNECTED -> Toast.makeText(this, "Connected with device", Toast.LENGTH_SHORT).show() }
             }
             HM_MESSAGE_DEVICE_NAME -> {
                 val connectedDeviceName = it.data.getString(DEVICE_NAME)
                 Toast.makeText(this, "Connected to $connectedDeviceName", Toast.LENGTH_SHORT).show()
-                //onPrint()
-
-                printInvoiceViewModel.getRelatedDataAndPrint(
-                    invoice!!.customer_id!!,
-                    invoice!!.sale_person_id!!,
-                    orderedInvoice?.sale_man_id
-                )
+                printInvoiceViewModel.getRelatedDataAndPrint(invoice!!.customer_id!!, invoice!!.sale_person_id!!, orderedInvoice?.sale_man_id)
             }
             HM_MESSAGE_TOAST -> {
                 Toast.makeText(this, it.data.getString(TOAST), Toast.LENGTH_SHORT).show()
@@ -481,96 +515,13 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
             }
 
         }
-
         true
     }
-    private fun arrangeProductList(): ArrayList<SoldProductInfo> {
 
-        val positionList: ArrayList<Int> = ArrayList()
-        val newSoldProductList: ArrayList<SoldProductInfo> = ArrayList()
-        val newPresentList: ArrayList<Promotion> = ArrayList()
+    override fun onBackPressed() {
+        setResult(Activity.RESULT_OK)
+        finish()
+    }
 
-        for (i in promotionList.indices) {
-
-            val stockId1 = promotionList[i].promotion_product_id
-
-            for ((indexForNew, promotion) in newPresentList.withIndex()) {
-                var stockId = promotion.promotion_product_id
-                if (stockId != stockId1 && (indexForNew + 1) == newPresentList.size) {
-                    val newPromotion =
-                        Promotion() // Check currency_id, price, promoPlanId, promotion price, product name // ToDo - Check point !!!
-                    newPromotion.promotion_quantity = 0
-                    newPromotion.promotion_product_id = promotionList[i].promotion_product_id
-
-                    newPresentList.add(newPromotion)
-                }
-            }
-                if (newPresentList.size == 0) {
-                    val newPromotion =
-                        Promotion() // Check currency_id, price, promoPlanId, promotion price, product name // ToDo - Check point !!!
-                    newPromotion.promotion_quantity = 0
-                    newPromotion.promotion_product_id = promotionList[i].promotion_product_id
-                    newPresentList.add(newPromotion)
-                }
-
-            }
-
-            for (promotion in promotionList) {
-
-                val stockId = promotion.promotion_product_id
-
-                for (i in newPresentList.indices) {
-                    val stockId1 = newPresentList[i].promotion_product_id
-                    if (stockId == stockId1) {
-                        val promotionQty = promotion.promotion_quantity
-                        newPresentList[i].promotion_quantity += promotionQty
-                    }
-                }
-
-            }
-
-            for (i in soldProductList.indices) {
-
-                val soldProductStockId = soldProductList[i].product.id
-
-                newSoldProductList.add(soldProductList[i])
-
-                if (newPresentList.isNotEmpty()) {
-                    for (j in newPresentList.indices) {
-                        val promoProductId = newPresentList[j].promotion_product_id
-
-                        if (soldProductStockId == promoProductId) {
-                            val promoProduct = SoldProductInfo(Product(), false)
-                            promoProduct.product.id = promoProductId
-                            promoProduct.quantity = newPresentList[j].promotion_quantity
-                            promoProduct.product.purchase_price = "0.0"
-                            promoProduct.product.selling_price = "0.0"
-                            //promoProduct.product.product_name = newPresentList[j].promotion_product_name // ToDo - Check point !!!
-                            promoProduct.promotionPrice = 0.0
-
-                            newSoldProductList.add(promoProduct)
-                            positionList.add(j)
-                            break
-                        }
-
-                    }
-                }
-
-            }
-
-            for (i in positionList.size downTo 0) {
-                val pos = positionList[i - 1]
-                newPresentList.removeAt(pos)
-            }
-
-            return newSoldProductList
-
-        }
-
-        override fun onBackPressed() {
-            setResult(Activity.RESULT_OK)
-            finish()
-        }
-   }
-
+}
 

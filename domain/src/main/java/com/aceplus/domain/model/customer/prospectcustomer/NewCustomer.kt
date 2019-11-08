@@ -1,14 +1,22 @@
 package com.aceplus.domain.model.customer.prospectcustomer
 
 class NewCustomer(
+    var id: Int = 0,
+    var customerId: String,
     val customerName: String,
-    val contact_person: String,
+    val contactPerson: String,
     val phone: String,
     val address: String,
     val latitude: Double,
     val longitude: Double,
-    val township_number: Int,
-    val district_id: Int,
-    val state_division_id: Int,
-    val shopTypeId: Int
+    var streetId: Int ,
+    val townshipNumber: Int,
+    var township: String,
+    val districtId: Int,
+    val stateDivisionId: Int,
+    val shopTypeId: Int,
+    var createdUserId: String,
+    var createdDate: String,
+    var flag: String
+
 )

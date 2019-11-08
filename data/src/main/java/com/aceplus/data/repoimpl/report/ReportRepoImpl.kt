@@ -66,6 +66,11 @@ class ReportRepoImpl(private val db: MyDatabase) : ReportRepo {
         return Observable.just(db.invoiceProductDao().getSaleInvoiceDetailReport(invoiceId))
     }
 
+    override fun saleInvoiceDetlailPrint(invoiceId: String): Observable<Invoice> {
+        return Observable.just(db.invoiceDao().getSaleHistoryReportForPrint(invoiceId))
+    }
+
+
     //spinner data
     override fun getAllCustomerData(): Observable<List<Customer>> {
         return Observable.just(db.customerDao().allData)

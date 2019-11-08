@@ -43,6 +43,7 @@ interface ReportRepo {
     fun saleHistoryReportForDate(fromDate: String,toDate:String ): Observable<List<SaleInvoiceReport>>
 
     fun saleInvoiceDetailReport(invoiceId: String): Observable<List<SaleInvoiceDetailReport>>
+    fun saleInvoiceDetlailPrint(invoiceId:String):Observable<Invoice>
     //spinner data
     fun getAllCustomerData(): Observable<List<Customer>>
 

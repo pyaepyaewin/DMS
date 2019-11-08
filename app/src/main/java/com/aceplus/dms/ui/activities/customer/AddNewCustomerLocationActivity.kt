@@ -48,10 +48,16 @@ class AddNewCustomerLocationActivity : BaseActivity(), KodeinAware {
         private const val IE_SALE_MAN_ID = "IE_SALE_MAN_ID"
         private const val IE_CUSTOMER_DATA = "IE_CUSTOMER_DATA"
 
-        private const val NAME = "name"
-        private const val PERSON = "person"
-        private const val PHONE = "phone"
-        private const val ADDRESS = "address"
+        private const val IE_NAME = "name"
+        private const val IE_PERSON = "person"
+        private const val IE_PHONE = "phone"
+        private const val IE_ADDRESS = "address"
+        private const val IE_PAYMENT_TYPE = "paymentType"
+        private const val IE_STREET_ID = "sid"
+        private const val IE_TOWNSHIP_ID = "tid"
+        private const val IE_SHOP_TYPE_ID = "stId"
+        private const val IE_DISTINCT_ID = "did"
+        private const val IE_STATE_DIVISION_ID = "sdId"
 
         fun newIntentFromCustomerActivity(
             context: Context,
@@ -70,14 +76,26 @@ class AddNewCustomerLocationActivity : BaseActivity(), KodeinAware {
             customerName: String,
             contactPerson: String,
             phone: String,
-            address: String
+            address: String,
+            paymentType: String,
+            streetId: Int,
+            townshipId: Int,
+            shopTypeId: Int,
+            districtId: Int,
+            stateDivisionId: Int
         ): Intent {
             val intent = Intent(context, AddNewCustomerLocationActivity::class.java)
             intent.putExtra(IE_FROM, "addNewCustomerActivity")
-            intent.putExtra(NAME, customerName)
-            intent.putExtra(PERSON, contactPerson)
-            intent.putExtra(PHONE, phone)
-            intent.putExtra(ADDRESS, address)
+            intent.putExtra(IE_NAME, customerName)
+            intent.putExtra(IE_PERSON, contactPerson)
+            intent.putExtra(IE_PHONE, phone)
+            intent.putExtra(IE_ADDRESS, address)
+            intent.putExtra(IE_PAYMENT_TYPE, paymentType)
+            intent.putExtra(IE_STREET_ID, streetId)
+            intent.putExtra(IE_TOWNSHIP_ID, townshipId)
+            intent.putExtra(IE_SHOP_TYPE_ID, shopTypeId)
+            intent.putExtra(IE_DISTINCT_ID, districtId)
+            intent.putExtra(IE_STATE_DIVISION_ID, stateDivisionId)
             return intent
         }
     }
@@ -90,10 +108,16 @@ class AddNewCustomerLocationActivity : BaseActivity(), KodeinAware {
     private var map: GoogleMap? = null
     private var markerCount: Int = 0
 
-    private lateinit var name: String
-    private lateinit var person: String
-    private lateinit var phone: String
-    private lateinit var address: String
+    private var name: String? = null
+    private var person: String? = null
+    private var phone: String? = null
+    private var address: String? = null
+    private var paymentType: String? = null
+    private var streetId: Int? = null
+    private var townshipId: Int? = null
+    private var shopTypeId: Int? = null
+    private var districtId: Int? = null
+    private var stateDivisionId: Int? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -116,10 +140,16 @@ class AddNewCustomerLocationActivity : BaseActivity(), KodeinAware {
         from = intent.getStringExtra(IE_FROM)
         salesmanId = intent.getStringExtra(IE_SALE_MAN_ID)
 
-        name = intent.getStringExtra(NAME)
-        person = intent.getStringExtra(PERSON)
-        phone = intent.getStringExtra(PHONE)
-        address = intent.getStringExtra(ADDRESS)
+        name = intent.getStringExtra(IE_NAME)
+        person = intent.getStringExtra(IE_PERSON)
+        phone = intent.getStringExtra(IE_PHONE)
+        address = intent.getStringExtra(IE_ADDRESS)
+        paymentType = intent.getStringExtra(IE_PAYMENT_TYPE)
+        streetId = intent.getIntExtra(IE_STREET_ID, 0)
+        townshipId = intent.getIntExtra(IE_TOWNSHIP_ID, 0)
+        shopTypeId = intent.getIntExtra(IE_SHOP_TYPE_ID, 0)
+        districtId = intent.getIntExtra(IE_DISTINCT_ID, 0)
+        stateDivisionId = intent.getIntExtra(IE_STATE_DIVISION_ID, 0)
 
     }
 
@@ -259,8 +289,8 @@ class AddNewCustomerLocationActivity : BaseActivity(), KodeinAware {
                         latDouble = location.latitude
                         lonDouble = location.longitude
                     }
-                    Log.d("LAT","$latDouble")
-                    Log.d("LON","$lonDouble")
+                    Log.d("LAT", "$latDouble")
+                    Log.d("LON", "$lonDouble")
                 }
             }
         }
@@ -365,16 +395,22 @@ class AddNewCustomerLocationActivity : BaseActivity(), KodeinAware {
         if (from.equals("AddNewCustomerActivity", true)) {
             val intent = AddNewCustomerActivity.newIntentFromAddNewCustomerLocation(
                 applicationContext,
-                name,
-                person,
-                phone,
-                address,
+                name!!,
+                person!!,
+                phone!!,
+                address!!,
                 latDouble,
-                lonDouble
+                lonDouble,
+                paymentType!!,
+                streetId!!,
+                townshipId!!,
+                shopTypeId!!,
+                districtId!!,
+                stateDivisionId!!
             )
             startActivity(intent)
             finish()
-        }else {
+        } else {
             customer!!.flag = "2"
             customerViewModel.updateCustomerData(customer!!)
             if (customer!!.latitude != null) {

@@ -2,22 +2,13 @@ package com.aceplus.dms.viewmodel.report
 
 import android.arch.lifecycle.MutableLiveData
 import android.util.Log
-import com.aceplus.domain.entity.CompanyInformation
-import com.aceplus.domain.entity.credit.Credit
 import com.aceplus.domain.entity.customer.Customer
 import com.aceplus.domain.entity.invoice.Invoice
-import com.aceplus.domain.entity.preorder.PreOrder
 import com.aceplus.domain.entity.product.Product
 import com.aceplus.domain.entity.product.ProductCategory
 import com.aceplus.domain.entity.product.ProductGroup
-import com.aceplus.domain.entity.route.Route
-import com.aceplus.domain.entity.route.RouteScheduleItemV2
-import com.aceplus.domain.entity.sale.SaleMan
-import com.aceplus.domain.entity.sale.saleexchange.SaleExchange
-import com.aceplus.domain.entity.sale.salereturn.SaleReturn
 import com.aceplus.domain.entity.sale.saletarget.SaleTargetCustomer
 import com.aceplus.domain.entity.sale.saletarget.SaleTargetSaleMan
-import com.aceplus.domain.entity.sale.salevisit.SaleVisitRecordUpload
 import com.aceplus.domain.repo.report.ReportRepo
 import com.aceplus.domain.vo.report.*
 import com.aceplus.shared.viewmodel.BaseViewModel
@@ -120,7 +111,7 @@ class ReportViewModel(
     var saleInvoiceReportSuccessState =
         MutableLiveData<Pair<List<SaleInvoiceReport>, List<Customer>>>()
     var saleInvoiceDetailReportSuccessState = MutableLiveData<List<SaleInvoiceDetailReport>>()
-
+    var saleHistoryForPrintData = MutableLiveData<Invoice>()
     fun loadSaleInvoiceList() {
         launch {
             reportRepo.saleInvoiceReport()
@@ -133,8 +124,6 @@ class ReportViewModel(
     }
 
     // sale history report
-    var saleInvoiceReportForDateList = MutableLiveData<List<SaleInvoiceReport>>()
-
     fun loadHistoryInvoiceList() {
         launch {
             reportRepo.saleHistoryReport()
@@ -145,7 +134,7 @@ class ReportViewModel(
                 }
         }
     }
-
+    var saleInvoiceReportForDateList = MutableLiveData<List<SaleInvoiceReport>>()
     fun loadHistoryInvoiceForDateList(fromDate: String, toDate: String) {
         launch {
             reportRepo.saleHistoryReportForDate(fromDate, toDate)
@@ -194,6 +183,20 @@ class ReportViewModel(
                 .subscribe({
                     saleInvoiceDetailReportSuccessState.postValue(it)
                     Log.d("Invoice List", "${it.size}")
+                }, {
+                    reportErrorState.value = it.localizedMessage
+                })
+        }
+
+    }
+
+    fun loadSaleInvoiceDetailPrint(invoiceId: String) {
+        launch {
+            reportRepo.saleInvoiceDetlailPrint(invoiceId)
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.mainThread())
+                .subscribe({
+                    saleHistoryForPrintData.postValue(it)
                 }, {
                     reportErrorState.value = it.localizedMessage
                 })
@@ -589,123 +592,134 @@ class ReportViewModel(
     }
 
     //end of day report
-    var saleManDataList = MutableLiveData<List<SaleMan>>()
+    var endOfDayReportData = MutableLiveData<EndOfDayReport>()
 
-    fun loadSaleManList() {
+    fun loadEndOFDayReport() {
+        var userName = ""
+        var routeName = ""
+        var startTime = ""
+        var endTime = ""
+        var totalSaleAmount = 0.0
+        var totalSaleOrderAmount = 0.0
+        var totalSaleExchangeAmount = 0.0
+        var totalSaleCashAmount = 0.0
+        var totalSaleNetCashAmount = 0.0
+        var totalSaleReturnAmount = 0.0
+        var totalSales = ""
+        var totalSalesOrder = ""
+        var totalExchange = ""
+        var totalReturn  = ""
+        var totalCashReceive = ""
+        var netCash =""
+        var totalCustomer = ""
+        var newCustomer = ""
+        var planCustomer = ""
+        var totalSalesCount = ""
+        var totalOrderCount = ""
+        var totalSalesExchangeOnly = ""
+        var totalSalesReturnOnly = ""
+        var totalCashReceiptCount = ""
+        var notVisitedCount = ""
         launch {
             reportRepo.getSaleManNameList()
-                .subscribeOn(schedulerProvider.io())
-                .observeOn(schedulerProvider.mainThread())
-                .subscribe {
-                    saleManDataList.postValue(it)
-                }
-        }
-    }
+                .flatMap {
+                    for (i in it) {
+                        userName = i.user_name!!
+                    }
 
-    var saleManRouteNameDataList = MutableLiveData<List<Route>>()
-    fun loadSaleManRouteNameDataList() {
-        launch {
-            reportRepo.getSaleManRouteNameList()
-                .subscribeOn(schedulerProvider.io())
-                .observeOn(schedulerProvider.mainThread())
-                .subscribe {
-                    saleManRouteNameDataList.postValue(it)
+                    return@flatMap reportRepo.getSaleManRouteNameList()
                 }
-        }
-    }
-
-    var startTimeAndEndTimeList = MutableLiveData<List<CompanyInformation>>()
-    fun loadStartTimeAndEndTimeList() {
-        launch {
-            reportRepo.getStartTimeAndEndTimeList()
-                .subscribeOn(schedulerProvider.io())
-                .observeOn(schedulerProvider.mainThread())
-                .subscribe {
-                    startTimeAndEndTimeList.postValue(it)
+                .flatMap {
+                    for (i in it) {
+                        routeName = i.route_name!!
+                    }
+                    return@flatMap reportRepo.getStartTimeAndEndTimeList()
                 }
-        }
-    }
-
-    var totalSaleOrderList = MutableLiveData<List<PreOrder>>()
-    fun loadTotalSaleOrderList() {
-        launch {
-            reportRepo.getTotalSaleOrderList()
-                .subscribeOn(schedulerProvider.io())
-                .observeOn(schedulerProvider.mainThread())
-                .subscribe {
-                    totalSaleOrderList.postValue(it)
+                .flatMap {
+                    for (i in it) {
+                        startTime = i.start_time!!
+                        endTime = i.end_time!!
+                    }
+                    return@flatMap reportRepo.getAllInvoiceData()
                 }
-        }
-    }
-
-    var totalSaleExchangeList = MutableLiveData<List<SaleExchange>>()
-    fun loadTotalSaleExchangeList() {
-        launch {
-            reportRepo.getTotalSaleExchangeList()
-                .subscribeOn(schedulerProvider.io())
-                .observeOn(schedulerProvider.mainThread())
-                .subscribe {
-                    totalSaleExchangeList.postValue(it)
+                .flatMap {
+                    for (i in it) {
+                        totalSaleAmount += i.total_amount!!.toDouble()
+                        totalSales = totalSaleAmount.toString()
+                        totalSaleExchangeAmount += i.pay_amount!!.toDouble()
+                        totalExchange = totalSaleExchangeAmount.toString()
+                        totalSalesCount = it.size.toString()
+                    }
+                    return@flatMap reportRepo.getAllCustomerData()
                 }
-        }
-    }
-
-    var totalSaleReturnList = MutableLiveData<List<SaleReturn>>()
-    fun loadTotalSaleReturnList() {
-        launch {
-            reportRepo.getTotalSaleReturnList()
-                .subscribeOn(schedulerProvider.io())
-                .observeOn(schedulerProvider.mainThread())
-                .subscribe {
-                    totalSaleReturnList.postValue(it)
+                .flatMap {
+                    totalCustomer = it.size.toString()
+                    return@flatMap reportRepo.getDataForNewCustomerList()
                 }
-        }
-    }
-
-    var totalCashReceiptList = MutableLiveData<List<Credit>>()
-    fun loadTotalCashReceiptList() {
-        launch {
-            reportRepo.getTotalCashReceiptList()
-                .subscribeOn(schedulerProvider.io())
-                .observeOn(schedulerProvider.mainThread())
-                .subscribe {
-                    totalCashReceiptList.postValue(it)
+                .flatMap {
+                    newCustomer = it.size.toString()
+                    return@flatMap reportRepo.getTotalSaleOrderList()
                 }
-        }
-    }
-
-    var planCustomerList = MutableLiveData<List<RouteScheduleItemV2>>()
-    fun loadPlanCustomerList() {
-        launch {
-            reportRepo.getPlanCustomerList()
-                .subscribeOn(schedulerProvider.io())
-                .observeOn(schedulerProvider.mainThread())
-                .subscribe {
-                    planCustomerList.postValue(it)
+                .flatMap {
+                    for (i in it) {
+                        totalSaleOrderAmount += i.net_amount!!.toDouble()
+                        totalSalesOrder = totalSaleOrderAmount.toString()
+                        totalOrderCount = it.size.toString()
+                    }
+                    return@flatMap reportRepo.getTotalSaleExchangeList()
                 }
-        }
-    }
-
-    var dataForNewCustomerList = MutableLiveData<List<Customer>>()
-    fun loadDataForNewCustomerList() {
-        launch {
-            reportRepo.getDataForNewCustomerList()
-                .subscribeOn(schedulerProvider.io())
-                .observeOn(schedulerProvider.mainThread())
-                .subscribe {
-                    dataForNewCustomerList.postValue(it)
+                .flatMap {
+                    totalSalesExchangeOnly = it.size.toString()
+                    return@flatMap reportRepo.getTotalSaleReturnList()
                 }
-        }
-    }
-
-    var dataNotVisitedCountList = MutableLiveData<List<SaleVisitRecordUpload>>()
-    fun loadDataNotVisitedCountList() {
-        launch {
-            reportRepo.getDataNotVisitedCountList()
+                .flatMap {
+                    for (i in it) {
+                        totalSaleReturnAmount += i.pay_amount
+                        totalReturn = totalSaleReturnAmount.toString()
+                        totalSalesReturnOnly = it.size.toString()
+                    }
+                    return@flatMap reportRepo.getTotalCashReceiptList()
+                }
+                .flatMap {
+                    for (i in it) {
+                        totalSaleCashAmount += i.pay_amount
+                        totalCashReceive = totalSaleCashAmount.toString()
+                        totalSaleNetCashAmount += i.pay_amount
+                        netCash = totalSaleNetCashAmount.toString()
+                        totalCashReceiptCount = it.size.toString()
+                    }
+                    return@flatMap reportRepo.getPlanCustomerList()
+                }
+                .flatMap {
+                    planCustomer = it.size.toString()
+                    return@flatMap reportRepo.getDataNotVisitedCountList()
+                }
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.mainThread())
                 .subscribe {
-                    dataNotVisitedCountList.postValue(it)
+                    notVisitedCount = it.size.toString()
+                    val allData = EndOfDayReport(
+                        userName,
+                        routeName,
+                        startTime,
+                        endTime,
+                        totalSales,
+                        totalSalesOrder,
+                        totalExchange,
+                        totalReturn,
+                        totalCashReceive,
+                        netCash,
+                        totalCustomer,
+                        newCustomer,
+                        planCustomer,
+                        totalSalesCount,
+                        totalOrderCount,
+                        totalSalesExchangeOnly,
+                        totalSalesReturnOnly,
+                        totalCashReceiptCount,
+                        notVisitedCount
+                    )
+                    endOfDayReportData.postValue(allData)
                 }
         }
     }

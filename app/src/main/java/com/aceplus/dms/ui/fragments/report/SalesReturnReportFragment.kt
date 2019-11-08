@@ -9,9 +9,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import com.aceplus.dms.R
+import com.aceplus.dms.ui.activities.PrintInvoiceActivity
 import com.aceplus.dms.ui.adapters.report.SalesReturnDetailReportAdapter
 import com.aceplus.dms.ui.adapters.report.SalesReturnReportAdapter
 import com.aceplus.dms.viewmodel.report.ReportViewModel
+import com.aceplus.domain.entity.invoice.Invoice
+import com.aceplus.domain.vo.report.SaleInvoiceDetailReport
 import com.aceplus.domain.vo.report.SalesReturnDetailReport
 import com.aceplus.domain.vo.report.SalesReturnReport
 import com.aceplus.shared.ui.activities.BaseFragment
@@ -25,6 +28,8 @@ import java.util.*
 
 class SalesReturnReportFragment : BaseFragment(), KodeinAware {
     override val kodein: Kodein by kodein()
+    private var invoice: Invoice? = null
+    var saleReturnDetailList: List<SalesReturnDetailReport> = listOf()
     private val salesReturnReportAdapter: SalesReturnReportAdapter by lazy {
         SalesReturnReportAdapter(
             this::onClickItem
@@ -60,6 +65,10 @@ class SalesReturnReportFragment : BaseFragment(), KodeinAware {
         //sale return detail report list
         salesReturnReportViewModel.salesReturnDetailReportSuccessState.observe(this, Observer {
             salesReturnDetailReportAdapter.setNewList(it as ArrayList<SalesReturnDetailReport>)
+            saleReturnDetailList = it
+        })
+        salesReturnReportViewModel.saleHistoryForPrintData.observe(this, Observer {
+            invoice = it
         })
     }
 
@@ -82,7 +91,13 @@ class SalesReturnReportFragment : BaseFragment(), KodeinAware {
 
         //Action of dialog button
         dialogBoxView.btn_print.setOnClickListener {
-            Toast.makeText(activity, "Continue to print", Toast.LENGTH_SHORT).show()
+            val intent = PrintInvoiceActivity.newIntentFromSaleHistoryActivity(
+                context!!,
+                invoice,
+                saleReturnDetailList as List<SaleInvoiceDetailReport>
+            )
+            startActivity(intent)
+            Toast.makeText(activity, "Continue to add", Toast.LENGTH_SHORT).show()
             dialog.dismiss()
         }
         dialogBoxView.btn_ok.setOnClickListener {

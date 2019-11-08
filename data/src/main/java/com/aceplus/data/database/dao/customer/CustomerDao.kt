@@ -28,6 +28,9 @@ interface CustomerDao {
     @Query("select * from customer where id = :customerId")
     fun dataById(customerId: Int): Customer
 
+    @Query("select * from customer where id = :customerId")
+    fun deliveryCustomerDataList(customerId: Int): Customer
+
     @get:Query("select id as data from customer")
     val allID: List<StringObject>
 
