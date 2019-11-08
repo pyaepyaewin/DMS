@@ -293,7 +293,7 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
         } else if (printMode == "S"){
 
             Utils.saveInvoiceImageIntoGallery(invoice!!.invoice_id, this, myBitmap, "Sale") // Doesn't work
-            val editProductList = arrangeProductList()
+            val editProductList = printInvoiceViewModel.arrangeProductList(soldProductList, promotionList)
             val customerData: Customer = relatedDataForPrint!!.customer
             //invoice!!.printMode = "sale" // Doesn't exist in invoice, in all condition ?? add or param pass?
             PrintUtils.printWithHSPOS(
@@ -317,7 +317,7 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
         } else if (printMode == "RP"){
 
             Utils.saveInvoiceImageIntoGallery(invoice!!.invoice_id, this, myBitmap, "Sale") // Doesn't work
-            val editProductList = arrangeProductList()
+            val editProductList = printInvoiceViewModel.arrangeProductList(soldProductList, promotionList)
             val customerData: Customer = relatedDataForPrint!!.customer
             PrintUtils.printWithHSPOS(
                 this,
@@ -340,7 +340,7 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
         } else if (printMode == "D"){
 
             Utils.saveInvoiceImageIntoGallery(invoice!!.invoice_id, this, myBitmap, "Deliver") // Doesn't work
-            val editProductList = arrangeProductList()
+            val editProductList = printInvoiceViewModel.arrangeProductList(soldProductList, promotionList)
             val customerData: Customer = relatedDataForPrint!!.customer
             PrintUtils.printDeliverWithHSPOS(
                 this,
@@ -365,7 +365,7 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
         } else if (printMode == "SR"){
 
             Utils.saveInvoiceImageIntoGallery(invoice!!.invoice_id, this, myBitmap, "Sale") // Doesn't work
-            val editProductList = arrangeProductList()
+            val editProductList = printInvoiceViewModel.arrangeProductList(soldProductList, promotionList)
             val customerData: Customer = relatedDataForPrint!!.customer
             PrintUtils.printWithHSPOS(
                 this,
@@ -448,7 +448,7 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
         true
     }
 
-    private fun arrangeProductList(): ArrayList<SoldProductInfo>{
+    /*private fun arrangeProductList(): ArrayList<SoldProductInfo>{
 
         val positionList: ArrayList<Int> = ArrayList()
         val newSoldProductList: ArrayList<SoldProductInfo> = ArrayList()
@@ -529,7 +529,7 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
 
         return newSoldProductList
 
-    }
+    }*/
 
     override fun onBackPressed() {
         setResult(Activity.RESULT_OK)
