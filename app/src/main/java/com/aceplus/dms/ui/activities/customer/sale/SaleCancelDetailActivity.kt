@@ -18,6 +18,7 @@ import com.aceplus.dms.viewmodel.factory.KodeinViewModelFactory
 import com.aceplus.dms.viewmodel.salecancelviewmodel.SaleCancelDetailViewModel
 import com.aceplus.domain.entity.product.Product
 import com.aceplus.domain.model.sale.salecancel.SoldProductDataClass
+import com.aceplus.domain.vo.SoldProductInfo
 import kotlinx.android.synthetic.main.activity_sale.*
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
@@ -25,10 +26,9 @@ import org.kodein.di.android.kodein
 
 class SaleCancelDetailActivity : AppCompatActivity(), KodeinAware {
     override val kodein: Kodein by kodein()
-    var productIdList = listOf<Int>()
     var soldProductList1 = mutableListOf<String>()
+    var soldProductDataList = mutableListOf<Product>()
     private val duplicateProductList = mutableListOf<SoldProductDataClass>()
-
 
     companion object {
         fun getIntent(context: Context, invoiceID: String): Intent {
@@ -46,6 +46,7 @@ class SaleCancelDetailActivity : AppCompatActivity(), KodeinAware {
     private val saleCancelDetailAdapter: SaleCancelDetailAdapter by lazy {
         SaleCancelDetailAdapter()
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sale)
@@ -54,7 +55,7 @@ class SaleCancelDetailActivity : AppCompatActivity(), KodeinAware {
             this,
             android.arch.lifecycle.Observer {
 
-               soldProductList1= it as MutableList<String>
+                soldProductList1 = it as MutableList<String>
 
                 saleCancelDetailViewModel.loadSoldProductList(soldProductList1)
 
@@ -72,12 +73,19 @@ class SaleCancelDetailActivity : AppCompatActivity(), KodeinAware {
         saleCancelDetailViewModel.soldProductListSuccessState.observe(
             this,
             android.arch.lifecycle.Observer {
-                saleCancelDetailAdapter.setNewList(it as ArrayList<Product>)
+                soldProductDataList = it as MutableList<Product>
+                var soldProductInfoList= ArrayList<SoldProductInfo>()
+                soldProductDataList.map {
+                    val soldProductInfo = SoldProductInfo()
+                    soldProductInfo.product = it
+                    soldProductInfoList.add(soldProductInfo)
+                }
 
-
-
+                saleCancelDetailAdapter.setNewList(soldProductInfoList)
 
             })
+
+
 
         saleCancelDetailViewModel.soldProductListErrorState.observe(
             this,
@@ -92,17 +100,17 @@ class SaleCancelDetailActivity : AppCompatActivity(), KodeinAware {
         }
 
 
-
     }
+}
 
-    private fun onClickNoticeListItem(data: Product) {
-    }
-    private fun onLongClickSoldProductListItem(soldProduct: SoldProductDataClass, position: Int) {
+//    private fun onClickNoticeListItem(data: Product) {
+//    }
+    //private fun onLongClickSoldProductListItem(soldProduct: SoldProductDataClass, position: Int) {
 
-        AlertDialog.Builder(this@SaleCancelDetailActivity)
-            .setTitle("Delete sold product")
-            .setMessage("Are you sure you want to delete ${soldProduct.product_name}?")
-            .setPositiveButton("Yes") { arg0, arg1 ->
+//        AlertDialog.Builder(this@SaleCancelDetailActivity)
+//            .setTitle("Delete sold product")
+//            .setMessage("Are you sure you want to delete ${soldProduct.product_name}?")
+//            .setPositiveButton("Yes") { arg0, arg1 ->
 
 //                for (i in duplicateProductList.indices) {
 //                    if (duplicateProductList[i].product_id == soldProduct.product_id) {
@@ -169,89 +177,89 @@ class SaleCancelDetailActivity : AppCompatActivity(), KodeinAware {
 //            }
 //                    .setNegativeButton("No", null)
 //                    .show()
-            }
-    }
-    private fun onClickQtyButton(soldProduct: SoldProductDataClass, position: Int){
-
-        val layoutInflater = this@SaleCancelDetailActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        val view = layoutInflater.inflate(R.layout.dialog_box_sale_quantity, null)
-
-        val remainingQtyTextView = view.findViewById(R.id.availableQuantity) as TextView
-        val quantityEditText = view.findViewById(R.id.quantity) as EditText
-        val messageTextView = view.findViewById(R.id.message) as TextView
-
-        val alertDialog = AlertDialog.Builder(this@SaleCancelDetailActivity)
-            .setView(view)
-            .setTitle("Sale Quantity")
-            .setPositiveButton("Confirm") { arg0, arg1 ->
-
-//                if (quantityEditText.text.toString().isEmpty()) {
-//                    messageTextView.text = "You must specify quantity."
-//                } else{
+//            }
+//    }
+//    private fun onClickQtyButton(soldProduct: SoldProductDataClass, position: Int){
 //
-//                    val quantity = quantityEditText.text.toString().toInt()
+//        val layoutInflater = this@SaleCancelDetailActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+//        val view = layoutInflater.inflate(R.layout.dialog_box_sale_quantity, null)
 //
-//                    if (soldProduct.quantity != 0 && soldProduct.quantity < quantity){
-//                        /*updatedQtyForGift = true
-//                        updatedQtyForPercent = true*/
-//                        soldProduct.currentProductQty = soldProduct.quantity
-//                    }
+//        val remainingQtyTextView = view.findViewById(R.id.availableQuantity) as TextView
+//        val quantityEditText = view.findViewById(R.id.quantity) as EditText
+//        val messageTextView = view.findViewById(R.id.message) as TextView
 //
-//                    soldProduct.quantity = quantity
-//                    soldProduct.product.selling_price
+//        val alertDialog = AlertDialog.Builder(this@SaleCancelDetailActivity)
+//            .setView(view)
+//            .setTitle("Sale Quantity")
+//            .setPositiveButton("Confirm") { arg0, arg1 ->
 //
-//                    //saleViewModel.calculateSoldProductData(true, soldProduct, mSoldProductListAdapter.getDataList() as ArrayList, this.promotionList, position)
+////                if (quantityEditText.text.toString().isEmpty()) {
+////                    messageTextView.text = "You must specify quantity."
+////                } else{
+////
+////                    val quantity = quantityEditText.text.toString().toInt()
+////
+////                    if (soldProduct.quantity != 0 && soldProduct.quantity < quantity){
+////                        /*updatedQtyForGift = true
+////                        updatedQtyForPercent = true*/
+////                        soldProduct.currentProductQty = soldProduct.quantity
+////                    }
+////
+////                    soldProduct.quantity = quantity
+////                    soldProduct.product.selling_price
+////
+////                    //saleViewModel.calculateSoldProductData(true, soldProduct, mSoldProductListAdapter.getDataList() as ArrayList, this.promotionList, position)
+////
+////                    val newList = mSoldProductListAdapter.getDataList() as ArrayList
+////                    newList[position] = soldProduct
+////                    saleViewModel.calculateSoldProductData(newList, this.promotionList)
+////
+////                }
 //
-//                    val newList = mSoldProductListAdapter.getDataList() as ArrayList
-//                    newList[position] = soldProduct
-//                    saleViewModel.calculateSoldProductData(newList, this.promotionList)
+//            }
+//            .setNegativeButton("Cancel", null)
+//            .create()
 //
-//                }
-
-            }
-            .setNegativeButton("Cancel", null)
-            .create()
-
-//        alertDialog.setOnShowListener {
-//            if (isPreOrder) availableQuantityLayout.visibility = View.GONE
-//            else remainingQtyTextView.text = soldProduct.product.remaining_quantity.toString()
-//        }
-
-        alertDialog.show()
-
-    }
-
-    private fun onClickFocButton(soldProduct: SoldProductDataClass, position: Int){
-
-        val layoutInflater = this@SaleCancelDetailActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        val view = layoutInflater.inflate(R.layout.dialog_box_sale_foc, null)
-
-        val radioFocPercent: RadioButton = view.findViewById(R.id.radioPrecent)
-        val radioFocAmount: RadioButton = view.findViewById(R.id.radioAmount)
-        val focVolume: EditText = view.findViewById(R.id.focPercent)
-
-        val alertDialog = AlertDialog.Builder(this@SaleCancelDetailActivity)
-            .setView(view)
-            .setTitle("FOC percent or Amount")
-            .setPositiveButton("Confirm") { arg0, arg1 ->
-
-//                if (radioFocPercent.isChecked){
-//                    soldProduct.focPercent = focVolume.text.toString().toDouble()
-//                    soldProduct.setFocType(true)
-//                } else{
-//                    soldProduct.focAmount = focVolume.text.toString().toDouble()
-//                    soldProduct.setFocType(false)
-//                }
+////        alertDialog.setOnShowListener {
+////            if (isPreOrder) availableQuantityLayout.visibility = View.GONE
+////            else remainingQtyTextView.text = soldProduct.product.remaining_quantity.toString()
+////        }
 //
-//                val newList = mSoldProductListAdapter.getDataList() as ArrayList
-//                newList[position] = soldProduct
-//                saleViewModel.calculateSoldProductData(newList, this.promotionList)
-
-                //saleViewModel.calculateSoldProductData(false, soldProduct, mSoldProductListAdapter.getDataList() as ArrayList, this.promotionList, position)
-
-            }
-            .setNegativeButton("Cancel", null)
-            .create()
+//        alertDialog.show()
+//
+//    }
+//
+//    private fun onClickFocButton(soldProduct: SoldProductDataClass, position: Int){
+//
+//        val layoutInflater = this@SaleCancelDetailActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+//        val view = layoutInflater.inflate(R.layout.dialog_box_sale_foc, null)
+//
+//        val radioFocPercent: RadioButton = view.findViewById(R.id.radioPrecent)
+//        val radioFocAmount: RadioButton = view.findViewById(R.id.radioAmount)
+//        val focVolume: EditText = view.findViewById(R.id.focPercent)
+//
+//        val alertDialog = AlertDialog.Builder(this@SaleCancelDetailActivity)
+//            .setView(view)
+//            .setTitle("FOC percent or Amount")
+//            .setPositiveButton("Confirm") { arg0, arg1 ->
+//
+////                if (radioFocPercent.isChecked){
+////                    soldProduct.focPercent = focVolume.text.toString().toDouble()
+////                    soldProduct.setFocType(true)
+////                } else{
+////                    soldProduct.focAmount = focVolume.text.toString().toDouble()
+////                    soldProduct.setFocType(false)
+////                }
+////
+////                val newList = mSoldProductListAdapter.getDataList() as ArrayList
+////                newList[position] = soldProduct
+////                saleViewModel.calculateSoldProductData(newList, this.promotionList)
+//
+//                //saleViewModel.calculateSoldProductData(false, soldProduct, mSoldProductListAdapter.getDataList() as ArrayList, this.promotionList, position)
+//
+//            }
+//            .setNegativeButton("Cancel", null)
+//            .create()
 
 //        alertDialog.setOnShowListener {
 //
@@ -269,7 +277,7 @@ class SaleCancelDetailActivity : AppCompatActivity(), KodeinAware {
 //
 //        alertDialog.show()
 
-    }
-
-
-}
+//    }
+//
+//
+//}

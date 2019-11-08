@@ -6,11 +6,10 @@ import com.aceplus.dms.R
 import com.aceplus.dms.ui.viewholders.sale.SaleCancelDetailViewHolder
 import com.aceplus.domain.entity.product.Product
 import com.aceplus.domain.model.sale.salecancel.SoldProductDataClass
+import com.aceplus.domain.vo.SoldProductInfo
 import com.aceplus.shared.ui.adapter.BaseRecyclerViewAdapter
 
-class SaleCancelDetailAdapter(
-)
- : BaseRecyclerViewAdapter<SaleCancelDetailViewHolder, Product>() {
+class SaleCancelDetailAdapter : BaseRecyclerViewAdapter<SaleCancelDetailViewHolder, SoldProductInfo>() {
     override fun onCreateViewHolder(p0: ViewGroup, p1: Int): SaleCancelDetailViewHolder {
         val view = LayoutInflater.from(p0.context)
             .inflate(R.layout.list_row_sold_product_checkout, p0, false)
