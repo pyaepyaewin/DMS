@@ -1,12 +1,14 @@
 package com.aceplus.dms.ui.activities.customer.saleorder
 
+import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.support.v7.widget.LinearLayoutManager
 import android.view.View
-import android.widget.Toast
 import com.aceplus.dms.R
+import com.aceplus.dms.ui.adapters.saleorder.OrderCheckoutListAdapter
 import com.aceplus.dms.utils.Utils
 import com.aceplus.dms.viewmodel.customer.sale.SaleCheckoutViewModel
 import com.aceplus.domain.entity.customer.Customer
@@ -26,12 +28,15 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlinx.android.synthetic.main.activity_sale_checkout.activity_sale_checkout_radio_bank as activity_sale_checkout_radio_bank1
+import kotlinx.android.synthetic.main.activity_sale_checkout.activity_sale_checkout_radio_group as activity_sale_checkout_radio_group1
 import kotlinx.android.synthetic.main.activity_sale_checkout.bank_account_layout as bank_account_layout1
 import kotlinx.android.synthetic.main.activity_sale_checkout.btn_amtOk as btn_amtOk1
 import kotlinx.android.synthetic.main.activity_sale_checkout.btn_disOk as btn_disOk1
 import kotlinx.android.synthetic.main.activity_sale_checkout.checkout_delivery_date_chooser_text as checkout_delivery_date_chooser_text1
 import kotlinx.android.synthetic.main.activity_sale_checkout.checkout_delivery_date_layout as checkout_delivery_date_layout1
 import kotlinx.android.synthetic.main.activity_sale_checkout.checkout_remark_layout as checkout_remark_layout1
+import kotlinx.android.synthetic.main.activity_sale_checkout.edit_txt_account_name as edit_txt_account_name1
+import kotlinx.android.synthetic.main.activity_sale_checkout.edit_txt_branch_name as edit_txt_branch_name1
 import kotlinx.android.synthetic.main.activity_sale_checkout.edtVolumeDiscountPercent as edtVolumeDiscountPercent1
 import kotlinx.android.synthetic.main.activity_sale_checkout.netAmountLayout as netAmountLayout1
 import kotlinx.android.synthetic.main.activity_sale_checkout.payAmountLayout as payAmountLayout1
@@ -39,6 +44,8 @@ import kotlinx.android.synthetic.main.activity_sale_checkout.tableHeaderDiscount
 import kotlinx.android.synthetic.main.activity_sale_checkout.tableHeaderQty as tableHeaderQty1
 import kotlinx.android.synthetic.main.activity_sale_checkout.tax_layout as tax_layout1
 import kotlinx.android.synthetic.main.activity_sale_checkout.edt_dueDate as edt_dueDate1
+import kotlinx.android.synthetic.main.activity_sale_checkout.payAmount as payAmount1
+import kotlinx.android.synthetic.main.activity_sale_checkout.receiptPerson as receiptPerson1
 import kotlinx.android.synthetic.main.activity_sale_checkout.tax_label_saleCheckout as tax_label_saleCheckout1
 import kotlinx.android.synthetic.main.activity_sale_checkout.tvNetAmount as tvNetAmount1
 import kotlinx.android.synthetic.main.activity_sale_checkout.tvTotalAmount as tvTotalAmount1
@@ -49,6 +56,7 @@ import kotlinx.android.synthetic.main.activity_sale_order_checkout.duedateLayout
 import kotlinx.android.synthetic.main.activity_sale_order_checkout.edtVolumeDiscountAmt as edtVolumeDiscountAmt1
 import kotlinx.android.synthetic.main.activity_sale_order_checkout.layout_receipt_person as layout_receipt_person1
 import kotlinx.android.synthetic.main.activity_sale_order_checkout.refundLayout as refundLayout1
+import kotlinx.android.synthetic.main.activity_sale_order_checkout.rvSoldProductList as rvSoldProductList1
 import kotlinx.android.synthetic.main.activity_sale_order_checkout.tableHeaderUM as tableHeaderUM1
 import kotlinx.android.synthetic.main.activity_sale_order_checkout.volDisForPreOrderLayout as volDisForPreOrderLayout1
 
@@ -80,6 +88,7 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
     }
 
     private val saleCheckoutViewModel: SaleCheckoutViewModel by viewModel()
+    private val orderCheckoutListAdapter: OrderCheckoutListAdapter by lazy { OrderCheckoutListAdapter() }
 
     private val df = DecimalFormat(".##")
     private var customer: Customer? = null
@@ -96,6 +105,7 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
     private var taxType: String = ""
     private var taxPercent: Int = 0
     private var taxAmt: Double = 0.0
+    private var salePersonId: String = ""
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -105,6 +115,8 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
         initializeData()
         setupUI()
         catchEvents()
+
+        orderCheckoutListAdapter.setNewList(soldProductList)
 
     }
 
@@ -125,14 +137,17 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
         checkout_delivery_date_layout.visibility = View.VISIBLE
         duedateLayout.visibility = View.GONE
 
+        rvSoldProductList.adapter = orderCheckoutListAdapter
+        rvSoldProductList.layoutManager = LinearLayoutManager(this)
+
     }
 
     private fun initializeData(){
 
         calculateTotalAmount()
         saleCheckoutViewModel.calculateFinalAmount(soldProductList, totalAmount) // Check - should do only for pre-order
-//        salePersonId = saleCheckoutViewModel.getSaleManID()
-//        locationCode = saleCheckoutViewModel.getRouteID() // Check point
+        salePersonId = saleCheckoutViewModel.getSaleManID()
+        //locationCode = saleCheckoutViewModel.getRouteID() // Check point
 
     }
 
@@ -164,7 +179,6 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
                     displayFinalAmount(totalItemDisAmt)
                 else
                     displayFinalDataForDelivery() // ToDo - need to update for delivery
-
             }
         })
 
@@ -183,7 +197,38 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
 
         if (type == "save"){
 
-            Toast.makeText(this, "Save", Toast.LENGTH_SHORT).show()
+            var paymentMethod = when(activity_sale_checkout_radio_group.checkedRadioButtonId){
+                R.id.activity_sale_checkout_radio_bank -> "B"
+                R.id.activity_sale_checkout_radio_cash -> "CA"
+                else -> ""
+            }
+
+            val paidAmount = payAmount.text.toString().toDouble()
+
+            if (validationInput(paymentMethod == "B", paidAmount)){
+
+                if (!isDelivery){
+
+                    if (paidAmount < netAmount){
+                        // ToDo - check insufficient amount
+                        //savePreOrderInformation("CR")
+                    } else{
+                        //savePreOrderInformation("CA")
+                    }
+
+                    if (Utils.isInternetAccess(this)){
+                        //uploadPreOrderToServer()
+                    } else{
+                        //sendSMSMessage()
+                    }
+
+                } else{
+
+                    // ToDo for delivery
+
+                }
+
+            }
 
         }
 
@@ -306,6 +351,65 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
         this.taxAmt = taxAmt
 
         return taxAmt
+
+    }
+
+    private fun validationInput(withBankInfo: Boolean, paidAmount: Double): Boolean{
+
+        var deliDate = false
+        var bank = false
+        var acc = false
+
+        if (paidAmount > netAmount){
+
+            AlertDialog.Builder(this)
+                .setTitle("Delivery")
+                .setMessage("Your pay amount must be less than Net Amount.")
+                .setPositiveButton("OK") { dialog, which ->
+                    payAmount.setText("0")
+                    payAmount.requestFocus()
+                }
+                .show()
+
+            return false
+        }
+
+        if (!isDelivery){
+
+            if (checkout_delivery_date_chooser_text.text.isBlank())
+                checkout_delivery_date_chooser_text.error = "Please enter DELIVERY DATE"
+            else
+                deliDate = true
+
+            return if (withBankInfo){
+                if (edit_txt_branch_name.text.isNotBlank()) bank = true
+                else edit_txt_branch_name.error = "Please enter bank name"
+
+                if (edit_txt_account_name.text.isNotBlank()) acc = true
+                else edit_txt_account_name.error = "Please enter bank account"
+
+                deliDate && bank && acc
+            } else{
+                deliDate
+            }
+
+        } else{
+
+            if (receiptPerson.text.isBlank()){
+
+                AlertDialog.Builder(this)
+                    .setTitle("Delivery")
+                    .setMessage("You must provide 'Receipt Person'.")
+                    .setPositiveButton("OK") { dialog, which ->
+                        receiptPerson.requestFocus()
+                    }
+                    .show()
+
+                return false
+            }
+
+            return true
+        }
 
     }
 

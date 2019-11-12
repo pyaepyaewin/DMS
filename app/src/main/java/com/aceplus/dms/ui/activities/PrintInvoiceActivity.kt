@@ -224,26 +224,16 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
 
     private fun getIntentData() {
 
-        if (intent.getSerializableExtra("CREDIT") != null) creditList =
-            intent.getSerializableExtra("CREDIT") as ArrayList<CreditInvoice>
-        if (intent.getParcelableExtra<Invoice>(IE_INVOICE) != null) invoice =
-            intent.getParcelableExtra(IE_INVOICE)
-        if (intent.getParcelableArrayListExtra<SoldProductInfo>(IE_SOLD_PRODUCT_LIST) != null) soldProductList =
-            intent.getParcelableArrayListExtra(IE_SOLD_PRODUCT_LIST)
-        if (intent.getParcelableArrayListExtra<Promotion>(IE_PROMOTION_LIST) != null) promotionList =
-            intent.getParcelableArrayListExtra(IE_PROMOTION_LIST)
-        if (intent.getStringExtra(SALE_MAN_NAME) != null) salePersonName =
-            intent.getStringExtra(SALE_MAN_NAME)
-        if (intent.getStringExtra(CUSTOMER_NAME) != null) customerName =
-            intent.getStringExtra(CUSTOMER_NAME)
-        if (intent.getStringExtra(CUSTOMER_TOWNSHIP) != null) customerTownShip =
-            intent.getStringExtra(CUSTOMER_TOWNSHIP)
-        if (intent.getParcelableArrayListExtra<SoldProductInfo>(IE_SALE_RETURN_LIST) != null) saleReturnList =
-            intent.getParcelableArrayListExtra(IE_SALE_RETURN_LIST)
-        if (intent.getStringExtra(IE_PRINT_MODE) != null) printMode =
-            intent.getStringExtra(IE_PRINT_MODE)
-        if (intent.getParcelableArrayListExtra<SaleInvoiceDetailReport>(HISTORY_REPORT_SOLD_PRODUCT_LIST) != null)
-            historyReportSoldProductList = intent.getParcelableArrayListExtra(HISTORY_REPORT_SOLD_PRODUCT_LIST)
+        if (intent.getSerializableExtra("CREDIT") != null) creditList = intent.getSerializableExtra("CREDIT") as ArrayList<CreditInvoice>
+        if (intent.getParcelableExtra<Invoice>(IE_INVOICE) != null) invoice = intent.getParcelableExtra(IE_INVOICE)
+        if (intent.getParcelableArrayListExtra<SoldProductInfo>(IE_SOLD_PRODUCT_LIST) != null) soldProductList = intent.getParcelableArrayListExtra(IE_SOLD_PRODUCT_LIST)
+        if (intent.getParcelableArrayListExtra<Promotion>(IE_PROMOTION_LIST) != null) promotionList = intent.getParcelableArrayListExtra(IE_PROMOTION_LIST)
+        if (intent.getStringExtra(SALE_MAN_NAME) != null) salePersonName = intent.getStringExtra(SALE_MAN_NAME)
+        if (intent.getStringExtra(CUSTOMER_NAME) != null) customerName = intent.getStringExtra(CUSTOMER_NAME)
+        if (intent.getStringExtra(CUSTOMER_TOWNSHIP) != null) customerTownShip = intent.getStringExtra(CUSTOMER_TOWNSHIP)
+        if (intent.getParcelableArrayListExtra<SoldProductInfo>(IE_SALE_RETURN_LIST) != null) saleReturnList = intent.getParcelableArrayListExtra(IE_SALE_RETURN_LIST)
+        if (intent.getStringExtra(IE_PRINT_MODE) != null) printMode = intent.getStringExtra(IE_PRINT_MODE)
+        if (intent.getParcelableArrayListExtra<SaleInvoiceDetailReport>(HISTORY_REPORT_SOLD_PRODUCT_LIST) != null) historyReportSoldProductList = intent.getParcelableArrayListExtra(HISTORY_REPORT_SOLD_PRODUCT_LIST)
 
     }
 
