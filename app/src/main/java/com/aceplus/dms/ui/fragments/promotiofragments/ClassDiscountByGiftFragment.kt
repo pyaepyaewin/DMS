@@ -48,8 +48,8 @@ class ClassDiscountByGiftFragment:Fragment(),KodeinAware {
             startActivity(intent)
 
         }
-        category_discount_title.setText("CLASS DISCOUNT BY Gift")
-        product_name.setText("CLASS ID")
+        category_discount_title.text = "CLASS DISCOUNT BY Gift"
+        product_name.text = "CLASS ID"
         classDiscountByGiftViewModel.classDiscountByGiftSuccessState.observe(this, android.arch.lifecycle.Observer {
             classDiscountByGiftAdapter.setNewList(it as ArrayList<ClassDiscountByGiftDataClass>)
         })

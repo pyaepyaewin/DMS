@@ -3,6 +3,7 @@ package com.aceplus.dms.viewmodel.salecancelviewmodel
 import android.arch.lifecycle.MutableLiveData
 import com.aceplus.domain.entity.invoice.InvoiceProduct
 import com.aceplus.domain.entity.product.Product
+import com.aceplus.domain.model.sale.salecancel.SaleCancelDetailItem
 import com.aceplus.domain.model.sale.salecancel.SoldProductDataClass
 import com.aceplus.domain.repo.salecancelrepo.SaleCancelRepo
 import com.aceplus.shared.viewmodel.BaseViewModel
@@ -15,13 +16,13 @@ class SaleCancelDetailViewModel(
 ) : BaseViewModel() {
     var productIdListSuccessState = MutableLiveData<List<String>>()
     var productIdListErrorState = MutableLiveData<String>()
-    fun loadSoldProductIdList(invoiceID:String) {
+    fun loadSoldProductIdList(invoiceID: String) {
         launch {
             saleCancelRepo.getProductIdList(invoiceID)
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
-                    productIdListSuccessState.postValue(it)
+                    productIdListSuccessState.value = it
 
                 }, {
                     productIdListErrorState.value = it.localizedMessage
@@ -29,15 +30,15 @@ class SaleCancelDetailViewModel(
         }
     }
 
-    var soldProductListSuccessState = MutableLiveData<List<Product>>()
+    var soldProductListSuccessState = MutableLiveData<List<SaleCancelDetailItem>>()
     var soldProductListErrorState = MutableLiveData<String>()
-    fun loadSoldProductList(productIdList:List<String>) {
+    fun loadSoldProductList(productIdList: List<String>) {
         launch {
             saleCancelRepo.getSoldProductList(productIdList)
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
-                    soldProductListSuccessState.postValue(it)
+                    soldProductListSuccessState.value = it
 
                 }, {
                     soldProductListErrorState.value = it.localizedMessage
@@ -45,7 +46,17 @@ class SaleCancelDetailViewModel(
         }
     }
 
+    fun deleteInvoice(invoiceID: String) {
+        saleCancelRepo.deleteInvoiceData(invoiceID)
+    }
 
+    fun deleteInvoiceProduct(invoiceId: String) {
+        saleCancelRepo.deleteInvoiceProduct(invoiceId)
+    }
+    fun updateQty(qty:Int,productName: String)
+    {
+        saleCancelRepo.updateQuantity(qty,productName)
+    }
 
 }
 

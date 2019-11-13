@@ -40,6 +40,12 @@ interface InvoiceProductDao {
     @Query("select IP.product_id from invoice_product as IP,invoice as I WHERE IP.invoice_product_id=I.invoice_id and I.invoice_id = :invoiceID")
     fun getProductIdList(invoiceID:String):List<String>
 
+    @Query("Delete from invoice_product where invoice_product_id=:invoiceId")
+    fun deleteAll(invoiceId:String)
+
+    @Query("UPDATE invoice_product SET sale_quantity= :qty WHERE invoice_product_id=:invoiceNo")
+    fun update(qty:Int,invoiceNo:String)
+
 //    @Query("select P.product_name,P.um,IP.sale_quantity,IP.s_price,IP.promotion_price from invoice_product as IP LEFT JOIN product as P ON P.id=IP.product_id where IP.invoice_product_id=:invoiceId")
 //    fun getSaleCancelDetailList(invoiceId:String):List<SoldProductInfo>
 
