@@ -10,6 +10,8 @@ import com.aceplus.domain.entity.customer.CustomerFeedback
 import com.aceplus.domain.entity.customer.DidCustomerFeedback
 import com.aceplus.domain.entity.invoice.Invoice
 import com.aceplus.domain.entity.invoice.InvoiceProduct
+import com.aceplus.domain.entity.preorder.PreOrder
+import com.aceplus.domain.entity.preorder.PreOrderProduct
 import com.aceplus.domain.entity.product.Product
 import com.aceplus.domain.entity.promotion.PromotionDate
 import com.aceplus.domain.entity.promotion.PromotionGift
@@ -68,6 +70,10 @@ interface CustomerVisitRepo {
     fun insertNewInvoice(invoice: Invoice)
     fun getAllInvoice(): Observable<List<Invoice>>
 
+    fun getOrderInvoiceCountByID(invoiceId: String): Observable<Int>
+    fun insertPreOrder(preOrder: PreOrder)
+    fun getAllPreOrder(): Observable<List<PreOrder>>
+
     fun insertInvoiceProduct(invoiceProduct: InvoiceProduct)
     fun getAllInvoiceProduct(): Observable<List<InvoiceProduct>>
     fun insertAllInvoiceProduct(invoiceProductList: ArrayList<InvoiceProduct>)
@@ -81,5 +87,8 @@ interface CustomerVisitRepo {
     fun getDiscountPercentFromVolumeDiscountFilterItem(volDisFilterId: Int, buyAmt: Double): Observable<List<VolumeDiscountFilterItem>>
 
     fun getVolumeDiscountByDate(currentDate: String): Observable<List<VolumeDiscount>>
+
+    fun insertAllPreOrderProduct(preOrderProductList: ArrayList<PreOrderProduct>)
+    fun getAllPreOrderProduct(): Observable<List<PreOrderProduct>>
 
 }

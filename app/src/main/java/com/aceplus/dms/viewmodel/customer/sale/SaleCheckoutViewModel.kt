@@ -3,10 +3,11 @@ package com.aceplus.dms.viewmodel.customer.sale
 import android.annotation.SuppressLint
 import android.arch.lifecycle.MutableLiveData
 import android.util.Log
-import com.aceplus.data.utils.Constant
 import com.aceplus.dms.utils.Utils
 import com.aceplus.domain.entity.invoice.Invoice
 import com.aceplus.domain.entity.invoice.InvoiceProduct
+import com.aceplus.domain.entity.preorder.PreOrder
+import com.aceplus.domain.entity.preorder.PreOrderProduct
 import com.aceplus.domain.entity.promotion.Promotion
 import com.aceplus.domain.model.forApi.invoice.InvoiceDetail
 import com.aceplus.domain.repo.CustomerVisitRepo
@@ -279,7 +280,7 @@ class SaleCheckoutViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
                             if (!soldProduct.promotionPlanId.isNullOrEmpty())
                                 invoiceDetail.promotion_plan_id = soldProduct.promotionPlanId.toInt()
 
-                            invoiceDetailList.add(invoiceDetail)
+                            invoiceDetailList.add(invoiceDetail) // To Check // For what?
 
 
                             val invoiceProduct = InvoiceProduct()
@@ -291,7 +292,7 @@ class SaleCheckoutViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
                             invoiceProduct.discount_percent = soldProduct.discountPercent
                             invoiceProduct.s_price = soldProduct.product.selling_price!!.toDouble()
                             invoiceProduct.p_price = soldProduct.product.purchase_price!!.toDouble()
-                            invoiceProduct.promotion_price = soldProduct.promoPriceByDiscount
+                            invoiceProduct.promotion_price = soldProduct.promoPriceByDiscount // Check promo price or promo price by disc
                             invoiceProduct.item_discount_percent = soldProduct.focPercent
                             invoiceProduct.item_discount_amount = soldProduct.focAmount
                             invoiceProduct.exclude = "${soldProduct.exclude}"
@@ -380,6 +381,109 @@ class SaleCheckoutViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
 
     fun updateSaleVisitRecord(customerId: Int){
         customerVisitRepo.updateSaleVisitRecord(customerId, "1", "1")
+    }
+
+    fun saveOrderData(
+        invoiceId: String,
+        customerId: Int,
+        salePersonId: String,
+        deviceId: String,
+        preOrderDate: String,
+        deliveryDate: String,
+        advancedPaymentAmount: Double,
+        totalAmount: Double,
+        locationID: Int,
+        totalDiscountAmount: Double,
+        totalVolumeDiscountPercent: Double,
+        taxAmt: Double,
+        remark: String,
+        bank: String,
+        acc: String,
+        cashOrLoanOrBank: String,
+        soldProductList: ArrayList<SoldProductInfo>,
+        promotionList: ArrayList<Promotion>
+    ){
+
+        val invoice = Invoice()
+
+        launch {
+            customerVisitRepo.getOrderInvoiceCountByID(invoiceId)
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.mainThread())
+                .subscribe{
+
+                    if (it == 0){
+
+                        val preOrder = PreOrder()
+                        val preOrderProductList: ArrayList<PreOrderProduct> = ArrayList()
+
+                        for (soldProduct in soldProductList){
+
+                            val preOrderProduct = PreOrderProduct()
+                            preOrderProduct.sale_order_id = invoiceId
+                            preOrderProduct.product_id = soldProduct.product.product_id
+                            preOrderProduct.order_quantity = soldProduct.quantity.toString()
+                            preOrderProduct.price = soldProduct.product.selling_price
+                            preOrderProduct.total_amount = soldProduct.totalAmt
+                            preOrderProduct.promotion_price = soldProduct.promoPriceByDiscount.toString() // Check promo price or promo price by disc
+                            preOrderProduct.promotion_plan_id = soldProduct.promotionPlanId
+                            preOrderProduct.volume_discount = soldProduct.discountAmount.toString()
+                            preOrderProduct.volume_discount_percent = soldProduct.discountPercent.toString()
+                            //preOrderProduct.item_discount_percent = soldProduct.itemDiscountAmount.toString() // ToDo -  Check
+                            //preOrderProduct.item_discount_amount // ToDo -  Check
+                            preOrderProduct.exclude = "${soldProduct.exclude}"
+
+                            preOrderProductList.add(preOrderProduct)
+
+                            // ToDo - something
+
+                        }
+
+                        customerVisitRepo.insertAllPreOrderProduct(preOrderProductList)
+
+
+                        for (promotion in promotionList){
+
+                            // ToDo - something for promotion
+
+                        }
+
+                        preOrder.invoice_id = invoiceId
+                        preOrder.customer_id = customerId.toString()
+                        preOrder.sale_man_id = salePersonId
+                        preOrder.dev_id = deviceId
+                        preOrder.pre_order_date = preOrderDate
+                        preOrder.expected_delivery_date = deliveryDate
+                        preOrder.advance_payment_amount = advancedPaymentAmount.toString()
+                        preOrder.net_amount = totalAmount.toString() // To Check
+                        preOrder.location_id = locationID.toString()
+                        preOrder.discount = totalDiscountAmount.toString() // To Check
+                        preOrder.discount_percent = totalVolumeDiscountPercent.toString() // To Check
+                        preOrder.tax_amount = taxAmt.toString()
+                        preOrder.bank_name = bank
+                        preOrder.bank_account_no = acc
+                        preOrder.remark = remark
+                        preOrder.delete_flag = 0
+                        preOrder.sale_flag = 0
+
+                        customerVisitRepo.insertPreOrder(preOrder)
+
+                        customerVisitRepo.getAllPreOrder()
+                            .flatMap { preOrderList ->
+                                Log.d("Testing", "Pre Order count = ${preOrderList.size}")
+                                return@flatMap customerVisitRepo.getAllPreOrderProduct()
+                            }
+                            .subscribeOn(schedulerProvider.io())
+                            .observeOn(schedulerProvider.mainThread())
+                            .subscribe{ preOrderProductList ->
+                                Log.d("Testing", "Pre Order Product count = ${preOrderProductList.size}")
+                            }
+
+                    } else Log.d("Testing", "Found same invoice id")
+
+                }
+        }
+
     }
 
 }

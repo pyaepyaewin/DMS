@@ -31,6 +31,9 @@ interface PreOrderDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(list: List<PreOrder>)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insert(preOrder: PreOrder)
+
     @Query("Delete from pre_order")
     fun deleteAll()
 
@@ -42,5 +45,8 @@ interface PreOrderDao {
 
     @Query("select invoice.invoice_id,customer_name,address,total_quantity,prepaid_amount,total_amount from invoice inner join customer on customer.id = invoice.customer_id inner join pre_order on pre_order.invoice_id =  invoice.invoice_id ")
     fun getPreOrderReport(): List<PreOrderReport>
+
+    @Query("select count(*) from pre_order where invoice_id = :invoiceId")
+    fun getOrderInvoiceCountByID(invoiceId: String): Int
 
 }

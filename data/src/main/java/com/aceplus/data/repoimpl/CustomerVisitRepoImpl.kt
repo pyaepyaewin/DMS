@@ -14,6 +14,8 @@ import com.aceplus.domain.entity.customer.CustomerFeedback
 import com.aceplus.domain.entity.customer.DidCustomerFeedback
 import com.aceplus.domain.entity.invoice.Invoice
 import com.aceplus.domain.entity.invoice.InvoiceProduct
+import com.aceplus.domain.entity.preorder.PreOrder
+import com.aceplus.domain.entity.preorder.PreOrderProduct
 import com.aceplus.domain.entity.product.Product
 import com.aceplus.domain.entity.promotion.PromotionDate
 import com.aceplus.domain.entity.promotion.PromotionGift
@@ -394,6 +396,26 @@ class CustomerVisitRepoImpl(
 
     override fun getVolumeDiscountByDate(currentDate: String): Observable<List<VolumeDiscount>> {
         return Observable.just(db.volumeDiscountDao().getVolumeDiscountByDate(currentDate))
+    }
+
+    override fun getOrderInvoiceCountByID(invoiceId: String): Observable<Int> {
+        return Observable.just(db.preOrderDao().getOrderInvoiceCountByID(invoiceId))
+    }
+
+    override fun insertAllPreOrderProduct(preOrderProductList: ArrayList<PreOrderProduct>) {
+        db.preOrderProductDao().insertAll(preOrderProductList)
+    }
+
+    override fun insertPreOrder(preOrder: PreOrder) {
+        db.preOrderDao().insert(preOrder)
+    }
+
+    override fun getAllPreOrder(): Observable<List<PreOrder>> {
+        return Observable.just(db.preOrderDao().allData)
+    }
+
+    override fun getAllPreOrderProduct(): Observable<List<PreOrderProduct>> {
+        return Observable.just(db.preOrderProductDao().allData)
     }
 
 }

@@ -11,15 +11,10 @@ import com.google.gson.annotations.SerializedName
 class PreOrder {
 
     @PrimaryKey
-    @ColumnInfo(name = "id")
-    @SerializedName("id")
-    @Expose
-    var id: Int = 0
-
     @ColumnInfo(name = "invoice_id")
     @SerializedName("invoice_id")
     @Expose
-    var invoice_id: String? = null
+    var invoice_id: String = "0"
 
     @ColumnInfo(name = "customer_id")
     @SerializedName("customer_id")

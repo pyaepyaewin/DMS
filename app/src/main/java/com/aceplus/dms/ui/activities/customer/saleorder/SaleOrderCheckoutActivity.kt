@@ -7,6 +7,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.view.View
+import com.aceplus.data.utils.Constant
 import com.aceplus.dms.R
 import com.aceplus.dms.ui.adapters.saleorder.OrderCheckoutListAdapter
 import com.aceplus.dms.utils.Utils
@@ -50,6 +51,9 @@ import kotlinx.android.synthetic.main.activity_sale_checkout.tax_label_saleCheck
 import kotlinx.android.synthetic.main.activity_sale_checkout.tvNetAmount as tvNetAmount1
 import kotlinx.android.synthetic.main.activity_sale_checkout.tvTotalAmount as tvTotalAmount1
 import kotlinx.android.synthetic.main.activity_sale_checkout.tax_txtView as tax_txtView1
+import kotlinx.android.synthetic.main.activity_sale_checkout.tvInvoiceId as tvInvoiceId1
+import kotlinx.android.synthetic.main.activity_sale_checkout.checkout_remark_edit_text as checkout_remark_edit_text1
+import kotlinx.android.synthetic.main.activity_sale_checkout.tvPrepaidAmount as tvPrepaidAmount1
 import kotlinx.android.synthetic.main.activity_sale_order_checkout.advancedPaidAmountLayout as advancedPaidAmountLayout1
 import kotlinx.android.synthetic.main.activity_sale_order_checkout.bank_branch_layout as bank_branch_layout1
 import kotlinx.android.synthetic.main.activity_sale_order_checkout.duedateLayout as duedateLayout1
@@ -105,7 +109,9 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
     private var taxType: String = ""
     private var taxPercent: Int = 0
     private var taxAmt: Double = 0.0
-    private var salePersonId: String = ""
+    private var salePersonId: String? = null
+    private var locationCode: Int = 0
+    private var invoiceId: String = ""
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -147,7 +153,11 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
         calculateTotalAmount()
         saleCheckoutViewModel.calculateFinalAmount(soldProductList, totalAmount) // Check - should do only for pre-order
         salePersonId = saleCheckoutViewModel.getSaleManID()
-        //locationCode = saleCheckoutViewModel.getRouteID() // Check point
+        locationCode = saleCheckoutViewModel.getRouteID() // Check point
+
+        val invoiceID = saleCheckoutViewModel.getInvoiceNumber( salePersonId!!, locationCode, Constant.FOR_SALE)
+        tvInvoiceId.text = invoiceID
+        this.invoiceId = invoiceID
 
     }
 
@@ -203,7 +213,7 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
                 else -> ""
             }
 
-            val paidAmount = payAmount.text.toString().toDouble()
+            val paidAmount = if (tvPrepaidAmount.text.isNotBlank()) tvPrepaidAmount.text.toString().toDouble() else 0.0
 
             if (validationInput(paymentMethod == "B", paidAmount)){
 
@@ -211,9 +221,9 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
 
                     if (paidAmount < netAmount){
                         // ToDo - check insufficient amount
-                        //savePreOrderInformation("CR")
+                        savePreOrderInformation("CR")
                     } else{
-                        //savePreOrderInformation("CA")
+                        savePreOrderInformation("CA")
                     }
 
                     if (Utils.isInternetAccess(this)){
@@ -410,6 +420,39 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
 
             return true
         }
+
+    }
+
+    private fun savePreOrderInformation(cashOrLoanOrBank: String){
+
+        saleCheckoutViewModel.updateDepartureTimeForSaleManRoute( salePersonId!!, customer!!.id.toString())
+        saleCheckoutViewModel.updateSaleVisitRecord(customer!!.id)
+
+        val customerId = customer!!.id
+        val preOrderDate = Utils.getCurrentDate(true) // To check format
+        val deliveryDate = checkout_delivery_date_chooser_text.text.toString() // To check format
+        val advancedPaymentAmount = if (payAmount.text.isNotBlank()) payAmount.text.toString().toDouble() else 0.0
+
+        saleCheckoutViewModel.saveOrderData(
+            invoiceId,
+            customerId,
+            salePersonId!!,
+            Utils.getDeviceId(this),
+            preOrderDate,
+            deliveryDate,
+            advancedPaymentAmount,
+            totalAmount,
+            locationCode,
+            volDisAmount,
+            volDisPercent,
+            taxAmt,
+            checkout_remark_edit_text.text.toString(),
+            edit_txt_branch_name.text.toString(),
+            edit_txt_account_name.text.toString(),
+            cashOrLoanOrBank,
+            soldProductList,
+            promotionList
+        )
 
     }
 
