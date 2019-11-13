@@ -1,5 +1,6 @@
 package com.aceplus.dms.ui.activities.customer.saleorder
 
+import android.app.Activity
 import android.app.AlertDialog
 import android.arch.lifecycle.Observer
 import android.content.Context
@@ -297,7 +298,7 @@ class SaleOrderActivity : BaseActivity(), KodeinAware {
 
         if (isFocPass){
             val intent = SaleOrderCheckoutActivity.getIntentFromSaleOrder(this, customer!!, mOrderedProductListAdapter.getDataList() as ArrayList, this.promotionList)
-            startActivity(intent)
+            startActivityForResult(intent, Utils.RQ_BACK_TO_CUSTOMER)
         }
 
     }
@@ -340,6 +341,16 @@ class SaleOrderActivity : BaseActivity(), KodeinAware {
 
         }
         return true
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+
+        if (requestCode == Utils.RQ_BACK_TO_CUSTOMER)
+            if (resultCode == Activity.RESULT_OK){
+                setResult(Activity.RESULT_OK)
+                finish()
+            }
+
     }
 
 }

@@ -87,6 +87,21 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
             return intent
         }
 
+        fun newIntentFromSaleOrderCheckout(
+            context: Context,
+            invoice: Invoice,
+            soldProductList: ArrayList<SoldProductInfo>,
+            promotionList: ArrayList<Promotion>
+        ): Intent{
+            val intent = Intent(context, PrintInvoiceActivity::class.java)
+            intent.putExtra(IE_INVOICE, invoice)
+            intent.putExtra(IE_SOLD_PRODUCT_LIST, soldProductList)
+            intent.putExtra(IE_PROMOTION_LIST, promotionList)
+            intent.putExtra(IE_PRINT_MODE, "S")
+            // ToDo - check for ordered invoice
+            return intent
+        }
+
         fun getIntentFromCredit(
             context: Context,
             credit: MutableList<CreditInvoice>,

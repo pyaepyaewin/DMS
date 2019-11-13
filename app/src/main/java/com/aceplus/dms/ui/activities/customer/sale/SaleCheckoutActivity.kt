@@ -289,8 +289,7 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
             if (isSaleExchange != null && !isSaleExchange.equals("yes", true)){
                 val invoiceCount = AppUtils.getIntFromShp(Constant.INVOICE_COUNT, this) ?: 0
 
-                if (invoiceCount >= 0)
-                    AppUtils.saveIntToShp(Constant.INVOICE_COUNT, invoiceCount + 1, this)
+                if (invoiceCount >= 0) AppUtils.saveIntToShp(Constant.INVOICE_COUNT, invoiceCount + 1, this)
 
                 try {
                     val invoiceID = saleCheckoutViewModel.getInvoiceNumber( salePersonId!!, locationCode, Constant.FOR_SALE)

@@ -30,7 +30,7 @@ class SaleCheckoutViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
         return customerVisitRepo.getRouteScheduleIDV2()
     }
 
-    fun getInvoiceNumber(saleManId:String,locationNumber:Int,invoiceMode:String):String{
+    fun getInvoiceNumber(saleManId:String,locationNumber:Int,invoiceMode:String): String{
         return Utils.getInvoiceNo(
             saleManId,
             locationNumber.toString(),
@@ -404,8 +404,6 @@ class SaleCheckoutViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
         promotionList: ArrayList<Promotion>
     ){
 
-        val invoice = Invoice()
-
         launch {
             customerVisitRepo.getOrderInvoiceCountByID(invoiceId)
                 .subscribeOn(schedulerProvider.io())
@@ -414,6 +412,7 @@ class SaleCheckoutViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
 
                     if (it == 0){
 
+                        val invoice = Invoice()
                         val preOrder = PreOrder()
                         val preOrderProductList: ArrayList<PreOrderProduct> = ArrayList()
 
@@ -443,10 +442,25 @@ class SaleCheckoutViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
 
 
                         for (promotion in promotionList){
-
                             // ToDo - something for promotion
-
                         }
+
+                        invoice.invoice_id = invoiceId
+                        invoice.customer_id = customerId.toString()
+                        invoice.sale_date = preOrderDate
+                        invoice.total_amount = totalAmount.toString()
+                        invoice.total_discount_amount = totalDiscountAmount // Need to check
+                        invoice.pay_amount = advancedPaymentAmount.toString()
+                        invoice.refund_amount = "0.0"
+                        invoice.sale_person_id = salePersonId
+                        invoice.location_code = locationID.toString()
+                        invoice.device_id = deviceId
+                        invoice.invoice_status = cashOrLoanOrBank
+                        invoice.total_discount_percent = totalVolumeDiscountPercent.toString()
+                        invoice.rate = "1"
+                        invoice.tax_amount = taxAmt
+                        invoice.due_date = deliveryDate
+                        // To check - No currency found
 
                         preOrder.invoice_id = invoiceId
                         preOrder.customer_id = customerId.toString()
@@ -467,6 +481,8 @@ class SaleCheckoutViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
                         preOrder.sale_flag = 0
 
                         customerVisitRepo.insertPreOrder(preOrder)
+                        this.invoice.postValue(invoice)
+
 
                         customerVisitRepo.getAllPreOrder()
                             .flatMap { preOrderList ->

@@ -1,20 +1,32 @@
 package com.aceplus.dms.ui.activities.customer.saleorder
 
+import android.Manifest
+import android.app.Activity
 import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.support.v4.app.ActivityCompat
+import android.support.v4.content.ContextCompat
 import android.support.v7.widget.LinearLayoutManager
+import android.view.LayoutInflater
 import android.view.View
+import android.widget.EditText
+import android.widget.LinearLayout
+import android.widget.TextView
 import com.aceplus.data.utils.Constant
 import com.aceplus.dms.R
+import com.aceplus.dms.ui.activities.PrintInvoiceActivity
 import com.aceplus.dms.ui.adapters.saleorder.OrderCheckoutListAdapter
 import com.aceplus.dms.utils.Utils
 import com.aceplus.dms.viewmodel.customer.sale.SaleCheckoutViewModel
 import com.aceplus.domain.entity.customer.Customer
+import com.aceplus.domain.entity.invoice.Invoice
 import com.aceplus.domain.entity.promotion.Promotion
 import com.aceplus.domain.vo.SoldProductInfo
+import com.aceplussolutions.rms.constants.AppUtils
 import com.aceplussolutions.rms.ui.activities.BaseActivity
 import kotlinx.android.synthetic.main.activity_sale_checkout.*
 import kotlinx.android.synthetic.main.activity_sale_order_checkout.*
@@ -79,6 +91,8 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
         private const val IE_PROMOTION_LIST = "IE_PROMOTION_LIST"
         private const val IE_IS_DELIVERY = "IE_IS_DELIVERY"
 
+        private const val RC_REQUEST_SEND_SMS = 101
+
         fun getIntentFromSaleOrder(context: Context, customerData: Customer, soldProductList: ArrayList<SoldProductInfo>, promotionList: ArrayList<Promotion>): Intent{
 
             val intent = Intent(context, SaleOrderCheckoutActivity::class.java)
@@ -112,6 +126,7 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
     private var salePersonId: String? = null
     private var locationCode: Int = 0
     private var invoiceId: String = ""
+    private var invoice: Invoice? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -155,10 +170,6 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
         salePersonId = saleCheckoutViewModel.getSaleManID()
         locationCode = saleCheckoutViewModel.getRouteID() // Check point
 
-        val invoiceID = saleCheckoutViewModel.getInvoiceNumber( salePersonId!!, locationCode, Constant.FOR_SALE)
-        tvInvoiceId.text = invoiceID
-        this.invoiceId = invoiceID
-
     }
 
     private fun catchEvents(){
@@ -192,6 +203,18 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
             }
         })
 
+        saleCheckoutViewModel.invoice.observe(this, android.arch.lifecycle.Observer {
+            if (it != null){
+                invoice = it
+                saleCheckoutViewModel.invoice.value = null
+
+                if (Utils.isInternetAccess(this))
+                    uploadPreOrderToServer() // ToDo - need to update
+                else
+                    sendSMSMessage() // ToDo - need to update
+            }
+        })
+
     }
 
     private fun getIntentData(){
@@ -221,15 +244,11 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
 
                     if (paidAmount < netAmount){
                         // ToDo - check insufficient amount
+                        setInvoiceId()
                         savePreOrderInformation("CR")
                     } else{
+                        setInvoiceId()
                         savePreOrderInformation("CA")
-                    }
-
-                    if (Utils.isInternetAccess(this)){
-                        //uploadPreOrderToServer()
-                    } else{
-                        //sendSMSMessage()
                     }
 
                 } else{
@@ -423,6 +442,16 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
 
     }
 
+    private fun setInvoiceId(){
+
+        val invoiceCount = AppUtils.getIntFromShp(Constant.INVOICE_COUNT, this) ?: 0
+        if (invoiceCount >= 0) AppUtils.saveIntToShp(Constant.INVOICE_COUNT, invoiceCount + 1, this)
+        val invoiceID = saleCheckoutViewModel.getInvoiceNumber( salePersonId!!, locationCode, Constant.FOR_SALE)
+        tvInvoiceId.text = invoiceID
+        this.invoiceId = invoiceID
+
+    }
+
     private fun savePreOrderInformation(cashOrLoanOrBank: String){
 
         saleCheckoutViewModel.updateDepartureTimeForSaleManRoute( salePersonId!!, customer!!.id.toString())
@@ -453,6 +482,98 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
             soldProductList,
             promotionList
         )
+
+    }
+
+    private fun uploadPreOrderToServer(){
+
+        // ToDo
+
+    }
+
+    private fun sendSMSMessage(){
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED){
+
+            if (!ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.SEND_SMS)){
+
+                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.SEND_SMS), RC_REQUEST_SEND_SMS)
+
+            }
+
+        } else showDialogForPhoneNumber()
+
+    }
+
+    private fun showDialogForPhoneNumber(){
+
+        val layoutInflater = getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        val view = layoutInflater.inflate(R.layout.dialog_box_sale_quantity, null)
+
+        val availableQuantityLayout = view.findViewById(R.id.availableQuantityLayout) as LinearLayout
+        val qtyTextView = view.findViewById(R.id.dialog_sale_qty_txtView) as TextView
+        val phoneNoEditText = view.findViewById(R.id.quantity) as EditText
+        val messageTextView = view.findViewById(R.id.message) as TextView
+
+        availableQuantityLayout.visibility = View.GONE
+        qtyTextView.visibility = View.GONE
+
+        val alertDialog = AlertDialog.Builder(this)
+            .setView(view)
+            .setTitle("No internet access !\nPlease enter Phone Number to send message")
+            .setPositiveButton("Confirm", null)
+            .setNegativeButton("Cancel", null)
+            .create()
+
+        alertDialog.setOnShowListener {
+
+            availableQuantityLayout.visibility = View.GONE
+
+            alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+
+                if (phoneNoEditText.text.isBlank()){
+                    messageTextView.text = "You must specify Phone Number."
+                    return@setOnClickListener
+                }
+
+                val phoneNo = phoneNoEditText.text.toString()
+
+                // ToDo
+
+                alertDialog.dismiss()
+            }
+
+            alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener {
+                alertDialog.dismiss()
+                toPrintActivity("S")
+            }
+
+        }
+
+        alertDialog.show()
+
+    }
+
+    private fun toPrintActivity(printMode: String){
+
+        val intent = PrintInvoiceActivity.newIntentFromSaleOrderCheckout(
+            this,
+            invoice!!,
+            soldProductList,
+            promotionList
+        )
+
+        startActivityForResult(intent, Utils.RQ_BACK_TO_CUSTOMER)
+
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+
+        if (requestCode == Utils.RQ_BACK_TO_CUSTOMER)
+            if (resultCode == Activity.RESULT_OK){
+                setResult(Activity.RESULT_OK)
+                finish()
+            }
 
     }
 
