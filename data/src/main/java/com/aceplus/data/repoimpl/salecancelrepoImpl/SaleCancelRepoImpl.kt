@@ -11,10 +11,17 @@ import com.aceplus.domain.vo.SoldProductInfo
 import io.reactivex.Observable
 
 class SaleCancelRepoImpl(val database: MyDatabase) : SaleCancelRepo {
-    override fun updateQuantity(qty: Int, productName: String) {
-        return database.invoiceProductDao().update(qty,productName)
+    override fun updateQuantity(invoiceId: String, productId: String, qty: Int) {
+        return database.invoiceProductDao().updateQtyForInvoiceProduct(invoiceId,productId,qty)
 
     }
+
+    override fun deleteInvoiceProductForLongClick(productId: String) {
+        return database.invoiceProductDao().deleteInvoiceProduct(productId)
+
+    }
+
+
 
     override fun deleteInvoiceData(invoiceId: String) {
         return database.invoiceDao().deleteAll(invoiceId)

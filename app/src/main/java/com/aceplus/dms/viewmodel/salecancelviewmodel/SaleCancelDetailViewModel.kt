@@ -53,9 +53,13 @@ class SaleCancelDetailViewModel(
     fun deleteInvoiceProduct(invoiceId: String) {
         saleCancelRepo.deleteInvoiceProduct(invoiceId)
     }
-    fun updateQty(qty:Int,productName: String)
+    fun updateQty(invoiceId: String, productId: String, qty: Int)
     {
-        saleCancelRepo.updateQuantity(qty,productName)
+        saleCancelRepo.updateQuantity(invoiceId,productId,qty)
+    }
+    fun deleteInvoiceProductForLongClick(productId:String)
+    {
+        saleCancelRepo.deleteInvoiceProductForLongClick(productId)
     }
 
 }

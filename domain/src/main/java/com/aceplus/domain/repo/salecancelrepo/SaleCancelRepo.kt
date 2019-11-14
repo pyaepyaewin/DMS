@@ -13,6 +13,8 @@ interface SaleCancelRepo {
     fun getSoldProductList(productIdList:List<String>):Observable<List<SaleCancelDetailItem>>
     fun deleteInvoiceData(invoiceId:String)
     fun deleteInvoiceProduct(invoiceId: String)
-    fun updateQuantity(qty:Int,productName: String)
+    fun updateQuantity(invoiceId: String,productId: String,qty:Int)
+    fun deleteInvoiceProductForLongClick(productId:String)
+
 
 }

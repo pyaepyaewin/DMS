@@ -6,7 +6,9 @@ import com.aceplussolutions.rms.ui.viewholder.BaseViewHolder
 import kotlinx.android.synthetic.main.list_row_sold_product_checkout.view.*
 
 class SaleCancelDetailViewHolder(
-    itemView: View, val onClickQtyButton: (data: SoldProductInfo, position: Int) -> Unit) : BaseViewHolder<SoldProductInfo>(itemView) {
+    itemView: View, val onClickQtyButton: (data: SoldProductInfo, position: Int) -> Unit,
+    val onLongClickSoldProductListItem: (data: SoldProductInfo, position: Int) -> Unit
+) : BaseViewHolder<SoldProductInfo>(itemView) {
 
     override fun setData(data: SoldProductInfo) {
         itemView.apply {
@@ -14,18 +16,17 @@ class SaleCancelDetailViewHolder(
             um.text = data.product.um
             qty.text = data.quantity.toString()
             qty.setOnClickListener { onClickQtyButton(data, position) }
-
             price.text = data.product.selling_price
             discount.text = data.promotionPrice.toString()
-             val qty: Int = data.quantity
+            val qty: Int = data.quantity
             val price: Double = data.product.selling_price!!.toDouble()
-             val amt1 = qty * price
-              amt.text=amt1.toString()
+            val amt1 = qty * price
+            amt.text = amt1.toString()
 
-//            setOnLongClickListener {
-//                onLongClickProduct(data, position)
-//                true
-//            }
+            setOnLongClickListener {
+                onLongClickSoldProductListItem(data, position)
+                true
+            }
         }
 
     }

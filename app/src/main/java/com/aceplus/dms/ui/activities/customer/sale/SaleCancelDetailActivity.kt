@@ -10,6 +10,7 @@ import android.os.Bundle
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.EditText
@@ -27,6 +28,7 @@ import com.aceplus.domain.model.sale.salecancel.SoldProductDataClass
 import com.aceplus.domain.vo.SoldProductInfo
 import kotlinx.android.synthetic.main.activity_sale.*
 import kotlinx.android.synthetic.main.dialog_box_sale_quantity.*
+import kotlinx.android.synthetic.main.dialog_box_sale_quantity.view.*
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.kodein
@@ -38,7 +40,9 @@ class SaleCancelDetailActivity : AppCompatActivity(), KodeinAware {
     override val kodein: Kodein by kodein()
     var soldProductList1 = mutableListOf<String>()
     var soldProductDataList = mutableListOf<SaleCancelDetailItem>()
-    private val duplicateProductList = mutableListOf<SoldProductDataClass>()
+    private var isPreOrder: Boolean = false
+    private val duplicateProductList = mutableListOf<SoldProductInfo>()
+
 
     lateinit var alertDialog1: AlertDialog
 
@@ -58,7 +62,7 @@ class SaleCancelDetailActivity : AppCompatActivity(), KodeinAware {
     }
 
     private val saleCancelDetailAdapter: SaleCancelDetailAdapter by lazy {
-        SaleCancelDetailAdapter(this::onClickQtyButton)
+        SaleCancelDetailAdapter(this::onClickQtyButton, this::onLongClickSoldProductListItem)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -141,6 +145,7 @@ class SaleCancelDetailActivity : AppCompatActivity(), KodeinAware {
                     }
 
                     saleCancelDetailAdapter.setNewList(soldProductInfoList)
+                    saleCancelDetailAdapter.notifyDataSetChanged()
                 }
             })
 
@@ -174,8 +179,6 @@ class SaleCancelDetailActivity : AppCompatActivity(), KodeinAware {
                 saleCancelDetailViewModel.deleteInvoiceProduct(invoice)
                 startActivity(SaleCancelActivity.newIntentFromCustomer(this))
                 finish()
-              //val toSaleCancelIntent = Intent(this, SaleCancelActivity::class.java)
-               //startActivity(toSaleCancelIntent)
 
             } else {
                 alertDialog1.dismiss()
@@ -187,110 +190,74 @@ class SaleCancelDetailActivity : AppCompatActivity(), KodeinAware {
 
     }
 
-    private fun onClickQtyButton(soldProduct: SoldProductInfo, position: Int){
+    private fun onClickQtyButton(soldProduct: SoldProductInfo, position: Int) {
 
-        val layoutInflater = this.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        val layoutInflater =
+            this.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         val view = layoutInflater.inflate(R.layout.dialog_box_sale_quantity, null)
         val alertDialog = android.app.AlertDialog.Builder(this)
             .setView(view)
             .setTitle("Sale Quantity")
             .setPositiveButton("Confirm") { arg0, arg1 ->
 
-                if (quantity.text.toString().isBlank()) {
+                if (view.quantity.text.isBlank()) {
                     message.text = "You must specify quantity."
-                } else{
+                    Log.i("qty", "qqqqqqqqqqqqqqqqqqq")
+                } else {
+                    val quantity = view.quantity.text.toString().toInt()
+                    if (soldProduct.quantity != 0 && soldProduct.quantity < quantity) {
+                        soldProduct.currentProductQty = soldProduct.quantity
+                    }
 
-                    val quantity = quantity.text.toString().toInt()
                     soldProduct.quantity = quantity
-                    val newList = saleCancelDetailAdapter.getDataList() as ArrayList
+                   // saleCancelDetailViewModel.updateQty(quantity,soldProduct.product.product_id!!)
+                        val newList = saleCancelDetailAdapter.getDataList() as ArrayList
                     newList[position] = soldProduct
-                    saleCancelDetailViewModel.updateQty(quantity,soldProduct.product.product_name!!)
 
-                }
+                    saleCancelDetailAdapter.notifyItemRemoved(position)
+
+               }
 
             }
             .setNegativeButton("Cancel", null)
             .create()
+        alertDialog.setOnShowListener {
+             if (isPreOrder) view.availableQuantityLayout.visibility = View.GONE
+              else
+            view.availableQuantity.text = soldProduct.product.remaining_quantity.toString()
 
-                alertDialog.show()
+        }
+        alertDialog.show()
 
     }
 
-//    private fun onLongClickSoldProductListItem(soldProduct: SoldProductInfo, position: Int) {
-//
-//        android.app.AlertDialog.Builder(this)
-//            .setTitle("Delete sold product")
-//            .setMessage("Are you sure you want to delete ${soldProduct.product.product_name}?")
-//            .setPositiveButton("Yes") { arg0, arg1 ->
-//
-//                for (i in duplicateProductList.indices){
-//                    if (duplicateProductList[i].product_id == soldProduct.product.product_id){
-//                        duplicateProductList.removeAt(i)
-//                        break
-//                    }
-//                }
-//
-//                if (soldProduct.quantity != 0){
-//
-//                    if(saleCancelDetailViewModel.totalQtyForGiftWithProduct1.containsKey(soldProduct.product.class_id)){
-//                        val tempQty = saleViewModel.totalQtyForGiftWithProduct1[soldProduct.product.class_id]
-//                        saleViewModel.totalQtyForGiftWithProduct1[soldProduct.product.class_id!!] = tempQty!! - soldProduct.quantity
-//                        val amt = saleViewModel.totalAmtForGiftWithProduct1[soldProduct.product.class_id!!]
-//                        saleViewModel.totalAmtForGiftWithProduct1[soldProduct.product.class_id!!] = amt!! - soldProduct.product.selling_price!!.toDouble()
-//                        saleViewModel.totalQtyForGiftWithProduct1.remove(soldProduct.product.class_id!!)
-//                        saleViewModel.totalAmtForGiftWithProduct1.remove(soldProduct.product.class_id!!)
-//                    }
-//
-//                    if (saleViewModel.totalQtyForGiftWithProduct.containsKey(soldProduct.product.class_id)){
-//                        val tempQty = saleViewModel.totalQtyForGiftWithProduct[soldProduct.product.class_id]
-//                        saleViewModel.totalQtyForGiftWithProduct[soldProduct.product.class_id!!] = tempQty!! - soldProduct.quantity
-//                    }
-//
-//                    if (saleViewModel.productItemForGift.contains(soldProduct.product.product_name)){
-//                        saleViewModel.productItemForGift.remove(soldProduct.product.product_name)
-//                    }
-//
-//                    if (promotionList.size > 0){
-//                        try {
-//                            for (promotion in promotionList){
-//                                // ToDo - remove promotion if same class id is founded
-//                                //ToDo - To check promoPlanID and classID not found in Promotion class
-//                            }
-//                        } catch (exception: ConcurrentModificationException){
-//                            exception.printStackTrace()
-//                        }
-//                        updatePromotionProductList()
-//                    }
-//
-//                }
-//
-//                val oldList = mSoldProductListAdapter.getDataList() as ArrayList
-//                oldList.remove(soldProduct)
-//                saleViewModel.calculateSoldProductData(oldList, this.promotionList)
-//
-//                if (oldList.isEmpty()){
-//                    promotionList.clear()
-//                    promotionGiftByClassDis.clear()
-//                    saleViewModel.totalQtyForPercentWithProduct.clear()
-//                    saleViewModel.totalQtyForPercentWithProduct1.clear()
-//                    saleViewModel.totalAmtForPercentWithProduct1.clear()
-//                    saleViewModel.totalQtyForGiftWithProduct.clear()
-//                    saleViewModel.totalQtyForGiftWithProduct1.clear()
-//                    saleViewModel.totalAmtForGiftWithProduct1.clear()
-//                    giftCategoryClassId.clear()
-//                    percentCategoryClassId.clear()
-//                    saleViewModel.productItemForPercent.clear()
-//                    saleViewModel.productItemForGift.clear()
-//                    //countForGiftItem = 0
-//                    saleViewModel.giftTotalCount.clear()
-//                }
-//
-//            }
-//            .setNegativeButton("No", null)
-//            .show()
-//    }
+    private fun onLongClickSoldProductListItem(soldProduct: SoldProductInfo, position: Int) {
+
+        android.app.AlertDialog.Builder(this)
+            .setTitle("Delete sold product")
+            .setMessage("Are you sure you want to delete ${soldProduct.product.product_id}?")
+
+            .setPositiveButton("Yes") { arg0, arg1 ->
+
+                for (i in duplicateProductList.indices) {
+                    if (duplicateProductList[i].product.product_id == soldProduct.product.product_id) {
+                        duplicateProductList.removeAt(i)
+                        break
+                    }
+                }
+                duplicateProductList.remove(soldProduct)
+               // duplicateProductList.removeAt(position)
+                saleCancelDetailAdapter.setNewList(duplicateProductList as ArrayList<SoldProductInfo>)
+
+
+                val oldList = saleCancelDetailAdapter.getDataList() as ArrayList
+                oldList.remove(soldProduct)
+            }
+                    .setNegativeButton("No", null)
+                    .show()
+            }
+    }
 
 
 
-}
 

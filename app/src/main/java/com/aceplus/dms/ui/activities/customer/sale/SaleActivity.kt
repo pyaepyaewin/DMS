@@ -242,37 +242,37 @@ class SaleActivity : BaseActivity(), KodeinAware {
 
                 if (soldProduct.quantity != 0){
 
-                    if(saleViewModel.totalQtyForGiftWithProduct1.containsKey(soldProduct.product.class_id)){
-                        val tempQty = saleViewModel.totalQtyForGiftWithProduct1[soldProduct.product.class_id]
-                        saleViewModel.totalQtyForGiftWithProduct1[soldProduct.product.class_id!!] = tempQty!! - soldProduct.quantity
-                        val amt = saleViewModel.totalAmtForGiftWithProduct1[soldProduct.product.class_id!!]
-                        saleViewModel.totalAmtForGiftWithProduct1[soldProduct.product.class_id!!] = amt!! - soldProduct.product.selling_price!!.toDouble()
-                        saleViewModel.totalQtyForGiftWithProduct1.remove(soldProduct.product.class_id!!)
-                        saleViewModel.totalAmtForGiftWithProduct1.remove(soldProduct.product.class_id!!)
-                    }
-
-                    if (saleViewModel.totalQtyForGiftWithProduct.containsKey(soldProduct.product.class_id)){
-                        val tempQty = saleViewModel.totalQtyForGiftWithProduct[soldProduct.product.class_id]
-                        saleViewModel.totalQtyForGiftWithProduct[soldProduct.product.class_id!!] = tempQty!! - soldProduct.quantity
-                    }
-
-                    if (saleViewModel.productItemForGift.contains(soldProduct.product.product_name)){
-                        saleViewModel.productItemForGift.remove(soldProduct.product.product_name)
-                    }
-
-                    if (promotionList.size > 0){
-                        try {
-                            for (promotion in promotionList){
-                                // ToDo - remove promotion if same class id is founded
-                                //ToDo - To check promoPlanID and classID not found in Promotion class
-                            }
-                        } catch (exception: ConcurrentModificationException){
-                            exception.printStackTrace()
-                        }
-                        updatePromotionProductList()
-                    }
-
+                if(saleViewModel.totalQtyForGiftWithProduct1.containsKey(soldProduct.product.class_id)){
+                    val tempQty = saleViewModel.totalQtyForGiftWithProduct1[soldProduct.product.class_id]
+                    saleViewModel.totalQtyForGiftWithProduct1[soldProduct.product.class_id!!] = tempQty!! - soldProduct.quantity
+                    val amt = saleViewModel.totalAmtForGiftWithProduct1[soldProduct.product.class_id!!]
+                    saleViewModel.totalAmtForGiftWithProduct1[soldProduct.product.class_id!!] = amt!! - soldProduct.product.selling_price!!.toDouble()
+                    saleViewModel.totalQtyForGiftWithProduct1.remove(soldProduct.product.class_id!!)
+                    saleViewModel.totalAmtForGiftWithProduct1.remove(soldProduct.product.class_id!!)
                 }
+
+                if (saleViewModel.totalQtyForGiftWithProduct.containsKey(soldProduct.product.class_id)){
+                    val tempQty = saleViewModel.totalQtyForGiftWithProduct[soldProduct.product.class_id]
+                    saleViewModel.totalQtyForGiftWithProduct[soldProduct.product.class_id!!] = tempQty!! - soldProduct.quantity
+                }
+
+                if (saleViewModel.productItemForGift.contains(soldProduct.product.product_name)){
+                    saleViewModel.productItemForGift.remove(soldProduct.product.product_name)
+                }
+
+                if (promotionList.size > 0){
+                    try {
+                        for (promotion in promotionList){
+                            // ToDo - remove promotion if same class id is founded
+                            //ToDo - To check promoPlanID and classID not found in Promotion class
+                        }
+                    } catch (exception: ConcurrentModificationException){
+                        exception.printStackTrace()
+                    }
+                    updatePromotionProductList()
+                }
+
+            }
 
                 val oldList = mSoldProductListAdapter.getDataList() as ArrayList
                 oldList.remove(soldProduct)
@@ -309,7 +309,6 @@ class SaleActivity : BaseActivity(), KodeinAware {
         val quantityEditText = view.findViewById(R.id.quantity) as EditText
         val messageTextView = view.findViewById(R.id.message) as TextView
         val availableQuantityLayout = view.findViewById(R.id.availableQuantityLayout) as LinearLayout
-
         val alertDialog = AlertDialog.Builder(this@SaleActivity)
             .setView(view)
             .setTitle("Sale Quantity")

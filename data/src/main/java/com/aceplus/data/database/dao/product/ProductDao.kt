@@ -47,4 +47,5 @@ interface ProductDao {
     @Query("select * from product where id = :stockId")
     fun deliveryProductDataList(stockId:String): List<Product>
 
+
 }
