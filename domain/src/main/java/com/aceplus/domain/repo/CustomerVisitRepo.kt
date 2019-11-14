@@ -2,6 +2,7 @@ package com.aceplus.domain.repo
 
 import com.aceplus.domain.entity.CompanyInformation
 import com.aceplus.domain.entity.Location
+import com.aceplus.domain.entity.SMSRecord
 import com.aceplus.domain.vo.SoldProductInfo
 import com.aceplus.domain.entity.classdiscount.ClassDiscountByPrice
 import com.aceplus.domain.entity.classdiscount.ClassDiscountByPriceItem
@@ -73,6 +74,7 @@ interface CustomerVisitRepo {
     fun getOrderInvoiceCountByID(invoiceId: String): Observable<Int>
     fun insertPreOrder(preOrder: PreOrder)
     fun getAllPreOrder(): Observable<List<PreOrder>>
+    fun getPreOrderByID(invoiceId: String): Observable<List<PreOrder>>
 
     fun insertInvoiceProduct(invoiceProduct: InvoiceProduct)
     fun getAllInvoiceProduct(): Observable<List<InvoiceProduct>>
@@ -89,6 +91,9 @@ interface CustomerVisitRepo {
     fun getVolumeDiscountByDate(currentDate: String): Observable<List<VolumeDiscount>>
 
     fun insertAllPreOrderProduct(preOrderProductList: ArrayList<PreOrderProduct>)
+    fun getPreOrderProductByInvoiceID(invoiceId: String): Observable<List<PreOrderProduct>>
     fun getAllPreOrderProduct(): Observable<List<PreOrderProduct>>
+
+    fun insertSmsRecord(smsRecord: SMSRecord)
 
 }

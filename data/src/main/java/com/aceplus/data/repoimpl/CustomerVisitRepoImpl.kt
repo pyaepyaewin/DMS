@@ -6,6 +6,7 @@ import com.aceplus.data.database.MyDatabase
 import com.aceplus.data.utils.Constant
 import com.aceplus.domain.entity.CompanyInformation
 import com.aceplus.domain.entity.Location
+import com.aceplus.domain.entity.SMSRecord
 import com.aceplus.domain.vo.SoldProductInfo
 import com.aceplus.domain.entity.classdiscount.ClassDiscountByPrice
 import com.aceplus.domain.entity.classdiscount.ClassDiscountByPriceItem
@@ -416,6 +417,18 @@ class CustomerVisitRepoImpl(
 
     override fun getAllPreOrderProduct(): Observable<List<PreOrderProduct>> {
         return Observable.just(db.preOrderProductDao().allData)
+    }
+
+    override fun getPreOrderByID(invoiceId: String): Observable<List<PreOrder>> {
+        return Observable.just(db.preOrderDao().getPreOrderByID(invoiceId))
+    }
+
+    override fun getPreOrderProductByInvoiceID(invoiceId: String): Observable<List<PreOrderProduct>> {
+        return Observable.just(db.preOrderProductDao().allData)
+    }
+
+    override fun insertSmsRecord(smsRecord: SMSRecord) {
+        db.smsRecordDao().insert(smsRecord)
     }
 
 }

@@ -4,12 +4,14 @@ import android.annotation.SuppressLint
 import android.arch.lifecycle.MutableLiveData
 import android.util.Log
 import com.aceplus.dms.utils.Utils
+import com.aceplus.domain.entity.SMSRecord
 import com.aceplus.domain.entity.invoice.Invoice
 import com.aceplus.domain.entity.invoice.InvoiceProduct
 import com.aceplus.domain.entity.preorder.PreOrder
 import com.aceplus.domain.entity.preorder.PreOrderProduct
 import com.aceplus.domain.entity.promotion.Promotion
 import com.aceplus.domain.model.forApi.invoice.InvoiceDetail
+import com.aceplus.domain.model.forApi.preorder.PreOrderPresentApi
 import com.aceplus.domain.repo.CustomerVisitRepo
 import com.aceplus.domain.vo.CalculatedFinalData
 import com.aceplus.domain.vo.SoldProductInfo
@@ -20,6 +22,7 @@ class SaleCheckoutViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
 
     var invoice = MutableLiveData<Invoice>()
     var finalData = MutableLiveData<CalculatedFinalData>()
+    var messageInfo = MutableLiveData<Pair<String, String>>()
 
     fun getSaleManID(): String{
         val saleManData = customerVisitRepo.getSaleManData()
@@ -420,7 +423,7 @@ class SaleCheckoutViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
 
                             val preOrderProduct = PreOrderProduct()
                             preOrderProduct.sale_order_id = invoiceId
-                            preOrderProduct.product_id = soldProduct.product.product_id
+                            preOrderProduct.product_id = soldProduct.product.id.toString()
                             preOrderProduct.order_quantity = soldProduct.quantity.toString()
                             preOrderProduct.price = soldProduct.product.selling_price
                             preOrderProduct.total_amount = soldProduct.totalAmt
@@ -499,6 +502,101 @@ class SaleCheckoutViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
 
                 }
         }
+
+    }
+
+    @SuppressLint("CheckResult")
+    fun getMessageInfo(
+        phoneNo: String,
+        invoiceId: String,
+        promotionList: ArrayList<Promotion>,
+        remark: String
+    ){
+
+        var message = ""
+        val preOrderPresentApiList = ArrayList<PreOrderPresentApi>()
+
+        launch {
+            customerVisitRepo.getPreOrderByID(invoiceId)
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.mainThread())
+                .subscribe{ preOrderList ->
+
+                    for (preOrder in preOrderList){
+
+                        /*var customerName = ""
+                        customerVisitRepo.getCustomerByID(preOrder.customer_id!!.toInt())
+                            .subscribeOn(schedulerProvider.io())
+                            .observeOn(schedulerProvider.mainThread())
+                            .subscribe{
+                                customerName = "${it.customer_name}"
+                            }
+
+                        var saleManName = ""
+                        customerVisitRepo.getSaleManName(preOrder.sale_man_id!!)
+                            .subscribeOn(schedulerProvider.io())
+                            .observeOn(schedulerProvider.mainThread())
+                            .subscribe{ nameList ->
+                                for (name in nameList){
+                                    saleManName = "$name"
+                                }
+                            }*/
+
+                        message += "Inv: ${preOrder.invoice_id}" +
+                                "\nCus: ${preOrder.customer_name}, SM: ${preOrder.sale_man_name}" +
+                                "\nSO: ${preOrder.pre_order_date}"
+
+
+                        for (promotion in promotionList){
+
+                            val preOrderPresentApi = PreOrderPresentApi()
+                            preOrderPresentApi.saleOrderId = preOrder.invoice_id
+                            preOrderPresentApi.productId = promotion.promotion_product_id
+                            preOrderPresentApi.quantity = promotion.promotion_quantity
+
+                            message += "\nPromotion product name by id\t${promotion.promotion_quantity}"
+
+                            preOrderPresentApiList.add(preOrderPresentApi) // To check for what
+
+                        }
+
+                        customerVisitRepo.getPreOrderProductByInvoiceID(preOrder.invoice_id)
+                            .subscribeOn(schedulerProvider.io())
+                            .observeOn(schedulerProvider.mainThread())
+                            .subscribe{ preOrderProductList ->
+
+                                for (preOrderProduct in preOrderProductList){
+
+                                    var productName = ""
+
+                                    customerVisitRepo.getProductByID(preOrderProduct.product_id!!.toInt())
+                                        .subscribeOn(schedulerProvider.io())
+                                        .observeOn(schedulerProvider.mainThread())
+                                        .subscribe{ productList ->
+                                            for (product in productList){
+                                                productName = "${product.product_name}"
+                                            }
+                                        }
+
+                                    message += "\n$productName\t${preOrderProduct.order_quantity}"
+
+                                }
+
+                            }
+
+                        message += "\nRemark: $remark\nDL: ${preOrder.expected_delivery_date}"
+
+                    }
+                    messageInfo.postValue(Pair(phoneNo, message))
+                    Log.d("Testing", message)
+                }
+        }
+
+    }
+
+    fun saveSmsRecord(smsRecord: SMSRecord){
+
+        customerVisitRepo.insertSmsRecord(smsRecord)
 
     }
 

@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.Activity
 import android.app.AlertDialog
 import android.app.DatePickerDialog
+import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -11,17 +12,23 @@ import android.os.Bundle
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.LinearLayoutManager
+import android.telephony.SmsManager
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import com.aceplus.data.utils.Constant
 import com.aceplus.dms.R
 import com.aceplus.dms.ui.activities.PrintInvoiceActivity
 import com.aceplus.dms.ui.adapters.saleorder.OrderCheckoutListAdapter
+import com.aceplus.dms.utils.SmsDeliveredReceiver
+import com.aceplus.dms.utils.SmsSentReceiver
 import com.aceplus.dms.utils.Utils
 import com.aceplus.dms.viewmodel.customer.sale.SaleCheckoutViewModel
+import com.aceplus.domain.entity.SMSRecord
 import com.aceplus.domain.entity.customer.Customer
 import com.aceplus.domain.entity.invoice.Invoice
 import com.aceplus.domain.entity.promotion.Promotion
@@ -36,6 +43,7 @@ import kotlinx.android.synthetic.main.activity_sale_order_checkout.saleDateTextV
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.kodein
+import java.lang.Exception
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
@@ -211,7 +219,14 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
                 if (Utils.isInternetAccess(this))
                     uploadPreOrderToServer() // ToDo - need to update
                 else
-                    sendSMSMessage() // ToDo - need to update
+                    sendSMSMessage()
+            }
+        })
+
+        saleCheckoutViewModel.messageInfo.observe(this, android.arch.lifecycle.Observer {
+            if (it != null){
+                sendSMS(it.first, it.second)
+                insertSMSRecord(it.first, it.second)
             }
         })
 
@@ -252,9 +267,7 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
                     }
 
                 } else{
-
                     // ToDo for delivery
-
                 }
 
             }
@@ -460,7 +473,7 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
         val customerId = customer!!.id
         val preOrderDate = Utils.getCurrentDate(true) // To check format
         val deliveryDate = checkout_delivery_date_chooser_text.text.toString() // To check format
-        val advancedPaymentAmount = if (payAmount.text.isNotBlank()) payAmount.text.toString().toDouble() else 0.0
+        val advancedPaymentAmount = if (tvPrepaidAmount.text.isNotBlank()) tvPrepaidAmount.text.toString().toDouble() else 0.0
 
         saleCheckoutViewModel.saveOrderData(
             invoiceId,
@@ -537,8 +550,15 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
                 }
 
                 val phoneNo = phoneNoEditText.text.toString()
-
-                // ToDo
+                if (phoneNo.isNotBlank()){
+                    saleCheckoutViewModel.getMessageInfo(
+                        phoneNo,
+                        invoiceId,
+                        promotionList,
+                        checkout_remark_edit_text.text.toString()
+                        )
+                    toPrintActivity("S")
+                }
 
                 alertDialog.dismiss()
             }
@@ -551,6 +571,44 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
         }
 
         alertDialog.show()
+
+    }
+
+    private fun sendSMS(phoneNumber: String, message: String){
+
+        val sentPendingIntents = ArrayList<PendingIntent>()
+        val deliveredPendingIntents = ArrayList<PendingIntent>()
+
+        val smsSentReceiverIntent = Intent(this, SmsSentReceiver::class.java)
+        val smsDeliveredReceiverIntent = Intent(this, SmsDeliveredReceiver::class.java)
+
+        val sentPI = PendingIntent.getBroadcast(this, 0, smsSentReceiverIntent, 0)
+        val deliveredPI = PendingIntent.getBroadcast(this, 0, smsDeliveredReceiverIntent, 0)
+
+        try {
+            val sms = SmsManager.getDefault()
+            val mSMSMessage = sms.divideMessage(message)
+            for (i in mSMSMessage.indices){
+                sentPendingIntents.add(i, sentPI)
+                deliveredPendingIntents.add(i, deliveredPI)
+            }
+            sms.sendMultipartTextMessage(phoneNumber, null, mSMSMessage, sentPendingIntents, deliveredPendingIntents)
+        } catch (e: Exception){
+            e.printStackTrace()
+            Toast.makeText(baseContext, "SMS sending failed...", Toast.LENGTH_SHORT).show()
+        }
+
+    }
+
+    private fun insertSMSRecord(phoneNumber: String, message: String){
+
+        val smsRecord = SMSRecord()
+
+        smsRecord.send_date = Utils.getCurrentDate(true)
+        smsRecord.message_body = message
+        smsRecord.phone_no = phoneNumber
+
+        saleCheckoutViewModel.saveSmsRecord(smsRecord)
 
     }
 

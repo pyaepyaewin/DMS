@@ -18,6 +18,9 @@ interface PreOrderProductDao {
     @get:Query("select * from pre_order_product")
     val allData: List<PreOrderProduct>
 
+    @Query("select * from pre_order_product where sale_order_id = :invoiceId")
+    fun getPreOrderProductByInvoiceID(invoiceId: String): List<PreOrderProduct>
+
     @Query("select * from pre_order_product WHERE sale_order_id =:invoice_id AND delete_flag = 0")
     fun allDataById(invoice_id: String?): List<PreOrderProduct>
 

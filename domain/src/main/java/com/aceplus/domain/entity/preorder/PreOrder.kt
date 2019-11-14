@@ -2,6 +2,7 @@ package com.aceplus.domain.entity.preorder
 
 import android.arch.persistence.room.ColumnInfo
 import android.arch.persistence.room.Entity
+import android.arch.persistence.room.Ignore
 import android.arch.persistence.room.PrimaryKey
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
@@ -21,10 +22,20 @@ class PreOrder {
     @Expose
     var customer_id: String? = null
 
+    @ColumnInfo(name = "customer_name")
+    @SerializedName("customer_name")
+    @Expose
+    @Ignore var customer_name: String? = null
+
     @ColumnInfo(name = "sale_man_id")
     @SerializedName("sale_man_id")
     @Expose
     var sale_man_id: String? = null
+
+    @ColumnInfo(name = "sale_man_name")
+    @SerializedName("sale_man_name")
+    @Expose
+    @Ignore var sale_man_name: String? = null
 
     @ColumnInfo(name = "dev_id")
     @SerializedName("dev_id")

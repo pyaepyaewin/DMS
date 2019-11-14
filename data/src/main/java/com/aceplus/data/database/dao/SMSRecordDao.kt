@@ -20,6 +20,9 @@ interface SMSRecordDao{
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(list: List<SMSRecord>)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insert(smsRecord: SMSRecord)
+
     @Query("Delete from sms_record")
     fun deleteAll()
 
