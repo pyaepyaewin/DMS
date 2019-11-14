@@ -500,6 +500,8 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
 
     private fun uploadPreOrderToServer(){
 
+        Utils.callDialog("Please wait...", this)
+
         // ToDo
 
     }
@@ -551,13 +553,8 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
 
                 val phoneNo = phoneNoEditText.text.toString()
                 if (phoneNo.isNotBlank()){
-                    saleCheckoutViewModel.getMessageInfo(
-                        phoneNo,
-                        invoiceId,
-                        promotionList,
-                        checkout_remark_edit_text.text.toString()
-                        )
-                    toPrintActivity("S")
+                    saleCheckoutViewModel.getMessageInfo(phoneNo, invoiceId, promotionList, checkout_remark_edit_text.text.toString())
+                    toPrintActivity()
                 }
 
                 alertDialog.dismiss()
@@ -565,7 +562,7 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
 
             alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener {
                 alertDialog.dismiss()
-                toPrintActivity("S")
+                toPrintActivity()
             }
 
         }
@@ -591,6 +588,7 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
             for (i in mSMSMessage.indices){
                 sentPendingIntents.add(i, sentPI)
                 deliveredPendingIntents.add(i, deliveredPI)
+                Log.d("Testing", "Looping msg")
             }
             sms.sendMultipartTextMessage(phoneNumber, null, mSMSMessage, sentPendingIntents, deliveredPendingIntents)
         } catch (e: Exception){
@@ -612,7 +610,7 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
 
     }
 
-    private fun toPrintActivity(printMode: String){
+    private fun toPrintActivity(){
 
         val intent = PrintInvoiceActivity.newIntentFromSaleOrderCheckout(
             this,

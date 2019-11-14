@@ -560,6 +560,7 @@ class SaleCheckoutViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
 
                         }
 
+                        // Need to fix
                         customerVisitRepo.getPreOrderProductByInvoiceID(preOrder.invoice_id)
                             .subscribeOn(schedulerProvider.io())
                             .observeOn(schedulerProvider.mainThread())
