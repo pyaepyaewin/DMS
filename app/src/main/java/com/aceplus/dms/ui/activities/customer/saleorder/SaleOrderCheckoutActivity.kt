@@ -216,8 +216,10 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
                 invoice = it
                 saleCheckoutViewModel.invoice.value = null
 
-                if (Utils.isInternetAccess(this))
-                    uploadPreOrderToServer() // ToDo - need to update
+                if (Utils.isInternetAccess(this)){
+                    Utils.callDialog("Please wait...", this)
+                    saleCheckoutViewModel.getPreOrderRequest()
+                }
                 else
                     sendSMSMessage()
             }
@@ -500,8 +502,6 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
 
     private fun uploadPreOrderToServer(){
 
-        Utils.callDialog("Please wait...", this)
-
         // ToDo
 
     }
@@ -588,9 +588,9 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
             for (i in mSMSMessage.indices){
                 sentPendingIntents.add(i, sentPI)
                 deliveredPendingIntents.add(i, deliveredPI)
-                Log.d("Testing", "Looping msg")
             }
             sms.sendMultipartTextMessage(phoneNumber, null, mSMSMessage, sentPendingIntents, deliveredPendingIntents)
+            Log.d("Testing", "Send msg")
         } catch (e: Exception){
             e.printStackTrace()
             Toast.makeText(baseContext, "SMS sending failed...", Toast.LENGTH_SHORT).show()

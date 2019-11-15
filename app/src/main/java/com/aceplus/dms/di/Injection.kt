@@ -104,7 +104,7 @@ val repoModule = Kodein.Module {
         )
     }
     bind<CustomerVisitRepo>() with singleton {
-        CustomerVisitRepoImpl(db = instance(), shf = instance())
+        CustomerVisitRepoImpl(db = instance(), shf = instance(), upLoadApi = instance("cloud"))
     }
     bind<ReportRepo>() with singleton {
         ReportRepoImpl(instance())
@@ -162,12 +162,8 @@ val vmModule = Kodein.Module {
     bind() from singleton { SaleCancelViewModel(instance(), instance()) }
     bind() from singleton { SaleCancelDetailViewModel(instance(), instance()) }
 
-
-
 }
-
 
 fun provideDB(context: Context): MyDatabase = MyDatabase.getInstance(context)!!
 fun provideDownloadApi() = createDownloadWebService(createOkHttpClient(), Constant.BASE_URL)
-fun provideSharedPreferences(context: Context): SharedPreferences =
-    context.getSharedPreferences(SharedConstants.SHP_NAME, 0)
+fun provideSharedPreferences(context: Context): SharedPreferences = context.getSharedPreferences(SharedConstants.SHP_NAME, 0)

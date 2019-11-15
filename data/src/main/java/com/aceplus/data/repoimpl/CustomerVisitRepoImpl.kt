@@ -1,8 +1,8 @@
 package com.aceplus.data.repoimpl
 
-import android.content.ContentValues
 import android.content.SharedPreferences
 import com.aceplus.data.database.MyDatabase
+import com.aceplus.data.remote.UploadApiService
 import com.aceplus.data.utils.Constant
 import com.aceplus.domain.entity.CompanyInformation
 import com.aceplus.domain.entity.Location
@@ -37,7 +37,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 class CustomerVisitRepoImpl(
-    private val db: MyDatabase, private val shf: SharedPreferences
+    private val db: MyDatabase, private val shf: SharedPreferences, private val upLoadApi: UploadApiService
 ) : CustomerVisitRepo {
 
     override fun getLocationCode(): Int {
@@ -424,7 +424,7 @@ class CustomerVisitRepoImpl(
     }
 
     override fun getPreOrderProductByInvoiceID(invoiceId: String): Observable<List<PreOrderProduct>> {
-        return Observable.just(db.preOrderProductDao().allData)
+        return Observable.just(db.preOrderProductDao().getPreOrderProductByInvoiceID(invoiceId))
     }
 
     override fun insertSmsRecord(smsRecord: SMSRecord) {

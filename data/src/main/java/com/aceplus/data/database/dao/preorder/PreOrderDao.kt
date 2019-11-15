@@ -46,7 +46,7 @@ interface PreOrderDao {
     @Query("select count(*) from pre_order where invoice_id = :invoiceId")
     fun getOrderInvoiceCountByID(invoiceId: String): Int
 
-    @Query("select po.invoice_id, po.customer_id, c.customer_name, po.sale_man_id, sm.user_name as sale_man_name, po.dev_id, pre_order_date, po.expected_delivery_date, po.advance_payment_amount, po.net_amount, po.location_id, po.discount, po.discount_percent, po.volume_discount, po.volume_discount_percent, po.tax_amount, po.bank_name, po.bank_account_no, po.remark, po.delete_flag, po.sale_flag from pre_order as po left join customer as c on po.customer_id = c.id left join sale_man as sm on po.sale_man_id = sm.id where invoice_id = :invoiceId")
+    @Query("select po.invoice_id, c.customer_name as customer_id, sm.user_name as sale_man_id, po.dev_id, pre_order_date, po.expected_delivery_date, po.advance_payment_amount, po.net_amount, po.location_id, po.discount, po.discount_percent, po.volume_discount, po.volume_discount_percent, po.tax_amount, po.bank_name, po.bank_account_no, po.remark, po.delete_flag, po.sale_flag from pre_order as po left join customer as c on po.customer_id = c.id left join sale_man as sm on po.sale_man_id = sm.id where invoice_id = :invoiceId")
     fun getPreOrderByID(invoiceId: String): List<PreOrder>
 
 }

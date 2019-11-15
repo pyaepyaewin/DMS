@@ -515,42 +515,24 @@ class SaleCheckoutViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
 
         var message = ""
         val preOrderPresentApiList = ArrayList<PreOrderPresentApi>()
+        var preOrder: PreOrder? = null
 
         launch {
             customerVisitRepo.getPreOrderByID(invoiceId)
-                .subscribeOn(schedulerProvider.io())
-                .observeOn(schedulerProvider.mainThread())
-                .subscribe{ preOrderList ->
+                .flatMap { preOrderList ->
 
-                    for (preOrder in preOrderList){
+                    if (preOrderList.isNotEmpty()){
 
-                        /*var customerName = ""
-                        customerVisitRepo.getCustomerByID(preOrder.customer_id!!.toInt())
-                            .subscribeOn(schedulerProvider.io())
-                            .observeOn(schedulerProvider.mainThread())
-                            .subscribe{
-                                customerName = "${it.customer_name}"
-                            }
+                        preOrder = preOrderList[0]
 
-                        var saleManName = ""
-                        customerVisitRepo.getSaleManName(preOrder.sale_man_id!!)
-                            .subscribeOn(schedulerProvider.io())
-                            .observeOn(schedulerProvider.mainThread())
-                            .subscribe{ nameList ->
-                                for (name in nameList){
-                                    saleManName = "$name"
-                                }
-                            }*/
-
-                        message += "Inv: ${preOrder.invoice_id}" +
-                                "\nCus: ${preOrder.customer_name}, SM: ${preOrder.sale_man_name}" +
-                                "\nSO: ${preOrder.pre_order_date}"
-
+                        message += "Inv: ${preOrder?.invoice_id}" +
+                                "\nCus: ${preOrder?.customer_id}, SM: ${preOrder?.sale_man_id}" +
+                                "\nSO: ${preOrder?.pre_order_date}"
 
                         for (promotion in promotionList){
 
                             val preOrderPresentApi = PreOrderPresentApi()
-                            preOrderPresentApi.saleOrderId = preOrder.invoice_id
+                            preOrderPresentApi.saleOrderId = invoiceId
                             preOrderPresentApi.productId = promotion.promotion_product_id
                             preOrderPresentApi.quantity = promotion.promotion_quantity
 
@@ -560,34 +542,19 @@ class SaleCheckoutViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
 
                         }
 
-                        // Need to fix
-                        customerVisitRepo.getPreOrderProductByInvoiceID(preOrder.invoice_id)
-                            .subscribeOn(schedulerProvider.io())
-                            .observeOn(schedulerProvider.mainThread())
-                            .subscribe{ preOrderProductList ->
-
-                                for (preOrderProduct in preOrderProductList){
-
-                                    var productName = ""
-
-                                    customerVisitRepo.getProductByID(preOrderProduct.product_id!!.toInt())
-                                        .subscribeOn(schedulerProvider.io())
-                                        .observeOn(schedulerProvider.mainThread())
-                                        .subscribe{ productList ->
-                                            for (product in productList){
-                                                productName = "${product.product_name}"
-                                            }
-                                        }
-
-                                    message += "\n$productName\t${preOrderProduct.order_quantity}"
-
-                                }
-
-                            }
-
-                        message += "\nRemark: $remark\nDL: ${preOrder.expected_delivery_date}"
-
                     }
+                    return@flatMap customerVisitRepo.getPreOrderProductByInvoiceID(invoiceId)
+                }
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.mainThread())
+                .subscribe{ preOrderProductList ->
+
+                    for (preOrderProduct in preOrderProductList){
+                        message += "\n${preOrderProduct.product_id}\t${preOrderProduct.order_quantity}"
+                    }
+
+                    message += "\nRemark: $remark\nDL: ${preOrder?.expected_delivery_date}"
+
                     messageInfo.postValue(Pair(phoneNo, message))
                     Log.d("Testing", message)
                 }
@@ -595,9 +562,11 @@ class SaleCheckoutViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
 
     }
 
-    fun saveSmsRecord(smsRecord: SMSRecord){
+    fun saveSmsRecord(smsRecord: SMSRecord) = customerVisitRepo.insertSmsRecord(smsRecord)
 
-        customerVisitRepo.insertSmsRecord(smsRecord)
+    fun getPreOrderRequest(){
+
+        // ToDo - create pre-order request object and post to view to call upload api
 
     }
 
