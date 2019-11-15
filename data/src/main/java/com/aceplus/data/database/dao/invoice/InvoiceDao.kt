@@ -48,4 +48,9 @@ interface InvoiceDao {
     @Query("select customer.customer_name,invoice.invoice_id,invoice.sale_date,invoice.total_quantity,invoice.total_amount from invoice,customer where date(invoice.sale_date) = date('now') and invoice.invoice_id NOT LIKE 'OS%' and invoice.customer_id=customer.id")
     fun getSaleCancelList():List<SaleCancelItem>
 
+    @Query("Delete from  invoice where invoice_id=:invoiceId")
+    fun deleteAll(invoiceId:String)
+
+
+
 }

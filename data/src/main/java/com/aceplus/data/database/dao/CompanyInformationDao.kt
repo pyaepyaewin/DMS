@@ -23,4 +23,7 @@ interface CompanyInformationDao{
     @Query("Delete from company_information")
     fun deleteAll()
 
+    @Query("select * from company_information")
+    fun getTaxPercent():List<CompanyInformation>
+
 }

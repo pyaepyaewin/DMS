@@ -247,7 +247,7 @@
                         android:textStyle="bold" />
             </LinearLayout>
 
-            <ListView
+            <android.support.v7.widget.RecyclerView
                     android:id="@+id/soldProductList"
                     android:layout_width="match_parent"
                     android:layout_height="300dp"
@@ -266,7 +266,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
 
-                    <ListView
+                    <android.support.v7.widget.RecyclerView
                             android:id="@+id/promotion_plan_gift_listview"
                             android:layout_width="match_parent"
                             android:layout_height="150dp" />

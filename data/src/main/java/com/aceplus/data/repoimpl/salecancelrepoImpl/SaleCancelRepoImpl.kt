@@ -11,20 +11,41 @@ import com.aceplus.domain.vo.SoldProductInfo
 import io.reactivex.Observable
 
 class SaleCancelRepoImpl(val database: MyDatabase) : SaleCancelRepo {
-    override fun getSoldProductList(productIdList: List<String>): Observable<List<Product>> {
-        return Observable.just(database.productDao().allProductData(productIdList))
+//    override fun getTaxPercent() {
+//        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+//    }
+
+    override fun updateQuantity(invoiceId: String, productId: String, qty: Int) {
+        return database.invoiceProductDao().updateQtyForInvoiceProduct(invoiceId,productId,qty)
 
     }
 
+    override fun deleteInvoiceProductForLongClick(productId: String) {
+        return database.invoiceProductDao().deleteInvoiceProduct(productId)
+
+    }
+
+
+
+    override fun deleteInvoiceData(invoiceId: String) {
+        return database.invoiceDao().deleteAll(invoiceId)
+
+    }
+
+    override fun deleteInvoiceProduct(invoiceId: String) {
+        return database.invoiceProductDao().deleteAll(invoiceId)
+
+    }
+
+    override fun getSoldProductList(productIdList: List<String>): Observable<List<SaleCancelDetailItem>> {
+        return Observable.just(database.productDao().allProductData(productIdList))
+
+    }
 
     override fun getProductIdList(invoiceID: String): Observable<List<String>> {
         return Observable.just(database.invoiceProductDao().getProductIdList(invoiceID))
 
     }
-
-
-
-
     override fun getSaleCancelList(): Observable<List<SaleCancelItem>> {
         return Observable.just(database.invoiceDao().getSaleCancelList())
     }

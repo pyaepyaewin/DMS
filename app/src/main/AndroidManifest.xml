@@ -52,83 +52,84 @@
                 <action android:name="android.intent.action.VIEW" />
             </intent-filter>
         </activity>
-
         <activity
                 android:name=".ui.activities.MainActivity"
-                        android:screenOrientation="landscape" />
-
+                android:screenOrientation="landscape" />
         <activity
                 android:name=".ui.activities.customer.sale.SaleCancelDetailActivity"
-                android:screenOrientation="landscape"></activity>
+                android:screenOrientation="landscape" />
         <activity
                 android:name=".ui.activities.LoginActivity"
-                android:screenOrientation="landscape"/>
+                android:screenOrientation="landscape" />
         <activity
                 android:name=".ui.activities.SyncActivity"
-                android:screenOrientation="landscape"/>
+                android:screenOrientation="landscape" />
         <activity
                 android:name=".ui.activities.RouteActivity"
-                android:screenOrientation="landscape"/>
+                android:screenOrientation="landscape" />
         <activity
                 android:name=".ui.activities.CustomerVisitActivity"
-                android:screenOrientation="landscape"/>
+                android:screenOrientation="landscape" />
         <activity
                 android:name=".ui.activities.PromotionActivity"
-                android:screenOrientation="landscape"/>
+                android:screenOrientation="landscape" />
         <activity
                 android:name=".ui.activities.VanIssueActivity"
-                android:screenOrientation="landscape"/>
+                android:screenOrientation="landscape" />
         <activity
                 android:name=".ui.activities.ReportActivity"
-                android:screenOrientation="landscape"/>
+                android:screenOrientation="landscape" />
         <activity
                 android:name=".ui.activities.customer.CustomerActivity"
-                android:screenOrientation="landscape"/>
+                android:screenOrientation="landscape" />
         <activity
                 android:name=".ui.activities.customer.AddNewCustomerActivity"
-                android:screenOrientation="landscape"/>
+                android:screenOrientation="landscape" />
         <activity
                 android:name=".ui.activities.customer.CreditCollectionActivity"
-                android:screenOrientation="landscape"/>
+                android:screenOrientation="landscape" />
         <activity
                 android:name=".ui.activities.customer.DeliveryActivity"
-                android:screenOrientation="landscape"/>
+                android:screenOrientation="landscape" />
         <activity
                 android:name=".ui.activities.customer.sale.SaleCancelActivity"
-                android:screenOrientation="landscape"/>
+                android:screenOrientation="landscape" />
         <activity
                 android:name=".ui.activities.customer.CustomerLocationActivity"
-                android:screenOrientation="landscape"/>
+                android:screenOrientation="landscape" />
         <activity
                 android:name=".ui.activities.customer.sale.SaleReturnActivity"
-                android:screenOrientation="landscape"/>
+                android:screenOrientation="landscape" />
         <activity
                 android:name=".ui.activities.customer.AddNewCustomerLocationActivity"
-                android:screenOrientation="landscape"/>
+                android:screenOrientation="landscape" />
         <activity
                 android:name=".ui.activities.customer.sale.SaleActivity"
-                android:screenOrientation="landscape"/>
+                android:screenOrientation="landscape" />
         <activity
                 android:name=".ui.activities.customer.saleorder.SaleOrderActivity"
-                android:screenOrientation="landscape"/>
+                android:screenOrientation="landscape" />
         <activity
                 android:name=".ui.activities.customer.PosmActivity"
-                android:screenOrientation="landscape"/>
+                android:screenOrientation="landscape" />
         <activity
                 android:name=".ui.activities.customer.sale.SaleCheckoutActivity"
-                android:screenOrientation="landscape"/>
+                android:screenOrientation="landscape" />
         <activity
                 android:name=".ui.activities.CreditCollectionCheckoutActivity"
-                android:screenOrientation="landscape"/>
+                android:screenOrientation="landscape" />
         <activity
                 android:name=".ui.activities.PrintInvoiceActivity"
-                android:screenOrientation="landscape"/>
+                android:screenOrientation="landscape" />
         <activity
                 android:name=".ui.activities.DeviceListActivity"
-                android:screenOrientation="landscape"/>
+                android:screenOrientation="landscape" />
         <activity
                 android:name=".ui.activities.customer.saleorder.SaleOrderCheckoutActivity"
-                android:screenOrientation="landscape"/>
+                android:screenOrientation="landscape" />
+        <activity
+                android:name=".ui.activities.customer.sale.SaleCancelCheckoutActivity"
+                android:screenOrientation="landscape"></activity>
     </application>
 
 </manifest>

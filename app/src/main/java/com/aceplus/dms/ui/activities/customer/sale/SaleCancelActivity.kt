@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
+import android.util.Log.i
 import com.aceplus.dms.R
 import com.aceplus.dms.ui.adapters.sale.SalesCancelAdapter
 import com.aceplus.dms.viewmodel.factory.KodeinViewModelFactory
@@ -57,7 +58,7 @@ class SaleCancelActivity : BaseActivity(), KodeinAware {
         saleCancelViewModel.saleCancelErrorState.observe(
             this,
             android.arch.lifecycle.Observer {
-
+              i("Tag",it)
             })
         sale_cancel_item_list.apply {
             layoutManager = LinearLayoutManager(context)
@@ -67,6 +68,7 @@ class SaleCancelActivity : BaseActivity(), KodeinAware {
 
     }
     private fun onClickNoticeListItem(data: SaleCancelItem) {
-        startActivity(SaleCancelDetailActivity.getIntent(this,data.invoice_id))
+        startActivity(SaleCancelDetailActivity.getIntent(this,data.invoice_id,data.sale_date))
+        finish()
     }
 }
