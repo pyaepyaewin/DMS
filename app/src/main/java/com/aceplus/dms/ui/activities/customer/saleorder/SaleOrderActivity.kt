@@ -109,10 +109,13 @@ class SaleOrderActivity : BaseActivity(), KodeinAware {
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
 
         getIntentData()
-        mOrderedProductListAdapter.setNewList(soldProductList)
-        for (i in soldProductList){
-            val netAmount = (i.quantity * i.product.selling_price!!.toInt())
-            tvNetAmount.text = netAmount.toString()
+        if (from == "fragmentDeliveryReport") {
+            mOrderedProductListAdapter.setNewList(soldProductList)
+            for (i in soldProductList) {
+                var netAmount = 0
+                netAmount += (i.quantity * i.product.selling_price!!.toInt())
+                tvNetAmount.text = netAmount.toString()
+            }
         }
         setupUI()
         catchEvents()
