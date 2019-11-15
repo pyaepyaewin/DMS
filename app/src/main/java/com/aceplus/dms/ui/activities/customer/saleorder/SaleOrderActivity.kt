@@ -109,14 +109,7 @@ class SaleOrderActivity : BaseActivity(), KodeinAware {
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
 
         getIntentData()
-        if (from == "fragmentDeliveryReport") {
-            mOrderedProductListAdapter.setNewList(soldProductList)
-            for (i in soldProductList) {
-                var netAmount = 0
-                netAmount += (i.quantity * i.product.selling_price!!.toInt())
-                tvNetAmount.text = netAmount.toString()
-            }
-        }
+        mOrderedProductListAdapter.setNewList(soldProductList)
         setupUI()
         catchEvents()
         saleViewModel.loadProductList()
@@ -142,6 +135,11 @@ class SaleOrderActivity : BaseActivity(), KodeinAware {
     }
 
     private fun setupUI(){
+        for (i in soldProductList) {
+            var netAmount = 0
+            netAmount += (i.quantity * i.product.selling_price!!.toInt())
+            tvNetAmount.text = netAmount.toString()
+        }
 
         headerDiscount.visibility = View.GONE
         tableHeaderQty.visibility = View.GONE
