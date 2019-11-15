@@ -13,6 +13,10 @@ import com.aceplus.domain.vo.customer.DeliveryVO
 import io.reactivex.Observable
 
 class DeliveryRepoImpl(private val db: MyDatabase) : DeliveryRepo {
+    //Testing
+    override fun allData(): Observable<List<Delivery>> {
+        return Observable.just(db.deliveryDao().allData)
+    }
 
     override fun deliveryDataList(): Observable<List<DeliveryVO>> {
         return Observable.just(db.deliveryDao().getDeliveryData())

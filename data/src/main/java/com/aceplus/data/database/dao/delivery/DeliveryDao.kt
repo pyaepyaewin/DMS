@@ -33,7 +33,7 @@ interface DeliveryDao {
     @Query("select product_name,total_quantity from product inner  join delivery on delivery.invoice_no = :invoiceId")
     fun getDeliverDetailReport(invoiceId:String): List<DeliverDetailReport>
 
-    @Query("select customer.id as CID ,customer.customer_name,customer.address,delivery.id as DID,delivery.invoice_no,delivery.amount,delivery.paid_amount,pre_order.discount,pre_order.discount_percent,delivery.sale_man_id,remark from customer inner  join delivery on delivery.customer_id = customer.id inner join pre_order on delivery.customer_id = pre_order.customer_id")
+    @Query("select customer.id as CID ,customer.customer_name,customer.address,delivery.id as DID,delivery.invoice_no,delivery.amount,delivery.paid_amount,delivery.discount,delivery.discount_percent,delivery.sale_man_id,delivery.remark from customer inner  join delivery on delivery.customer_id = customer.id")
     fun getDeliveryData(): List<DeliveryVO>
 
 }

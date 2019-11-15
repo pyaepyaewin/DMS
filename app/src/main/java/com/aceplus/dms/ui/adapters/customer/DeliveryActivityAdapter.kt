@@ -8,10 +8,17 @@ import com.aceplus.domain.model.delivery.Deliver
 import com.aceplus.domain.vo.customer.DeliveryVO
 import com.aceplus.shared.ui.adapter.BaseRecyclerViewAdapter
 
-class DeliveryActivityAdapter(private val onClick: (deliver: DeliveryVO) -> Unit):
-    BaseRecyclerViewAdapter<DeliveryActivityViewHolder, DeliveryVO>() {
+class DeliveryActivityAdapter(private val onClick: (deliver: Deliver) -> Unit):
+    BaseRecyclerViewAdapter<DeliveryActivityViewHolder, Deliver>() {
     override fun onCreateViewHolder(p0: ViewGroup, p1: Int): DeliveryActivityViewHolder {
-        val view = LayoutInflater.from(p0.context).inflate(R.layout.list_row_delivery_report,p0,false)
-        return DeliveryActivityViewHolder(view,onClick)
+        val view =
+            LayoutInflater.from(p0.context).inflate(R.layout.list_row_delivery_report, p0, false)
+        return DeliveryActivityViewHolder(view, onClick)
     }
+
+//    override fun onBindViewHolder(holder: DeliveryActivityViewHolder, position: Int) {
+//
+//        holder.setData(mDataList[position],position)
+//
+//    }
 }

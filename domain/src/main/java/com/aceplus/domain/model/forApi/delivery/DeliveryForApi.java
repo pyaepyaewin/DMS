@@ -55,6 +55,14 @@ public class DeliveryForApi {
     @Expose
     String paidAmount;
 
+    @SerializedName("Discount")
+    @Expose
+    Double discount;
+
+    @SerializedName("DiscountPercent")
+    @Expose
+    Double discountPercent;
+
     /**
      * expDate
      */
@@ -68,6 +76,11 @@ public class DeliveryForApi {
     @SerializedName("SaleManId")
     @Expose
     String saleManId;
+
+    @SerializedName("Remark")
+    @Expose
+    String remark;
+
 
     /**
      * deliveryItemForApiList
@@ -181,6 +194,12 @@ public class DeliveryForApi {
     public String getPaidAmount() {
         return paidAmount;
     }
+    public Double getDiscount() {
+        return discount;
+    }
+    public Double getDiscountPercent() {
+        return discountPercent;
+    }
 
     /**
      * Setter method for paidAmount
@@ -216,6 +235,10 @@ public class DeliveryForApi {
      */
     public String getSaleManId() {
         return saleManId;
+    }
+
+    public String getRemark() {
+        return remark;
     }
 
     /**

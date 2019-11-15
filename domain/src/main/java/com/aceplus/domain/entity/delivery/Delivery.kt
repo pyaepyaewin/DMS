@@ -41,6 +41,16 @@ class Delivery {
     @Expose
     var paid_amount: String? = null
 
+    @ColumnInfo(name = "discount")
+    @SerializedName("discount")
+    @Expose
+    var discount: Double? = null
+
+    @ColumnInfo(name = "discount_percent")
+    @SerializedName("discount_percent")
+    @Expose
+    var discount_percent: Double? = null
+
     @ColumnInfo(name = "expire_date")
     @SerializedName("expire_date")
     @Expose
@@ -50,4 +60,9 @@ class Delivery {
     @SerializedName("sale_man_id")
     @Expose
     var sale_man_id:String? = null
+
+    @ColumnInfo(name = "remark")
+    @SerializedName("remark")
+    @Expose
+    var remark: String? = null
 }

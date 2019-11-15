@@ -53,22 +53,6 @@ class SaleOrderActivity : BaseActivity(), KodeinAware {
             intent.putExtra(IE_CUSTOMER_DATA, customerId)
             return intent
         }
-
-        fun newIntentFromDelivery(
-            context: FragmentActivity,
-            b: Boolean,
-            customer: com.aceplus.domain.model.customer.Customer,
-            soldProductList: ArrayList<SoldProduct>,
-            deliver: Deliver
-        ): Intent? {
-            val intent = Intent(context, SaleOrderActivity::class.java)
-            intent.putExtra(IE_IS_DELIVERY, b)
-            intent.putExtra(IE_CUSTOMER_INFO_KEY, customer)
-            intent.putExtra(IE_SOLD_PROUDCT_LIST_KEY, soldProductList)
-            intent.putExtra(IE_ORDERED_INVOICE_KEY, deliver)
-            return intent
-
-        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

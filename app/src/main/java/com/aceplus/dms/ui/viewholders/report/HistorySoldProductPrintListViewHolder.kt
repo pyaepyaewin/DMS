@@ -1,5 +1,6 @@
 package com.aceplus.dms.ui.viewholders.report
 
+import android.util.Log
 import android.view.View
 import com.aceplus.dms.utils.Utils
 import com.aceplus.domain.vo.report.SaleInvoiceDetailReport
