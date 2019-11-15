@@ -5,14 +5,16 @@ import android.arch.lifecycle.Observer
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.support.v4.app.FragmentActivity
 import android.support.v7.widget.GridLayoutManager
+import android.support.v7.widget.LinearLayoutManager
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
 import android.widget.*
 import com.aceplus.data.utils.Constant
 import com.aceplus.dms.R
-import com.aceplus.dms.ui.activities.customer.sale.SaleCheckoutActivity
 import com.aceplus.dms.ui.adapters.sale.ProductListAdapter
 import com.aceplus.dms.ui.adapters.saleorder.OrderedProductListAdapter
 import com.aceplus.dms.utils.Utils
@@ -20,13 +22,13 @@ import com.aceplus.dms.viewmodel.customer.sale.SaleViewModel
 import com.aceplus.domain.entity.customer.Customer
 import com.aceplus.domain.entity.product.Product
 import com.aceplus.domain.entity.promotion.Promotion
+import com.aceplus.domain.model.delivery.Deliver
 import com.aceplus.domain.vo.SoldProductInfo
 import com.aceplussolutions.rms.ui.activities.BaseActivity
 import kotlinx.android.synthetic.main.activity_sale.*
 import kotlinx.android.synthetic.main.activity_sale.saleDateTextView
 import kotlinx.android.synthetic.main.activity_sale.tableHeaderQty
 import kotlinx.android.synthetic.main.activity_sale1.*
-import kotlinx.android.synthetic.main.dialog_box_sale_quantity.*
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.kodein
@@ -34,12 +36,12 @@ import java.util.*
 import kotlin.collections.ArrayList
 import kotlinx.android.synthetic.main.activity_sale.cancelImg as cancelImg1
 import kotlinx.android.synthetic.main.activity_sale.checkoutImg as checkoutImg1
-import kotlinx.android.synthetic.main.activity_sale.headerDiscount as headerDiscount1
 import kotlinx.android.synthetic.main.activity_sale.rvSoldProductList as rvSoldProductList1
 import kotlinx.android.synthetic.main.activity_sale.searchAutoCompleteTextView as searchAutoCompleteTextView1
-import kotlinx.android.synthetic.main.activity_sale.tvNetAmount as tvNetAmount1
+import kotlinx.android.synthetic.main.activity_sale1.headerDiscount as headerDiscount1
 import kotlinx.android.synthetic.main.activity_sale1.rvProductList as rvProductList1
 import kotlinx.android.synthetic.main.activity_sale1.searchAndSelectProductsLayout as searchAndSelectProductsLayout1
+import kotlinx.android.synthetic.main.activity_sale1.tvNetAmount as tvNetAmount1
 
 class SaleOrderActivity : BaseActivity(), KodeinAware {
 
@@ -51,9 +53,15 @@ class SaleOrderActivity : BaseActivity(), KodeinAware {
     companion object {
 
         private const val IE_CUSTOMER_DATA = "IE_CUSTOMER_DATA"
+        private const val IE_IS_DELIVERY = "is-delivery"
+        private const val IE_CUSTOMER_INFO_KEY = "customer-info-key"
+        private const val IE_SOLD_PRODUCT_LIST_KEY = "sold-product-list-key"
+        private const val IE_ORDERED_INVOICE_KEY = "ordered_invoice_key"
+        private const val IE_FROM = "IE_FROM"
 
         fun newIntentFromCustomer(context: Context, customerData: Customer): Intent {
             val intent = Intent(context, SaleOrderActivity::class.java)
+            intent.putExtra(IE_FROM,"fromCustomer")
             intent.putExtra(IE_CUSTOMER_DATA, customerData)
             return intent
         }
@@ -63,17 +71,35 @@ class SaleOrderActivity : BaseActivity(), KodeinAware {
             intent.putExtra(IE_CUSTOMER_DATA, customerId)
             return intent
         }
+        fun newIntentFromDelivery(
+            context: FragmentActivity,
+            b: Boolean,
+            customer: Customer,
+            soldProductList: ArrayList<SoldProductInfo>,
+            deliver: Deliver
+        ): Intent? {
+            val intent = Intent(context, SaleOrderActivity::class.java)
+            intent.putExtra(IE_FROM,"fragmentDeliveryReport")
+            intent.putExtra(IE_IS_DELIVERY, b)
+            intent.putExtra(IE_CUSTOMER_INFO_KEY, customer)
+            intent.putExtra(IE_SOLD_PRODUCT_LIST_KEY, soldProductList)
+            intent.putExtra(IE_ORDERED_INVOICE_KEY, deliver)
+            return intent
+
+        }
     }
 
     private val saleViewModel: SaleViewModel by viewModel()
     private val mProductListAdapter by lazy { ProductListAdapter(this::onClickProductListItem) }
     private val mOrderedProductListAdapter: OrderedProductListAdapter by lazy { OrderedProductListAdapter(this::onLongClickOrderedProductListItem, this::onFocCheckChange, this::onClickQtyButton, this.isDelivery) }
     private val mSearchProductAdapter by lazy { ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, ArrayList<String>()) }
-
     private val duplicateProductList = mutableListOf<Product>()
     private var promotionList: ArrayList<Promotion> = ArrayList()
     private var isDelivery: Boolean = false
     private var customer: Customer? = null
+    private var soldProductList = ArrayList<SoldProductInfo>()
+    private var orderedInvoice: Deliver? = null
+    private var from: String? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -83,15 +109,33 @@ class SaleOrderActivity : BaseActivity(), KodeinAware {
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
 
         getIntentData()
+        mOrderedProductListAdapter.setNewList(soldProductList)
+        for (i in soldProductList){
+            val netAmount = (i.quantity * i.product.selling_price!!.toInt())
+            tvNetAmount.text = netAmount.toString()
+        }
         setupUI()
         catchEvents()
-
         saleViewModel.loadProductList()
-
     }
 
     private fun getIntentData(){
-        if (intent.getParcelableExtra<Customer>(IE_CUSTOMER_DATA) != null) customer = intent.getParcelableExtra(IE_CUSTOMER_DATA)
+        if (from != "fragmentDeliveryReport") {
+            if (intent.getParcelableExtra<Customer>(IE_CUSTOMER_DATA) != null) customer =
+                intent.getParcelableExtra(IE_CUSTOMER_DATA)
+        }else{
+            if (intent.getSerializableExtra(IE_CUSTOMER_INFO_KEY) != null) {
+                customer = intent.getSerializableExtra(IE_CUSTOMER_INFO_KEY) as Customer
+            }
+        }
+        isDelivery = intent.getBooleanExtra(IE_IS_DELIVERY, false)
+
+        if (intent.getSerializableExtra(IE_SOLD_PRODUCT_LIST_KEY) != null) {
+            soldProductList = intent.getSerializableExtra(IE_SOLD_PRODUCT_LIST_KEY) as ArrayList<SoldProductInfo>
+        }
+         if (intent.getSerializableExtra(IE_ORDERED_INVOICE_KEY) != null) {
+            orderedInvoice = intent.getSerializableExtra(IE_ORDERED_INVOICE_KEY) as Deliver
+        }
     }
 
     private fun setupUI(){
@@ -136,13 +180,15 @@ class SaleOrderActivity : BaseActivity(), KodeinAware {
                 ?: Utils.commonDialog("No issued product", this, 2)
         })
 
-        saleViewModel.calculatedSoldProductList.observe(this, Observer {
-            if (it != null){
-                mOrderedProductListAdapter.setNewList(it.first)
-                tvNetAmount.text = Utils.formatAmount(it.second)
-                saleViewModel.calculatedSoldProductList.value = null
-            }
-        })
+
+            saleViewModel.calculatedSoldProductList.observe(this, Observer {
+                if (it != null) {
+                    mOrderedProductListAdapter.setNewList(it.first)
+                    tvNetAmount.text = Utils.formatAmount(it.second)
+                    saleViewModel.calculatedSoldProductList.value = null
+                }
+            })
+
 
     }
 
@@ -297,6 +343,11 @@ class SaleOrderActivity : BaseActivity(), KodeinAware {
 
         if (isFocPass){
             val intent = SaleOrderCheckoutActivity.getIntentFromSaleOrder(this, customer!!, mOrderedProductListAdapter.getDataList() as ArrayList, this.promotionList)
+            startActivity(intent)
+        }
+
+        if (orderedInvoice != null){
+            val intent = SaleOrderCheckoutActivity.getIntent(this, orderedInvoice!!)
             startActivity(intent)
         }
 

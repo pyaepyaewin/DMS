@@ -18,9 +18,9 @@ class DeliveryVO(
     @ColumnInfo(name = "paid_amount")
     var paidAmount: String? = null,
     @ColumnInfo(name = "discount")
-    var discount: String? = null,
+    var discount: Double,
     @ColumnInfo(name = "discount_percent")
-    var discountPercent: String? = null,
+    var discountPercent: Double,
     @ColumnInfo(name = "sale_man_id")
     var saleManId: String? = null,
     @ColumnInfo(name = "remark")

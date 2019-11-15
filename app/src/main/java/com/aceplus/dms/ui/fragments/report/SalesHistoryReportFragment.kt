@@ -38,7 +38,7 @@ class SalesHistoryReportFragment : BaseFragment(), KodeinAware {
     private var toDate: String? = null
     private var invoice: Invoice? = null
     var saleHistoryDataList: List<SaleInvoiceReport> = listOf()
-    var saleHistoryDetailList: List<SaleInvoiceDetailReport> = listOf()
+    private var saleHistoryDetailList: List<SaleInvoiceDetailReport> = listOf()
 
     private val saleHistoryReportAdapter: SaleInvoiceReportAdapter by lazy {
         SaleInvoiceReportAdapter(

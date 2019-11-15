@@ -6,6 +6,7 @@ import com.aceplus.data.remote.DownloadApiService
 import com.aceplus.data.remote.UploadApiService
 import com.aceplus.data.utils.Constant
 import com.aceplus.domain.entity.*
+import com.aceplus.domain.entity.Currency
 import com.aceplus.domain.entity.classdiscount.*
 import com.aceplus.domain.entity.credit.Credit
 import com.aceplus.domain.entity.customer.Customer
@@ -98,7 +99,7 @@ import com.aceplus.domain.model.forApi.volumediscount.VolumeDiscountResponse
 import com.aceplus.domain.repo.SyncRepo
 import com.aceplussolutions.rms.constants.AppUtils
 import io.reactivex.Observable
-import java.util.ArrayList
+import java.util.*
 
 class SyncRepoImpl(
     private val downloadApiService: DownloadApiService,
@@ -130,7 +131,8 @@ class SyncRepoImpl(
     override fun getRouteScheduleIDV2(): Int {
         val saleManId = AppUtils.getStringFromShp(Constant.SALEMAN_ID, shf)
         val routeSchedule = db.routeScheduleV2Dao().dataBySaleManId(saleManId!!)
-        val routeScheduleItems = db.routeScheduleItemV2Dao().allDataByRouteScheduleId(routeSchedule.id.toString())
+        val routeScheduleItems =
+            db.routeScheduleItemV2Dao().allDataByRouteScheduleId(routeSchedule.id.toString())
         return if (routeScheduleItems.count() > 0)
             routeScheduleItems[0].route_schedule_id
         else
@@ -180,10 +182,14 @@ class SyncRepoImpl(
             invoiceForApi.bankName = it.bank_name
             invoiceForApi.bankAccountNo = it.bank_account_no
 
-            invoiceForApi.productDiscountPercent = "promotionDiscountPercent"//todo change table column
-            invoiceForApi.productDiscountAmount = "promotionDiscountAmount"//todo change table column
-            invoiceForApi.deliveryDiscountPercent = "deliveryDiscountPercent"//todo change table column
-            invoiceForApi.deliveryDiscountAmount = "deliveryDiscountAmount"//todo change table column
+            invoiceForApi.productDiscountPercent =
+                "promotionDiscountPercent"//todo change table column
+            invoiceForApi.productDiscountAmount =
+                "promotionDiscountAmount"//todo change table column
+            invoiceForApi.deliveryDiscountPercent =
+                "deliveryDiscountPercent"//todo change table column
+            invoiceForApi.deliveryDiscountAmount =
+                "deliveryDiscountAmount"//todo change table column
 
             val invoiceDetailForApiList = ArrayList<InvoiceDetail>()
             val invoiceDetailList = db.invoiceProductDao().allDataById(it.invoice_id)
@@ -251,10 +257,14 @@ class SyncRepoImpl(
             preOrderApi.remark = it.remark
             preOrderApi.bankName = it.bank_name
             preOrderApi.bankAccountNo = it.bank_account_no
-            preOrderApi.productDiscountPercent = "preOrder.getProductDiscountPercent()"//todo change table
-            preOrderApi.productDiscountAmount = "preOrder.getProductDiscountAmount()"//todo change table
-            preOrderApi.deliveryDiscountPercent = "preOrder.getDeliveryDiscountPercent()"//todo change table
-            preOrderApi.deliveryDiscountAmount = "preOrder.getDeliveryDiscountAmount()"//todo change table
+            preOrderApi.productDiscountPercent =
+                "preOrder.getProductDiscountPercent()"//todo change table
+            preOrderApi.productDiscountAmount =
+                "preOrder.getProductDiscountAmount()"//todo change table
+            preOrderApi.deliveryDiscountPercent =
+                "preOrder.getDeliveryDiscountPercent()"//todo change table
+            preOrderApi.deliveryDiscountAmount =
+                "preOrder.getDeliveryDiscountAmount()"//todo change table
 
             val preOrderProductList = db.preOrderProductDao().allDataById(it.invoice_id)
 
@@ -609,7 +619,8 @@ class SyncRepoImpl(
                 request.routeId = routeScheduleID.toString()
 
             val itemLists = ArrayList<DeviceIssueItem>()
-            val deviceIssueRequestItemDataList = db.deviceIssueRequestItemDao().allDataById(it.invoice_no)
+            val deviceIssueRequestItemDataList =
+                db.deviceIssueRequestItemDao().allDataById(it.invoice_no)
 
             deviceIssueRequestItemDataList.map {
                 val deviceIssueItem = DeviceIssueItem()
@@ -1101,7 +1112,8 @@ class SyncRepoImpl(
 
     override fun saveDiscountCategoryQuantityData(discountCategoryQuantityList: List<DataForDiscountCategoryQuantity>) {
         val tDiscountByCategoryQuantityEntityList = mutableListOf<TDiscountByCategoryQuantity>()
-        val tDiscountByCategoryQuantityItemEntityList = mutableListOf<TDiscountByCategoryQuantityItem>()
+        val tDiscountByCategoryQuantityItemEntityList =
+            mutableListOf<TDiscountByCategoryQuantityItem>()
         discountCategoryQuantityList.map { data ->
             data.tDiscountByCategoryQuantity.map {
                 val tDiscountByCategoryQuantity = TDiscountByCategoryQuantity()
@@ -1328,6 +1340,9 @@ class SyncRepoImpl(
                 deliveryEntity.paid_amount = delivery.paidAmount
                 deliveryEntity.expire_date = delivery.expDate
                 deliveryEntity.sale_man_id = delivery.saleManId
+                deliveryEntity.discount = delivery.discount
+                deliveryEntity.discount_percent = delivery.discountPercent
+                deliveryEntity.remark = delivery.remark
 
                 deliveryEntityList.add(deliveryEntity)
 

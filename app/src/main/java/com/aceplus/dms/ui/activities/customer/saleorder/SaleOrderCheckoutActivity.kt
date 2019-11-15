@@ -7,10 +7,13 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import com.aceplus.dms.R
+import com.aceplus.dms.ui.activities.customer.DeliveryActivity
+import com.aceplus.dms.ui.fragments.customer.FragmentDeliveryReport
 import com.aceplus.dms.utils.Utils
 import com.aceplus.dms.viewmodel.customer.sale.SaleCheckoutViewModel
 import com.aceplus.domain.entity.customer.Customer
 import com.aceplus.domain.entity.promotion.Promotion
+import com.aceplus.domain.model.delivery.Deliver
 import com.aceplus.domain.vo.SoldProductInfo
 import com.aceplussolutions.rms.ui.activities.BaseActivity
 import kotlinx.android.synthetic.main.activity_sale_checkout.*
@@ -43,6 +46,7 @@ import kotlinx.android.synthetic.main.activity_sale_checkout.tax_label_saleCheck
 import kotlinx.android.synthetic.main.activity_sale_checkout.tvNetAmount as tvNetAmount1
 import kotlinx.android.synthetic.main.activity_sale_checkout.tvTotalAmount as tvTotalAmount1
 import kotlinx.android.synthetic.main.activity_sale_checkout.tax_txtView as tax_txtView1
+import kotlinx.android.synthetic.main.activity_sale_order_checkout.advancedPaidAmount as advancedPaidAmount1
 import kotlinx.android.synthetic.main.activity_sale_order_checkout.advancedPaidAmountLayout as advancedPaidAmountLayout1
 import kotlinx.android.synthetic.main.activity_sale_order_checkout.bank_branch_layout as bank_branch_layout1
 import kotlinx.android.synthetic.main.activity_sale_order_checkout.duedateLayout as duedateLayout1
@@ -66,6 +70,11 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
         private const val IE_SOLD_PRODUCT_LIST = "IE_SOLD_PRODUCT_LIST"
         private const val IE_PROMOTION_LIST = "IE_PROMOTION_LIST"
         private const val IE_IS_DELIVERY = "IE_IS_DELIVERY"
+        // For pre order
+        private const val IS_PRE_ORDER = "is-pre-order"
+        //For delivery
+        private const val ORDERED_INVOICE_KEY = "ordered_invoice_key"
+
 
         fun getIntentFromSaleOrder(context: Context, customerData: Customer, soldProductList: ArrayList<SoldProductInfo>, promotionList: ArrayList<Promotion>): Intent{
 
@@ -77,11 +86,19 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
 
         }
 
+        fun getIntent(saleOrderActivity: SaleOrderActivity, orderedInvoice: Deliver): Intent? {
+            val intent = Intent(saleOrderActivity, SaleOrderCheckoutActivity::class.java)
+            intent.putExtra(ORDERED_INVOICE_KEY,orderedInvoice)
+            return intent
+        }
+
     }
 
     private val saleCheckoutViewModel: SaleCheckoutViewModel by viewModel()
 
     private val df = DecimalFormat(".##")
+    private var orderedInvoice: Deliver? = null
+    private var isPreOrder: Boolean = false
     private var customer: Customer? = null
     private var isDelivery: Boolean = false
     private var soldProductList: ArrayList<SoldProductInfo> = ArrayList()
@@ -124,6 +141,12 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
         volDisForPreOrderLayout.visibility = View.GONE
         checkout_delivery_date_layout.visibility = View.VISIBLE
         duedateLayout.visibility = View.GONE
+        if (isDelivery) {
+            advancedPaidAmount.text = Utils.formatAmount(orderedInvoice!!.paidAmount)
+        }
+        if (isDelivery) {
+            tvTitle.text = (R.string.delivery_checkout).toString()
+        }
 
     }
 
@@ -171,11 +194,12 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
     }
 
     private fun getIntentData(){
-
+        isPreOrder = intent.getBooleanExtra(IS_PRE_ORDER, false)
         isDelivery = intent.getBooleanExtra(IE_IS_DELIVERY, false)
         if (intent.getParcelableExtra<Customer>(IE_CUSTOMER_DATA) != null) customer = intent.getParcelableExtra(IE_CUSTOMER_DATA)
         if (intent.getParcelableArrayListExtra<SoldProductInfo>(IE_SOLD_PRODUCT_LIST) != null) soldProductList = intent.getParcelableArrayListExtra(IE_SOLD_PRODUCT_LIST)
         if (intent.getParcelableArrayListExtra<Promotion>(IE_PROMOTION_LIST) != null) promotionList = intent.getParcelableArrayListExtra(IE_PROMOTION_LIST)
+        if (intent.getSerializableExtra(ORDERED_INVOICE_KEY) != null) orderedInvoice = intent.getSerializableExtra(ORDERED_INVOICE_KEY) as Deliver
 
     }
 
@@ -307,6 +331,17 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
 
         return taxAmt
 
+    }
+
+    override fun onBackPressed() {
+        if (isPreOrder){ }
+        else if(isDelivery){ toDeliveryActivity()}
+        super.onBackPressed()
+    }
+    private fun toDeliveryActivity(){
+        val intent = Intent(this@SaleOrderCheckoutActivity, DeliveryActivity::class.java)
+        startActivity(intent)
+        finish()
     }
 
 }

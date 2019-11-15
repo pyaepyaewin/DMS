@@ -36,7 +36,8 @@ class OrderedProductListViewHolder(
             if (data.promotionPrice != 0.0) promoPrice = data.promotionPrice
             promotionPrice.text = Utils.formatAmount(promoPrice)
 
-            amount.text = Utils.formatAmount(data.totalAmt)
+//            amount.text = Utils.formatAmount(data.totalAmt)
+            amount.text = (data.quantity * sellingPrice!!.toInt()).toString()
 
             FocCheck.isChecked = data.isFocIsChecked
             FocCheck.setOnClickListener { onFocCheckChange(data, FocCheck.isChecked, position) }
