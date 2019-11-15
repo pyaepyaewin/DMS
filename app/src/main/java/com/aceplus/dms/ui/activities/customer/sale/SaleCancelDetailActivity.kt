@@ -41,7 +41,7 @@ class SaleCancelDetailActivity : AppCompatActivity(), KodeinAware {
     var soldProductList1 = mutableListOf<String>()
     var soldProductDataList = mutableListOf<SaleCancelDetailItem>()
     private var isPreOrder: Boolean = false
-    private val duplicateProductList = mutableListOf<SoldProductInfo>()
+    private var duplicateProductList = mutableListOf<SoldProductInfo>()
 
 
     lateinit var alertDialog1: AlertDialog
@@ -78,6 +78,9 @@ class SaleCancelDetailActivity : AppCompatActivity(), KodeinAware {
         cancelImg.setOnClickListener {
             onBackPressed()
             true
+        }
+        checkoutImg.setOnClickListener {
+            startActivity(SaleCancelCheckoutActivity.getSaleCancelDetailIntent(this,saleCancelDetailAdapter.getDataList() as ArrayList,invoiceid,invoicedate))
         }
         saleCancelDetailViewModel.productIdListSuccessState.observe(
             this,
@@ -213,8 +216,15 @@ class SaleCancelDetailActivity : AppCompatActivity(), KodeinAware {
                    // saleCancelDetailViewModel.updateQty(quantity,soldProduct.product.product_id!!)
                         val newList = saleCancelDetailAdapter.getDataList() as ArrayList
                     newList[position] = soldProduct
+                    var totalAmt: Double = 0.00
+                    for (i in newList) {
 
-                    saleCancelDetailAdapter.notifyItemRemoved(position)
+                        val amt = i.quantity.toDouble() * i.product.selling_price!!.toDouble()
+                        totalAmt += amt
+                        tvNetAmount.text = totalAmt.toString()
+                    }
+
+                   saleCancelDetailAdapter.notifyItemChanged(position)
 
                }
 
@@ -231,27 +241,31 @@ class SaleCancelDetailActivity : AppCompatActivity(), KodeinAware {
 
     }
 
-    private fun onLongClickSoldProductListItem(soldProduct: SoldProductInfo, position: Int) {
+    private fun onLongClickSoldProductListItem(soldProduct: SoldProductInfo,position: Int) {
 
         android.app.AlertDialog.Builder(this)
             .setTitle("Delete sold product")
-            .setMessage("Are you sure you want to delete ${soldProduct.product.product_id}?")
+            .setMessage("Are you sure you want to delete ${soldProduct.product.product_name}?")
 
             .setPositiveButton("Yes") { arg0, arg1 ->
 
-                for (i in duplicateProductList.indices) {
-                    if (duplicateProductList[i].product.product_id == soldProduct.product.product_id) {
-                        duplicateProductList.removeAt(i)
-                        break
-                    }
-                }
-                duplicateProductList.remove(soldProduct)
-               // duplicateProductList.removeAt(position)
-                saleCancelDetailAdapter.setNewList(duplicateProductList as ArrayList<SoldProductInfo>)
+                 // duplicateProductList.removeAt(position)
+                //saleCancelDetailAdapter.notifyDataSetChanged()
+
+              var testList =  saleCancelDetailAdapter.getDataList() as ArrayList
+
+                testList.removeAt(position)
+
+                saleCancelDetailAdapter.notifyDataSetChanged()
 
 
-                val oldList = saleCancelDetailAdapter.getDataList() as ArrayList
-                oldList.remove(soldProduct)
+
+             //  duplicateProductList.remove(soldProduct)
+//                saleCancelDetailAdapter.setNewList(duplicateProductList as ArrayList<SoldProductInfo>)
+
+
+//                val oldList = saleCancelDetailAdapter.getDataList() as ArrayList
+//                oldList.remove(soldProduct)
             }
                     .setNegativeButton("No", null)
                     .show()

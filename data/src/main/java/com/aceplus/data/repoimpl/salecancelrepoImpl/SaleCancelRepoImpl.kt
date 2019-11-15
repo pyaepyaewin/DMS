@@ -11,6 +11,10 @@ import com.aceplus.domain.vo.SoldProductInfo
 import io.reactivex.Observable
 
 class SaleCancelRepoImpl(val database: MyDatabase) : SaleCancelRepo {
+//    override fun getTaxPercent() {
+//        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+//    }
+
     override fun updateQuantity(invoiceId: String, productId: String, qty: Int) {
         return database.invoiceProductDao().updateQtyForInvoiceProduct(invoiceId,productId,qty)
 

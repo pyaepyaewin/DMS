@@ -15,6 +15,7 @@ interface SaleCancelRepo {
     fun deleteInvoiceProduct(invoiceId: String)
     fun updateQuantity(invoiceId: String,productId: String,qty:Int)
     fun deleteInvoiceProductForLongClick(productId:String)
+    //fun getTaxPercent()
 
 
 }

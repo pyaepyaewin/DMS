@@ -32,7 +32,7 @@
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
             android:theme="@style/AppTheme">
-        <activity android:name=".ui.activities.customer.sale.SaleCancelCheckoutActivity"></activity>
+
 
         <meta-data
                 android:name="com.google.android.gms.version"
@@ -127,6 +127,9 @@
         <activity
                 android:name=".ui.activities.customer.saleorder.SaleOrderCheckoutActivity"
                 android:screenOrientation="landscape" />
+        <activity
+                android:name=".ui.activities.customer.sale.SaleCancelCheckoutActivity"
+                android:screenOrientation="landscape"></activity>
     </application>
 
 </manifest>

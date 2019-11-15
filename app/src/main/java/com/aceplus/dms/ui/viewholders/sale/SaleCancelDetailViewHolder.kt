@@ -1,6 +1,7 @@
 package com.aceplus.dms.ui.viewholders.sale
 
 import android.view.View
+import com.aceplus.dms.R
 import com.aceplus.domain.vo.SoldProductInfo
 import com.aceplussolutions.rms.ui.viewholder.BaseViewHolder
 import kotlinx.android.synthetic.main.list_row_sold_product_checkout.view.*
@@ -15,6 +16,7 @@ class SaleCancelDetailViewHolder(
             name.text = data.product.product_name
             um.text = data.product.um
             qty.text = data.quantity.toString()
+            itemView.qty.setBackgroundColor(itemView.resources.getColor(R.color.colorAccent))
             qty.setOnClickListener { onClickQtyButton(data, position) }
             price.text = data.product.selling_price
             discount.text = data.promotionPrice.toString()
@@ -24,12 +26,15 @@ class SaleCancelDetailViewHolder(
             amt.text = amt1.toString()
 
             setOnLongClickListener {
-                onLongClickSoldProductListItem(data, position)
+                onLongClickSoldProductListItem(data,adapterPosition)
                 true
             }
         }
 
     }
+
+
+
 
 }
 
