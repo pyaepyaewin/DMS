@@ -21,6 +21,9 @@ interface PreOrderProductDao {
     @Query("select pop.id, pop.sale_order_id, p.product_name as product_id, pop.order_quantity, pop.price, pop.total_amount, pop.promotion_price, pop.promotion_plan_id, pop.volume_discount, pop.volume_discount_percent, pop.item_discount_percent, pop.item_discount_amount, pop.exclude, pop.delete_flag from pre_order_product as pop left join product as p on pop.product_id = p.id where pop.sale_order_id = :invoiceId")
     fun getPreOrderProductByInvoiceID(invoiceId: String): List<PreOrderProduct>
 
+    @Query("select * from pre_order_product where sale_order_id = :invoiceId")
+    fun getPreOrderProductByInvoiceID2(invoiceId: String): List<PreOrderProduct>
+
     @Query("select * from pre_order_product WHERE sale_order_id =:invoice_id AND delete_flag = 0")
     fun allDataById(invoice_id: String?): List<PreOrderProduct>
 

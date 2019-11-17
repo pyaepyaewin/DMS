@@ -12,6 +12,7 @@ import com.aceplus.domain.entity.customer.DidCustomerFeedback
 import com.aceplus.domain.entity.invoice.Invoice
 import com.aceplus.domain.entity.invoice.InvoiceProduct
 import com.aceplus.domain.entity.preorder.PreOrder
+import com.aceplus.domain.entity.preorder.PreOrderPresent
 import com.aceplus.domain.entity.preorder.PreOrderProduct
 import com.aceplus.domain.entity.product.Product
 import com.aceplus.domain.entity.promotion.PromotionDate
@@ -22,6 +23,8 @@ import com.aceplus.domain.entity.sale.SaleMan
 import com.aceplus.domain.entity.volumediscount.VolumeDiscount
 import com.aceplus.domain.entity.volumediscount.VolumeDiscountFilter
 import com.aceplus.domain.entity.volumediscount.VolumeDiscountFilterItem
+import com.aceplus.domain.model.forApi.invoice.InvoiceResponse
+import com.aceplus.domain.model.forApi.preorder.PreOrderPresentApi
 import io.reactivex.Observable
 
 interface CustomerVisitRepo {
@@ -90,8 +93,13 @@ interface CustomerVisitRepo {
 
     fun insertAllPreOrderProduct(preOrderProductList: ArrayList<PreOrderProduct>)
     fun getPreOrderProductByInvoiceID(invoiceId: String): Observable<List<PreOrderProduct>>
+    fun getPreOrderProductByInvoiceID2(invoiceId: String): Observable<List<PreOrderProduct>>
     fun getAllPreOrderProduct(): Observable<List<PreOrderProduct>>
 
+    fun getPreOrderPresentByInvoiceID(invoiceId: String): Observable<List<PreOrderPresent>>
+
     fun insertSmsRecord(smsRecord: SMSRecord)
+
+    fun uploadPreOrderToServer(paramData: String): Observable<InvoiceResponse>
 
 }

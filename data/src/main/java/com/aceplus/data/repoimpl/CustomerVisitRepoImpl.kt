@@ -16,6 +16,7 @@ import com.aceplus.domain.entity.customer.DidCustomerFeedback
 import com.aceplus.domain.entity.invoice.Invoice
 import com.aceplus.domain.entity.invoice.InvoiceProduct
 import com.aceplus.domain.entity.preorder.PreOrder
+import com.aceplus.domain.entity.preorder.PreOrderPresent
 import com.aceplus.domain.entity.preorder.PreOrderProduct
 import com.aceplus.domain.entity.product.Product
 import com.aceplus.domain.entity.promotion.PromotionDate
@@ -28,6 +29,8 @@ import com.aceplus.domain.entity.sale.salevisit.SaleVisitRecordUpload
 import com.aceplus.domain.entity.volumediscount.VolumeDiscount
 import com.aceplus.domain.entity.volumediscount.VolumeDiscountFilter
 import com.aceplus.domain.entity.volumediscount.VolumeDiscountFilterItem
+import com.aceplus.domain.model.forApi.invoice.InvoiceResponse
+import com.aceplus.domain.model.forApi.preorder.PreOrderPresentApi
 import com.aceplus.domain.repo.CustomerVisitRepo
 import com.aceplus.shared.utils.GPSTracker
 import com.aceplussolutions.rms.constants.AppUtils
@@ -427,8 +430,20 @@ class CustomerVisitRepoImpl(
         return Observable.just(db.preOrderProductDao().getPreOrderProductByInvoiceID(invoiceId))
     }
 
+    override fun getPreOrderProductByInvoiceID2(invoiceId: String): Observable<List<PreOrderProduct>> {
+        return Observable.just(db.preOrderProductDao().getPreOrderProductByInvoiceID2(invoiceId))
+    }
+
     override fun insertSmsRecord(smsRecord: SMSRecord) {
         db.smsRecordDao().insert(smsRecord)
+    }
+
+    override fun getPreOrderPresentByInvoiceID(invoiceId: String): Observable<List<PreOrderPresent>> {
+        return Observable.just(db.preOrderPresentDao().getPreOrderPresentByInvoiceID(invoiceId))
+    }
+
+    override fun uploadPreOrderToServer(paramData: String): Observable<InvoiceResponse> {
+        return upLoadApi.uploadPreOrderData(paramData)
     }
 
 }

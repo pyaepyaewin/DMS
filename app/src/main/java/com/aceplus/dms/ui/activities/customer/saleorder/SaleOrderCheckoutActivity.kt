@@ -9,6 +9,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.support.design.widget.Snackbar
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.LinearLayoutManager
@@ -198,7 +199,7 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
         calculateTotalAmount()
         saleCheckoutViewModel.calculateFinalAmount(soldProductList, totalAmount) // Check - should do only for pre-order
         salePersonId = saleCheckoutViewModel.getSaleManID()
-        locationCode = saleCheckoutViewModel.getRouteID() // Check point
+        locationCode = saleCheckoutViewModel.getRouteID() // Check point - main thread
 
     }
 
@@ -240,7 +241,7 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
 
                 if (Utils.isInternetAccess(this)){
                     Utils.callDialog("Please wait...", this)
-                    saleCheckoutViewModel.getPreOrderRequest()
+                    saleCheckoutViewModel.getPreOrderRequest(salePersonId!!, locationCode.toString())
                 }
                 else
                     sendSMSMessage()
@@ -251,6 +252,21 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
             if (it != null){
                 sendSMS(it.first, it.second)
                 insertSMSRecord(it.first, it.second)
+            }
+        })
+
+        saleCheckoutViewModel.uploadResult.observe(this, android.arch.lifecycle.Observer { uploaded ->
+            if (uploaded != null){
+                if (uploaded){
+                    Utils.cancelDialog()
+                    Snackbar.make(rvSoldProductList, resources.getString(R.string.upload_succes_msg), Snackbar.LENGTH_INDEFINITE)
+                        .setAction("Done"){
+                            toPrintActivity()
+                        }
+                        .show()
+                } else{
+                    sendSMSMessage()
+                }
             }
         })
 
@@ -656,8 +672,10 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
     }
 
     override fun onBackPressed() {
-        if (isPreOrder){ super.onBackPressed() }
-        else if(isDelivery){ toDeliveryActivity() }
+        if(isDelivery)
+            toDeliveryActivity()
+        else
+            super.onBackPressed()
 
     }
 

@@ -29,4 +29,7 @@ interface PreOrderPresentDao {
     @Query("update pre_order_present set delete_flag = 1 WHERE delete_flag = 0")
     fun updateAllInactiveData()
 
+    @Query("select * from pre_order_present WHERE pre_order_id = :invoiceId")
+    fun getPreOrderPresentByInvoiceID(invoiceId: String): List<PreOrderPresent>
+
 }
