@@ -75,7 +75,8 @@ interface CustomerVisitRepo {
     fun getOrderInvoiceCountByID(invoiceId: String): Observable<Int>
     fun insertPreOrder(preOrder: PreOrder)
     fun getAllPreOrder(): Observable<List<PreOrder>>
-    fun getPreOrderByID(invoiceId: String): Observable<List<PreOrder>>
+    fun getActivePreOrderByIDWithName(invoiceId: String): Observable<List<PreOrder>>
+    fun getAllActivePreOrder(): Observable<List<PreOrder>>
 
     fun insertInvoiceProduct(invoiceProduct: InvoiceProduct)
     fun getAllInvoiceProduct(): Observable<List<InvoiceProduct>>
@@ -92,11 +93,13 @@ interface CustomerVisitRepo {
     fun getVolumeDiscountByDate(currentDate: String): Observable<List<VolumeDiscount>>
 
     fun insertAllPreOrderProduct(preOrderProductList: ArrayList<PreOrderProduct>)
-    fun getPreOrderProductByInvoiceID(invoiceId: String): Observable<List<PreOrderProduct>>
-    fun getPreOrderProductByInvoiceID2(invoiceId: String): Observable<List<PreOrderProduct>>
+    fun getActivePreOrderProductByInvoiceIDWithName(invoiceId: String): Observable<List<PreOrderProduct>>
+    fun getActivePreOrderProductByInvoiceIDList(invoiceIdList: List<String>): Observable<List<PreOrderProduct>>
     fun getAllPreOrderProduct(): Observable<List<PreOrderProduct>>
+    fun updateInactivePreOrderAndPreOrderProductByID(id: String)
 
-    fun getPreOrderPresentByInvoiceID(invoiceId: String): Observable<List<PreOrderPresent>>
+    fun getActivePreOrderPresentByInvoiceIDList(invoiceIdList: List<String>): Observable<List<PreOrderPresent>>
+    fun updateInactivePreOrderPresentByID(id: String)
 
     fun insertSmsRecord(smsRecord: SMSRecord)
 

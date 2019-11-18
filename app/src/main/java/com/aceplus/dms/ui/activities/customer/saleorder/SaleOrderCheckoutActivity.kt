@@ -199,7 +199,7 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
         calculateTotalAmount()
         saleCheckoutViewModel.calculateFinalAmount(soldProductList, totalAmount) // Check - should do only for pre-order
         salePersonId = saleCheckoutViewModel.getSaleManID()
-        locationCode = saleCheckoutViewModel.getRouteID() // Check point - main thread
+        locationCode = saleCheckoutViewModel.getRouteID() // Check point - route id or location id - main thread
 
     }
 
@@ -252,6 +252,7 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
             if (it != null){
                 sendSMS(it.first, it.second)
                 insertSMSRecord(it.first, it.second)
+                // To check - found no update commend for delete flag
             }
         })
 
@@ -267,6 +268,7 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
                 } else{
                     sendSMSMessage()
                 }
+                saleCheckoutViewModel.uploadResult.value = null
             }
         })
 
@@ -536,12 +538,6 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
             soldProductList,
             promotionList
         )
-
-    }
-
-    private fun uploadPreOrderToServer(){
-
-        // ToDo
 
     }
 

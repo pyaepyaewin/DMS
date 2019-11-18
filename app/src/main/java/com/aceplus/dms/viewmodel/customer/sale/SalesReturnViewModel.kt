@@ -9,6 +9,13 @@ class SalesReturnViewModel(
     private val schedulerProvider: SchedulerProvider
 ) : BaseViewModel() {
 
+    fun getSaleManID(): String{
+        val saleManData = customerVisitRepo.getSaleManData()
+        return saleManData.id
+    }
 
+    fun getRouteID(): Int{
+        return customerVisitRepo.getRouteScheduleIDV2()
+    }
 
 }

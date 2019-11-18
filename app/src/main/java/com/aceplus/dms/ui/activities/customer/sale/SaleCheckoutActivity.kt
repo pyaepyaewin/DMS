@@ -103,7 +103,7 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
         calculateTotalAmount()
         saleCheckoutViewModel.calculateFinalAmount(soldProductList, totalAmount)
         salePersonId = saleCheckoutViewModel.getSaleManID()
-        locationCode = saleCheckoutViewModel.getRouteID() // Check point
+        locationCode = saleCheckoutViewModel.getRouteID() // Check point - route id or location id - main thread
 
     }
 

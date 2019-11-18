@@ -436,7 +436,7 @@ class SaleCheckoutViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
                             preOrderProduct.volume_discount_percent = soldProduct.discountPercent.toString()
                             //preOrderProduct.item_discount_percent = soldProduct.itemDiscountAmount.toString() // ToDo -  Check
                             //preOrderProduct.item_discount_amount // ToDo -  Check
-                            preOrderProduct.exclude = "${soldProduct.exclude}"
+                            preOrderProduct.exclude = soldProduct.exclude?.toString()
 
                             preOrderProductList.add(preOrderProduct)
 
@@ -521,7 +521,7 @@ class SaleCheckoutViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
         var preOrder: PreOrder? = null
 
         launch {
-            customerVisitRepo.getPreOrderByID(invoiceId)
+            customerVisitRepo.getActivePreOrderByIDWithName(invoiceId)
                 .flatMap { preOrderList ->
 
                     if (preOrderList.isNotEmpty()){
@@ -539,14 +539,14 @@ class SaleCheckoutViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
                             preOrderPresentApi.productId = promotion.promotion_product_id
                             preOrderPresentApi.quantity = promotion.promotion_quantity
 
-                            message += "\nPromotion product name by id\t${promotion.promotion_quantity}"
+                            message += "\n${promotion.name}\t${promotion.promotion_quantity}" // To check name by id
 
                             preOrderPresentApiList.add(preOrderPresentApi) // To check for what
 
                         }
 
                     }
-                    return@flatMap customerVisitRepo.getPreOrderProductByInvoiceID(invoiceId)
+                    return@flatMap customerVisitRepo.getActivePreOrderProductByInvoiceIDWithName(invoiceId)
                 }
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.mainThread())
@@ -569,14 +569,13 @@ class SaleCheckoutViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
 
     fun getPreOrderRequest(saleManId: String, routeID: String){
 
+        val invoiceNoList = ArrayList<String>()
         val preOrderApiList = ArrayList<PreOrderApi>()
         val preOrderPresentApiList = ArrayList<PreOrderPresentApi>()
 
         launch {
-            customerVisitRepo.getAllPreOrder()
-                .subscribeOn(schedulerProvider.io())
-                .observeOn(schedulerProvider.mainThread())
-                .subscribe{ preOrderList ->
+            customerVisitRepo.getAllActivePreOrder()
+                .flatMap { preOrderList ->
 
                     for (preOrder in preOrderList){
 
@@ -597,54 +596,64 @@ class SaleCheckoutViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
                         preOrderApi.bankName = preOrder.bank_name
                         preOrderApi.bankAccountNo = preOrder.bank_account_no
 
-                        val preOrderDetailApiList = ArrayList<PreOrderDetailApi>()
-
-                        customerVisitRepo.getPreOrderPresentByInvoiceID(preOrder.invoice_id)
-                            .flatMap { preOrderPresentList ->
-
-                                for (preOrderPresent in preOrderPresentList){
-                                    val preOrderPresentApi = PreOrderPresentApi()
-                                    preOrderPresentApi.saleOrderId = preOrderPresent.pre_order_id.toString() // Check type
-                                    preOrderPresentApi.productId = preOrderPresent.stock_id
-                                    preOrderPresentApi.quantity = preOrderPresent.quantity.roundToInt() // Check type
-                                    preOrderPresentApi.status = "Y"
-                                    preOrderPresentApiList.add(preOrderPresentApi)
-                                }
-
-                                return@flatMap customerVisitRepo.getPreOrderProductByInvoiceID2(preOrder.invoice_id)
-                            }
-                            .subscribeOn(schedulerProvider.io())
-                            .observeOn(schedulerProvider.mainThread())
-                            .subscribe{ preOrderProductList ->
-
-                                for (preOrderProduct in preOrderProductList){
-                                    val preOrderDetailApi = PreOrderDetailApi()
-                                    preOrderDetailApi.saleOrderId = preOrderProduct.sale_order_id
-                                    preOrderDetailApi.productId = preOrderProduct.product_id?.toInt() ?: 0
-                                    preOrderDetailApi.qty = preOrderProduct.order_quantity?.toDouble() ?: 0.0
-                                    preOrderDetailApi.promotionPrice = preOrderProduct.promotion_price?.toDouble() ?: 0.0
-                                    preOrderDetailApi.volumeDiscount = preOrderProduct.volume_discount?.toDouble() ?: 0.0
-                                    preOrderDetailApi.volumeDiscountPer = preOrderProduct.volume_discount_percent?.toDouble() ?: 0.0
-                                    preOrderDetailApi.s_Price = preOrderProduct.price?.toDouble() ?: 0.0
-
-                                    if (!preOrderProduct.exclude.isNullOrBlank())
-                                        preOrderDetailApi.exclude = preOrderProduct.exclude!!.toInt()
-
-                                    if (!preOrderProduct.promotion_plan_id.isNullOrBlank())
-                                        preOrderDetailApi.promotionPlanId = preOrderProduct.promotion_plan_id!!.toInt()
-
-                                    preOrderDetailApiList.add(preOrderDetailApi)
-                                }
-
-                                preOrderApi.preOrderDetailList = preOrderDetailApiList
-                                preOrderApiList.add(preOrderApi)
-
-                            }
+                        invoiceNoList.add(preOrder.invoice_id)
+                        preOrderApiList.add(preOrderApi)
 
                     }
 
-                    val preOrderRequestDataList = ArrayList<PreOrderRequestData>() // Check which come first
-                    Log.d("Testing", preOrderApiList.size.toString()) // To test skipping the looping
+                    return@flatMap customerVisitRepo.getActivePreOrderPresentByInvoiceIDList(invoiceNoList)
+                }
+                .flatMap { preOrderPresentList ->
+
+                    for (preOrderPresent in preOrderPresentList){
+                        val preOrderPresentApi = PreOrderPresentApi()
+                        preOrderPresentApi.saleOrderId = preOrderPresent.pre_order_id.toString() // Check type
+                        preOrderPresentApi.productId = preOrderPresent.stock_id
+                        preOrderPresentApi.quantity = preOrderPresent.quantity.roundToInt() // Check type
+                        preOrderPresentApi.status = "Y"
+                        preOrderPresentApiList.add(preOrderPresentApi)
+                    }
+
+                    return@flatMap customerVisitRepo.getActivePreOrderProductByInvoiceIDList(invoiceNoList)
+                }
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.mainThread())
+                .subscribe{ preOrderProductList ->
+
+                    for (index in invoiceNoList.indices){
+
+                        val preOrderDetailApiList = ArrayList<PreOrderDetailApi>()
+
+                        for (preOrderProduct in preOrderProductList){
+
+                            if (preOrderApiList[index].id == preOrderProduct.sale_order_id){
+
+                                val preOrderDetailApi = PreOrderDetailApi()
+                                preOrderDetailApi.saleOrderId = preOrderProduct.sale_order_id
+                                preOrderDetailApi.productId = preOrderProduct.product_id?.toInt() ?: 0
+                                preOrderDetailApi.qty = preOrderProduct.order_quantity?.toDouble() ?: 0.0
+                                preOrderDetailApi.promotionPrice = preOrderProduct.promotion_price?.toDouble() ?: 0.0
+                                preOrderDetailApi.volumeDiscount = preOrderProduct.volume_discount?.toDouble() ?: 0.0
+                                preOrderDetailApi.volumeDiscountPer = preOrderProduct.volume_discount_percent?.toDouble() ?: 0.0
+                                preOrderDetailApi.s_Price = preOrderProduct.price?.toDouble() ?: 0.0
+
+                                if (!preOrderProduct.exclude.isNullOrBlank())
+                                    preOrderDetailApi.exclude = preOrderProduct.exclude!!.toInt()
+
+                                if (!preOrderProduct.promotion_plan_id.isNullOrBlank())
+                                    preOrderDetailApi.promotionPlanId = preOrderProduct.promotion_plan_id!!.toInt()
+
+                                preOrderDetailApiList.add(preOrderDetailApi)
+
+                            }
+
+                        }
+
+                        preOrderApiList[index].preOrderDetailList = preOrderDetailApiList
+
+                    }
+
+                    val preOrderRequestDataList = ArrayList<PreOrderRequestData>()
 
                     val preOrderRequestData = PreOrderRequestData()
                     preOrderRequestData.data = preOrderApiList
@@ -682,19 +691,18 @@ class SaleCheckoutViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
 
                         if (preOrderRequest.data[0].data.isNotEmpty()){
                             for (preOrderApi in preOrderRequest.data[0].data){
-                                // Update delete flag in two
+                                customerVisitRepo.updateInactivePreOrderAndPreOrderProductByID(preOrderApi.id)
                             }
                             for (preOrderPresentApi in preOrderRequest.data[0].preorderPresent){
-                                // Update delete flag
+                                customerVisitRepo.updateInactivePreOrderPresentByID(preOrderPresentApi.saleOrderId)
                             }
                         }
 
                         uploadResult.postValue(true)
 
                     } else{
-
                         uploadResult.postValue(false)
-
+                        Log.d("Testing", it.aceplusStatusMessage)
                     }
 
                 }

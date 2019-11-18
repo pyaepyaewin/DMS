@@ -422,28 +422,41 @@ class CustomerVisitRepoImpl(
         return Observable.just(db.preOrderProductDao().allData)
     }
 
-    override fun getPreOrderByID(invoiceId: String): Observable<List<PreOrder>> {
-        return Observable.just(db.preOrderDao().getPreOrderByID(invoiceId))
+    override fun getActivePreOrderByIDWithName(invoiceId: String): Observable<List<PreOrder>> {
+        return Observable.just(db.preOrderDao().getActivePreOrderByIDWithName(invoiceId))
     }
 
-    override fun getPreOrderProductByInvoiceID(invoiceId: String): Observable<List<PreOrderProduct>> {
-        return Observable.just(db.preOrderProductDao().getPreOrderProductByInvoiceID(invoiceId))
+    override fun getActivePreOrderProductByInvoiceIDWithName(invoiceId: String): Observable<List<PreOrderProduct>> {
+        return Observable.just(db.preOrderProductDao().getActivePreOrderProductByInvoiceIDWithName(invoiceId))
     }
 
-    override fun getPreOrderProductByInvoiceID2(invoiceId: String): Observable<List<PreOrderProduct>> {
-        return Observable.just(db.preOrderProductDao().getPreOrderProductByInvoiceID2(invoiceId))
+    override fun getActivePreOrderProductByInvoiceIDList(invoiceIdList: List<String>): Observable<List<PreOrderProduct>> {
+        return Observable.just(db.preOrderProductDao().getActivePreOrderProductByInvoiceIDList(invoiceIdList))
     }
 
     override fun insertSmsRecord(smsRecord: SMSRecord) {
         db.smsRecordDao().insert(smsRecord)
     }
 
-    override fun getPreOrderPresentByInvoiceID(invoiceId: String): Observable<List<PreOrderPresent>> {
-        return Observable.just(db.preOrderPresentDao().getPreOrderPresentByInvoiceID(invoiceId))
+    override fun getActivePreOrderPresentByInvoiceIDList(invoiceIdList: List<String>): Observable<List<PreOrderPresent>> {
+        return Observable.just(db.preOrderPresentDao().getActivePreOrderPresentByInvoiceIDList(invoiceIdList))
     }
 
     override fun uploadPreOrderToServer(paramData: String): Observable<InvoiceResponse> {
         return upLoadApi.uploadPreOrderData(paramData)
+    }
+
+    override fun getAllActivePreOrder(): Observable<List<PreOrder>> {
+        return Observable.just(db.preOrderDao().allActiveData)
+    }
+
+    override fun updateInactivePreOrderAndPreOrderProductByID(id: String) {
+        db.preOrderDao().updateInactivePreOrderByID(id)
+        db.preOrderProductDao().updateInactivePreOrderProductByID(id)
+    }
+
+    override fun updateInactivePreOrderPresentByID(id: String) {
+        db.preOrderPresentDao().updateInactivePreOrderPresentByID(id)
     }
 
 }

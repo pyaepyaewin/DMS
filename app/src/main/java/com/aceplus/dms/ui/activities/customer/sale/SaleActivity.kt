@@ -365,10 +365,10 @@ class SaleActivity : BaseActivity(), KodeinAware {
             .setPositiveButton("Confirm") { arg0, arg1 ->
 
                 if (radioFocPercent.isChecked){
-                    soldProduct.focPercent = focVolume.text.toString().toDouble()
+                    soldProduct.focPercent = if (focVolume.text.isNotBlank()) focVolume.text.toString().toDouble() else 0.0
                     soldProduct.setFocType(true)
                 } else{
-                    soldProduct.focAmount = focVolume.text.toString().toDouble()
+                    soldProduct.focAmount = if (focVolume.text.isNotBlank()) focVolume.text.toString().toDouble() else 0.0
                     soldProduct.setFocType(false)
                 }
 
