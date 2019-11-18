@@ -71,9 +71,10 @@ class SaleReturnActivity : BaseActivity(), KodeinAware {
         salePersonID = salesReturnViewModel.getSaleManID()
         locationCode = salesReturnViewModel.getRouteID() // Check point - route id or location id - main thread
 
-        /*if (isSaleExchange)
-            saleReturnID = Utils.getInvoiceNo(salePersonID!!, locationCode.toString(), Constant.FOR_SALE_RETURN_EXCHANGE, )*/
-
+        saleReturnID = if (isSaleExchange)
+            Utils.getInvoiceNo(salePersonID!!, locationCode.toString(), Constant.FOR_SALE_RETURN_EXCHANGE, salesReturnViewModel.getLastCountForInvoiceNumber(Constant.FOR_SALE_RETURN_EXCHANGE))
+        else
+            Utils.getInvoiceNo(salePersonID!!, locationCode.toString(), Constant.FOR_SALE_RETURN, salesReturnViewModel.getLastCountForInvoiceNumber(Constant.FOR_SALE_RETURN))
     }
 
     private fun setupUI(){
