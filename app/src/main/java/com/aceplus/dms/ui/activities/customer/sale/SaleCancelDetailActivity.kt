@@ -17,7 +17,6 @@ import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.RadioButton
 import android.widget.TextView
-import com.aceplus.dms.R
 import com.aceplus.dms.ui.adapters.sale.SaleCancelDetailAdapter
 import com.aceplus.dms.utils.Utils
 import com.aceplus.dms.viewmodel.factory.KodeinViewModelFactory
@@ -35,6 +34,11 @@ import org.kodein.di.android.kodein
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.reflect.jvm.internal.impl.load.kotlin.JvmType
+import android.support.v4.content.ContextCompat.getSystemService
+import android.icu.lang.UCharacter.GraphemeClusterBreak.T
+import android.R
+
+
 
 class SaleCancelDetailActivity : AppCompatActivity(), KodeinAware {
     override val kodein: Kodein by kodein()
@@ -47,10 +51,12 @@ class SaleCancelDetailActivity : AppCompatActivity(), KodeinAware {
     lateinit var alertDialog1: AlertDialog
 
     companion object {
-        fun getIntent(context: Context, invoiceID: String, date: String): Intent {
+        fun getIntent(context: Context, invoiceID: String, date: String,customerId:String,customerName:String): Intent {
             val saleCancelIntent = Intent(context, SaleCancelDetailActivity::class.java)
             saleCancelIntent.putExtra("INVOICE_ID", invoiceID)
             saleCancelIntent.putExtra("INVOICE_DATE", date)
+            saleCancelIntent.putExtra("CUSTOMER_ID", customerId)
+            saleCancelIntent.putExtra("CUSTOMER_NAME", customerName)
 
             return saleCancelIntent
         }
@@ -67,7 +73,7 @@ class SaleCancelDetailActivity : AppCompatActivity(), KodeinAware {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_sale)
+        setContentView(com.aceplus.dms.R.layout.activity_sale)
         tvTitle.text = "SALES CANCEL"
         tableHeaderOrderedQty.visibility = View.GONE
         headerFoc.visibility = View.GONE
@@ -75,12 +81,14 @@ class SaleCancelDetailActivity : AppCompatActivity(), KodeinAware {
         alertDialogWithRadioButtons()
         var invoiceid = intent.getStringExtra("INVOICE_ID")
         var invoicedate = intent.getStringExtra("INVOICE_DATE")
+        var customerId=intent.getStringExtra("CUSTOMER_ID")
+        var customerName=intent.getStringExtra("CUSTOMER_NAME")
         cancelImg.setOnClickListener {
             onBackPressed()
             true
         }
         checkoutImg.setOnClickListener {
-            startActivity(SaleCancelCheckoutActivity.getSaleCancelDetailIntent(this,saleCancelDetailAdapter.getDataList() as ArrayList,invoiceid,invoicedate))
+            startActivity(SaleCancelCheckoutActivity.getSaleCancelDetailIntent(this,saleCancelDetailAdapter.getDataList() as ArrayList,invoiceid,invoicedate,customerId,customerName))
         }
         saleCancelDetailViewModel.productIdListSuccessState.observe(
             this,
@@ -110,6 +118,7 @@ class SaleCancelDetailActivity : AppCompatActivity(), KodeinAware {
                     soldProductDataList.map {
                         val soldProductInfo = SoldProductInfo()
                         soldProductInfo.product = Product()
+                        soldProductInfo.product.id=it.id
                         soldProductInfo.product.product_id = it.product_id
                         soldProductInfo.product.product_name = it.product_name
                         soldProductInfo.product.um = it.um
@@ -197,7 +206,7 @@ class SaleCancelDetailActivity : AppCompatActivity(), KodeinAware {
 
         val layoutInflater =
             this.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        val view = layoutInflater.inflate(R.layout.dialog_box_sale_quantity, null)
+        val view = layoutInflater.inflate(com.aceplus.dms.R.layout.dialog_box_sale_quantity, null)
         val alertDialog = android.app.AlertDialog.Builder(this)
             .setView(view)
             .setTitle("Sale Quantity")
@@ -249,24 +258,14 @@ class SaleCancelDetailActivity : AppCompatActivity(), KodeinAware {
 
             .setPositiveButton("Yes") { arg0, arg1 ->
 
-                 // duplicateProductList.removeAt(position)
-                //saleCancelDetailAdapter.notifyDataSetChanged()
-
               var testList =  saleCancelDetailAdapter.getDataList() as ArrayList
 
                 testList.removeAt(position)
-
                 saleCancelDetailAdapter.notifyDataSetChanged()
-
-
-
-             //  duplicateProductList.remove(soldProduct)
-//                saleCancelDetailAdapter.setNewList(duplicateProductList as ArrayList<SoldProductInfo>)
-
-
-//                val oldList = saleCancelDetailAdapter.getDataList() as ArrayList
-//                oldList.remove(soldProduct)
-            }
+                for(i in testList) {
+                    val clickedDataItem = i.product.id
+                }
+           }
                     .setNegativeButton("No", null)
                     .show()
             }

@@ -1,30 +1,43 @@
 package com.aceplus.dms.ui.activities.customer.sale
 
+import android.app.AlertDialog
 import android.app.DatePickerDialog
-import android.arch.lifecycle.ViewModelProviders
+import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
+import android.util.Log
+import android.util.Log.i
 import android.view.View
+import com.aceplus.data.utils.Constant
 import com.aceplus.dms.R
+import com.aceplus.dms.ui.activities.LoginActivity
+import com.aceplus.dms.ui.activities.PrintInvoiceActivity
 import com.aceplus.dms.ui.adapters.sale.SaleCancelCheckoutAdapter
 import com.aceplus.dms.utils.Utils
-import com.aceplus.dms.viewmodel.factory.KodeinViewModelFactory
 import com.aceplus.dms.viewmodel.salecancelviewmodel.SaleCancelCheckOutViewModel
+import com.aceplus.domain.entity.invoice.Invoice
+import com.aceplus.domain.entity.invoice.InvoiceProduct
+import com.aceplus.domain.entity.promotion.Promotion
+import com.aceplus.domain.model.forApi.invoice.InvoiceDetail
 import com.aceplus.domain.vo.SoldProductInfo
+import com.aceplussolutions.rms.ui.activities.BaseActivity
 import kotlinx.android.synthetic.main.activity_sale_checkout.*
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.kodein
+
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 
-class SaleCancelCheckoutActivity : AppCompatActivity(), KodeinAware {
+class SaleCancelCheckoutActivity : BaseActivity(), KodeinAware {
     override val kodein: Kodein by kodein()
+    override val layoutId: Int
+        get() = R.layout.activity_sale_checkout
+
     var totalAmt = 0.0
     private var netAmount: Double = 0.0
     private var volDisAmount: Double = 0.0
@@ -32,10 +45,12 @@ class SaleCancelCheckoutActivity : AppCompatActivity(), KodeinAware {
     private var taxPercent: Int = 0
     private var taxAmt: Double = 0.0
     private var totalDiscountAmount: Double = 0.0
-    private var totalVolumeDiscount: Double = 0.0
-    private var totalVolumeDiscountPercent: Double = 0.0
     private var taxType: String = ""
     private var volDisPercent: Double = 0.0
+    private var salePersonId: String? = null
+    private var invoice= arrayListOf<Invoice>()
+    var totalQtyForInvoice = 0
+    val invoiceProductList: ArrayList<InvoiceProduct> = ArrayList()
 
 
     private val df = DecimalFormat(".##")
@@ -44,38 +59,42 @@ class SaleCancelCheckoutActivity : AppCompatActivity(), KodeinAware {
     companion object {
         fun getSaleCancelDetailIntent(
             context: Context,
-            soldProductList: ArrayList<SoldProductInfo>, invoiceID: String, date: String
+            soldProductList: ArrayList<SoldProductInfo>,
+            invoiceID: String,
+            date: String,
+            customerID: String,
+            customerName: String
+
 
         ): Intent {
             val saleCancelDetailIntent = Intent(context, SaleCancelCheckoutActivity::class.java)
             saleCancelDetailIntent.putExtra("SOLD_PRODUCT_LIST", soldProductList)
             saleCancelDetailIntent.putExtra("INVOICE_ID", invoiceID)
             saleCancelDetailIntent.putExtra("DATE", date)
+            saleCancelDetailIntent.putExtra("CUSTOMER_ID", customerID)
+            saleCancelDetailIntent.putExtra("CUSTOMER_NAME", customerName)
+
             return saleCancelDetailIntent
 
         }
 
-        private var soldProductList: ArrayList<SoldProductInfo> = ArrayList()
-
-//        private val saleCancelCheckOutViewModel: SaleCancelCheckOutViewModel by lazy {
-//            ViewModelProviders.of(this, KodeinViewModelFactory((kodein)))
-//                .get(SaleCancelCheckOutViewModel::class.java)
-//        }
-
-        private val saleCancelCheckOutAdapter: SaleCancelCheckoutAdapter by lazy {
-            SaleCancelCheckoutAdapter()
-        }
-
     }
 
+    private var soldProductList: ArrayList<SoldProductInfo> = ArrayList()
+
+    private val saleCancelCheckOutAdapter: SaleCancelCheckoutAdapter by lazy {
+        SaleCancelCheckoutAdapter()
+    }
+    private val saleCancelCheckOutViewModel: SaleCancelCheckOutViewModel by viewModel()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_sale_checkout)
         advancedPaidAmountLayout.visibility = View.GONE
         volDisForPreOrderLayout.visibility = View.GONE
         volumeDiscountLayout2.visibility = View.GONE
         llSaleStatus.visibility = View.GONE
+        tableHeaderDiscount.text = "Promotion Price"
         soldProductList = intent.getParcelableArrayListExtra("SOLD_PRODUCT_LIST")
+        saleDateTextView.text = Utils.getCurrentDate(false)
 
 
         for (i in soldProductList) {
@@ -85,19 +104,72 @@ class SaleCancelCheckoutActivity : AppCompatActivity(), KodeinAware {
         }
         tvTotalAmount.text = totalAmt.toString()
         tvNetAmount.text = totalAmt.toString()
-        //val taxAmt = calculateTax()
-       // tax_txtView.text = taxAmt.toString()
-        saleDateTextView.text = Utils.getCurrentDate(false)
         tvInvoiceId.text = intent.getStringExtra("INVOICE_ID")
         saleCancelCheckOutAdapter.setNewList(soldProductList)
         rvSoldProductList.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = saleCancelCheckOutAdapter
         }
+        saleCancelCheckOutViewModel.taxPercentSuccessState.observe(
+            this,
+            android.arch.lifecycle.Observer {
+
+                taxPercent = it?.get(0)!!.tax!!
+                taxType = it?.get(0)!!.tax_type.toString()
+                netAmount = totalAmt
+                val taxAmt = calculateTax()
+                if (taxType.equals("E", ignoreCase = true)) {
+                    tax_label_saleCheckout.text = "Tax (Exclude) : "
+                    netAmount = totalAmt - totalDiscountAmount + taxAmt
+                } else {
+                    tax_label_saleCheckout.text = "Tax (Include) : "
+                    netAmount = totalAmt - totalDiscountAmount
+                }
+                tax_txtView.text = Utils.formatAmount(taxAmt)
+
+
+            })
+
+        saleCancelCheckOutViewModel.taxPercentErrorState.observe(
+            this,
+            android.arch.lifecycle.Observer {
+                i("Tag", it)
+            })
+
+        saleCancelCheckOutViewModel.loadTaxPercent()
+        saleCancelCheckOutViewModel.allInvoiceSuccessState.observe(
+            this,
+            android.arch.lifecycle.Observer {
+
+                invoice = it as ArrayList<Invoice>
+              startActivity(PrintInvoiceActivity.newIntentFromSaleCancelCheckout(this,invoice,soldProductList))
+
+
+            })
+
+        saleCancelCheckOutViewModel.allInvoicetErrorState.observe(
+            this,
+            android.arch.lifecycle.Observer {
+                i("Tag", it)
+            })
+
+
         btn_disOk.setOnClickListener { calculateDiscPercentToAmt() }
         btn_amtOk.setOnClickListener { calculateDiscAmtToPercent() }
         edt_dueDate.setOnClickListener { chooseDueDate() }
-
+        confirmAndPrint_img.setOnClickListener {
+            Utils.askConfirmationDialog(
+                "Save",
+                "Do you want to confirm?",
+                "save",
+                this,
+                this::onClickSaveButton
+            )
+        }
+        activity_sale_checkout_radio_bank.setOnCheckedChangeListener { button, isChecked ->
+            bank_branch_layout.visibility = if (isChecked) View.VISIBLE else View.GONE
+            bank_account_layout.visibility = if (isChecked) View.VISIBLE else View.GONE
+        }
 
     }
 
@@ -116,6 +188,7 @@ class SaleCancelCheckoutActivity : AppCompatActivity(), KodeinAware {
             this.netAmount = netAmount
             this.volDisAmount = discountAmount
             calculateRefundAmount()
+
         }
 
     }
@@ -135,6 +208,8 @@ class SaleCancelCheckoutActivity : AppCompatActivity(), KodeinAware {
             this.netAmount = netAmount
             this.volDisAmount = discountAmount
             calculateRefundAmount()
+
+
         }
 
     }
@@ -174,15 +249,123 @@ class SaleCancelCheckoutActivity : AppCompatActivity(), KodeinAware {
         dateDialog.show()
 
     }
+
+    private fun onClickSaveButton(type: String) {
+
+        if (type == "save") {
+
+            var paymentMethod = when (activity_sale_checkout_radio_group.checkedRadioButtonId) {
+                R.id.activity_sale_checkout_radio_bank -> "B"
+                R.id.activity_sale_checkout_radio_cash -> "CA"
+                else -> ""
+            }
+
+            if (validationInput(paymentMethod == "B")) {
+
+                if (refundAmount < 0 || payAmount.text.isBlank()) {
+                    //setInvoiceId()
+                    saveData("CR")
+                } else {
+                    //setInvoiceId()
+                    saveData("CA")
+                }
+
+            }
+
+        }
+    }
+    private fun saveData(cashOrLoanOrBank: String){
+        val invoiceId =intent.getStringExtra("INVOICE_ID")
+        val customerId=intent.getStringExtra("CUSTOMER_ID")
+        val saleDate = Utils.getCurrentDate(true)
+        val payAmt = if (payAmount.text.isNotBlank()) payAmount.text.toString().toDouble() else 0.0
+        val receiptPerson = receiptPerson.text.toString()
+        val invoiceTime = Utils.getCurrentDate(true)
+        val deviceId = Utils.getDeviceId(this)
+        salePersonId=saleCancelCheckOutViewModel.getSaleManID()
+        var dueDate = ""
+        if (cashOrLoanOrBank == "CR") dueDate = saleDate
+        if (edt_dueDate.text.isNotBlank()) dueDate = edt_dueDate.text.toString()
+        saleCancelCheckOutViewModel.saveCheckoutData(
+            customerId,
+            saleDate,
+            invoiceId,
+            payAmt,
+            refundAmount,
+            receiptPerson,
+            salePersonId!!,
+            invoiceTime,
+            dueDate,
+            deviceId,
+            cashOrLoanOrBank,
+            soldProductList,
+            totalAmt,
+            taxAmt,
+            edit_txt_branch_name.text.toString(),
+            edit_txt_account_name.text.toString(),
+            volDisAmount,
+            volDisPercent
+        )
+        saleCancelCheckOutViewModel.loadAllInvoiceData()
+        //startActivity(PrintInvoiceActivity.newIntentFromSaleCancelCheckout(this,invoice,soldProductList))
+
+
+    }
+
+    private fun validationInput(withBankInfo: Boolean): Boolean {
+
+        var dateAndPayment = false
+        var name = false
+        var bank = false
+        var acc = false
+        receiptPerson.error = null
+        edit_txt_branch_name.error = null
+        edit_txt_account_name.error = null
+
+        if (edt_dueDate.text.isNotBlank() || payAmount.text.isNotBlank()) {
+
+            dateAndPayment = true
+
+        } else if (payAmount.text.isBlank()) {
+
+            AlertDialog.Builder(this)
+                .setTitle("Alert")
+                .setMessage("You must specify due date.")
+                .setPositiveButton("OK", null)
+                .show()
+
+        }
+
+        if (receiptPerson.text.isNotBlank()) name = true
+        else receiptPerson.error = "Please enter receipt person"
+
+        return if (withBankInfo) {
+            if (edit_txt_branch_name.text.isNotBlank()) bank = true
+            else edit_txt_branch_name.error = "Please enter bank name"
+
+            if (edit_txt_account_name.text.isNotBlank()) acc = true
+            else edit_txt_account_name.error = "Please enter bank account"
+
+            dateAndPayment && name && bank && acc
+        } else {
+            dateAndPayment && name
+        }
+
+    }
+
+    private fun calculateTax(): Double {
+
+        var taxAmt = 0.0
+        if (taxPercent != 0)
+            taxAmt = netAmount / 21
+
+        this.taxAmt = taxAmt
+
+        return taxAmt
+
+    }
 }
-   // private fun calculateTax(amount: Double): Double {
-//        var taxAmt = 0.0
-//        if (taxPercent != 0.0) {
-//            taxAmt = amount * taxPercent / 100
-//        }
-//        this.taxAmt = taxAmt
-//
-//        return taxAmt
+
 
 
 

@@ -1,6 +1,7 @@
 package com.aceplus.dms.viewmodel.salecancelviewmodel
 
 import android.arch.lifecycle.MutableLiveData
+import com.aceplus.domain.entity.CompanyInformation
 import com.aceplus.domain.entity.invoice.InvoiceProduct
 import com.aceplus.domain.entity.product.Product
 import com.aceplus.domain.model.sale.salecancel.SaleCancelDetailItem

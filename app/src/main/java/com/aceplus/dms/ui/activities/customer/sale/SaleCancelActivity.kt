@@ -31,6 +31,7 @@ class SaleCancelActivity : BaseActivity(), KodeinAware {
             return Intent(context, SaleCancelActivity::class.java)
         }
     }
+
     private val saleCancelViewModel: SaleCancelViewModel by lazy {
         ViewModelProviders.of(this, KodeinViewModelFactory((kodein)))
             .get(SaleCancelViewModel::class.java)
@@ -58,7 +59,7 @@ class SaleCancelActivity : BaseActivity(), KodeinAware {
         saleCancelViewModel.saleCancelErrorState.observe(
             this,
             android.arch.lifecycle.Observer {
-              i("Tag",it)
+                i("Tag", it)
             })
         sale_cancel_item_list.apply {
             layoutManager = LinearLayoutManager(context)
@@ -67,8 +68,9 @@ class SaleCancelActivity : BaseActivity(), KodeinAware {
         saleCancelViewModel.loadSaleCancelList()
 
     }
+
     private fun onClickNoticeListItem(data: SaleCancelItem) {
-        startActivity(SaleCancelDetailActivity.getIntent(this,data.invoice_id,data.sale_date))
+        startActivity(SaleCancelDetailActivity.getIntent(this, data.invoice_id, data.sale_date,data.id,data.customer_name))
         finish()
     }
 }

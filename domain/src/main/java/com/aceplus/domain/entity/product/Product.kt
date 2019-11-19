@@ -21,7 +21,7 @@ class Product() : Parcelable {
     @ColumnInfo(name = "product_id")
     @SerializedName("product_id")
     @Expose
-    var product_id:  String? = null
+    var product_id:  String=""
 
     @ColumnInfo(name = "product_name")
     @SerializedName("product_name")

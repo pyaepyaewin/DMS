@@ -7,7 +7,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
-import android.os.Parcelable
 import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
 import android.view.View
@@ -19,11 +18,9 @@ import com.aceplus.dms.utils.BluetoothService
 import com.aceplus.dms.utils.PrintUtils
 import com.aceplus.dms.utils.Utils
 import com.aceplus.dms.viewmodel.PrintInvoiceViewModel
-import com.aceplus.domain.entity.credit.Credit
 import com.aceplus.domain.entity.customer.Customer
 import com.aceplus.domain.entity.delivery.Delivery
 import com.aceplus.domain.entity.invoice.Invoice
-import com.aceplus.domain.entity.product.Product
 import com.aceplus.domain.entity.promotion.Promotion
 import com.aceplus.domain.model.credit.CreditInvoice
 import com.aceplus.domain.vo.RelatedDataForPrint
@@ -47,6 +44,8 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
 
         private const val IE_SOLD_PRODUCT_LIST = "IE_SOLD_PRODUCT_LIST"
         private const val IE_INVOICE = "IE_INVOICE"
+        private const val INVOICE_ID = "INVOICE_ID"
+
         private const val HISTORY_REPORT_SOLD_PRODUCT_LIST = "HISTORY_REPORT_SOLD_PRODUCT_LIST"
         private const val IE_PROMOTION_LIST = "IE_PROMOTION_LIST"
         private const val IE_PRINT_MODE = "IE_PRINT_MODE"
@@ -137,12 +136,27 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
             return intent
         }
 
+        fun newIntentFromSaleCancelCheckout(
+            context: Context,
+            invoice:ArrayList<Invoice>,
+            soldProductList: ArrayList<SoldProductInfo>
+
+        ): Intent {
+            val intent = Intent(context, PrintInvoiceActivity::class.java)
+            intent.putExtra(IE_SOLD_PRODUCT_LIST, soldProductList)
+            intent.putExtra(IE_PRINT_MODE, "S")
+            intent.putParcelableArrayListExtra(IE_INVOICE, invoice)
+
+            return intent
+        }
+
 
     }
 
     private val printInvoiceViewModel: PrintInvoiceViewModel by viewModel()
     private val soldProductPrintListAdapter: SoldProductPrintListAdapter by lazy { SoldProductPrintListAdapter(printMode)}
     private val historySoldProductPrintListAdapter: HistorySoldProductPrintListAdapter by lazy { HistorySoldProductPrintListAdapter() }
+
 
     private var invoice: Invoice? = null
     private var soldProductList: ArrayList<SoldProductInfo> = ArrayList()

@@ -10,6 +10,8 @@ public class SaleCancelItem implements Serializable{
 
     private String customer_name;
 
+    private String id;
+
     private String invoice_id;
 
     private String sale_date;
@@ -21,6 +23,15 @@ public class SaleCancelItem implements Serializable{
     public String getCustomer_name() {
         return customer_name;
     }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
 
     public void setCustomer_name(String customer_name) {
         this.customer_name = customer_name;

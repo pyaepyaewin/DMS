@@ -43,8 +43,8 @@ interface InvoiceProductDao {
     @Query("Delete from invoice_product where invoice_product_id=:invoiceId")
     fun deleteAll(invoiceId:String)
 
-    @Query("Delete from invoice_product where invoice_product_id=:productId")
-    fun deleteInvoiceProduct(productId:String)
+    @Query("Delete from invoice_product where invoice_product_id=:invoiceId")
+    fun deleteInvoiceProduct(invoiceId:String)
 
     @Query("UPDATE invoice_product SET sale_quantity=:qty WHERE product_id=:productId and invoice_product_id=:invoiceId")
     fun updateQtyForInvoiceProduct(invoiceId: String,productId: String,qty:Int)
