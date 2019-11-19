@@ -7,6 +7,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
+import android.view.View
 import android.view.WindowManager
 import android.widget.*
 import com.aceplus.data.utils.Constant
@@ -50,19 +51,21 @@ class SaleReturnActivity : BaseActivity(), KodeinAware {
     private val salesReturnViewModel: SalesReturnViewModel by viewModel()
     private val mSearchProductAdapter by lazy { ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, ArrayList<String>()) }
     private val mProductListAdapter by lazy { ProductListAdapter(::onClickProductListItem) }
-    private val mReturnProductListAdapter by lazy { SaleReturnSelectedProductAdapter() }
+    private val mReturnProductListAdapter by lazy { SaleReturnSelectedProductAdapter(this::onClickQtyButton, this::onLongClickSoldProductListItem) }
 
     private var isSaleExchange: Boolean = false
     private var customer: Customer? = null
     private var salePersonID: String? = null
     private var saleReturnID: String? = null
     private var locationCode: Int = 0
+    private var netAmount: Double = 0.0
+    private var taxAmount: Double = 0.0
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN) // Hide keyboard on startup.
+        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN) // Hide keyboard
 
         getIntentData()
         initializeData()
@@ -111,7 +114,7 @@ class SaleReturnActivity : BaseActivity(), KodeinAware {
     private fun catchEvents(){
 
         cancel_img.setOnClickListener { onBackPressed() }
-        confirm_img.setOnClickListener { "ToDo" }
+        confirm_img.setOnClickListener { Utils.askConfirmationDialog("Save", "Do you want to confirm?", "save", this, this::onClickSaveButton) }
 
         salesReturnViewModel.productDataList.observe(this, Observer {
             if(it != null){
@@ -129,6 +132,19 @@ class SaleReturnActivity : BaseActivity(), KodeinAware {
                 } else{
                     txtTaxAmt.text = "Tax (Include) : "
                 }
+            }
+        })
+
+        salesReturnViewModel.calculatedProductList.observe(this, Observer {
+            if (it != null){
+                mReturnProductListAdapter.setNewList(it.first)
+                netAmount = it.second
+                taxAmount = it.third
+
+                totalAmountTextView.text = Utils.formatAmount(netAmount)
+                taxAmtEditText.setText(Utils.formatAmount(taxAmount))
+
+                salesReturnViewModel.calculatedProductList.value = null
             }
         })
 
@@ -180,8 +196,6 @@ class SaleReturnActivity : BaseActivity(), KodeinAware {
                     val quantity = quantityEditText.text.toString().toInt()
 
                     if (soldProduct.quantity != 0 && soldProduct.quantity < quantity){
-                        /*updatedQtyForGift = true
-                        updatedQtyForPercent = true*/
                         soldProduct.currentProductQty = soldProduct.quantity
                     }
 
@@ -189,16 +203,64 @@ class SaleReturnActivity : BaseActivity(), KodeinAware {
 
                     val newList = mReturnProductListAdapter.getDataList() as ArrayList
                     newList[position] = soldProduct
-                    //saleViewModel.calculateSoldProductData(newList, this.promotionList)
+                    salesReturnViewModel.calculateSelectedProductData(newList)
                 }
 
             }
             .setNegativeButton("Cancel", null)
             .create()
 
+        alertDialog.setOnShowListener { availableQuantityLayout.visibility = View.GONE }
+        alertDialog.show()
+
     }
 
     private fun onLongClickSoldProductListItem(soldProduct: SoldProductInfo, position: Int){
+
+        AlertDialog.Builder(this)
+            .setTitle("Delete sold product")
+            .setMessage("Are you sure you want to delete ${soldProduct.product.product_name}?")
+            .setPositiveButton("Yes"){ arg0, arg1 ->
+
+                val newList = mReturnProductListAdapter.getDataList() as ArrayList
+                newList.removeAt(position)
+                salesReturnViewModel.calculateSelectedProductData(newList)
+
+            }
+            .setNegativeButton("No", null)
+            .show()
+
+    }
+
+    private fun onClickSaveButton(type: String){
+
+        if (type == "save"){
+
+            if (mReturnProductListAdapter.getDataList().isEmpty()){
+                AlertDialog.Builder(this)
+                    .setTitle("Alert")
+                    .setMessage("You must specify at least one product.")
+                    .setPositiveButton("OK", null)
+                    .show()
+                return
+            }
+
+            for (product in mReturnProductListAdapter.getDataList()){
+
+                if (product.quantity == 0){
+                    AlertDialog.Builder(this)
+                        .setTitle("Alert")
+                        .setMessage("Quantity must not be zero.")
+                        .setPositiveButton("OK", null)
+                        .show()
+                    return
+                }
+
+            }
+
+            salesReturnViewModel.saveData(isSaleExchange)
+
+        }
 
     }
 

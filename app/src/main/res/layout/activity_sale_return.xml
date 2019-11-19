@@ -215,7 +215,9 @@
                                 android:layout_above="@+id/saleReturnDiscountLayout"
                                 android:layout_alignParentEnd="true"
                                 android:layout_alignParentRight="true"
-                                android:layout_margin="5dp">
+                                android:layout_marginTop="5dp"
+                                android:layout_marginRight="30dp"
+                                android:layout_marginBottom="10dp">
 
                             <TextView
                                     android:layout_width="0dp"
@@ -229,7 +231,7 @@
                                     android:id="@+id/totalAmountTextView"
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
-                                    android:layout_weight="2"
+                                    android:layout_weight="3"
                                     android:gravity="center_horizontal"
                                     android:text="0.0"
                                     android:textStyle="bold" />
@@ -243,8 +245,7 @@
                                 android:layout_alignParentEnd="true"
                                 android:layout_alignParentRight="true"
                                 android:layout_marginTop="5dp"
-                                android:layout_marginEnd="5dp"
-                                android:layout_marginRight="5dp"
+                                android:layout_marginRight="30dp"
                                 android:layout_marginBottom="5dp">
 
                             <TextView
@@ -260,9 +261,10 @@
                                     android:id="@+id/saleReturnDiscountEditText"
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
-                                    android:layout_weight="2"
+                                    android:layout_weight="3"
                                     android:gravity="center_horizontal"
                                     android:inputType="numberDecimal"
+                                    android:textSize="14sp"
                                     android:textStyle="bold" />
                         </LinearLayout>
 
@@ -274,8 +276,7 @@
                                 android:layout_alignParentEnd="true"
                                 android:layout_alignParentRight="true"
                                 android:layout_marginTop="5dp"
-                                android:layout_marginEnd="5dp"
-                                android:layout_marginRight="5dp"
+                                android:layout_marginRight="30dp"
                                 android:layout_marginBottom="5dp"
                                 android:visibility="gone">
 
@@ -305,7 +306,9 @@
                                 android:layout_above="@+id/taxAmtLayout"
                                 android:layout_alignParentEnd="true"
                                 android:layout_alignParentRight="true"
-                                android:layout_margin="5dp">
+                                android:layout_marginTop="5dp"
+                                android:layout_marginRight="30dp"
+                                android:layout_marginBottom="5dp">
 
                             <TextView
                                     android:layout_width="0dp"
@@ -319,9 +322,10 @@
                                     android:id="@+id/returnCashAmtEditText"
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
-                                    android:layout_weight="2"
+                                    android:layout_weight="3"
                                     android:gravity="center_horizontal"
                                     android:inputType="numberDecimal"
+                                    android:textSize="14sp"
                                     android:textStyle="bold" />
                         </LinearLayout>
 
@@ -332,7 +336,9 @@
                                 android:layout_alignParentBottom="true"
                                 android:layout_alignParentEnd="true"
                                 android:layout_alignParentRight="true"
-                                android:layout_margin="5dp">
+                                android:layout_marginTop="5dp"
+                                android:layout_marginRight="30dp"
+                                android:layout_marginBottom="10dp">
 
                             <TextView
                                     android:id="@+id/txtTaxAmt"
@@ -347,9 +353,10 @@
                                     android:id="@+id/taxAmtEditText"
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
-                                    android:layout_weight="2"
+                                    android:layout_weight="3"
                                     android:gravity="center_horizontal"
                                     android:inputType="number"
+                                    android:textSize="14sp"
                                     android:textStyle="bold" />
                         </LinearLayout>
 
