@@ -2,7 +2,7 @@ package com.aceplus.domain.vo.report
 
 import android.arch.persistence.room.ColumnInfo
 
-class SalesOrderHistoryReport (
+class SalesOrderHistoryFullDataReport (
     @ColumnInfo(name = "invoice_id")
     var invoiceId:String,
 
@@ -12,9 +12,6 @@ class SalesOrderHistoryReport (
     @ColumnInfo(name = "address")
     var address:String,
 
-    @ColumnInfo(name = "total_amount")
-    var totalAmount:String,
-
     @ColumnInfo(name = "discount")
     var discount: String,
 
@@ -23,4 +20,5 @@ class SalesOrderHistoryReport (
 
     @ColumnInfo(name = "net_amount")
     var netAmount: String
+
 )

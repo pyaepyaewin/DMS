@@ -16,9 +16,4 @@ class DeliveryActivityAdapter(private val onClick: (deliver: Deliver) -> Unit):
         return DeliveryActivityViewHolder(view, onClick)
     }
 
-//    override fun onBindViewHolder(holder: DeliveryActivityViewHolder, position: Int) {
-//
-//        holder.setData(mDataList[position],position)
-//
-//    }
 }

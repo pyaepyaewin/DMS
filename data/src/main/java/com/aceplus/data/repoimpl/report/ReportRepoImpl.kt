@@ -6,6 +6,7 @@ import com.aceplus.domain.entity.credit.Credit
 import com.aceplus.domain.entity.customer.Customer
 import com.aceplus.domain.entity.invoice.Invoice
 import com.aceplus.domain.entity.preorder.PreOrder
+import com.aceplus.domain.entity.preorder.PreOrderProduct
 import com.aceplus.domain.entity.product.Product
 import com.aceplus.domain.entity.product.ProductCategory
 import com.aceplus.domain.entity.product.ProductGroup
@@ -22,6 +23,7 @@ import com.aceplus.domain.vo.report.*
 import io.reactivex.Observable
 
 class ReportRepoImpl(private val db: MyDatabase) : ReportRepo {
+
     //deliver report
     override fun deliverReport(): Observable<List<DeliverReport>> {
         return Observable.just(db.deliveryDao().getDeliverReport())
@@ -34,6 +36,9 @@ class ReportRepoImpl(private val db: MyDatabase) : ReportRepo {
     //preOrder report
     override fun preOrderReport(): Observable<List<PreOrderReport>> {
         return Observable.just(db.preOrderDao().getPreOrderReport())
+    }
+    override fun preOrderQtyReport(invoiceIdList: List<String>): Observable<List<PreOrderProduct>> {
+        return Observable.just(db.preOrderProductDao().allQtyDataById(invoiceIdList))
     }
 
     override fun preOrderDetailReport(invoiceId: String): Observable<List<PreOrderDetailReport>> {
@@ -94,7 +99,7 @@ class ReportRepoImpl(private val db: MyDatabase) : ReportRepo {
     }
 
     //sale order history report
-    override fun salesOrderHistoryReport(): Observable<List<SalesOrderHistoryReport>> {
+    override fun salesOrderHistoryReport(): Observable<List<SalesOrderHistoryFullDataReport>> {
         return Observable.just(db.preOrderDao().getSalesOrderHistoryReport())
     }
 

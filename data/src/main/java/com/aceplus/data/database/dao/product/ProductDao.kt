@@ -35,6 +35,9 @@ interface ProductDao {
     @Query("update product set remaining_quantity = remaining_quantity - :soldQty, sold_quantity = sold_quantity + :soldQty where product.id = :productID")
     fun updateProductRemainingQty(soldQty: Int, productID: Int)
 
+    @Query("update product set remaining_quantity = remaining_quantity - :soldQty, delivery_quantity = delivery_quantity + :soldQty where product.id = :productID")
+    fun updateProductDeliveryQty(soldQty: Int, productID: Int)
+
     @Query("Delete from product")
     fun deleteAll()
 
@@ -44,8 +47,8 @@ interface ProductDao {
     @Query("select p.id, p.product_id, p.product_name, p.category_id, p.group_id, p.total_quantity, p.remaining_quantity, p.selling_price, p.purchase_price, p.discount_type, u.name as um, p.sold_quantity, p.order_quantity, p.exchange_quantity, p.return_quantity, p.delivery_quantity, p.present_quantity, p.device_issue_status, p.class_id,IP.promotion_price ,IP.sale_quantity from product as p, um as u,invoice_product as IP where p.um = u.id and p.id in (:productIDList) and p.id=IP.product_id")
     fun allProductData(productIDList: List<String>): List<SaleCancelDetailItem>
 
-    @Query("select * from product where id = :stockId")
-    fun deliveryProductDataList(stockId:String): List<Product>
+    @Query("select * from product where id in (:stockIdList)")
+    fun deliveryProductDataList(stockIdList:List<String>): List<Product>
 
 
 }

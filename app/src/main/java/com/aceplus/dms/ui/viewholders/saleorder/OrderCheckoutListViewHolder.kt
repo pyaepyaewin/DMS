@@ -16,8 +16,10 @@ class OrderCheckoutListViewHolder(itemView: View): BaseViewHolder<SoldProductInf
         itemView.name.text = data.product.product_name
         itemView.qty.text = data.quantity.toString()
         itemView.price.text = Utils.formatAmount(data.product.selling_price?.toDouble() ?: 0.0)
-        itemView.discount.text = Utils.formatAmount(data.promoPriceByDiscount)
-        itemView.amt.text = Utils.formatAmount(data.totalAmt)
+//        itemView.discount.text = Utils.formatAmount(data.promoPriceByDiscount)
+//        itemView.amt.text = Utils.formatAmount(data.totalAmt)
+        itemView.discount.text = Utils.formatAmount(data.product.selling_price?.toDouble() ?: 0.0)
+        itemView.amt.text = (data.quantity * data.product.selling_price!!.toInt()).toString()
 
     }
 

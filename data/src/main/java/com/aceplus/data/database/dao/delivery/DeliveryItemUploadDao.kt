@@ -26,5 +26,8 @@ interface DeliveryItemUploadDao {
     @Query("Delete from delivery_item_upload")
     fun deleteAll()
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertDeliveryItemUpload(cvDeliveryUploadItem: DeliveryItemUpload)
+
 
 }

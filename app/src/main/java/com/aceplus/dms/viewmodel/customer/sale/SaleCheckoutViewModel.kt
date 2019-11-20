@@ -18,22 +18,25 @@ import com.aceplus.domain.vo.SoldProductInfo
 import com.aceplus.shared.viewmodel.BaseViewModel
 import com.kkk.githubpaging.network.rx.SchedulerProvider
 
-class SaleCheckoutViewModel(private val customerVisitRepo: CustomerVisitRepo, private val schedulerProvider: SchedulerProvider): BaseViewModel() {
+class SaleCheckoutViewModel(
+    private val customerVisitRepo: CustomerVisitRepo,
+    private val schedulerProvider: SchedulerProvider
+) : BaseViewModel() {
 
     var invoice = MutableLiveData<Invoice>()
     var finalData = MutableLiveData<CalculatedFinalData>()
     var messageInfo = MutableLiveData<Pair<String, String>>()
 
-    fun getSaleManID(): String{
+    fun getSaleManID(): String {
         val saleManData = customerVisitRepo.getSaleManData()
         return saleManData.id
     }
 
-    fun getRouteID(): Int{
+    fun getRouteID(): Int {
         return customerVisitRepo.getRouteScheduleIDV2()
     }
 
-    fun getInvoiceNumber(saleManId:String,locationNumber:Int,invoiceMode:String): String{
+    fun getInvoiceNumber(saleManId: String, locationNumber: Int, invoiceMode: String): String {
         return Utils.getInvoiceNo(
             saleManId,
             locationNumber.toString(),
@@ -43,7 +46,7 @@ class SaleCheckoutViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
     }
 
     @SuppressLint("CheckResult")
-    fun calculateFinalAmount(soldProductList: ArrayList<SoldProductInfo>, totalAmount: Double){
+    fun calculateFinalAmount(soldProductList: ArrayList<SoldProductInfo>, totalAmount: Double) {
 
         var amountAndPercentage: MutableMap<String, Double> = mutableMapOf()
         var sameCategoryProducts: ArrayList<SoldProductInfo> = ArrayList()
@@ -65,12 +68,12 @@ class SaleCheckoutViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
             customerVisitRepo.getVolumeDiscountFilterByDate(Utils.getCurrentDate(true))
                 .flatMap {
 
-                    for (i in it){
+                    for (i in it) {
 
                         volDisFilterId = i.id
                         exclude = i.exclude?.toInt()
 
-                        for (soldProduct in soldProductList){
+                        for (soldProduct in soldProductList) {
 
                             var categoryProduct: String? = null
                             var category: String? = null
@@ -78,8 +81,8 @@ class SaleCheckoutViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
                             customerVisitRepo.getProductByID(soldProduct.product.id)
                                 .subscribeOn(schedulerProvider.io())
                                 .observeOn(schedulerProvider.mainThread())
-                                .subscribe{ productList ->
-                                    for ( p in productList){
+                                .subscribe { productList ->
+                                    for (p in productList) {
                                         categoryProduct = p.category_id
                                     }
                                 }
@@ -87,8 +90,8 @@ class SaleCheckoutViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
                             customerVisitRepo.getVolumeDiscountFilterItem(volDisFilterId)
                                 .subscribeOn(schedulerProvider.io())
                                 .observeOn(schedulerProvider.mainThread())
-                                .subscribe{ volumeDiscFilterItemList ->
-                                    for (v in volumeDiscFilterItemList){
+                                .subscribe { volumeDiscFilterItemList ->
+                                    for (v in volumeDiscFilterItemList) {
                                         category = v.category_id
                                     }
                                 }
@@ -98,11 +101,11 @@ class SaleCheckoutViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
 
                         }
 
-                        for (aSameCategoryProduct in sameCategoryProducts){
+                        for (aSameCategoryProduct in sameCategoryProducts) {
 
-                            soldPrice = if (aSameCategoryProduct.promotionPrice == 0.0){
+                            soldPrice = if (aSameCategoryProduct.promotionPrice == 0.0) {
                                 aSameCategoryProduct.product.selling_price?.toDouble() ?: 0.0
-                            } else{
+                            } else {
                                 aSameCategoryProduct.promotionPrice
                             }
 
@@ -116,14 +119,17 @@ class SaleCheckoutViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
 
                         }
 
-                        if (exclude == 0){
+                        if (exclude == 0) {
 
-                            customerVisitRepo.getDiscountPercentFromVolumeDiscountFilterItem(volDisFilterId, totalBuyAmtInclude)
+                            customerVisitRepo.getDiscountPercentFromVolumeDiscountFilterItem(
+                                volDisFilterId,
+                                totalBuyAmtInclude
+                            )
                                 .subscribeOn(schedulerProvider.io())
                                 .observeOn(schedulerProvider.mainThread())
-                                .subscribe{ discList ->
+                                .subscribe { discList ->
                                     if (discList.isEmpty()) exclude = null
-                                    for (disc in discList){
+                                    for (disc in discList) {
                                         discountPercent = disc.discount_percent?.toDouble() ?: 0.0
                                     }
                                 }
@@ -133,24 +139,28 @@ class SaleCheckoutViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
                             amountAndPercentage["Amount"] = itemTotalDis
 
                             // Check what's this for ... exceed?
-                            if (discountPercent > 0){
-                                for (soldProduct in sameCategoryProducts){
+                            if (discountPercent > 0) {
+                                for (soldProduct in sameCategoryProducts) {
                                     soldProduct.exclude = exclude
-                                    val discountAmount = soldProduct.totalAmt * (discountPercent / 100)
+                                    val discountAmount =
+                                        soldProduct.totalAmt * (discountPercent / 100)
                                     soldProduct.discountPercent = discountPercent
                                     soldProduct.discountAmount = discountAmount
                                     //soldProduct.totalAmt = soldProduct.totalAmount // Check point
                                 }
                             }
 
-                        } else{
+                        } else {
 
-                            customerVisitRepo.getDiscountPercentFromVolumeDiscountFilterItem(volDisFilterId, totalBuyAmtExclude)
+                            customerVisitRepo.getDiscountPercentFromVolumeDiscountFilterItem(
+                                volDisFilterId,
+                                totalBuyAmtExclude
+                            )
                                 .subscribeOn(schedulerProvider.io())
                                 .observeOn(schedulerProvider.mainThread())
-                                .subscribe{ discList ->
+                                .subscribe { discList ->
                                     if (discList.isEmpty()) exclude = null
-                                    for (disc in discList){
+                                    for (disc in discList) {
                                         discountPercent = disc.discount_percent?.toDouble() ?: 0.0
                                     }
                                 }
@@ -160,10 +170,11 @@ class SaleCheckoutViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
                             amountAndPercentage["Amount"] = itemTotalDis
 
                             // Check what's this for ... exceed?
-                            if (discountPercent > 0){
-                                for (soldProduct in sameCategoryProducts){
+                            if (discountPercent > 0) {
+                                for (soldProduct in sameCategoryProducts) {
                                     soldProduct.exclude = exclude
-                                    val discountAmount = soldProduct.totalAmt * (discountPercent / 100)
+                                    val discountAmount =
+                                        soldProduct.totalAmt * (discountPercent / 100)
                                     soldProduct.discountPercent = discountPercent
                                     soldProduct.discountAmount = discountAmount
                                     //soldProduct.totalAmt = soldProduct.totalAmount // Check point
@@ -174,34 +185,42 @@ class SaleCheckoutViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
 
                     }
 
-                    return@flatMap customerVisitRepo.getVolumeDiscountByDate(Utils.getCurrentDate(true))
+                    return@flatMap customerVisitRepo.getVolumeDiscountByDate(
+                        Utils.getCurrentDate(
+                            true
+                        )
+                    )
                 }
                 .flatMap {
 
                     var volDisId = 0
                     var buyAmt = 0.0
 
-                    for (i in it){
+                    for (i in it) {
                         volDisId = i.id
                         exclude = i.exclude?.toInt()
 
-                        if (exclude == 0){
+                        if (exclude == 0) {
                             buyAmt = totalAmount
-                        } else{
+                        } else {
                             var noPromoBuyAmt = 0.0
-                            for (soldProduct in soldProductList){
+                            for (soldProduct in soldProductList) {
                                 if (soldProduct.promotionPrice == 0.0 && soldProduct.discountPercent == 0.0)
                                     noPromoBuyAmt += soldProduct.totalAmt
                             }
                             buyAmt = noPromoBuyAmt
                         }
 
-                        customerVisitRepo.getDiscountPercentFromVolumeDiscountFilterItem(volDisId, buyAmt)
+                        customerVisitRepo.getDiscountPercentFromVolumeDiscountFilterItem(
+                            volDisId,
+                            buyAmt
+                        )
                             .subscribeOn(schedulerProvider.io())
                             .observeOn(schedulerProvider.mainThread())
-                            .subscribe{ volDiscFilterItemList ->
-                                for (volDiscFilterItem in volDiscFilterItemList){
-                                    val discountPercentForVolDis = volDiscFilterItem.discount_percent?.toDouble() ?: 0.0
+                            .subscribe { volDiscFilterItemList ->
+                                for (volDiscFilterItem in volDiscFilterItemList) {
+                                    val discountPercentForVolDis =
+                                        volDiscFilterItem.discount_percent?.toDouble() ?: 0.0
                                     totalVolumeDiscount = buyAmt * (discountPercentForVolDis / 100)
                                     totalVolumeDiscountPercent = discountPercentForVolDis
                                 }
@@ -212,14 +231,20 @@ class SaleCheckoutViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
                 }
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.mainThread())
-                .subscribe{ companyInfoList ->
+                .subscribe { companyInfoList ->
 
-                    for(company in companyInfoList){
+                    for (company in companyInfoList) {
                         taxPercent = company.tax ?: 0
                         taxType = company.tax_type ?: ""
                     }
 
-                    val finalData = CalculatedFinalData(amountAndPercentage, totalVolumeDiscount, totalVolumeDiscountPercent, taxType, taxPercent)
+                    val finalData = CalculatedFinalData(
+                        amountAndPercentage,
+                        totalVolumeDiscount,
+                        totalVolumeDiscountPercent,
+                        taxType,
+                        taxPercent
+                    )
                     this.finalData.postValue(finalData)
 
                 }
@@ -248,7 +273,7 @@ class SaleCheckoutViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
         acc: String,
         totalDiscountAmount: Double,
         totalVolumeDiscountPercent: Double
-    ){
+    ) {
 
         var totalQtyForInvoice = 0
         val invoiceDetailList: ArrayList<InvoiceDetail> = ArrayList()
@@ -258,13 +283,13 @@ class SaleCheckoutViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
             customerVisitRepo.getInvoiceCountByID(invoiceId)
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.mainThread())
-                .subscribe{
+                .subscribe {
 
-                    if (it == 0){
+                    if (it == 0) {
 
                         val invoiceProductList: ArrayList<InvoiceProduct> = ArrayList()
 
-                        for (soldProduct in soldProductList){
+                        for (soldProduct in soldProductList) {
 
                             val invoiceDetail = InvoiceDetail()
                             invoiceDetail.tsaleId = invoiceId
@@ -281,7 +306,8 @@ class SaleCheckoutViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
                             invoiceDetail.itemDiscountAmount = soldProduct.focAmount
 
                             if (!soldProduct.promotionPlanId.isNullOrEmpty())
-                                invoiceDetail.promotion_plan_id = soldProduct.promotionPlanId.toInt()
+                                invoiceDetail.promotion_plan_id =
+                                    soldProduct.promotionPlanId.toInt()
 
                             invoiceDetailList.add(invoiceDetail) // To Check // For what?
 
@@ -295,22 +321,24 @@ class SaleCheckoutViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
                             invoiceProduct.discount_percent = soldProduct.discountPercent
                             invoiceProduct.s_price = soldProduct.product.selling_price!!.toDouble()
                             invoiceProduct.p_price = soldProduct.product.purchase_price!!.toDouble()
-                            invoiceProduct.promotion_price = soldProduct.promoPriceByDiscount // Check promo price or promo price by disc
+                            invoiceProduct.promotion_price =
+                                soldProduct.promoPriceByDiscount // Check promo price or promo price by disc
                             invoiceProduct.item_discount_percent = soldProduct.focPercent
                             invoiceProduct.item_discount_amount = soldProduct.focAmount
                             invoiceProduct.exclude = "${soldProduct.exclude}"
 
                             if (!soldProduct.promotionPlanId.isNullOrEmpty())
-                                invoiceProduct.promotion_plan_id = soldProduct.promotionPlanId.toInt()
+                                invoiceProduct.promotion_plan_id =
+                                    soldProduct.promotionPlanId.toInt()
 
                             totalQtyForInvoice += soldProduct.quantity
 
-                            if (soldProduct.totalAmt != 0.0){
+                            if (soldProduct.totalAmt != 0.0) {
                                 invoiceProductList.add(invoiceProduct)
                                 customerVisitRepo.updateProductRemainingQty(soldProduct) // Need to remind !!!
                             }
 
-                            if (soldProduct.focQuantity > 0 && soldProduct.totalAmt == 0.0){
+                            if (soldProduct.focQuantity > 0 && soldProduct.totalAmt == 0.0) {
                                 // ToDo - add promotion list
                             }
 
@@ -318,7 +346,7 @@ class SaleCheckoutViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
 
                         customerVisitRepo.insertAllInvoiceProduct(invoiceProductList)
 
-                        for (promotion in promotionList){
+                        for (promotion in promotionList) {
                             // ToDo - update qty
                             // ToDo - insert invoice present
                         }
@@ -342,9 +370,11 @@ class SaleCheckoutViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
                         invoice.volume_amount = 0.0 // Need to check
                         invoice.package_grade = "" // Need to check
                         invoice.invoice_product_id = 0 // Need to check
-                        invoice.total_quantity = totalQtyForInvoice.toDouble() // Check int or double
+                        invoice.total_quantity =
+                            totalQtyForInvoice.toDouble() // Check int or double
                         invoice.invoice_status = cashOrLoanOrBank
-                        invoice.total_discount_percent = totalVolumeDiscountPercent.toString()  // Need to check
+                        invoice.total_discount_percent =
+                            totalVolumeDiscountPercent.toString()  // Need to check
                         invoice.rate = "1"
                         invoice.tax_amount = taxAmt
                         invoice.bank_name = bank
@@ -363,8 +393,11 @@ class SaleCheckoutViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
                             }
                             .subscribeOn(schedulerProvider.io())
                             .observeOn(schedulerProvider.mainThread())
-                            .subscribe{ invoiceProductList ->
-                                Log.d("Testing", "Invoice product count = ${invoiceProductList.size}")
+                            .subscribe { invoiceProductList ->
+                                Log.d(
+                                    "Testing",
+                                    "Invoice product count = ${invoiceProductList.size}"
+                                )
                             }
 
                     } else Log.d("Testing", "Found same invoice id")
@@ -374,7 +407,7 @@ class SaleCheckoutViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
 
     }
 
-    fun updateDepartureTimeForSaleManRoute(saleManId: String, customerId: String){
+    fun updateDepartureTimeForSaleManRoute(saleManId: String, customerId: String) {
         customerVisitRepo.updateDepartureTimeForSaleManRoute(
             saleManId,
             customerId,
@@ -382,7 +415,7 @@ class SaleCheckoutViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
         )
     }
 
-    fun updateSaleVisitRecord(customerId: Int){
+    fun updateSaleVisitRecord(customerId: Int) {
         customerVisitRepo.updateSaleVisitRecord(customerId, "1", "1")
     }
 
@@ -405,21 +438,21 @@ class SaleCheckoutViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
         cashOrLoanOrBank: String,
         soldProductList: ArrayList<SoldProductInfo>,
         promotionList: ArrayList<Promotion>
-    ){
+    ) {
 
         launch {
             customerVisitRepo.getOrderInvoiceCountByID(invoiceId)
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.mainThread())
-                .subscribe{
+                .subscribe {
 
-                    if (it == 0){
+                    if (it == 0) {
 
                         val invoice = Invoice()
                         val preOrder = PreOrder()
                         val preOrderProductList: ArrayList<PreOrderProduct> = ArrayList()
 
-                        for (soldProduct in soldProductList){
+                        for (soldProduct in soldProductList) {
 
                             val preOrderProduct = PreOrderProduct()
                             preOrderProduct.sale_order_id = invoiceId
@@ -427,10 +460,12 @@ class SaleCheckoutViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
                             preOrderProduct.order_quantity = soldProduct.quantity.toString()
                             preOrderProduct.price = soldProduct.product.selling_price
                             preOrderProduct.total_amount = soldProduct.totalAmt
-                            preOrderProduct.promotion_price = soldProduct.promoPriceByDiscount.toString() // Check promo price or promo price by disc
+                            preOrderProduct.promotion_price =
+                                soldProduct.promoPriceByDiscount.toString() // Check promo price or promo price by disc
                             preOrderProduct.promotion_plan_id = soldProduct.promotionPlanId
                             preOrderProduct.volume_discount = soldProduct.discountAmount.toString()
-                            preOrderProduct.volume_discount_percent = soldProduct.discountPercent.toString()
+                            preOrderProduct.volume_discount_percent =
+                                soldProduct.discountPercent.toString()
                             //preOrderProduct.item_discount_percent = soldProduct.itemDiscountAmount.toString() // ToDo -  Check
                             //preOrderProduct.item_discount_amount // ToDo -  Check
                             preOrderProduct.exclude = "${soldProduct.exclude}"
@@ -444,7 +479,7 @@ class SaleCheckoutViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
                         customerVisitRepo.insertAllPreOrderProduct(preOrderProductList)
 
 
-                        for (promotion in promotionList){
+                        for (promotion in promotionList) {
                             // ToDo - something for promotion
                         }
 
@@ -475,7 +510,8 @@ class SaleCheckoutViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
                         preOrder.net_amount = totalAmount.toString() // To Check
                         preOrder.location_id = locationID.toString()
                         preOrder.discount = totalDiscountAmount.toString() // To Check
-                        preOrder.discount_percent = totalVolumeDiscountPercent.toString() // To Check
+                        preOrder.discount_percent =
+                            totalVolumeDiscountPercent.toString() // To Check
                         preOrder.tax_amount = taxAmt.toString()
                         preOrder.bank_name = bank
                         preOrder.bank_account_no = acc
@@ -494,8 +530,11 @@ class SaleCheckoutViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
                             }
                             .subscribeOn(schedulerProvider.io())
                             .observeOn(schedulerProvider.mainThread())
-                            .subscribe{ preOrderProductList ->
-                                Log.d("Testing", "Pre Order Product count = ${preOrderProductList.size}")
+                            .subscribe { preOrderProductList ->
+                                Log.d(
+                                    "Testing",
+                                    "Pre Order Product count = ${preOrderProductList.size}"
+                                )
                             }
 
                     } else Log.d("Testing", "Found same invoice id")
@@ -511,7 +550,7 @@ class SaleCheckoutViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
         invoiceId: String,
         promotionList: ArrayList<Promotion>,
         remark: String
-    ){
+    ) {
 
         var message = ""
         val preOrderPresentApiList = ArrayList<PreOrderPresentApi>()
@@ -521,7 +560,7 @@ class SaleCheckoutViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
             customerVisitRepo.getPreOrderByID(invoiceId)
                 .flatMap { preOrderList ->
 
-                    if (preOrderList.isNotEmpty()){
+                    if (preOrderList.isNotEmpty()) {
 
                         preOrder = preOrderList[0]
 
@@ -529,7 +568,7 @@ class SaleCheckoutViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
                                 "\nCus: ${preOrder?.customer_id}, SM: ${preOrder?.sale_man_id}" +
                                 "\nSO: ${preOrder?.pre_order_date}"
 
-                        for (promotion in promotionList){
+                        for (promotion in promotionList) {
 
                             val preOrderPresentApi = PreOrderPresentApi()
                             preOrderPresentApi.saleOrderId = invoiceId
@@ -547,9 +586,9 @@ class SaleCheckoutViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
                 }
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.mainThread())
-                .subscribe{ preOrderProductList ->
+                .subscribe { preOrderProductList ->
 
-                    for (preOrderProduct in preOrderProductList){
+                    for (preOrderProduct in preOrderProductList) {
                         message += "\n${preOrderProduct.product_id}\t${preOrderProduct.order_quantity}"
                     }
 
@@ -564,7 +603,7 @@ class SaleCheckoutViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
 
     fun saveSmsRecord(smsRecord: SMSRecord) = customerVisitRepo.insertSmsRecord(smsRecord)
 
-    fun getPreOrderRequest(){
+    fun getPreOrderRequest() {
 
         // ToDo - create pre-order request object and post to view to call upload api
 

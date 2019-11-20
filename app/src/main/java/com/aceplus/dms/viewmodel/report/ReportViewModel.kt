@@ -4,6 +4,7 @@ import android.arch.lifecycle.MutableLiveData
 import android.util.Log
 import com.aceplus.domain.entity.customer.Customer
 import com.aceplus.domain.entity.invoice.Invoice
+import com.aceplus.domain.entity.preorder.PreOrderProduct
 import com.aceplus.domain.entity.product.Product
 import com.aceplus.domain.entity.product.ProductCategory
 import com.aceplus.domain.entity.product.ProductGroup
@@ -15,6 +16,7 @@ import com.aceplus.shared.viewmodel.BaseViewModel
 import com.kkk.githubpaging.network.rx.SchedulerProvider
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 
 class ReportViewModel(
     private val reportRepo: ReportRepo,
@@ -56,22 +58,32 @@ class ReportViewModel(
     }
 
     //pre order report
-    var preOrderReportSuccessState = MutableLiveData<List<PreOrderReport>>()
+    var preOrderReportSuccessState = MutableLiveData<Pair<List<PreOrderReport>,List<PreOrderProduct>>>()
     var preOrderDetailReportSuccessState = MutableLiveData<List<PreOrderDetailReport>>()
     fun loadPreOrderReport() {
+        var preOrderReport:List<PreOrderReport> = listOf()
+        var preOrderProductList:List<PreOrderProduct>
         launch {
             reportRepo.preOrderReport()
+                .flatMap {
+                    preOrderReport = it
+                    val invoiceIdList = mutableListOf<String>()
+                    for (i in it){
+                        invoiceIdList!!.add(i.invoiceId)
+                    }
+                    return@flatMap reportRepo.preOrderQtyReport(invoiceIdList as List<String>)
+                }
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.mainThread())
-                .subscribe({
-                    preOrderReportSuccessState.postValue(it)
-                    Log.d("Testing", "$it")
-                }, {
-                    reportErrorState.value = it.localizedMessage
-                })
+                .subscribe{
+                    preOrderProductList = it
+                    preOrderReportSuccessState.postValue(Pair(preOrderReport,preOrderProductList))
+
+                }
         }
 
     }
+
 
     fun loadPreOrderDetailReport(invoiceId: String) {
         launch {
@@ -254,18 +266,17 @@ class ReportViewModel(
 
     //sale order history report
     var salesOrderHistoryReportSuccessState =
-        MutableLiveData<Pair<List<SalesOrderHistoryReport>, List<Customer>>>()
+        MutableLiveData<Pair<List<SalesOrderHistoryFullDataReport>, List<Customer>>>()
 
     fun loadSalesOrderHistoryReport() {
         var customerDataList = listOf<Customer>()
-        var saleOrderHistoryReport = listOf<SalesOrderHistoryReport>()
+        var saleOrderHistoryReport = listOf<SalesOrderHistoryFullDataReport>()
         launch {
             reportRepo.salesOrderHistoryReport()
-                .doOnNext {
+                .flatMap {
                     saleOrderHistoryReport = it
+                    return@flatMap reportRepo.getAllCustomerData()
                 }
-                .flatMap { reportRepo.getAllCustomerData() }
-
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.mainThread())
                 .subscribe({

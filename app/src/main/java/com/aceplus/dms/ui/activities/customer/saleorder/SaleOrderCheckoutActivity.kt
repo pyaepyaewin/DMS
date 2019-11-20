@@ -5,7 +5,9 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.app.PendingIntent
+import android.content.ContentValues
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -28,12 +30,15 @@ import com.aceplus.dms.utils.SmsDeliveredReceiver
 import com.aceplus.dms.utils.SmsSentReceiver
 import com.aceplus.dms.ui.activities.customer.DeliveryActivity
 import com.aceplus.dms.utils.Utils
+import com.aceplus.dms.viewmodel.customer.delivery.DeliveryViewModel
 import com.aceplus.dms.viewmodel.customer.sale.SaleCheckoutViewModel
 import com.aceplus.domain.entity.SMSRecord
 import com.aceplus.domain.entity.customer.Customer
 import com.aceplus.domain.entity.invoice.Invoice
 import com.aceplus.domain.entity.promotion.Promotion
 import com.aceplus.domain.model.delivery.Deliver
+import com.aceplus.domain.repo.CustomerVisitRepo
+import com.aceplus.domain.repo.deliveryrepo.DeliveryRepo
 import com.aceplus.domain.vo.SoldProductInfo
 import com.aceplussolutions.rms.constants.AppUtils
 import com.aceplussolutions.rms.ui.activities.BaseActivity
@@ -42,6 +47,7 @@ import kotlinx.android.synthetic.main.activity_sale_order_checkout.*
 import kotlinx.android.synthetic.main.activity_sale_order_checkout.back_img
 import kotlinx.android.synthetic.main.activity_sale_order_checkout.confirmAndPrint_img
 import kotlinx.android.synthetic.main.activity_sale_order_checkout.saleDateTextView
+import kotlinx.android.synthetic.main.activity_sale_order_checkout.view.*
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.kodein
@@ -75,6 +81,8 @@ import kotlinx.android.synthetic.main.activity_sale_checkout.tvTotalAmount as tv
 import kotlinx.android.synthetic.main.activity_sale_checkout.tax_txtView as tax_txtView1
 import kotlinx.android.synthetic.main.activity_sale_checkout.tvInvoiceId as tvInvoiceId1
 import kotlinx.android.synthetic.main.activity_sale_checkout.checkout_remark_edit_text as checkout_remark_edit_text1
+import kotlinx.android.synthetic.main.activity_sale_checkout.llSaleStatus as llSaleStatus1
+import kotlinx.android.synthetic.main.activity_sale_checkout.paymentMethodLayout as paymentMethodLayout1
 import kotlinx.android.synthetic.main.activity_sale_checkout.tvPrepaidAmount as tvPrepaidAmount1
 import kotlinx.android.synthetic.main.activity_sale_order_checkout.advancedPaidAmount as advancedPaidAmount1
 import kotlinx.android.synthetic.main.activity_sale_order_checkout.advancedPaidAmountLayout as advancedPaidAmountLayout1
@@ -125,9 +133,23 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
             return intent
         }
 
-    }
+        fun getIntentForDeliveryFromSaleOrder(
+            saleOrderActivity: SaleOrderActivity,
+            isDelivery:Boolean,
+            soldProductList: java.util.ArrayList<SoldProductInfo>,
+            orderedInvoice:Deliver
+        ): Intent? {
+            val intent = Intent(saleOrderActivity, SaleOrderCheckoutActivity::class.java)
+            intent.putExtra(IE_SOLD_PRODUCT_LIST,soldProductList)
+            intent.putExtra(ORDERED_INVOICE_KEY,orderedInvoice)
+            intent.putExtra(IE_IS_DELIVERY,isDelivery)
+            return intent
+        }
 
+    }
+    private val deliveryRepo: DeliveryRepo? = null
     private val saleCheckoutViewModel: SaleCheckoutViewModel by viewModel()
+    private val deliveryCheckoutViewModel: DeliveryViewModel by viewModel()
     private val orderCheckoutListAdapter: OrderCheckoutListAdapter by lazy { OrderCheckoutListAdapter() }
 
     private val df = DecimalFormat(".##")
@@ -151,10 +173,23 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
     private var locationCode: Int = 0
     private var invoiceId: String = ""
     private var invoice: Invoice? = null
+    private var saleManId = ""
+    private var saleManNo = ""
+    private var saleManPwd = ""
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        try {
+            saleManId = AppUtils.getStringFromShp(Constant.SALEMAN_ID, this)!!
+            saleManNo = AppUtils.getStringFromShp(Constant.SALEMAN_NO, this)!!
+            saleManPwd = AppUtils.getStringFromShp(Constant.SALEMAN_PWD, this)!!
+        } catch (e: NullPointerException) {
+            e.printStackTrace()
+            Utils.backToLogin(this)
+        }
+
 
         getIntentData()
         initializeData()
@@ -166,27 +201,47 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
     }
 
     private fun setupUI(){
+//        edtVolumeDiscountPercent.setText(orderedInvoice!!.discountPercent.toString())
+//        edtVolumeDiscountAmt.setText(orderedInvoice!!.amount.toString())
+//        payAmount.setText(orderedInvoice!!.paidAmount.toString())
+        if (isDelivery){
+            deliveryHeaderLayout.tvTitle.text = "DELIVERY CHECKOUT"
+            tvInvoiceId.text = orderedInvoice!!.invoiceNo
+            tvTotalAmount.text = orderedInvoice!!.amount.toString()
+            btn_disOk.visibility = View.GONE
+            btn_amtOk.visibility = View.GONE
+            paymentMethodLayout.visibility = View.GONE
+            refundLayout.visibility = View.GONE
+            llSaleStatus.visibility = View.GONE
+            duedateLayout.visibility = View.GONE
+            payAmountLayout.visibility = View.VISIBLE
+            checkout_delivery_date_layout.visibility = View.GONE
+            checkout_remark_layout.visibility = View.GONE
+            layout_receipt_person.visibility = View.VISIBLE
+            payAmountLayout.visibility = View.VISIBLE
+            tableHeaderUM.visibility = View.GONE
+            advancedPaidAmountLayout.visibility = View.GONE
+            volDisForPreOrderLayout.visibility = View.GONE
 
-        saleDateTextView.text = Utils.getDate(false)
-        tableHeaderDiscount.text = "Promotion Price"
-        tax_layout.visibility = View.VISIBLE
-        checkout_remark_layout.visibility = View.VISIBLE
-        tableHeaderQty.text = getString(R.string.ordered_qty)
-        if (isDelivery) tableHeaderQty.text = getString(R.string.delivery_checkout)
-        tableHeaderUM.visibility = View.GONE
-        advancedPaidAmountLayout.visibility = View.GONE
-        payAmountLayout.visibility = View.GONE
-        refundLayout.visibility = View.GONE
-        layout_receipt_person.visibility = View.GONE
-        volDisForPreOrderLayout.visibility = View.GONE
-        checkout_delivery_date_layout.visibility = View.VISIBLE
-        duedateLayout.visibility = View.GONE
-        if (isDelivery) {
-            advancedPaidAmount.text = Utils.formatAmount(orderedInvoice!!.paidAmount)
         }
-        if (isDelivery) {
-            tvTitle.text = (R.string.delivery_checkout).toString()
+        else{
+            saleDateTextView.text = Utils.getDate(false)
+            tableHeaderDiscount.text = "Promotion Price"
+            tax_layout.visibility = View.VISIBLE
+            checkout_remark_layout.visibility = View.VISIBLE
+            tableHeaderQty.text = getString(R.string.ordered_qty)
+            tableHeaderUM.visibility = View.GONE
+            advancedPaidAmountLayout.visibility = View.GONE
+            payAmountLayout.visibility = View.GONE
+            refundLayout.visibility = View.GONE
+            layout_receipt_person.visibility = View.GONE
+            volDisForPreOrderLayout.visibility = View.GONE
+            checkout_delivery_date_layout.visibility = View.VISIBLE
+            duedateLayout.visibility = View.GONE
         }
+//        if (isDelivery) {
+//            advancedPaidAmount.text = Utils.formatAmount(orderedInvoice!!.paidAmount)
+//        }
 
         rvSoldProductList.adapter = orderCheckoutListAdapter
         rvSoldProductList.layoutManager = LinearLayoutManager(this)
@@ -263,7 +318,6 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
         if (intent.getParcelableArrayListExtra<SoldProductInfo>(IE_SOLD_PRODUCT_LIST) != null) soldProductList = intent.getParcelableArrayListExtra(IE_SOLD_PRODUCT_LIST)
         if (intent.getParcelableArrayListExtra<Promotion>(IE_PROMOTION_LIST) != null) promotionList = intent.getParcelableArrayListExtra(IE_PROMOTION_LIST)
         if (intent.getSerializableExtra(ORDERED_INVOICE_KEY) != null) orderedInvoice = intent.getSerializableExtra(ORDERED_INVOICE_KEY) as Deliver
-
     }
 
     private fun onClickSaveButton(type: String){
@@ -292,7 +346,18 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
                     }
 
                 } else{
-                    // ToDo for delivery
+                    if (this@SaleOrderCheckoutActivity.receiptPerson.text.isEmpty()) {
+                        AlertDialog.Builder(this@SaleOrderCheckoutActivity)
+                            .setTitle("Delivery")
+                            .setMessage("You must provide 'Receipt Person'.")
+                            .setPositiveButton(
+                                "OK"
+                            ) { arg0, arg1 -> receiptPerson.requestFocus() }
+                            .show()
+
+                        return
+                    }
+                    insertDeliveryDataToDatabase(orderedInvoice!!)
                 }
 
             }
@@ -646,6 +711,66 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
 
     }
 
+    private fun insertDeliveryDataToDatabase(deliver:Deliver){
+        val saleDate = Utils.getCurrentDate(true)
+        var invoiceId = ""
+        var salePersonId = ""
+        val customerVisitRepo: CustomerVisitRepo? = null
+
+        try {
+            invoiceId = Utils.getInvoiceNo(
+                AppUtils.getStringFromShp(Constant.SALEMAN_NO, this)!!,
+                locationCode.toString(),
+                Constant.FOR_DELIVERY,
+                customerVisitRepo!!.getLastCountForInvoiceNumber(Constant.FOR_DELIVERY)
+            )
+            salePersonId = AppUtils.getStringFromShp(Constant.SALEMAN_ID, this)!!
+        } catch (e: NullPointerException) {
+            e.printStackTrace()
+            Utils.backToLogin(this)
+        }
+        val paidAmount = if (tvPrepaidAmount.text.isNotEmpty())
+            java.lang.Double.parseDouble(tvPrepaidAmount.text.toString().replace(",", ""))
+        else
+            0
+        val dueDate = Utils.getCurrentDate(true)
+        val invoiceTime = Utils.getCurrentDate(true)
+        val totalQuantity = deliveryCheckoutViewModel.insertDeliveryDataItemToDatabase(soldProductList, invoiceId)
+        totalDiscountAmount = orderedInvoice!!.discount
+        totalVolumeDiscountPercent = orderedInvoice!!.discountPercent
+        var caOrCr = "CR"
+        if (java.lang.Double.parseDouble(tvNetAmount.text.toString()) > 0) {
+            if (java.lang.Double.parseDouble(tvNetAmount.text.toString()) == paidAmount) {
+                caOrCr = "CA"
+            }
+        }
+
+        deliveryCheckoutViewModel.routeDataList.observe(this,android.arch.lifecycle.Observer {
+            val sale_man_id = it!!.sale_man_id
+            val invoice = Invoice()
+            invoice.invoice_id = invoiceId
+//            invoice.customer_id = customer!!.id.toString()
+            invoice.sale_date = saleDate
+            invoice.total_amount = totalAmount.toString()
+            invoice.total_quantity = totalQuantity.toDouble()
+            invoice.total_discount_amount = totalDiscountAmount
+            invoice.pay_amount = paidAmount.toString()
+            invoice.receipt_person_name = receiptPerson.text.toString()
+            invoice.sale_person_id = salePersonId
+            invoice.location_code = sale_man_id
+            invoice.device_id = Utils.getDeviceId(this@SaleOrderCheckoutActivity)
+            invoice.invoice_time = invoiceTime
+            invoice.invoice_status = caOrCr
+            invoice.total_discount_percent = totalVolumeDiscountPercent.toString()
+            invoice.rate = "1"
+            invoice.tax_amount = taxAmt
+            invoice.due_date = dueDate
+            deliveryRepo!!.saveInvoiceData(invoice)
+        })
+
+        deliveryCheckoutViewModel.loadRouteId(saleManId)
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
 
         if (requestCode == Utils.RQ_BACK_TO_CUSTOMER)
@@ -656,14 +781,8 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
     }
 
     override fun onBackPressed() {
-        if (isPreOrder){ super.onBackPressed() }
-        else if(isDelivery){ toDeliveryActivity() }
-
-    }
-
-    fun toDeliveryActivity(){
-        val intent = Intent(this@SaleOrderCheckoutActivity, DeliveryActivity::class.java)
-        startActivity(intent)
+//        val intent = Intent(this@SaleOrderCheckoutActivity, DeliveryActivity::class.java)
+//        startActivity(intent)
         finish()
     }
 

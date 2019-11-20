@@ -49,6 +49,8 @@ interface InvoiceProductDao {
     @Query("UPDATE invoice_product SET sale_quantity=:qty WHERE product_id=:productId and invoice_product_id=:invoiceId")
     fun updateQtyForInvoiceProduct(invoiceId: String,productId: String,qty:Int)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertDeliveryData(cvInvoiceProduct: InvoiceProduct)
 
 
 //    @Query("select P.product_name,P.um,IP.sale_quantity,IP.s_price,IP.promotion_price from invoice_product as IP LEFT JOIN product as P ON P.id=IP.product_id where IP.invoice_product_id=:invoiceId")

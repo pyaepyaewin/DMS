@@ -24,6 +24,9 @@ interface PreOrderProductDao {
     @Query("select * from pre_order_product WHERE sale_order_id =:invoice_id AND delete_flag = 0")
     fun allDataById(invoice_id: String?): List<PreOrderProduct>
 
+    @Query("select * from pre_order_product WHERE sale_order_id in (:invoiceIdList)")
+    fun allQtyDataById(invoiceIdList: List<String>): List<PreOrderProduct>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(list: List<PreOrderProduct>)
 

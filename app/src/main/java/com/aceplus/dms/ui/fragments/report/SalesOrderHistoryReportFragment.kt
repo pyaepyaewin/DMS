@@ -14,6 +14,7 @@ import android.widget.Toast
 import com.aceplus.dms.R
 import com.aceplus.dms.ui.adapters.report.SalesOrderHistoryReportAdapter
 import com.aceplus.dms.viewmodel.report.ReportViewModel
+import com.aceplus.domain.vo.report.SalesOrderHistoryFullDataReport
 import com.aceplus.domain.vo.report.SalesOrderHistoryReport
 import com.aceplus.shared.ui.activities.BaseFragment
 import kotlinx.android.synthetic.main.fragment_sale_invoice_report.*
@@ -61,7 +62,13 @@ class SalesOrderHistoryReportFragment : BaseFragment(), KodeinAware {
         salesOrderHistoryReportViewModel.salesOrderHistoryReportSuccessState.observe(
             this,
             Observer {
-                salesOrderHistoryReportAdapter.setNewList(it!!.first as ArrayList<SalesOrderHistoryReport>)
+                val saleOrderHistoryReportList = arrayListOf<SalesOrderHistoryReport>()
+                for (i in it!!.first){
+                    val netAmunt = i.netAmount.toDouble() - i.advancePaymentAmount.toDouble() - i.discount.toDouble()
+                    val saleOrderHistoryReport = SalesOrderHistoryReport(i.invoiceId,i.customerName,i.address,i.netAmount,i.advancePaymentAmount,i.discount,netAmunt.toString())
+                    saleOrderHistoryReportList.add(saleOrderHistoryReport)
+                }
+                salesOrderHistoryReportAdapter.setNewList(saleOrderHistoryReportList)
 
                 //select customer name list in db
                 if (it!!.second != null) {
@@ -84,7 +91,7 @@ class SalesOrderHistoryReportFragment : BaseFragment(), KodeinAware {
                             p3: Long
                         ) {
                             val filterList: ArrayList<SalesOrderHistoryReport> = ArrayList()
-                            for (c in it!!.first) {
+                            for (c in saleOrderHistoryReportList) {
                                 if (c.customerName == customerNameList[p2]) {
                                     filterList.add(c)
                                 }
@@ -116,17 +123,18 @@ class SalesOrderHistoryReportFragment : BaseFragment(), KodeinAware {
         salesOrderHistoryReportViewModel.loadSalesOrderHistoryReport()
     }
 
-    private fun calculateAmount(allItems: List<SalesOrderHistoryReport>) {
+    private fun calculateAmount(allItems: List<SalesOrderHistoryFullDataReport>) {
         var totalAmount = 0.0
         var discount = 0
         var netAmount = 0.0
         var advancePaymentAmount = 0.0
         //Calculate total,discount and net amounts
         for (i in allItems) {
-            totalAmount += i.totalAmount.toDouble()
+            totalAmount += i.netAmount.toDouble()
             discount += i.discount.toInt()
-            netAmount += i.netAmount.toDouble()
             advancePaymentAmount += i.advancePaymentAmount.toDouble()
+            val netAddAmount = totalAmount - advancePaymentAmount - discount
+            netAmount += netAddAmount
         }
         sale_report_total_amt.text = totalAmount.toString()
         sale_report_discount.text = discount.toString()

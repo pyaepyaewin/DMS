@@ -6,6 +6,7 @@ import com.aceplus.domain.entity.customer.Customer
 import com.aceplus.domain.entity.invoice.Invoice
 import com.aceplus.domain.entity.invoice.InvoiceProduct
 import com.aceplus.domain.entity.preorder.PreOrder
+import com.aceplus.domain.entity.preorder.PreOrderProduct
 import com.aceplus.domain.entity.product.ProductCategory
 import com.aceplus.domain.entity.product.ProductGroup
 import com.aceplus.domain.entity.route.Route
@@ -20,6 +21,7 @@ import com.aceplus.domain.vo.report.*
 import io.reactivex.Observable
 import java.sql.Date
 import java.util.*
+import kotlin.collections.ArrayList
 
 interface ReportRepo {
     //deliver report
@@ -29,6 +31,7 @@ interface ReportRepo {
 
     //preOrder report
     fun preOrderReport(): Observable<List<PreOrderReport>>
+    fun preOrderQtyReport(invoiceIdList: List<String>): Observable<List<PreOrderProduct>>
 
     fun preOrderDetailReport(invoiceId: String): Observable<List<PreOrderDetailReport>>
 
@@ -56,7 +59,7 @@ interface ReportRepo {
     fun salesCancelDetailReport(invoiceId: String): Observable<List<SaleCancelInvoiceDetailReport>>
 
     //sale order history report
-    fun salesOrderHistoryReport(): Observable<List<SalesOrderHistoryReport>>
+    fun salesOrderHistoryReport(): Observable<List<SalesOrderHistoryFullDataReport>>
 
     //sale return report
     fun salesReturnReport(): Observable<List<SalesReturnReport>>

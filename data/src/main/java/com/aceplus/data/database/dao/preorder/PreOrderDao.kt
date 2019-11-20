@@ -7,6 +7,7 @@ import android.arch.persistence.room.Insert
 import android.arch.persistence.room.OnConflictStrategy
 import android.arch.persistence.room.Query
 import com.aceplus.domain.vo.report.PreOrderReport
+import com.aceplus.domain.vo.report.SalesOrderHistoryFullDataReport
 import com.aceplus.domain.vo.report.SalesOrderHistoryReport
 
 
@@ -37,10 +38,10 @@ interface PreOrderDao {
     @Query("update pre_order set delete_flag = 1 WHERE delete_flag = 0")
     fun updateAllInactiveData()
 
-    @Query("select invoice.invoice_id,customer_name,address,total_amount,discount,advance_payment_amount,net_amount from invoice inner join pre_order on invoice.invoice_id = pre_order.invoice_id inner join customer on customer.id =  invoice.customer_id ")
-    fun getSalesOrderHistoryReport(): List<SalesOrderHistoryReport>
+    @Query("select invoice_id,customer_name,address,discount,advance_payment_amount,net_amount from pre_order inner join customer on customer.id = pre_order.customer_id where sale_flag = 1 ")
+    fun getSalesOrderHistoryReport(): List<SalesOrderHistoryFullDataReport>
 
-    @Query("select invoice.invoice_id,customer_name,address,total_quantity,prepaid_amount,total_amount from invoice inner join customer on customer.id = invoice.customer_id inner join pre_order on pre_order.invoice_id =  invoice.invoice_id ")
+    @Query("select invoice_id,customer_name,advance_payment_amount,net_amount from pre_order inner join customer on customer.id = pre_order.customer_id where sale_flag = 0")
     fun getPreOrderReport(): List<PreOrderReport>
 
     @Query("select count(*) from pre_order where invoice_id = :invoiceId")

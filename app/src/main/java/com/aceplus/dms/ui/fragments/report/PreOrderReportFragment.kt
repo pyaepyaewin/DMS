@@ -4,6 +4,7 @@ import android.app.AlertDialog
 import android.arch.lifecycle.Observer
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,6 +14,7 @@ import com.aceplus.dms.ui.adapters.report.PreOrderDetailReportAdapter
 import com.aceplus.dms.ui.adapters.report.PreOrderReportAdapter
 import com.aceplus.dms.viewmodel.report.ReportViewModel
 import com.aceplus.domain.vo.report.PreOrderDetailReport
+import com.aceplus.domain.vo.report.PreOrderQtyReport
 import com.aceplus.domain.vo.report.PreOrderReport
 import com.aceplus.shared.ui.activities.BaseFragment
 import kotlinx.android.synthetic.main.dialog_box_pre_order_products.view.*
@@ -41,7 +43,18 @@ class PreOrderReportFragment : BaseFragment(), KodeinAware {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         //pre order report list
         preOrderReportViewModel.preOrderReportSuccessState.observe(this, Observer {
-            preOrderReportAdapter.setNewList(it as ArrayList<PreOrderReport>)
+            val qtyPreOrderList = arrayListOf<PreOrderQtyReport>()
+            for (i in it!!.first){
+                var qty = 0.0
+                for (product in it.second){
+                    if (i.invoiceId == product.sale_order_id) {
+                        qty += product.order_quantity!!.toDouble()
+                    }
+                }
+                val preOrderQtyReport = PreOrderQtyReport(i.invoiceId,i.customerName,qty,i.prepaidAmount,i.totalAmount)
+                qtyPreOrderList.add(preOrderQtyReport)
+            }
+            preOrderReportAdapter.setNewList(qtyPreOrderList)
         })
 
         preOrderReportViewModel.reportErrorState.observe(this, Observer {
@@ -62,14 +75,10 @@ class PreOrderReportFragment : BaseFragment(), KodeinAware {
 
     private fun onClickItem(invoiceId: String) {
         //layout inflate for pre order report detail
-        val dialogBoxView =
-            activity!!.layoutInflater.inflate(
-                R.layout.dialog_box_pre_order_products,
-                null
-            )
+        val dialogBoxView = activity!!.layoutInflater.inflate(R.layout.dialog_box_pre_order_products, null)
         val builder = AlertDialog.Builder(activity)
         builder.setView(dialogBoxView)
-        builder.setCancelable(false)
+        builder.setCancelable(true)
         val dialog = builder.create()
 
         dialogBoxView.preOrderProducts.apply {
@@ -77,15 +86,6 @@ class PreOrderReportFragment : BaseFragment(), KodeinAware {
             adapter = preOrderDetailReportAdapter
         }
         preOrderReportViewModel.loadPreOrderDetailReport(invoiceId = invoiceId)
-
-        //Action of dialog button
-        dialogBoxView.btn_print.setOnClickListener {
-            Toast.makeText(activity, "Continue to print", Toast.LENGTH_SHORT).show()
-            dialog.dismiss()
-        }
-        dialogBoxView.btn_ok.setOnClickListener {
-            dialog.dismiss()
-        }
         dialog.show()
 
     }

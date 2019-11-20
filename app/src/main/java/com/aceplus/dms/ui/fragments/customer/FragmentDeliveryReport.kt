@@ -12,16 +12,15 @@ import com.aceplus.dms.R
 import com.aceplus.dms.ui.activities.customer.saleorder.SaleOrderActivity
 import com.aceplus.dms.ui.adapters.customer.DeliveryActivityAdapter
 import com.aceplus.dms.viewmodel.customer.delivery.DeliveryViewModel
-import com.aceplus.domain.entity.product.Product
+import com.aceplus.domain.entity.customer.Customer
+import com.aceplus.domain.entity.delivery.DeliveryItem
 import com.aceplus.domain.model.delivery.Deliver
-import com.aceplus.domain.model.delivery.DeliverItem
 import com.aceplus.domain.vo.SoldProductInfo
 import com.aceplus.shared.ui.activities.BaseFragment
 import kotlinx.android.synthetic.main.fragment_delivery_report.*
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.support.kodein
-import kotlin.math.roundToInt
 
 class FragmentDeliveryReport : BaseFragment(), KodeinAware {
     override val kodein: Kodein by kodein()
@@ -31,7 +30,9 @@ class FragmentDeliveryReport : BaseFragment(), KodeinAware {
             this::onClickItem
         )
     }
-    private var deliver1: Deliver? = null
+    private var soldProductList = ArrayList<SoldProductInfo>()
+    private var customer: Customer? = null
+    private var delivery:Deliver? = null
     private val fragmentDeliveryViewModel: DeliveryViewModel by viewModel()
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -69,85 +70,41 @@ class FragmentDeliveryReport : BaseFragment(), KodeinAware {
         fragmentDeliveryViewModel.loadDeliveryList()
         //Delivery Item List...........
         fragmentDeliveryViewModel.deliveryAllItemDataList.observe(this, Observer { list ->
-            val deliverItem = DeliverItem()
-            val deliverItemList = ArrayList<DeliverItem>()
-            for (i in list!!.first) {
-                deliverItem.deliverId = i.delivery_id!!.toInt()
-                deliverItem.stockNo = i.stock_id
-                deliverItem.orderQty = i.order_quantity!!.toDouble().roundToInt()
-                deliverItem.sPrice = i.s_price!!.toDouble()
-                deliverItem.receivedQty = i.received_quantity!!.toDouble().roundToInt()
-                deliverItemList.add(deliverItem)
-            }
-            for (i in list!!.second) {
-                deliverItem.deliverId = i.sale_order_id!!.toInt()
-                deliverItem.orderQty = i.quantity!!.toInt()
-                deliverItem.stockNo = i.stock_id
-                deliverItemList.add(deliverItem)
-            }
-            //Sold Product Info List
-            var soldProductList = ArrayList<SoldProductInfo>()
-            for (i in deliverItemList) {
-                fragmentDeliveryViewModel.deliveryProductDataList.observe(this, Observer {
-                    val innerSoldProductList = ArrayList<SoldProductInfo>()
-                    for (product in it!!) {
-                        val productItem = Product()
-                        productItem.id = product.id
-                        productItem.product_name = product.product_name
-                        productItem.selling_price = product.selling_price
-                        productItem.purchase_price = product.purchase_price
-                        productItem.discount_type = product.discount_type
-                        productItem.remaining_quantity = product.remaining_quantity
-                        val soldProduct = SoldProductInfo(productItem, false)
-                        val um = product.um
-                        soldProduct.product.um = um
-                        soldProduct.orderedQuantity = i.orderQty
-                        soldProduct.quantity = soldProduct.orderedQuantity
-                        soldProduct.product.product_id = i.stockNo
-
-                        if (i.sPrice == 0.0) {
-                            soldProduct.product.selling_price = 0.0.toString()
-                        }
-                        innerSoldProductList.add(soldProduct)
-                        soldProductList = innerSoldProductList
+            if (list != null) {
+                soldProductList = list.first as ArrayList<SoldProductInfo>
+                customer = list.second
+                val copySoldProductList = soldProductList
+                for (product in copySoldProductList) {
+                    if (product.orderedQuantity == 0) {
+                        copySoldProductList.remove(product)
                     }
-                })
-                fragmentDeliveryViewModel.loadProductDeliveryList(i.stockNo)
-            }
-
-            val copySoldProductList = ArrayList(soldProductList)
-            for (soldProduct in soldProductList) {
-                if (soldProduct.orderedQuantity == 0) {
-                    copySoldProductList.remove(soldProduct)
                 }
+                soldProductList = copySoldProductList
+                if (soldProductList.size == 0) run {
+                    AlertDialog.Builder(activity)
+                        .setTitle("Delivery")
+                        .setMessage("No products to deliver for this invoice.")
+                        .setPositiveButton("OK", null)
+                        .setIcon(R.drawable.info)
+                        .show()
+                } else if (customer != null && soldProductList.size != 0) {
+                    val intent = SaleOrderActivity.newIntentFromDelivery(
+                        activity!!,
+                        true,
+                        customer!!,
+                        soldProductList,
+                        delivery!!
+                    )
+                    startActivity(intent)
+                    activity!!.finish()
+                }
+                fragmentDeliveryViewModel.deliveryAllItemDataList.value = null
             }
-            soldProductList = copySoldProductList
-            if (soldProductList.size == 0) run {
-                AlertDialog.Builder(activity)
-                    .setTitle("Delivery")
-                    .setMessage("No products to deliver for this invoice.")
-                    .setPositiveButton("OK", null)
-                    .setIcon(R.drawable.info)
-                    .show()
-            } else if (list.third != null && soldProductList.size != 0) {
-                val intent = SaleOrderActivity.newIntentFromDelivery(
-                    activity!!,
-                    true,
-                    list.third!!,
-                    soldProductList,
-                    deliver1!!
-                )
-                startActivity(intent)
-                activity!!.finish()
-            }
-
-
         })
-
     }
 
     private fun onClickItem(deliver: Deliver) {
-        deliver1 = deliver
+        delivery = deliver
         fragmentDeliveryViewModel.loadAllDeliveryItemList(deliver.deliverId, deliver.customerId.toInt())
     }
 }

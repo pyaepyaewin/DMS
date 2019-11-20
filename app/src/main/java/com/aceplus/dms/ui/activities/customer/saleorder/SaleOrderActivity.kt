@@ -39,6 +39,7 @@ import kotlinx.android.synthetic.main.activity_sale.cancelImg as cancelImg1
 import kotlinx.android.synthetic.main.activity_sale.checkoutImg as checkoutImg1
 import kotlinx.android.synthetic.main.activity_sale.rvSoldProductList as rvSoldProductList1
 import kotlinx.android.synthetic.main.activity_sale.searchAutoCompleteTextView as searchAutoCompleteTextView1
+import kotlinx.android.synthetic.main.activity_sale.tvTitle as tvTitle1
 import kotlinx.android.synthetic.main.activity_sale1.headerDiscount as headerDiscount1
 import kotlinx.android.synthetic.main.activity_sale1.rvProductList as rvProductList1
 import kotlinx.android.synthetic.main.activity_sale1.searchAndSelectProductsLayout as searchAndSelectProductsLayout1
@@ -98,6 +99,7 @@ class SaleOrderActivity : BaseActivity(), KodeinAware {
     private var promotionList: ArrayList<Promotion> = ArrayList()
     private var isDelivery: Boolean = false
     private var customer: Customer? = null
+    private var deliveryCustomer: Customer? = null
     private var soldProductList = ArrayList<SoldProductInfo>()
     private var orderedInvoice: Deliver? = null
     private var from: String? = null
@@ -110,19 +112,21 @@ class SaleOrderActivity : BaseActivity(), KodeinAware {
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
 
         getIntentData()
-        mOrderedProductListAdapter.setNewList(soldProductList)
+        Log.d("Product List","${soldProductList.size}")
         setupUI()
         catchEvents()
         saleViewModel.loadProductList()
+        mOrderedProductListAdapter.setNewList(soldProductList)
     }
 
     private fun getIntentData(){
+        from = intent.getStringExtra(IE_FROM)
         if (from != "fragmentDeliveryReport") {
             if (intent.getParcelableExtra<Customer>(IE_CUSTOMER_DATA) != null) customer =
                 intent.getParcelableExtra(IE_CUSTOMER_DATA)
         }else{
             if (intent.getSerializableExtra(IE_CUSTOMER_INFO_KEY) != null) {
-                customer = intent.getSerializableExtra(IE_CUSTOMER_INFO_KEY) as Customer
+                deliveryCustomer = intent.getSerializableExtra(IE_CUSTOMER_INFO_KEY) as Customer
             }
         }
         isDelivery = intent.getBooleanExtra(IE_IS_DELIVERY, false)
@@ -136,12 +140,10 @@ class SaleOrderActivity : BaseActivity(), KodeinAware {
     }
 
     private fun setupUI(){
-        for (i in soldProductList) {
-            var netAmount = 0
-            netAmount += (i.quantity * i.product.selling_price!!.toInt())
-            tvNetAmount.text = netAmount.toString()
+        if (from == "fragmentDeliveryReport") {
+            tvTitle.text = "DELIVERY"
+            tvNetAmount.text = orderedInvoice!!.amount.toString()
         }
-
         headerDiscount.visibility = View.GONE
         tableHeaderQty.visibility = View.GONE
         saleDateTextView.text = Utils.getCurrentDate(false)
@@ -170,7 +172,13 @@ class SaleOrderActivity : BaseActivity(), KodeinAware {
         }
 
         cancelImg.setOnClickListener { onBackPressed() }
-        checkoutImg.setOnClickListener { checkoutOrder() }
+        checkoutImg.setOnClickListener {
+            if (from == "fragmentDeliveryReport"){
+                val intent = SaleOrderCheckoutActivity.getIntentForDeliveryFromSaleOrder(this,isDelivery, soldProductList,orderedInvoice!!)
+                startActivity(intent)
+            }else{
+                checkoutOrder()
+            } }
 
         saleViewModel.productDataList.observe(this, Observer {
             it?.let {
@@ -341,17 +349,25 @@ class SaleOrderActivity : BaseActivity(), KodeinAware {
             return
         }
 
-        val isFocPass = toEnableFocSameProduct()
 
-        if (isFocPass){
-            val intent = SaleOrderCheckoutActivity.getIntentFromSaleOrder(this, customer!!, mOrderedProductListAdapter.getDataList() as ArrayList, this.promotionList)
-            startActivityForResult(intent, Utils.RQ_BACK_TO_CUSTOMER)
-        }
+            val isFocPass = toEnableFocSameProduct()
+            if (isFocPass) {
+                val intent = SaleOrderCheckoutActivity.getIntentFromSaleOrder(
+                    this,
+                    customer!!,
+                    mOrderedProductListAdapter.getDataList() as ArrayList,
+                    this.promotionList
+                )
+                startActivityForResult(intent, Utils.RQ_BACK_TO_CUSTOMER)
+            }
+
 
         if (orderedInvoice != null){
             val intent = SaleOrderCheckoutActivity.getIntent(this, orderedInvoice!!)
             startActivity(intent)
         }
+
+
 
     }
 
