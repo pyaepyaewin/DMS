@@ -1,7 +1,13 @@
 package com.aceplus.dms.viewmodel.customer.sale
 
+import android.annotation.SuppressLint
 import android.arch.lifecycle.MutableLiveData
+import android.util.Log
+import com.aceplus.dms.utils.Utils
+import com.aceplus.domain.entity.invoice.InvoiceProduct
 import com.aceplus.domain.entity.product.Product
+import com.aceplus.domain.entity.sale.salereturn.SaleReturn
+import com.aceplus.domain.entity.sale.salereturn.SaleReturnDetail
 import com.aceplus.domain.repo.CustomerVisitRepo
 import com.aceplus.domain.vo.SoldProductInfo
 import com.aceplus.shared.viewmodel.BaseViewModel
@@ -89,9 +95,88 @@ class SalesReturnViewModel(
 
     }
 
-    fun saveData(isSaleExchange: Boolean){
+    @SuppressLint("CheckResult")
+    fun saveData(
+        isSaleExchange: Boolean,
+        saleReturnID: String,
+        salePersonID: Int,
+        customerID: Int,
+        locationID: Int,
+        netAmount: Double,
+        payAmount: Double,
+        deviceID: String,
+        discAmount: Double,
+        taxAmount: Double,
+        taxPercent: Int,
+        selectedProductList: List<SoldProductInfo>
+    ){
 
-        // ToDo - save data
+        customerVisitRepo.getSaleReturnCountByID(saleReturnID)
+            .subscribeOn(schedulerProvider.io())
+            .observeOn(schedulerProvider.mainThread())
+            .subscribe{
+
+                if (it == 0){
+
+                    val saleReturn = SaleReturn()
+                    saleReturn.sale_return_id = saleReturnID
+                    saleReturn.sale_man_id = salePersonID
+                    saleReturn.customer_id = customerID
+                    saleReturn.location_id = locationID
+                    saleReturn.amount = netAmount
+                    saleReturn.pay_amount = payAmount
+                    saleReturn.pc_address = deviceID
+                    saleReturn.return_date = Utils.getCurrentDate(false)
+                    saleReturn.invoice_status = if (payAmount >= netAmount) "CA" else "CR"
+                    saleReturn.discount = discAmount
+                    saleReturn.tax = taxAmount
+                    saleReturn.tax_percent = taxPercent.toDouble()
+
+                    customerVisitRepo.insertSaleReturn(saleReturn) // Need to check cuz I changed delete flag type
+
+                    val saleReturnDetailList = ArrayList<SaleReturnDetail>()
+
+                    for (product in selectedProductList){
+
+                        val saleReturnDetail = SaleReturnDetail()
+                        saleReturnDetail.sale_return_id = saleReturnID
+                        saleReturnDetail.product_id = product.product.id
+                        saleReturnDetail.price = product.product.selling_price?.toDouble() ?: 0.0
+                        saleReturnDetail.quantity = product.quantity
+                        saleReturnDetail.remark = product.remark
+
+                        saleReturnDetailList.add(saleReturnDetail)
+
+                    }
+
+                    customerVisitRepo.insertAllSaleReturnDetail(saleReturnDetailList) // Need to check cuz I changed delete flag type
+
+                    for (saleReturnDetail in saleReturnDetailList){
+
+                        customerVisitRepo.updateRemainingQtyWithExchangeOrReturn(
+                            isSaleExchange,
+                            saleReturnDetail.quantity,
+                            saleReturnDetail.product_id
+                        )
+
+                        /*customerVisitRepo.getProductByID(saleReturnDetail.product_id)
+                            .subscribeOn(schedulerProvider.io())
+                            .observeOn(schedulerProvider.mainThread())
+                            .subscribe{
+                                Log.d("Testing", "${it[0].product_name}\tRemaining Qty = ${it[0].remaining_quantity}\t${if (isSaleExchange) "Exchange Qty" else "Return Qty"} = ${if (isSaleExchange) it[0].exchange_quantity else it[0].return_quantity}")
+                            }*/
+
+                    }
+
+                    if (isSaleExchange){
+
+                    } else{
+
+                    }
+
+                } else Log.d("Testing", "Found same invoice id")
+
+            }
 
     }
 

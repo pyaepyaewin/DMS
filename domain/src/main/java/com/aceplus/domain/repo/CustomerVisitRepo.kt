@@ -20,6 +20,8 @@ import com.aceplus.domain.entity.promotion.PromotionGift
 import com.aceplus.domain.entity.promotion.PromotionPrice
 import com.aceplus.domain.entity.route.RouteScheduleV2
 import com.aceplus.domain.entity.sale.SaleMan
+import com.aceplus.domain.entity.sale.salereturn.SaleReturn
+import com.aceplus.domain.entity.sale.salereturn.SaleReturnDetail
 import com.aceplus.domain.entity.volumediscount.VolumeDiscount
 import com.aceplus.domain.entity.volumediscount.VolumeDiscountFilter
 import com.aceplus.domain.entity.volumediscount.VolumeDiscountFilterItem
@@ -48,6 +50,7 @@ interface CustomerVisitRepo {
     fun getAllProductData(): Observable<List<Product>>
     fun getProductByID(productID: Int): Observable<List<Product>>
     fun updateProductRemainingQty(soldProductInfo: SoldProductInfo)
+    fun updateRemainingQtyWithExchangeOrReturn(isSaleExchange: Boolean, qty: Int, productID: Int)
 
     fun saveDataForTempSaleManRoute(selectedCustomer: Customer, currentDate: String,arrivalStatus:Int)
     fun saveCustomerFeedback(didCustomerFeedbackEntity: DidCustomerFeedback)
@@ -104,5 +107,11 @@ interface CustomerVisitRepo {
     fun insertSmsRecord(smsRecord: SMSRecord)
 
     fun uploadPreOrderToServer(paramData: String): Observable<InvoiceResponse>
+
+    fun insertSaleReturn(saleReturn: SaleReturn)
+    fun getAllSaleReturn(): Observable<List<SaleReturn>>
+    fun getSaleReturnCountByID(id: String): Observable<Int>
+
+    fun insertAllSaleReturnDetail(list: List<SaleReturnDetail>)
 
 }

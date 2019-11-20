@@ -27,8 +27,14 @@ interface SaleReturnDao {
     @get:Query("select count(*) from sale_return WHERE sale_return_id LIKE 'SR%'")
     val dataCount: Int
 
+    @Query("select count(*) from sale_return where sale_return_id = :id")
+    fun getSaleReturnCountByID(id: String): Int
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(list: List<SaleReturn>)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insert(saleReturn: SaleReturn)
 
     @Query("Delete from sale_return")
     fun deleteAll()

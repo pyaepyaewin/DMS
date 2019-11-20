@@ -328,7 +328,7 @@ class SyncRepoImpl(
             saleReturnApi.saleManId = it.sale_man_id
             saleReturnApi.saleId = it.sale_id.toString()
 
-            val saleReturnDetailList = db.saleReturnDetailDao().allActiveDataById(it.sale_return_id)
+            val saleReturnDetailList = db.saleReturnDetailDao().allActiveDataById(it.sale_return_id!!)
 
             val saleReturnDetailApiList = ArrayList<SaleReturnItem>()
             saleReturnDetailList.map {

@@ -25,6 +25,8 @@ import com.aceplus.domain.entity.promotion.PromotionPrice
 import com.aceplus.domain.entity.route.RouteScheduleV2
 import com.aceplus.domain.entity.route.TempForSaleManRoute
 import com.aceplus.domain.entity.sale.SaleMan
+import com.aceplus.domain.entity.sale.salereturn.SaleReturn
+import com.aceplus.domain.entity.sale.salereturn.SaleReturnDetail
 import com.aceplus.domain.entity.sale.salevisit.SaleVisitRecordUpload
 import com.aceplus.domain.entity.volumediscount.VolumeDiscount
 import com.aceplus.domain.entity.volumediscount.VolumeDiscountFilter
@@ -151,8 +153,18 @@ class CustomerVisitRepoImpl(
     }
 
     override fun updateProductRemainingQty(soldProductInfo: SoldProductInfo) {
-        db.productDao()
-            .updateProductRemainingQty(soldProductInfo.quantity, soldProductInfo.product.id)
+        db.productDao().updateProductRemainingQty(soldProductInfo.quantity, soldProductInfo.product.id)
+    }
+
+    override fun updateRemainingQtyWithExchangeOrReturn(
+        isSaleExchange: Boolean,
+        qty: Int,
+        productID: Int
+    ) {
+        if (isSaleExchange)
+            db.productDao().updateProductRemainingQtyWithSaleExchange(qty, productID)
+        else
+            db.productDao().updateProductRemainingQtyWithSaleReturn(qty, productID)
     }
 
     override fun saveDataForTempSaleManRoute(
@@ -457,6 +469,22 @@ class CustomerVisitRepoImpl(
 
     override fun updateInactivePreOrderPresentByID(id: String) {
         db.preOrderPresentDao().updateInactivePreOrderPresentByID(id)
+    }
+
+    override fun insertSaleReturn(saleReturn: SaleReturn) {
+        db.saleReturnDao().insert(saleReturn)
+    }
+
+    override fun getAllSaleReturn(): Observable<List<SaleReturn>> {
+        return Observable.just(db.saleReturnDao().allData)
+    }
+
+    override fun getSaleReturnCountByID(id: String): Observable<Int> {
+        return Observable.just(db.saleReturnDao().getSaleReturnCountByID(id))
+    }
+
+    override fun insertAllSaleReturnDetail(list: List<SaleReturnDetail>) {
+        db.saleReturnDetailDao().insertAll(list)
     }
 
 }

@@ -179,7 +179,7 @@ class CustomerActivity : BaseActivity(), KodeinAware {
                 gspTracker
             )
             customerViewModel.insertDataForTempSaleManRouteAndSaleVisitRecord(selectedCustomer!!, Utils.getCurrentDate(true), gspTracker)
-            val intent = SaleActivity.newIntentFromCustomer(applicationContext, "no", selectedCustomer!!)
+            val intent = SaleActivity.newIntentFromCustomer(applicationContext, selectedCustomer!!)
             startActivity(intent)
         }
 

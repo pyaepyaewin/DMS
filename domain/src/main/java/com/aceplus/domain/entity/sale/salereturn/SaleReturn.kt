@@ -5,6 +5,7 @@ import android.arch.persistence.room.Entity
 import android.arch.persistence.room.PrimaryKey
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
+import io.reactivex.annotations.NonNull
 
 
 @Entity(tableName = "sale_return")
@@ -14,7 +15,7 @@ class SaleReturn {
     @ColumnInfo(name = "sale_return_id")
     @SerializedName("sale_return_id")
     @Expose
-    var sale_return_id: Int = 0
+    var sale_return_id: String = ""
 
     @ColumnInfo(name = "customer_id")
     @SerializedName("customer_id")
@@ -89,5 +90,5 @@ class SaleReturn {
     @ColumnInfo(name = "delete_flag")
     @SerializedName("delete_flag")
     @Expose
-    var delete_flag: String? = null
+    var delete_flag: Int = 0
 }

@@ -258,7 +258,20 @@ class SaleReturnActivity : BaseActivity(), KodeinAware {
 
             }
 
-            salesReturnViewModel.saveData(isSaleExchange)
+            salesReturnViewModel.saveData(
+                isSaleExchange,
+                saleReturnID!!,
+                salePersonID!!.toInt(),
+                customer!!.id,
+                locationCode,
+                netAmount,
+                if (returnCashAmtEditText.text.isNotBlank()) returnCashAmtEditText.text.toString().toDouble() else 0.0,
+                Utils.getDeviceId(this),
+                if (saleReturnDiscountEditText.text.isNotBlank()) saleReturnDiscountEditText.text.toString().toDouble() else 0.0,
+                taxAmount,
+                0,
+                mReturnProductListAdapter.getDataList()
+            )
 
         }
 
