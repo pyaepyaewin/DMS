@@ -64,5 +64,7 @@ interface InvoiceDao {
     @Query("UPDATE invoice SET total_quantity=:totalqty WHERE  invoice_product_id=:invoiceId")
     fun updateTotalQtyForInvoice(invoiceId: String,totalqty:Int)
 
+    @Query("select * from invoice WHERE  invoice_id=:invoiceId")
+    fun getSoldInvoice(invoiceId: String):List<Invoice>
 
 }

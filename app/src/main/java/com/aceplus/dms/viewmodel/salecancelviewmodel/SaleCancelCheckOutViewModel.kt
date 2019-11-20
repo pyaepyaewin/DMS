@@ -55,18 +55,18 @@ class SaleCancelCheckOutViewModel(
         saleCancelRepo.updateProductRemainingQty(soldProductInfo)
     }
 
-    var allInvoiceSuccessState = MutableLiveData<List<Invoice>>()
-    var allInvoicetErrorState = MutableLiveData<String>()
-    fun loadAllInvoiceData() {
+    var soldInvoiceListSuccessState = MutableLiveData<List<Invoice>>()
+    var soldInvoiceListErrorState = MutableLiveData<String>()
+    fun loadSoldInvoiceData(invoiceID: String) {
         launch {
-            saleCancelRepo.getAllInvoice()
+            saleCancelRepo.getSoldInvoice(invoiceID)
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
-                    allInvoiceSuccessState.value = it
+                    soldInvoiceListSuccessState.value = it
 
                 }, {
-                    allInvoicetErrorState.value = it.localizedMessage
+                    soldInvoiceListErrorState.value = it.localizedMessage
                 })
         }
     }
@@ -78,7 +78,10 @@ class SaleCancelCheckOutViewModel(
     fun deleteInvoiceProductData(invoiceID: String) {
         saleCancelRepo.deleteInvoiceProduct(invoiceID)
     }
-
+    fun deleteInvoiceProductForLongClick(invoiceId: String,productIdList:List<Int>)
+    {
+        saleCancelRepo.deleteInvoiceProductForLongClick(invoiceId,productIdList)
+    }
     @SuppressLint("CheckResult")
     fun saveCheckoutData(
         id: String,
@@ -114,7 +117,7 @@ class SaleCancelCheckOutViewModel(
             invoiceDetail.productId = soldProduct.product.id
             invoiceDetail.qty = soldProduct.quantity
             invoiceDetail.discountAmt = soldProduct.discountAmount
-            invoiceDetail.amt = totalAmount
+            invoiceDetail.amt = soldProduct.totalAmt
             invoiceDetail.discountPercent = soldProduct.discountPercent
             invoiceDetail.s_price = soldProduct.product.selling_price!!.toDouble()
             invoiceDetail.p_price = soldProduct.product.purchase_price!!.toDouble()
@@ -135,7 +138,7 @@ class SaleCancelCheckOutViewModel(
             invoiceProduct.product_id = soldProduct.product.id.toString()
             invoiceProduct.sale_quantity = soldProduct.quantity.toString()
             invoiceProduct.discount_amount = soldProduct.discountAmount.toString()
-            invoiceProduct.total_amount = totalAmount
+            invoiceProduct.total_amount = soldProduct.totalAmt
             invoiceProduct.discount_percent = soldProduct.discountPercent
             invoiceProduct.s_price = soldProduct.product.selling_price!!.toDouble()
             invoiceProduct.p_price = soldProduct.product.purchase_price!!.toDouble()

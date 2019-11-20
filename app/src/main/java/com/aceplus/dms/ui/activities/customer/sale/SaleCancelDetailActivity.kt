@@ -43,6 +43,8 @@ import android.R
 class SaleCancelDetailActivity : AppCompatActivity(), KodeinAware {
     override val kodein: Kodein by kodein()
     var soldProductList1 = mutableListOf<String>()
+    var indexList= arrayListOf<Int>()
+
     var soldProductDataList = mutableListOf<SaleCancelDetailItem>()
     private var isPreOrder: Boolean = false
     private var duplicateProductList = mutableListOf<SoldProductInfo>()
@@ -88,7 +90,7 @@ class SaleCancelDetailActivity : AppCompatActivity(), KodeinAware {
             true
         }
         checkoutImg.setOnClickListener {
-            startActivity(SaleCancelCheckoutActivity.getSaleCancelDetailIntent(this,saleCancelDetailAdapter.getDataList() as ArrayList,invoiceid,invoicedate,customerId,customerName))
+            startActivity(SaleCancelCheckoutActivity.getSaleCancelDetailIntent(this,saleCancelDetailAdapter.getDataList() as ArrayList,invoiceid,invoicedate,customerId,customerName,indexList))
         }
         saleCancelDetailViewModel.productIdListSuccessState.observe(
             this,
@@ -108,6 +110,13 @@ class SaleCancelDetailActivity : AppCompatActivity(), KodeinAware {
             })
 
         saleCancelDetailViewModel.loadSoldProductIdList(invoiceid)
+        saleCancelDetailViewModel.calculatedSoldProductList.observe(this, Observer {
+            if (it != null){
+                saleCancelDetailAdapter.setNewList(it.first)
+                tvNetAmount.text = Utils.formatAmount(it.second)
+                saleCancelDetailViewModel.calculatedSoldProductList.value = null
+            }
+        })
 
         saleCancelDetailViewModel.soldProductListSuccessState.observe(
             this,
@@ -137,19 +146,20 @@ class SaleCancelDetailActivity : AppCompatActivity(), KodeinAware {
                         soldProductInfo.product.return_quantity = it.return_quantity
                         soldProductInfo.product.sold_quantity = it.sold_quantity
                         soldProductInfo.product.total_quantity = it.total_quantity
+                        soldProductInfo.totalAmt=it.total_amount
                         soldProductInfo.promotionPrice = it.promotion_price
                         soldProductInfo.quantity = it.sale_quantity.toInt()
 
                         soldProductInfoList.add(soldProductInfo)
 
-                        var totalAmt: Double = 0.00
-                        for (i in soldProductInfoList) {
-
-                            val amt = i.quantity.toDouble() * i.product.selling_price!!.toDouble()
-                            totalAmt += amt
-                            tvNetAmount.text = totalAmt.toString()
-                        }
-
+//                        var totalAmt: Double = 0.00
+//                        for (i in soldProductInfoList) {
+//
+//                            val amount = i.totalAmt
+//                            totalAmt += amount
+//                            tvNetAmount.text = totalAmt.toString()
+//                        }
+//
 
                         invoiceId.text = invoiceid
                         saleDateTextView.text = Utils.getCurrentDate(false)
@@ -225,13 +235,15 @@ class SaleCancelDetailActivity : AppCompatActivity(), KodeinAware {
                    // saleCancelDetailViewModel.updateQty(quantity,soldProduct.product.product_id!!)
                         val newList = saleCancelDetailAdapter.getDataList() as ArrayList
                     newList[position] = soldProduct
-                    var totalAmt: Double = 0.00
-                    for (i in newList) {
+                    saleCancelDetailViewModel.calculateSoldProductData(newList)
 
-                        val amt = i.quantity.toDouble() * i.product.selling_price!!.toDouble()
-                        totalAmt += amt
-                        tvNetAmount.text = totalAmt.toString()
-                    }
+//                    var totalAmt: Double = 0.00
+//                    for (i in newList) {
+//
+//                        val amt = i.quantity.toDouble() * i.product.selling_price!!.toDouble()
+//                        totalAmt += amt
+//                        tvNetAmount.text = totalAmt.toString()
+//                    }
 
                    saleCancelDetailAdapter.notifyItemChanged(position)
 
@@ -258,13 +270,12 @@ class SaleCancelDetailActivity : AppCompatActivity(), KodeinAware {
 
             .setPositiveButton("Yes") { arg0, arg1 ->
 
-              var testList =  saleCancelDetailAdapter.getDataList() as ArrayList
-
-                testList.removeAt(position)
+              var oldList =  saleCancelDetailAdapter.getDataList() as ArrayList
+                oldList.removeAt(position)
+                indexList.add(soldProduct.product.id)
                 saleCancelDetailAdapter.notifyDataSetChanged()
-                for(i in testList) {
-                    val clickedDataItem = i.product.id
-                }
+                saleCancelDetailViewModel.calculateSoldProductData(oldList)
+
            }
                     .setNegativeButton("No", null)
                     .show()

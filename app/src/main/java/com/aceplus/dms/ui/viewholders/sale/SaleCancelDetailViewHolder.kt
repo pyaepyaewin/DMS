@@ -22,8 +22,8 @@ class SaleCancelDetailViewHolder(
             discount.text = data.promotionPrice.toString()
             val qty: Int = data.quantity
             val price: Double = data.product.selling_price!!.toDouble()
-            val amt1 = qty * price
-            amt.text = amt1.toString()
+//            val amt1 = qty * price
+            amt.text = data.totalAmt.toString()
 
             setOnLongClickListener {
                 onLongClickSoldProductListItem(data,adapterPosition)

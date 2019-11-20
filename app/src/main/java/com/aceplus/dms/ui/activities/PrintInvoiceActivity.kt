@@ -138,14 +138,14 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
 
         fun newIntentFromSaleCancelCheckout(
             context: Context,
-            invoice:ArrayList<Invoice>,
+            invoice: Invoice,
             soldProductList: ArrayList<SoldProductInfo>
 
         ): Intent {
             val intent = Intent(context, PrintInvoiceActivity::class.java)
             intent.putExtra(IE_SOLD_PRODUCT_LIST, soldProductList)
             intent.putExtra(IE_PRINT_MODE, "S")
-            intent.putParcelableArrayListExtra(IE_INVOICE, invoice)
+            intent.putExtra(IE_INVOICE, invoice)
 
             return intent
         }

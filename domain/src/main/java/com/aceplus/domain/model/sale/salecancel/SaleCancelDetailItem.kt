@@ -2,7 +2,7 @@ package com.aceplus.domain.model.sale.salecancel
 
 data class SaleCancelDetailItem(
     var id: Int = 0,
-
+    val total_amount:Double=0.0,
     var product_id: String,
     var product_name: String,
     var category_id: String,

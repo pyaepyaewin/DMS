@@ -48,9 +48,10 @@ class SaleCancelCheckoutActivity : BaseActivity(), KodeinAware {
     private var taxType: String = ""
     private var volDisPercent: Double = 0.0
     private var salePersonId: String? = null
-    private var invoice= arrayListOf<Invoice>()
+    private var invoice = arrayListOf<Invoice>()
     var totalQtyForInvoice = 0
     val invoiceProductList: ArrayList<InvoiceProduct> = ArrayList()
+    var indexList:ArrayList<Int> = ArrayList()
 
 
     private val df = DecimalFormat(".##")
@@ -63,7 +64,8 @@ class SaleCancelCheckoutActivity : BaseActivity(), KodeinAware {
             invoiceID: String,
             date: String,
             customerID: String,
-            customerName: String
+            customerName: String,
+            indexList:ArrayList<Int>
 
 
         ): Intent {
@@ -73,6 +75,8 @@ class SaleCancelCheckoutActivity : BaseActivity(), KodeinAware {
             saleCancelDetailIntent.putExtra("DATE", date)
             saleCancelDetailIntent.putExtra("CUSTOMER_ID", customerID)
             saleCancelDetailIntent.putExtra("CUSTOMER_NAME", customerName)
+            saleCancelDetailIntent.putIntegerArrayListExtra("INDEX_LIST", indexList)
+
 
             return saleCancelDetailIntent
 
@@ -94,6 +98,7 @@ class SaleCancelCheckoutActivity : BaseActivity(), KodeinAware {
         llSaleStatus.visibility = View.GONE
         tableHeaderDiscount.text = "Promotion Price"
         soldProductList = intent.getParcelableArrayListExtra("SOLD_PRODUCT_LIST")
+        indexList=intent.getIntegerArrayListExtra("INDEX_LIST")
         saleDateTextView.text = Utils.getCurrentDate(false)
 
 
@@ -137,17 +142,32 @@ class SaleCancelCheckoutActivity : BaseActivity(), KodeinAware {
             })
 
         saleCancelCheckOutViewModel.loadTaxPercent()
-        saleCancelCheckOutViewModel.allInvoiceSuccessState.observe(
+
+
+        saleCancelCheckOutViewModel.soldInvoiceListSuccessState.observe(
             this,
             android.arch.lifecycle.Observer {
 
-                invoice = it as ArrayList<Invoice>
-              startActivity(PrintInvoiceActivity.newIntentFromSaleCancelCheckout(this,invoice,soldProductList))
+                it?.let {
+                    if (it.isNotEmpty()) {
+                        startActivity(
+                            PrintInvoiceActivity.newIntentFromSaleCancelCheckout(
+                                this,
+                                it[0],
+                                soldProductList
+                            )
+                        )
+
+                        saleCancelCheckOutViewModel.soldInvoiceListSuccessState.value = null
+                        saleCancelCheckOutViewModel.soldInvoiceListErrorState.value = null
+
+                    }
+                }
 
 
             })
 
-        saleCancelCheckOutViewModel.allInvoicetErrorState.observe(
+        saleCancelCheckOutViewModel.soldInvoiceListErrorState.observe(
             this,
             android.arch.lifecycle.Observer {
                 i("Tag", it)
@@ -170,6 +190,7 @@ class SaleCancelCheckoutActivity : BaseActivity(), KodeinAware {
             bank_branch_layout.visibility = if (isChecked) View.VISIBLE else View.GONE
             bank_account_layout.visibility = if (isChecked) View.VISIBLE else View.GONE
         }
+
 
     }
 
@@ -274,18 +295,20 @@ class SaleCancelCheckoutActivity : BaseActivity(), KodeinAware {
 
         }
     }
-    private fun saveData(cashOrLoanOrBank: String){
-        val invoiceId =intent.getStringExtra("INVOICE_ID")
-        val customerId=intent.getStringExtra("CUSTOMER_ID")
+
+    private fun saveData(cashOrLoanOrBank: String) {
+        val invoiceId = intent.getStringExtra("INVOICE_ID")
+        val customerId = intent.getStringExtra("CUSTOMER_ID")
         val saleDate = Utils.getCurrentDate(true)
         val payAmt = if (payAmount.text.isNotBlank()) payAmount.text.toString().toDouble() else 0.0
         val receiptPerson = receiptPerson.text.toString()
         val invoiceTime = Utils.getCurrentDate(true)
         val deviceId = Utils.getDeviceId(this)
-        salePersonId=saleCancelCheckOutViewModel.getSaleManID()
+        salePersonId = saleCancelCheckOutViewModel.getSaleManID()
         var dueDate = ""
         if (cashOrLoanOrBank == "CR") dueDate = saleDate
         if (edt_dueDate.text.isNotBlank()) dueDate = edt_dueDate.text.toString()
+        saleCancelCheckOutViewModel.deleteInvoiceProductForLongClick(invoiceId,indexList)
         saleCancelCheckOutViewModel.saveCheckoutData(
             customerId,
             saleDate,
@@ -306,7 +329,7 @@ class SaleCancelCheckoutActivity : BaseActivity(), KodeinAware {
             volDisAmount,
             volDisPercent
         )
-        saleCancelCheckOutViewModel.loadAllInvoiceData()
+        saleCancelCheckOutViewModel.loadSoldInvoiceData(invoiceId)
         //startActivity(PrintInvoiceActivity.newIntentFromSaleCancelCheckout(this,invoice,soldProductList))
 
 
