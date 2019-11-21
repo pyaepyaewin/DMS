@@ -57,6 +57,7 @@ object Utils {
     const val MODE_GENERAL_SALE = "mode_general_sale"
 
     const val RQ_BACK_TO_CUSTOMER = 2
+    const val RQ_BACK_TO_CUSTOMER_VISIT = 3
 
     private var progressDialog: ProgressDialog? = null
 

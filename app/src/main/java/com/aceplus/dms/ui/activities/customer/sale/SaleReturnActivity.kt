@@ -1,5 +1,6 @@
 package com.aceplus.dms.ui.activities.customer.sale
 
+import android.app.Activity
 import android.app.AlertDialog
 import android.arch.lifecycle.Observer
 import android.content.Context
@@ -12,11 +13,13 @@ import android.view.WindowManager
 import android.widget.*
 import com.aceplus.data.utils.Constant
 import com.aceplus.dms.R
+import com.aceplus.dms.ui.activities.PrintInvoiceActivity
 import com.aceplus.dms.ui.adapters.sale.ProductListAdapter
 import com.aceplus.dms.ui.adapters.sale.SaleReturnSelectedProductAdapter
 import com.aceplus.dms.utils.Utils
 import com.aceplus.dms.viewmodel.customer.sale.SalesReturnViewModel
 import com.aceplus.domain.entity.customer.Customer
+import com.aceplus.domain.entity.invoice.Invoice
 import com.aceplus.domain.entity.product.Product
 import com.aceplus.domain.vo.SoldProductInfo
 import com.aceplussolutions.rms.ui.activities.BaseActivity
@@ -148,6 +151,20 @@ class SaleReturnActivity : BaseActivity(), KodeinAware {
             }
         })
 
+        salesReturnViewModel.saleReturnSuccessState.observe(this, Observer {
+            if (it != null){
+                if (isSaleExchange){
+                    val intent = SaleActivity.newIntentFromSaleReturn(this, customer!!, it as Double, saleReturnID!!)
+                    startActivityForResult(intent, Utils.RQ_BACK_TO_CUSTOMER)
+                }
+                else{
+                    val intent = PrintInvoiceActivity.newIntentFromSaleReturn(this, it as Invoice, mReturnProductListAdapter.getDataList() as ArrayList<SoldProductInfo>)
+                    startActivityForResult(intent, Utils.RQ_BACK_TO_CUSTOMER)
+                }
+                salesReturnViewModel.saleReturnSuccessState.value = null
+            }
+        })
+
         searchAutoCompleteTextView.onItemClickListener = AdapterView.OnItemClickListener { parent, view, position, id ->
             checkDuplicateProductAndAdd(mProductListAdapter.getDataList()[position])
             searchAutoCompleteTextView.setText("")
@@ -275,6 +292,14 @@ class SaleReturnActivity : BaseActivity(), KodeinAware {
 
         }
 
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == Utils.RQ_BACK_TO_CUSTOMER)
+            if (resultCode == Activity.RESULT_OK){
+                setResult(Activity.RESULT_OK)
+                finish()
+            }
     }
 
 }

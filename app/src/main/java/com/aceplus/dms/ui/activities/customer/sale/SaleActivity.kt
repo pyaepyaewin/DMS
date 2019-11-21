@@ -52,7 +52,7 @@ class SaleActivity : BaseActivity(), KodeinAware {
             return intent
         }
 
-        fun newIntentFromSaleExchange(context: Context, customerData: Customer, saleReturnAmount: Double, returnInvoiceID: String): Intent {
+        fun newIntentFromSaleReturn(context: Context, customerData: Customer, saleReturnAmount: Double, returnInvoiceID: String): Intent {
             val intent = Intent(context, SaleActivity::class.java)
             intent.putExtra(IE_SALE_EXCHANGE, true)
             intent.putExtra(IE_CUSTOMER_DATA, customerData)

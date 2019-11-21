@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.arch.lifecycle.MutableLiveData
 import android.util.Log
 import com.aceplus.dms.utils.Utils
+import com.aceplus.domain.entity.invoice.Invoice
 import com.aceplus.domain.entity.invoice.InvoiceProduct
 import com.aceplus.domain.entity.product.Product
 import com.aceplus.domain.entity.sale.salereturn.SaleReturn
@@ -21,6 +22,7 @@ class SalesReturnViewModel(
     var productDataList = MutableLiveData<Pair<List<Product>, List<String>>>()
     var taxType = MutableLiveData<String>()
     var calculatedProductList = MutableLiveData<Triple<ArrayList<SoldProductInfo>, Double, Double>>()
+    var saleReturnSuccessState = MutableLiveData<Any>()
 
     var taxInfo = Pair("", 0)
 
@@ -170,7 +172,23 @@ class SalesReturnViewModel(
 
                     if (isSaleExchange){
 
+                        saleReturnSuccessState.postValue(payAmount + discAmount)
+
                     } else{
+
+                        val invoice = Invoice()
+                        invoice.invoice_id = saleReturnID
+                        invoice.sale_date = Utils.getCurrentDate(true)
+                        invoice.customer_id = customerID.toString()
+                        invoice.location_code = locationID.toString()
+                        invoice.total_amount = netAmount.toString()
+                        invoice.pay_amount = payAmount.toString()
+                        invoice.total_discount_amount = discAmount
+                        invoice.device_id = deviceID
+                        invoice.invoice_status = saleReturn.invoice_status
+                        invoice.sale_person_id = salePersonID.toString()
+
+                        saleReturnSuccessState.postValue(invoice)
 
                     }
 

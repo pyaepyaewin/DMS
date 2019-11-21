@@ -1,5 +1,6 @@
 package com.aceplus.dms.ui.activities.customer
 
+import android.app.Activity
 import android.app.AlertDialog
 import android.arch.lifecycle.Observer
 import android.content.Context
@@ -336,7 +337,7 @@ class CustomerActivity : BaseActivity(), KodeinAware {
                     true,
                     selectedCustomer!!
                 )
-                startActivity(intent)
+            startActivity(intent)
             }
 
     }
