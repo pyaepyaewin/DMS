@@ -31,4 +31,6 @@ interface InvoiceCancelProductDao {
     fun getSaleCancelDetailReport(invoiceId:String): List<SaleCancelInvoiceDetailReport>
 
 
+
+
 }

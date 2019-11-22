@@ -19,7 +19,7 @@ class InvoiceCancelProduct {
     @ColumnInfo(name = "invoice_product_id")
     @SerializedName("invoice_product_id")
     @Expose
-    var invoice_product_id: Int = 0
+    var invoice_product_id: String =" "
 
     @ColumnInfo(name = "product_id")
     @SerializedName("product_id")

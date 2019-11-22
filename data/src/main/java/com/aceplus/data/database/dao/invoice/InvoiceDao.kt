@@ -67,4 +67,10 @@ interface InvoiceDao {
     @Query("select * from invoice WHERE  invoice_id=:invoiceId")
     fun getSoldInvoice(invoiceId: String):List<Invoice>
 
+
+
+    @Query("select * from invoice WHERE  invoice_id=:invoiceId")
+    fun getInvoiceCancel(invoiceId: String):Invoice
+
+
 }

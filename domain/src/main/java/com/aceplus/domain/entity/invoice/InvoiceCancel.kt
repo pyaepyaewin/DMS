@@ -13,18 +13,18 @@ class InvoiceCancel {
     @ColumnInfo(name = "id")
     @SerializedName("id")
     @Expose
-    var id: Int = 0
+    var id: String = ""
 
     @ColumnInfo(name = "invoice_id")
     @SerializedName("invoice_id")
     @Expose
-    var invoice_id: Int = 0
+    var invoice_id: String = ""
 
 
     @ColumnInfo(name = "customer_id")
     @SerializedName("customer_id")
     @Expose
-    var customer_id: Int = 0
+    var customer_id: String? = ""
 
     @ColumnInfo(name = "sale_date")
     @SerializedName("sale_date")
@@ -34,7 +34,7 @@ class InvoiceCancel {
     @ColumnInfo(name = "total_amount")
     @SerializedName("total_amount")
     @Expose
-    var total_amount: Double = 0.0
+    var total_amount: Double? = 0.0
 
     @ColumnInfo(name = "total_discount_amount")
     @SerializedName("total_discount_amount")
@@ -44,12 +44,12 @@ class InvoiceCancel {
     @ColumnInfo(name = "pay_amount")
     @SerializedName("pay_amount")
     @Expose
-    var pay_amount: Double = 0.0
+    var pay_amount: Double? = 0.0
 
     @ColumnInfo(name = "refund_amount")
     @SerializedName("refund_amount")
     @Expose
-    var refund_amount: Double = 0.0
+    var refund_amount: Double? = 0.0
 
     @ColumnInfo(name = "receipt_person_name")
     @SerializedName("receipt_person_name")
@@ -59,7 +59,7 @@ class InvoiceCancel {
     @ColumnInfo(name = "sale_person_id")
     @SerializedName("sale_person_id")
     @Expose
-    var sale_person_id: Int = 0
+    var sale_person_id: Int ?= 0
 
     @ColumnInfo(name = "due_date")
     @SerializedName("due_date")

@@ -5,6 +5,8 @@ import com.aceplus.data.database.MyDatabase
 import com.aceplus.data.utils.Constant
 import com.aceplus.domain.entity.CompanyInformation
 import com.aceplus.domain.entity.invoice.Invoice
+import com.aceplus.domain.entity.invoice.InvoiceCancel
+import com.aceplus.domain.entity.invoice.InvoiceCancelProduct
 import com.aceplus.domain.entity.invoice.InvoiceProduct
 import com.aceplus.domain.entity.product.Product
 import com.aceplus.domain.entity.sale.SaleMan
@@ -17,6 +19,28 @@ import com.aceplussolutions.rms.constants.AppUtils
 import io.reactivex.Observable
 
 class SaleCancelRepoImpl(val database: MyDatabase,val shf:SharedPreferences) : SaleCancelRepo {
+    override fun getInvoiceCancel(invoiceId: String): Observable<Invoice> {
+        return Observable.just(database.invoiceDao().getInvoiceCancel(invoiceId))
+    }
+
+    override fun insertInvoiceCancel(
+        invoiceCancel: InvoiceCancel,
+        invoiceCancelProduct: List<InvoiceCancelProduct>
+    ) {
+        database.invoiceCancelDao().insert(invoiceCancel)
+        database.invoiceCancelProductDao().insertAll(invoiceCancelProduct)
+    }
+//    override fun insertInvoiceCancelProduct(invoiceCancelProduct: List<InvoiceCancelProduct>) {
+//        return database.invoiceCancelProductDao().insertAll(invoiceCancelProduct)
+//
+//    }
+//
+//    override fun insertInvoiceCancel(invoiceCancel: List<InvoiceCancel>) {
+//        return database.invoiceCancelDao().insertAll(invoiceCancel)
+//
+//    }
+
+
     override fun deleteInvoiceProductForLongClick(invoiceId: String, productIdList: List<Int>) {
         return database.invoiceProductDao().deleteInvoiceProductForLongClick(invoiceId,productIdList)
 
