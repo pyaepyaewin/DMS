@@ -12,8 +12,7 @@ class SoldProductViewHolder(
     val onLongClickProduct: (data: SoldProductInfo, position: Int) -> Unit,
     val onFocCheckChange: (data: SoldProductInfo, isChecked: Boolean, position: Int) -> Unit,
     val onClickQtyButton: (data: SoldProductInfo, position: Int) -> Unit,
-    val onClickFocButton: (soldProduct: SoldProductInfo, position: Int) -> Unit,
-    private val isDelivery: Boolean
+    val onClickFocButton: (soldProduct: SoldProductInfo, position: Int) -> Unit
 ) : BaseViewHolder<SoldProductInfo>(itemView) {
 
     override fun setData(data: SoldProductInfo) {
@@ -27,7 +26,7 @@ class SoldProductViewHolder(
             name.text = data.product.product_name
             um.text = data.product.um
 
-            orderedQuantity.visibility = if (isDelivery) View.VISIBLE else View.GONE
+            orderedQuantity.visibility = View.GONE
 
             qty.text = data.quantity.toString()
             qty.setOnClickListener { onClickQtyButton(data, position) }

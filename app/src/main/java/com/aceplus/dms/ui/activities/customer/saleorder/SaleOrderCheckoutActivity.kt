@@ -9,6 +9,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.support.design.widget.Snackbar
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.LinearLayoutManager
@@ -253,7 +254,7 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
         calculateTotalAmount()
         saleCheckoutViewModel.calculateFinalAmount(soldProductList, totalAmount) // Check - should do only for pre-order
         salePersonId = saleCheckoutViewModel.getSaleManID()
-        locationCode = saleCheckoutViewModel.getRouteID() // Check point
+        locationCode = saleCheckoutViewModel.getRouteID() // Check point - route id or location id - main thread
     }
 
     private fun catchEvents(){
@@ -294,7 +295,7 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
 
                 if (Utils.isInternetAccess(this)){
                     Utils.callDialog("Please wait...", this)
-                    saleCheckoutViewModel.getPreOrderRequest()
+                    saleCheckoutViewModel.getPreOrderRequest(salePersonId!!, locationCode.toString())
                 }
                 else
                     sendSMSMessage()
@@ -305,6 +306,23 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
             if (it != null){
                 sendSMS(it.first, it.second)
                 insertSMSRecord(it.first, it.second)
+                // To check - found no update commend for delete flag
+            }
+        })
+
+        saleCheckoutViewModel.uploadResult.observe(this, android.arch.lifecycle.Observer { uploaded ->
+            if (uploaded != null){
+                if (uploaded){
+                    Utils.cancelDialog()
+                    Snackbar.make(rvSoldProductList, resources.getString(R.string.upload_succes_msg), Snackbar.LENGTH_INDEFINITE)
+                        .setAction("Done"){
+                            toPrintActivity("S")
+                        }
+                        .show()
+                } else{
+                    sendSMSMessage()
+                }
+                saleCheckoutViewModel.uploadResult.value = null
             }
         })
 
@@ -593,12 +611,6 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
 
     }
 
-    private fun uploadPreOrderToServer(){
-
-        // ToDo
-
-    }
-
     private fun sendSMSMessage(){
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED){
@@ -794,9 +806,11 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
     }
 
     override fun onBackPressed() {
-        val intent = Intent(this@SaleOrderCheckoutActivity, DeliveryActivity::class.java)
-        startActivity(intent)
-        finish()
-    }
+        if (isDelivery) {
+            val intent = Intent(this@SaleOrderCheckoutActivity, DeliveryActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
 
+    }
 }

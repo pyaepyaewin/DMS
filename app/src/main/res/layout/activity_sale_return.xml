@@ -34,7 +34,7 @@
                     android:src="@drawable/ic_done_hx_btn" />
 
             <TextView
-                    android:id="@+id/title"
+                    android:id="@+id/tvTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerHorizontal="true"
@@ -79,7 +79,8 @@
                 android:layout_marginTop="20dp"
                 android:layout_toRightOf="@+id/nameLayout"
                 android:gravity="right"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:visibility="gone">
 
             <TextView
                     android:layout_width="wrap_content"
@@ -129,7 +130,7 @@
                                 android:id="@+id/rvProductListSalesReturn"
                                 android:layout_width="match_parent"
                                 android:layout_height="fill_parent"
-                                android:divider="#000000"></android.support.v7.widget.RecyclerView>
+                                android:divider="#000000"/>
 
                     </LinearLayout>
 
@@ -139,61 +140,73 @@
                             android:layout_weight="2">
 
                         <LinearLayout
-                                android:id="@+id/headerLayout"
+                    android:id="@+id/headerLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:background="#898989"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp">
+
+                    <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="2"
+                            android:gravity="center_horizontal"
+                            android:text="@string/product"
+                            android:textColor="#FFFFFF"
+                            android:textStyle="bold" />
+
+                    <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center_horizontal"
+                            android:text="@string/um"
+                            android:textColor="#FFFFFF"
+                            android:textStyle="bold" />
+
+                    <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center_horizontal"
+                            android:text="Quantity"
+                            android:textColor="#FFFFFF"
+                            android:textStyle="bold" />
+
+                    <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center_horizontal"
+                            android:text="Price"
+                            android:textColor="#FFFFFF"
+                            android:textStyle="bold" />
+
+
+                    <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center_horizontal"
+                            android:text="Remark"
+                            android:textColor="#FFFFFF"
+                            android:textStyle="bold"
+                            android:visibility="gone" />
+
+                </LinearLayout>
+
+                        <android.support.v7.widget.RecyclerView
+                                android:id="@+id/selectedProductList"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_margin="10dp"
-                                android:background="#898989"
-                                android:padding="10dp">
-
-                            <TextView
-                                    android:layout_width="0dp"
-                                    android:layout_height="wrap_content"
-                                    android:layout_weight="2"
-                                    android:gravity="center_horizontal"
-                                    android:text="@string/product"
-                                    android:textColor="#FFFFFF"
-                                    android:textStyle="bold" />
-
-                            <TextView
-                                    android:layout_width="0dp"
-                                    android:layout_height="wrap_content"
-                                    android:layout_weight="1"
-                                    android:gravity="center_horizontal"
-                                    android:text="@string/um"
-                                    android:textColor="#FFFFFF"
-                                    android:textStyle="bold" />
-
-                            <TextView
-                                    android:layout_width="0dp"
-                                    android:layout_height="wrap_content"
-                                    android:layout_weight="1"
-                                    android:gravity="center_horizontal"
-                                    android:text="Quantity"
-                                    android:textColor="#FFFFFF"
-                                    android:textStyle="bold" />
-
-                            <TextView
-                                    android:layout_width="0dp"
-                                    android:layout_height="wrap_content"
-                                    android:layout_weight="1"
-                                    android:gravity="center_horizontal"
-                                    android:text="Price"
-                                    android:textColor="#FFFFFF"
-                                    android:textStyle="bold" />
-
-
-                            <TextView
-                                    android:layout_width="0dp"
-                                    android:layout_height="wrap_content"
-                                    android:layout_weight="1"
-                                    android:gravity="center_horizontal"
-                                    android:text="Remark"
-                                    android:textColor="#FFFFFF"
-                                    android:textStyle="bold"
-                                    android:visibility="gone" />
-
-                        </LinearLayout>
+                                android:layout_above="@id/netAmountLayout"
+                                android:layout_below="@id/headerLayout"
+                                android:layout_marginLeft="10dp"
+                                android:layout_marginRight="10dp"
+                                android:layout_marginBottom="10dp"
+                                android:descendantFocusability="blocksDescendants" />
 
                         <LinearLayout
                                 android:id="@+id/netAmountLayout"
@@ -202,21 +215,23 @@
                                 android:layout_above="@+id/saleReturnDiscountLayout"
                                 android:layout_alignParentEnd="true"
                                 android:layout_alignParentRight="true"
-                                android:layout_margin="5dp">
+                                android:layout_marginTop="5dp"
+                                android:layout_marginRight="30dp"
+                                android:layout_marginBottom="10dp">
 
                             <TextView
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
                                     android:layout_marginLeft="10dp"
                                     android:layout_weight="7"
-                                    android:text="@string/total_amount"
+                                    android:text="@string/net_amount"
                                     android:textStyle="bold" />
 
                             <TextView
                                     android:id="@+id/totalAmountTextView"
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
-                                    android:layout_weight="2"
+                                    android:layout_weight="3"
                                     android:gravity="center_horizontal"
                                     android:text="0.0"
                                     android:textStyle="bold" />
@@ -230,8 +245,7 @@
                                 android:layout_alignParentEnd="true"
                                 android:layout_alignParentRight="true"
                                 android:layout_marginTop="5dp"
-                                android:layout_marginEnd="5dp"
-                                android:layout_marginRight="5dp"
+                                android:layout_marginRight="30dp"
                                 android:layout_marginBottom="5dp">
 
                             <TextView
@@ -247,9 +261,10 @@
                                     android:id="@+id/saleReturnDiscountEditText"
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
-                                    android:layout_weight="2"
+                                    android:layout_weight="3"
                                     android:gravity="center_horizontal"
                                     android:inputType="numberDecimal"
+                                    android:textSize="14sp"
                                     android:textStyle="bold" />
                         </LinearLayout>
 
@@ -261,9 +276,9 @@
                                 android:layout_alignParentEnd="true"
                                 android:layout_alignParentRight="true"
                                 android:layout_marginTop="5dp"
-                                android:layout_marginEnd="5dp"
-                                android:layout_marginRight="5dp"
-                                android:layout_marginBottom="5dp">
+                                android:layout_marginRight="30dp"
+                                android:layout_marginBottom="5dp"
+                                android:visibility="gone">
 
                             <TextView
                                     android:layout_width="0dp"
@@ -291,7 +306,9 @@
                                 android:layout_above="@+id/taxAmtLayout"
                                 android:layout_alignParentEnd="true"
                                 android:layout_alignParentRight="true"
-                                android:layout_margin="5dp">
+                                android:layout_marginTop="5dp"
+                                android:layout_marginRight="30dp"
+                                android:layout_marginBottom="5dp">
 
                             <TextView
                                     android:layout_width="0dp"
@@ -305,46 +322,43 @@
                                     android:id="@+id/returnCashAmtEditText"
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
-                                    android:layout_weight="2"
+                                    android:layout_weight="3"
                                     android:gravity="center_horizontal"
                                     android:inputType="numberDecimal"
+                                    android:textSize="14sp"
                                     android:textStyle="bold" />
                         </LinearLayout>
 
                         <LinearLayout
                                 android:id="@+id/taxAmtLayout"
-                                android:layout_width="match_parent"
-                                android:layout_height="0dp"
+                                android:layout_width="400dp"
+                                android:layout_height="wrap_content"
                                 android:layout_alignParentBottom="true"
-                                android:layout_margin="10dp">
+                                android:layout_alignParentEnd="true"
+                                android:layout_alignParentRight="true"
+                                android:layout_marginTop="5dp"
+                                android:layout_marginRight="30dp"
+                                android:layout_marginBottom="10dp">
 
                             <TextView
-                                    android:id="@+id/taxAmttxt"
+                                    android:id="@+id/txtTaxAmt"
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
                                     android:layout_marginLeft="10dp"
                                     android:layout_weight="7"
-                                    android:text=""
+                                    android:text="Tax"
                                     android:textStyle="bold" />
 
                             <EditText
                                     android:id="@+id/taxAmtEditText"
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
-                                    android:layout_weight="2"
+                                    android:layout_weight="3"
                                     android:gravity="center_horizontal"
                                     android:inputType="number"
+                                    android:textSize="14sp"
                                     android:textStyle="bold" />
                         </LinearLayout>
-
-                        <android.support.v7.widget.RecyclerView
-                                android:id="@+id/soldProductList"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_above="@id/netAmountLayout"
-                                android:layout_below="@id/headerLayout"
-                                android:layout_margin="10dp"
-                                android:descendantFocusability="blocksDescendants" />
 
                     </RelativeLayout>
 

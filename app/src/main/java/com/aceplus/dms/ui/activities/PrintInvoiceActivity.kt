@@ -108,6 +108,19 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
             return intent
         }
 
+        fun newIntentFromSaleReturn(
+            context: Context,
+            invoice: Invoice,
+            returnProductList: ArrayList<SoldProductInfo>
+        ): Intent{
+            val intent = Intent(context, PrintInvoiceActivity::class.java)
+            intent.putExtra(IE_INVOICE, invoice)
+            intent.putExtra(IE_SOLD_PRODUCT_LIST, returnProductList)
+            intent.putExtra(IE_PRINT_MODE, "SR")
+            // To Notice - there's no promotion list
+            return intent
+        }
+
         fun getIntentFromCredit(
             context: Context,
             credit: MutableList<CreditInvoice>,
@@ -186,6 +199,7 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         try {
             mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
         } catch (e: Exception) {
@@ -205,7 +219,6 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
             print_soldProductList.adapter = soldProductPrintListAdapter
         }
         print_soldProductList.layoutManager = LinearLayoutManager(this)
-
     }
 
     override fun onStart() {
@@ -332,12 +345,18 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
             printInvoiceViewModel.getSalePersonName(invoice!!.sale_person_id!!)
             branch.text = branchCode.toString()
 
-            if (printMode == "S")
+            if (printMode == "S") {
+                print_soldProductList.adapter = soldProductPrintListAdapter
+                print_soldProductList.layoutManager = LinearLayoutManager(this)
                 soldProductPrintListAdapter.setNewList(soldProductList)
-            else
+            }
+            else {
+                print_soldProductList.adapter = historySoldProductPrintListAdapter
+                print_soldProductList.layoutManager = LinearLayoutManager(this)
                 historySoldProductPrintListAdapter.setNewList(historyReportSoldProductList)
+            }
 
-            setPromotionProductListView()
+            setPromotionProductListView() // ToDo - no promo list
             print_totalAmount.text = Utils.formatAmount(invoice!!.total_amount!!.toDouble())
 
             if (invoice!!.total_discount_amount != 0.0)
@@ -352,7 +371,7 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
             }
 
             print_prepaidAmount.text = Utils.formatAmount(invoice!!.pay_amount?.toDouble() ?: 0.0)
-            print_discountAmount.text = "${Utils.formatAmount(invoice!!.total_discount_amount)} (${invoice!!.total_discount_percent}%)"
+            print_discountAmount.text = "${Utils.formatAmount(invoice!!.total_discount_amount)} (${invoice?.total_discount_percent ?: 0.00}%)"
 
         } else if (printMode == "C") {
 
@@ -382,11 +401,44 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
             credit_discount.text = "0.0 (0%)"
 
         } else if (printMode == "C") {
+
             // ToDo
+
         } else if (printMode == "D") {
+
             // ToDo
+
         } else if (printMode == "SR") {
-            // ToDo
+
+            saleDate.text = Utils.getCurrentDate(false)
+            invoiceId.text = invoice!!.invoice_id
+            printInvoiceViewModel.getSalePersonName(invoice!!.sale_person_id!!)
+            branch.text = branchCode.toString()
+
+            print_soldProductList.adapter = soldProductPrintListAdapter
+            print_soldProductList.layoutManager = LinearLayoutManager(this)
+            soldProductPrintListAdapter.setNewList(soldProductList)
+
+            //setPromotionProductListView() // Cuz there is no promo list for return
+
+            print_totalAmount.text = Utils.formatAmount(invoice!!.total_amount!!.toDouble())
+
+            if (invoice!!.total_discount_amount != 0.0)
+                print_totalDiscount.text = Utils.formatAmount(invoice!!.total_discount_amount)
+
+            if (taxType.equals("E", true)) {
+                if (invoice!!.total_amount!!.isNotBlank())
+                    print_net_amount.text = Utils.formatAmount(invoice!!.total_amount!!.toDouble() - invoice!!.total_discount_amount + invoice!!.tax_amount)
+            } else {
+                if (invoice!!.total_amount!!.isNotBlank())
+                    print_net_amount.text = Utils.formatAmount(invoice!!.total_amount!!.toDouble() - invoice!!.total_discount_amount)
+            }
+
+            print_prepaidAmount.text = Utils.formatAmount(invoice!!.pay_amount?.toDouble() ?: 0.0)
+            print_discountAmount.text = "${Utils.formatAmount(invoice!!.total_discount_amount)} (${invoice?.total_discount_percent ?: 0.00}%)"
+
+            // To check - everything except promo list is same to S and RP - can combine
+
         }
     }
 

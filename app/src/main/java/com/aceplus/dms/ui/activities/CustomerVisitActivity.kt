@@ -1,6 +1,5 @@
 package com.aceplus.dms.ui.activities
 
-import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -28,28 +27,27 @@ class CustomerVisitActivity : BaseActivity(), KodeinAware {
             return Intent(context, CustomerVisitActivity::class.java)
         }
     }
-//val vm = ViewModelProviders.
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         buttonCustomer.setOnClickListener { startActivity(CustomerActivity.newIntent(applicationContext)) }
+
         buttonAddNewCustomer.setOnClickListener { startActivity(AddNewCustomerActivity.newIntent(applicationContext)) }
+
         buttonCreditCollections.setOnClickListener { startActivity(CreditCollectionActivity.newIntent(applicationContext)) }
-        buttonSaleExchange.setOnClickListener {
-            startActivity(
-                CustomerActivity.newIntentForSaleExchange(applicationContext, "yes")
-            )
-        }
+
+        buttonSaleExchange.setOnClickListener { startActivity(CustomerActivity.newIntentForSaleExchange(applicationContext, true)) }
+
         buttonDelivery.setOnClickListener { startActivity(DeliveryActivity.newIntent(applicationContext)) }
-        buttonInvoiceCancel.setOnClickListener {
-            val intent = SaleCancelActivity.newIntentFromCustomer(applicationContext)
-            startActivity(intent)
-        }
+
+        buttonInvoiceCancel.setOnClickListener { startActivity(SaleCancelActivity.newIntentFromCustomer(applicationContext)) }
+
         cancel_img.setOnClickListener { onBackPressed() }
     }
 
-    override fun onBackPressed() {
+    /*override fun onBackPressed() {
         super.onBackPressed()
         Utils.backToLogin(this)
-    }
+    }*/
 }

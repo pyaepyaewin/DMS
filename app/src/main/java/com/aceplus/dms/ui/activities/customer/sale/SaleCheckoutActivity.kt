@@ -46,13 +46,28 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
         private const val IE_SOLD_PRODUCT_LIST = "IE_SOLD_PRODUCT_LIST"
         private const val IE_PROMOTION_LIST = "IE_PROMOTION_LIST"
         private const val IE_SALE_EXCHANGE = "IE_SALE_EXCHANGE"
+        private const val IE_RETURN_AMOUNT = "IE_RETURN_AMOUNT"
+        private const val IE_SALE_RETURN_INVOICE_ID_KEY = "SALE_RETURN_INVOICE_ID_KEY"
 
         fun newIntentFromSale(context: Context, customerData: Customer, soldProductList: ArrayList<SoldProductInfo>, promotionList: ArrayList<Promotion>): Intent{
             val intent = Intent(context, SaleCheckoutActivity::class.java)
             intent.putExtra(IE_CUSTOMER_DATA, customerData)
             intent.putExtra(IE_SOLD_PRODUCT_LIST, soldProductList)
             intent.putExtra(IE_PROMOTION_LIST, promotionList)
-            intent.putExtra(IE_SALE_EXCHANGE, "no")
+            intent.putExtra(IE_SALE_EXCHANGE, false)
+            return intent
+        }
+
+        fun newIntentFromSaleForSaleExchange(
+            context: Context, customerData: Customer, soldProductList: ArrayList<SoldProductInfo>, promotionList: ArrayList<Promotion>, returnInvoiceNo: String, returnAmount: Double
+        ): Intent{
+            val intent = Intent(context, SaleCheckoutActivity::class.java)
+            intent.putExtra(IE_CUSTOMER_DATA, customerData)
+            intent.putExtra(IE_SOLD_PRODUCT_LIST, soldProductList)
+            intent.putExtra(IE_PROMOTION_LIST, promotionList)
+            intent.putExtra(IE_SALE_EXCHANGE, true)
+            intent.putExtra(IE_SALE_RETURN_INVOICE_ID_KEY, returnInvoiceNo)
+            intent.putExtra(IE_RETURN_AMOUNT, returnAmount)
             return intent
         }
 
@@ -72,7 +87,7 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
     private var taxPercent: Int = 0
     private var invoiceId: String = ""
     private var taxAmt: Double = 0.0
-    private var isSaleExchange: String? = null
+    private var isSaleExchange: Boolean = false
     private var locationCode: Int = 0
     private var salePersonId: String? = null
     private var invoice: Invoice? = null
@@ -81,6 +96,8 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
     private var totalDiscountAmount:Double = 0.0
     private var volDisPercent: Double = 0.0
     private var volDisAmount:Double = 0.0
+    private var saleReturnAmount: Double = 0.0
+    private var saleReturnInvoiceNo: String? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -89,8 +106,8 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
 
         getIntentData()
-        initializeData()
         setupUI()
+        initializeData()
         catchEvents()
 
         checkoutSoldProductListAdapter.setNewList(soldProductList)
@@ -103,7 +120,7 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
         calculateTotalAmount()
         saleCheckoutViewModel.calculateFinalAmount(soldProductList, totalAmount)
         salePersonId = saleCheckoutViewModel.getSaleManID()
-        locationCode = saleCheckoutViewModel.getRouteID() // Check point
+        locationCode = saleCheckoutViewModel.getRouteID() // Check point - route id or location id - main thread
 
     }
 
@@ -118,6 +135,8 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
 
         rvSoldProductList.adapter = checkoutSoldProductListAdapter
         rvSoldProductList.layoutManager = LinearLayoutManager(this)
+
+        saleExchangeLayout.visibility = if (isSaleExchange) View.VISIBLE else View.GONE
 
     }
 
@@ -171,17 +190,22 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
 
     private fun getIntentData(){
 
-        if (intent.getParcelableExtra<Customer>(IE_CUSTOMER_DATA) != null) customer = intent.getParcelableExtra(IE_CUSTOMER_DATA)
-        if (intent.getParcelableArrayListExtra<SoldProductInfo>(IE_SOLD_PRODUCT_LIST) != null) soldProductList = intent.getParcelableArrayListExtra(IE_SOLD_PRODUCT_LIST)
-        if (intent.getParcelableArrayListExtra<Promotion>(IE_PROMOTION_LIST) != null) promotionList = intent.getParcelableArrayListExtra(IE_PROMOTION_LIST)
-        if (intent.getStringExtra(IE_SALE_EXCHANGE) != null) isSaleExchange = intent.getStringExtra(IE_SALE_EXCHANGE)
+        isSaleExchange = intent.getBooleanExtra(IE_SALE_EXCHANGE, false)
+        customer = intent.getParcelableExtra(IE_CUSTOMER_DATA)
+        soldProductList = intent.getParcelableArrayListExtra(IE_SOLD_PRODUCT_LIST)
+        promotionList = intent.getParcelableArrayListExtra(IE_PROMOTION_LIST)
+
+        if (isSaleExchange){
+            saleReturnAmount = intent.getDoubleExtra(IE_RETURN_AMOUNT, 0.0)
+            saleReturnInvoiceNo = intent.getStringExtra(IE_SALE_RETURN_INVOICE_ID_KEY)
+        }
 
     }
 
     private fun displayFinalAmount(itemDisAmt: Double){
 
         val taxAmt = calculateTax()
-        var netAmount = 0.0
+        var netAmount: Double
 
         totalDiscountAmount = totalVolumeDiscount + itemDisAmt
 
@@ -208,6 +232,19 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
         else edtVolumeDiscountAmt.setText(totalDiscountAmount.toString())
 
         tax_txtView.text = df.format(taxAmt)
+
+        if (isSaleExchange){
+
+            val totalItemDiscountAmount = 0.0 // To Check
+            val saleExchangeAmount = totalAmount - totalItemDiscountAmount - totalVolumeDiscount
+
+            tvSaleReturnAmount.text = Utils.formatAmount(saleReturnAmount)
+//            tvPayAmountFromCustomer
+//            tvRefundToCustomer
+
+            // ToDo
+
+        }
 
     }
 
@@ -286,7 +323,7 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
     private fun setInvoiceId(){
 
         try {
-            if (isSaleExchange != null && !isSaleExchange.equals("yes", true)){
+            if (!isSaleExchange){
                 val invoiceCount = AppUtils.getIntFromShp(Constant.INVOICE_COUNT, this) ?: 0
 
                 if (invoiceCount >= 0) AppUtils.saveIntToShp(Constant.INVOICE_COUNT, invoiceCount + 1, this)
@@ -439,7 +476,7 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
 
     private fun saleOrExchange(){
 
-        if (isSaleExchange.equals("yes", true)){
+        if (isSaleExchange){
             toSaleExchange()
         } else{
             saleCheckoutViewModel.updateDepartureTimeForSaleManRoute( salePersonId!!, customer!!.id.toString())

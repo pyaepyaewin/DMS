@@ -39,50 +39,49 @@ class SaleActivity : BaseActivity(), KodeinAware {
         get() = R.layout.activity_sale1
 
     companion object {
+
         private const val IE_SALE_EXCHANGE = "IE_SALE_EXCHANGE"
         private const val IE_CUSTOMER_DATA = "IE_CUSTOMER_DATA"
-        private const val IE_IS_PRE_ORDER = "IS_PRE_ORDER"
-        private const val IE_IS_DELIVERY = "IS_DELIVERY"
-        private const val IE_REMAINING_AMOUNT_KEY = "REMAINING_AMOUNT_KEY"
-        private const val IE_USER_INFO_KEY = "USER_INFO_KEY"
-        private const val IE_CUSTOMER_INFO_KEY = "CUSTOMER_INFO_KEY"
-        private const val IE_SOLD_PRODUCT_LIST_KEY = "SOLD_PRODUCT_LIST_KEY"
-        private const val IE_ORDERED_INVOICE_KEY = "ORDERED_INVOICE_KEY"
+        private const val IE_RETURN_AMOUNT = "IE_RETURN_AMOUNT"
         private const val IE_SALE_RETURN_INVOICE_ID_KEY = "SALE_RETURN_INVOICE_ID_KEY"
 
-        fun newIntentFromCustomer(context: Context, isSaleExchange: String, customerData: Customer): Intent {
+        fun newIntentFromCustomer(context: Context, customerData: Customer): Intent {
             val intent = Intent(context, SaleActivity::class.java)
-            intent.putExtra(IE_SALE_EXCHANGE, isSaleExchange)
+            intent.putExtra(IE_SALE_EXCHANGE, false)
             intent.putExtra(IE_CUSTOMER_DATA, customerData)
             return intent
         }
 
-        fun newIntentFromSaleExchange(context: Context, isSaleExchange: String, customerId: String): Intent {
+        fun newIntentFromSaleReturn(context: Context, customerData: Customer, saleReturnAmount: Double, returnInvoiceID: String): Intent {
             val intent = Intent(context, SaleActivity::class.java)
-            intent.putExtra(IE_SALE_EXCHANGE, isSaleExchange)
-            intent.putExtra(IE_CUSTOMER_DATA, customerId)
+            intent.putExtra(IE_SALE_EXCHANGE, true)
+            intent.putExtra(IE_CUSTOMER_DATA, customerData)
+            intent.putExtra(IE_RETURN_AMOUNT, saleReturnAmount)
+            intent.putExtra(IE_SALE_RETURN_INVOICE_ID_KEY, returnInvoiceID)
             return intent
         }
+
     }
 
     private val saleViewModel: SaleViewModel by viewModel()
     private val mProductListAdapter by lazy { ProductListAdapter(::onClickProductListItem) }
-    private val mSoldProductListAdapter by lazy { SoldProductListAdapter(this::onLongClickSoldProductListItem, this::onFocCheckChange, this::onClickQtyButton, this::onClickFocButton, this.isDelivery) }
+    private val mSoldProductListAdapter by lazy { SoldProductListAdapter(this::onLongClickSoldProductListItem, this::onFocCheckChange, this::onClickQtyButton, this::onClickFocButton) }
     private val mPromotionGiftPresentListAdapter by lazy { PromotionPlanGiftListAdapter() }
     /*private val mPromotionItemListAdapter by lazy { PromotionPlanItemListAdapter() }*/
     private val mSearchProductAdapter by lazy { ArrayAdapter<String>(this@SaleActivity, android.R.layout.simple_list_item_1, ArrayList<String>()) }
 
     private val duplicateProductList = mutableListOf<Product>()
     private var customer: Customer? = null
+    private var isSaleExchange: Boolean = false
     private var promotionList: ArrayList<Promotion> = ArrayList()
     private val promotionGiftByClassDis: ArrayList<Int> = ArrayList()
     private val percentCategoryClassId: HashMap<String, Integer> = HashMap()
     private val giftCategoryClassId: HashMap<String, Integer> = HashMap()
     private val percentAmount: HashMap<String, Double> = HashMap()
     private val giftAmount: HashMap<String, Double> = HashMap()
+    private var saleReturnAmount: Double = 0.0
+    private var saleReturnInvoiceNo: String? = null
 
-    private var isDelivery: Boolean = false // Need to update by getIntentData
-    private var isPreOrder: Boolean = false // Need to update by getIntentData
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -102,8 +101,7 @@ class SaleActivity : BaseActivity(), KodeinAware {
 
     private fun setupUI() {
 
-        val check = intent.getStringExtra(IE_SALE_EXCHANGE)
-        if (check.equals("yes", ignoreCase = true)) tvTitle.text = getString(R.string.sale_exchange)
+        if (isSaleExchange) tvTitle.text = getString(R.string.sale_exchange)
 
         saleDateTextView.text = Utils.getCurrentDate(false)
 
@@ -122,8 +120,10 @@ class SaleActivity : BaseActivity(), KodeinAware {
         searchAutoCompleteTextView.setAdapter(mSearchProductAdapter)
         searchAutoCompleteTextView.threshold = 1
 
-        searchAndSelectProductsLayout.visibility = if (this.isDelivery) View.GONE else View.VISIBLE
-        tableHeaderOrderedQty.visibility = if (this.isDelivery) View.VISIBLE else View.GONE
+        tableHeaderOrderedQty.visibility = View.GONE
+
+        //searchAndSelectProductsLayout.visibility = if (this.isDelivery) View.GONE else View.VISIBLE
+        //tableHeaderOrderedQty.visibility = if (this.isDelivery) View.VISIBLE else View.GONE
         //tableHeaderDiscount.visibility = if (this.isPreOrder) View.GONE else View.VISIBLE
 
     }
@@ -308,7 +308,6 @@ class SaleActivity : BaseActivity(), KodeinAware {
         val remainingQtyTextView = view.findViewById(R.id.availableQuantity) as TextView
         val quantityEditText = view.findViewById(R.id.quantity) as EditText
         val messageTextView = view.findViewById(R.id.message) as TextView
-        val availableQuantityLayout = view.findViewById(R.id.availableQuantityLayout) as LinearLayout
         val alertDialog = AlertDialog.Builder(this@SaleActivity)
             .setView(view)
             .setTitle("Sale Quantity")
@@ -342,8 +341,7 @@ class SaleActivity : BaseActivity(), KodeinAware {
             .create()
 
         alertDialog.setOnShowListener {
-            if (isPreOrder) availableQuantityLayout.visibility = View.GONE
-            else remainingQtyTextView.text = soldProduct.product.remaining_quantity.toString()
+            remainingQtyTextView.text = soldProduct.product.remaining_quantity.toString()
         }
 
         alertDialog.show()
@@ -365,10 +363,10 @@ class SaleActivity : BaseActivity(), KodeinAware {
             .setPositiveButton("Confirm") { arg0, arg1 ->
 
                 if (radioFocPercent.isChecked){
-                    soldProduct.focPercent = focVolume.text.toString().toDouble()
+                    soldProduct.focPercent = if (focVolume.text.isNotBlank()) focVolume.text.toString().toDouble() else 0.0
                     soldProduct.setFocType(true)
                 } else{
-                    soldProduct.focAmount = focVolume.text.toString().toDouble()
+                    soldProduct.focAmount = if (focVolume.text.isNotBlank()) focVolume.text.toString().toDouble() else 0.0
                     soldProduct.setFocType(false)
                 }
 
@@ -425,8 +423,14 @@ class SaleActivity : BaseActivity(), KodeinAware {
 
         if (isFocPass){
 
-            val intent = SaleCheckoutActivity.newIntentFromSale(this, customer!!, mSoldProductListAdapter.getDataList() as ArrayList, this.promotionList)
-            startActivityForResult(intent, Utils.RQ_BACK_TO_CUSTOMER)
+            if (isSaleExchange){
+                val intent = SaleCheckoutActivity.newIntentFromSaleForSaleExchange(
+                    this, customer!!, mSoldProductListAdapter.getDataList() as ArrayList, this.promotionList, saleReturnInvoiceNo!!, saleReturnAmount)
+                startActivityForResult(intent, Utils.RQ_BACK_TO_CUSTOMER)
+            } else{
+                val intent = SaleCheckoutActivity.newIntentFromSale(this, customer!!, mSoldProductListAdapter.getDataList() as ArrayList, this.promotionList)
+                startActivityForResult(intent, Utils.RQ_BACK_TO_CUSTOMER)
+            }
 
         }
 
@@ -473,8 +477,10 @@ class SaleActivity : BaseActivity(), KodeinAware {
     }
 
     private fun getIntentData() {
-        if (intent.getParcelableExtra<Customer>(IE_CUSTOMER_DATA) != null) customer = intent.getParcelableExtra(IE_CUSTOMER_DATA)
-        // ToDo - get intent data
+        isSaleExchange = intent.getBooleanExtra(IE_SALE_EXCHANGE, false)
+        customer = intent.getParcelableExtra(IE_CUSTOMER_DATA)
+        saleReturnAmount = intent.getDoubleExtra(IE_RETURN_AMOUNT, 0.0)
+        saleReturnInvoiceNo = intent.getStringExtra(IE_SALE_RETURN_INVOICE_ID_KEY)
     }
 
     private fun updatePromotionProductList(){

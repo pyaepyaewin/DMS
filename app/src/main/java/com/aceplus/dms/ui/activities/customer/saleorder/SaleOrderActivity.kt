@@ -270,7 +270,7 @@ class SaleOrderActivity : BaseActivity(), KodeinAware {
 
         val alertDialog = AlertDialog.Builder(this)
             .setView(view)
-            .setTitle("Sale Quantity")
+            .setTitle("Sale Order Quantity")
             .setPositiveButton("Confirm") { arg0, arg1 ->
 
                 if (quantityEditText.text.toString().isBlank()) {

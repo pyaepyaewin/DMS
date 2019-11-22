@@ -16,6 +16,7 @@ import com.aceplus.domain.entity.customer.DidCustomerFeedback
 import com.aceplus.domain.entity.invoice.Invoice
 import com.aceplus.domain.entity.invoice.InvoiceProduct
 import com.aceplus.domain.entity.preorder.PreOrder
+import com.aceplus.domain.entity.preorder.PreOrderPresent
 import com.aceplus.domain.entity.preorder.PreOrderProduct
 import com.aceplus.domain.entity.product.Product
 import com.aceplus.domain.entity.promotion.PromotionDate
@@ -24,10 +25,14 @@ import com.aceplus.domain.entity.promotion.PromotionPrice
 import com.aceplus.domain.entity.route.RouteScheduleV2
 import com.aceplus.domain.entity.route.TempForSaleManRoute
 import com.aceplus.domain.entity.sale.SaleMan
+import com.aceplus.domain.entity.sale.salereturn.SaleReturn
+import com.aceplus.domain.entity.sale.salereturn.SaleReturnDetail
 import com.aceplus.domain.entity.sale.salevisit.SaleVisitRecordUpload
 import com.aceplus.domain.entity.volumediscount.VolumeDiscount
 import com.aceplus.domain.entity.volumediscount.VolumeDiscountFilter
 import com.aceplus.domain.entity.volumediscount.VolumeDiscountFilterItem
+import com.aceplus.domain.model.forApi.invoice.InvoiceResponse
+import com.aceplus.domain.model.forApi.preorder.PreOrderPresentApi
 import com.aceplus.domain.repo.CustomerVisitRepo
 import com.aceplus.shared.utils.GPSTracker
 import com.aceplussolutions.rms.constants.AppUtils
@@ -148,8 +153,18 @@ class CustomerVisitRepoImpl(
     }
 
     override fun updateProductRemainingQty(soldProductInfo: SoldProductInfo) {
-        db.productDao()
-            .updateProductRemainingQty(soldProductInfo.quantity, soldProductInfo.product.id)
+        db.productDao().updateProductRemainingQty(soldProductInfo.quantity, soldProductInfo.product.id)
+    }
+
+    override fun updateRemainingQtyWithExchangeOrReturn(
+        isSaleExchange: Boolean,
+        qty: Int,
+        productID: Int
+    ) {
+        if (isSaleExchange)
+            db.productDao().updateProductRemainingQtyWithSaleExchange(qty, productID)
+        else
+            db.productDao().updateProductRemainingQtyWithSaleReturn(qty, productID)
     }
 
     override fun saveDataForTempSaleManRoute(
@@ -419,16 +434,57 @@ class CustomerVisitRepoImpl(
         return Observable.just(db.preOrderProductDao().allData)
     }
 
-    override fun getPreOrderByID(invoiceId: String): Observable<List<PreOrder>> {
-        return Observable.just(db.preOrderDao().getPreOrderByID(invoiceId))
+    override fun getActivePreOrderByIDWithName(invoiceId: String): Observable<List<PreOrder>> {
+        return Observable.just(db.preOrderDao().getActivePreOrderByIDWithName(invoiceId))
     }
 
-    override fun getPreOrderProductByInvoiceID(invoiceId: String): Observable<List<PreOrderProduct>> {
-        return Observable.just(db.preOrderProductDao().getPreOrderProductByInvoiceID(invoiceId))
+    override fun getActivePreOrderProductByInvoiceIDWithName(invoiceId: String): Observable<List<PreOrderProduct>> {
+        return Observable.just(db.preOrderProductDao().getActivePreOrderProductByInvoiceIDWithName(invoiceId))
+    }
+
+    override fun getActivePreOrderProductByInvoiceIDList(invoiceIdList: List<String>): Observable<List<PreOrderProduct>> {
+        return Observable.just(db.preOrderProductDao().getActivePreOrderProductByInvoiceIDList(invoiceIdList))
     }
 
     override fun insertSmsRecord(smsRecord: SMSRecord) {
         db.smsRecordDao().insert(smsRecord)
+    }
+
+    override fun getActivePreOrderPresentByInvoiceIDList(invoiceIdList: List<String>): Observable<List<PreOrderPresent>> {
+        return Observable.just(db.preOrderPresentDao().getActivePreOrderPresentByInvoiceIDList(invoiceIdList))
+    }
+
+    override fun uploadPreOrderToServer(paramData: String): Observable<InvoiceResponse> {
+        return upLoadApi.uploadPreOrderData(paramData)
+    }
+
+    override fun getAllActivePreOrder(): Observable<List<PreOrder>> {
+        return Observable.just(db.preOrderDao().allActiveData)
+    }
+
+    override fun updateInactivePreOrderAndPreOrderProductByID(id: String) {
+        db.preOrderDao().updateInactivePreOrderByID(id)
+        db.preOrderProductDao().updateInactivePreOrderProductByID(id)
+    }
+
+    override fun updateInactivePreOrderPresentByID(id: String) {
+        db.preOrderPresentDao().updateInactivePreOrderPresentByID(id)
+    }
+
+    override fun insertSaleReturn(saleReturn: SaleReturn) {
+        db.saleReturnDao().insert(saleReturn)
+    }
+
+    override fun getAllSaleReturn(): Observable<List<SaleReturn>> {
+        return Observable.just(db.saleReturnDao().allData)
+    }
+
+    override fun getSaleReturnCountByID(id: String): Observable<Int> {
+        return Observable.just(db.saleReturnDao().getSaleReturnCountByID(id))
+    }
+
+    override fun insertAllSaleReturnDetail(list: List<SaleReturnDetail>) {
+        db.saleReturnDetailDao().insertAll(list)
     }
 
 }

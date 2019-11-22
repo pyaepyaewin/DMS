@@ -1,5 +1,6 @@
 package com.aceplus.dms.ui.activities.customer
 
+import android.app.Activity
 import android.app.AlertDialog
 import android.arch.lifecycle.Observer
 import android.content.Context
@@ -44,37 +45,29 @@ class CustomerActivity : BaseActivity(), KodeinAware {
         get() = R.layout.activity_customer
 
     companion object {
+
         private const val IE_SALE_EXCHANGE = "IE_SALE_EXCHANGE"
-        private const val IE_CUSTOMER_ID = "IE_CUSTOMER_ID"
 
         fun newIntent(context: Context): Intent {
             return Intent(context, CustomerActivity::class.java)
         }
 
-        fun newIntentForSaleExchange(context: Context, isSaleExchange: String): Intent {
+        fun newIntentForSaleExchange(context: Context, isSaleExchange: Boolean): Intent {
             val intent = Intent(context, CustomerActivity::class.java)
             intent.putExtra(IE_SALE_EXCHANGE, isSaleExchange)
             return intent
         }
 
-        fun newIntentFromSaleExchange(
-            context: Context,
-            isSaleExchange: String,
-            customerId: String
-        ): Intent {
-            val intent = Intent(context, CustomerActivity::class.java)
-            intent.putExtra(IE_SALE_EXCHANGE, isSaleExchange)
-            intent.putExtra(IE_CUSTOMER_ID, customerId)
-            return intent
-        }
     }
 
     private val customerViewModel: CustomerViewModel by viewModel()
     private val mCustomerListAdapter by lazy { CustomerListAdapter(::onClickCustomerListItem) }
 
+    private var isSaleExchange: Boolean = false
     private var selectedCustomer: Customer? = null
     private var allCustomerDataList: ArrayList<Customer> = ArrayList()
     private val gspTracker by lazy{ GPSTracker(applicationContext) }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -94,19 +87,16 @@ class CustomerActivity : BaseActivity(), KodeinAware {
 
     private fun setupUI() {
 
+        isSaleExchange = intent.getBooleanExtra(IE_SALE_EXCHANGE, false)
+
         rvCustomer.layoutManager = GridLayoutManager(applicationContext, 1)
         rvCustomer.adapter = mCustomerListAdapter
 
-        if (intent != null) {
-            val check = intent.getStringExtra(IE_SALE_EXCHANGE)
-            val customer_Id = intent.getStringExtra("CUSTOMER_ID")
+        if (isSaleExchange)
+            llCustomerButtonGp.visibility = View.GONE
+        else
+            btnOk.visibility = View.GONE
 
-            if (check.equals("yes", ignoreCase = true)) {
-                llCustomerButtonGp.visibility = View.GONE
-            } else {
-                btnOk.visibility = View.GONE
-            }
-        }
         btnPosm.visibility = View.GONE
 
     }
@@ -170,46 +160,10 @@ class CustomerActivity : BaseActivity(), KodeinAware {
 
         })
 
-        tvAddress.setOnClickListener {
-            // ToDo
-            /*if (didCustomerSelected()) {
-                val intent = CustomerLocationActivity.newIntent(
-                    applicationContext,
-                    latitude = tvLatitude.text.toString(),
-                    longitude = tvLongitude.text.toString(),
-                    customerName = tvCustomerNameCA.text.toString(),
-                    address = tvAddress.text.toString(),
-                    visitRecord = this.selectedCustomer!!.visit_record.toString()
-                )
-                startActivity(intent)
-            }*/
-        }
-
-        tvPhone.setOnClickListener {
-            if (didCustomerSelected()) {
-                val phoneNo = tvPhone.text.toString()
-                startActivity(Intent(Intent.ACTION_DIAL, Uri.parse("tel:$phoneNo")))
-            }
-        }
-
+        tvAddress.setOnClickListener { onClickAddress() }
+        tvPhone.setOnClickListener { onClickPhoneNo() }
         ivCancel.setOnClickListener { onBackPressed() }
-
-        btnOk.setOnClickListener {
-            /*if (didCustomerSelected()) {
-                //insert arrival & departure time for temp for sale man route
-                customerViewModel.insertDataForTempSaleManRoute(
-                    selectedCustomer!!,
-                    Utils.getCurrentDate(true)
-                )
-                val intent = SaleReturnActivity.newIntentFromCustomer(
-                    applicationContext,
-                    "yes",
-                    selectedCustomer!!
-                )
-                startActivity(intent)
-            }*/
-        }
-
+        btnOk.setOnClickListener { onClickOkButton() }
         btnSale.setOnClickListener { onClickSaleButton() }
         btnSaleOrder.setOnClickListener { onClickSaleOrderButton() }
         btnUnsellReason.setOnClickListener { onClickUnSellReasonButton() }
@@ -222,11 +176,12 @@ class CustomerActivity : BaseActivity(), KodeinAware {
 
         if (didCustomerSelected()) {
             customerViewModel.insertDataForTempSaleManRouteAndSaleVisitRecord(
-                selectedCustomer!!, Utils.getCurrentDate(true),
+                selectedCustomer!!,
+                Utils.getCurrentDate(true),
                 gspTracker
             )
             customerViewModel.insertDataForTempSaleManRouteAndSaleVisitRecord(selectedCustomer!!, Utils.getCurrentDate(true), gspTracker)
-            val intent = SaleActivity.newIntentFromCustomer(applicationContext, "no", selectedCustomer!!)
+            val intent = SaleActivity.newIntentFromCustomer(applicationContext, selectedCustomer!!)
             startActivity(intent)
         }
 
@@ -240,7 +195,7 @@ class CustomerActivity : BaseActivity(), KodeinAware {
                 Utils.getCurrentDate(true),
                 gspTracker
             )
-            customerViewModel.insertDataForTempSaleManRouteAndSaleVisitRecord(selectedCustomer!!, Utils.getCurrentDate(true),gspTracker)
+            customerViewModel.insertDataForTempSaleManRouteAndSaleVisitRecord(selectedCustomer!!, Utils.getCurrentDate(true), gspTracker)
             val intent = SaleOrderActivity.newIntentFromCustomer(applicationContext, selectedCustomer!!)
             startActivity(intent)
         }
@@ -250,7 +205,7 @@ class CustomerActivity : BaseActivity(), KodeinAware {
     private fun onClickUnSellReasonButton() {
 
         if (didCustomerSelected()) {
-            customerViewModel.insertDataForTempSaleManRouteAndSaleVisitRecord(selectedCustomer!!, Utils.getCurrentDate(true),gspTracker)
+            customerViewModel.insertDataForTempSaleManRouteAndSaleVisitRecord(selectedCustomer!!, Utils.getCurrentDate(true), gspTracker)
             customerViewModel.loadDidCustomerFeedback(selectedCustomer!!,
                 {
                     AlertDialog.Builder(this@CustomerActivity)
@@ -313,13 +268,13 @@ class CustomerActivity : BaseActivity(), KodeinAware {
     private fun onClickSaleReturnButton() {
 
         if (didCustomerSelected()) {
-            customerViewModel.insertDataForTempSaleManRouteAndSaleVisitRecord(selectedCustomer!!, Utils.getCurrentDate(true),gspTracker)
+            customerViewModel.insertDataForTempSaleManRouteAndSaleVisitRecord(selectedCustomer!!, Utils.getCurrentDate(true), gspTracker)
             val intent = SaleReturnActivity.newIntentFromCustomer(
                 applicationContext,
-                "no",
+                false,
                 selectedCustomer!!
             )
-            customerViewModel.insertDataForTempSaleManRouteAndSaleVisitRecord(selectedCustomer!!, Utils.getCurrentDate(true),gspTracker)
+            customerViewModel.insertDataForTempSaleManRouteAndSaleVisitRecord(selectedCustomer!!, Utils.getCurrentDate(true), gspTracker)
             startActivity(intent)
         }
 
@@ -328,11 +283,7 @@ class CustomerActivity : BaseActivity(), KodeinAware {
     private fun onClickPosmButton() {
 
         if (didCustomerSelected()) {
-            customerViewModel.insertDataForTempSaleManRouteAndSaleVisitRecord(
-                selectedCustomer!!,
-                Utils.getCurrentDate(true),
-                        gspTracker)
-            customerViewModel.insertDataForTempSaleManRouteAndSaleVisitRecord(selectedCustomer!!, Utils.getCurrentDate(true),gspTracker)
+            customerViewModel.insertDataForTempSaleManRouteAndSaleVisitRecord(selectedCustomer!!, Utils.getCurrentDate(true), gspTracker)
             val intent = PosmActivity.newIntentFromCustomer(applicationContext, selectedCustomer!!)
             startActivity(intent)
         }
@@ -342,7 +293,7 @@ class CustomerActivity : BaseActivity(), KodeinAware {
     private fun onClickBtnLocation() {
 
         if (didCustomerSelected()) {
-            customerViewModel.insertDataForTempSaleManRouteAndSaleVisitRecord(selectedCustomer!!, Utils.getCurrentDate(true),gspTracker)
+            customerViewModel.insertDataForTempSaleManRouteAndSaleVisitRecord(selectedCustomer!!, Utils.getCurrentDate(true), gspTracker)
             val intent = AddNewCustomerLocationActivity.newIntentFromCustomerActivity(
                 applicationContext,
                 salesmanId = AppUtils.getStringFromShp(Constant.SALEMAN_ID, applicationContext) ?: "",
@@ -354,9 +305,47 @@ class CustomerActivity : BaseActivity(), KodeinAware {
     }
 
     override fun onBackPressed() {
-       val intent = Intent(this,CustomerVisitActivity::class.java)
-       startActivity(intent)
+        val intent = Intent(this, CustomerVisitActivity::class.java)
+        startActivity(intent)
         finish()
+    }
+    private fun onClickAddress(){
+
+        /*if (didCustomerSelected()) {
+                val intent = CustomerLocationActivity.newIntent(
+                    applicationContext,
+                    latitude = tvLatitude.text.toString(),
+                    longitude = tvLongitude.text.toString(),
+                    customerName = tvCustomerNameCA.text.toString(),
+                    address = tvAddress.text.toString(),
+                    visitRecord = this.selectedCustomer!!.visit_record.toString()
+                )
+                startActivity(intent)
+            }*/
+
+    }
+
+    private fun onClickPhoneNo(){
+
+        if (didCustomerSelected()) {
+            val phoneNo = tvPhone.text.toString()
+            startActivity(Intent(Intent.ACTION_DIAL, Uri.parse("tel:$phoneNo")))
+        }
+
+    }
+
+    private fun onClickOkButton(){
+
+        if (didCustomerSelected()) {
+            customerViewModel.insertDataForTempSaleManRouteAndSaleVisitRecord(selectedCustomer!!, Utils.getCurrentDate(true), gspTracker)
+                val intent = SaleReturnActivity.newIntentFromCustomer(
+                    applicationContext,
+                    true,
+                    selectedCustomer!!
+                )
+            startActivity(intent)
+            }
+
     }
 
 }

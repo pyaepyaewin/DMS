@@ -12,6 +12,7 @@ import com.aceplus.domain.entity.customer.DidCustomerFeedback
 import com.aceplus.domain.entity.invoice.Invoice
 import com.aceplus.domain.entity.invoice.InvoiceProduct
 import com.aceplus.domain.entity.preorder.PreOrder
+import com.aceplus.domain.entity.preorder.PreOrderPresent
 import com.aceplus.domain.entity.preorder.PreOrderProduct
 import com.aceplus.domain.entity.product.Product
 import com.aceplus.domain.entity.promotion.PromotionDate
@@ -19,9 +20,13 @@ import com.aceplus.domain.entity.promotion.PromotionGift
 import com.aceplus.domain.entity.promotion.PromotionPrice
 import com.aceplus.domain.entity.route.RouteScheduleV2
 import com.aceplus.domain.entity.sale.SaleMan
+import com.aceplus.domain.entity.sale.salereturn.SaleReturn
+import com.aceplus.domain.entity.sale.salereturn.SaleReturnDetail
 import com.aceplus.domain.entity.volumediscount.VolumeDiscount
 import com.aceplus.domain.entity.volumediscount.VolumeDiscountFilter
 import com.aceplus.domain.entity.volumediscount.VolumeDiscountFilterItem
+import com.aceplus.domain.model.forApi.invoice.InvoiceResponse
+import com.aceplus.domain.model.forApi.preorder.PreOrderPresentApi
 import io.reactivex.Observable
 
 interface CustomerVisitRepo {
@@ -45,6 +50,7 @@ interface CustomerVisitRepo {
     fun getAllProductData(): Observable<List<Product>>
     fun getProductByID(productID: Int): Observable<List<Product>>
     fun updateProductRemainingQty(soldProductInfo: SoldProductInfo)
+    fun updateRemainingQtyWithExchangeOrReturn(isSaleExchange: Boolean, qty: Int, productID: Int)
 
     fun saveDataForTempSaleManRoute(selectedCustomer: Customer, currentDate: String,arrivalStatus:Int)
     fun saveCustomerFeedback(didCustomerFeedbackEntity: DidCustomerFeedback)
@@ -72,7 +78,8 @@ interface CustomerVisitRepo {
     fun getOrderInvoiceCountByID(invoiceId: String): Observable<Int>
     fun insertPreOrder(preOrder: PreOrder)
     fun getAllPreOrder(): Observable<List<PreOrder>>
-    fun getPreOrderByID(invoiceId: String): Observable<List<PreOrder>>
+    fun getActivePreOrderByIDWithName(invoiceId: String): Observable<List<PreOrder>>
+    fun getAllActivePreOrder(): Observable<List<PreOrder>>
 
     fun insertInvoiceProduct(invoiceProduct: InvoiceProduct)
     fun getAllInvoiceProduct(): Observable<List<InvoiceProduct>>
@@ -89,9 +96,22 @@ interface CustomerVisitRepo {
     fun getVolumeDiscountByDate(currentDate: String): Observable<List<VolumeDiscount>>
 
     fun insertAllPreOrderProduct(preOrderProductList: ArrayList<PreOrderProduct>)
-    fun getPreOrderProductByInvoiceID(invoiceId: String): Observable<List<PreOrderProduct>>
+    fun getActivePreOrderProductByInvoiceIDWithName(invoiceId: String): Observable<List<PreOrderProduct>>
+    fun getActivePreOrderProductByInvoiceIDList(invoiceIdList: List<String>): Observable<List<PreOrderProduct>>
     fun getAllPreOrderProduct(): Observable<List<PreOrderProduct>>
+    fun updateInactivePreOrderAndPreOrderProductByID(id: String)
+
+    fun getActivePreOrderPresentByInvoiceIDList(invoiceIdList: List<String>): Observable<List<PreOrderPresent>>
+    fun updateInactivePreOrderPresentByID(id: String)
 
     fun insertSmsRecord(smsRecord: SMSRecord)
+
+    fun uploadPreOrderToServer(paramData: String): Observable<InvoiceResponse>
+
+    fun insertSaleReturn(saleReturn: SaleReturn)
+    fun getAllSaleReturn(): Observable<List<SaleReturn>>
+    fun getSaleReturnCountByID(id: String): Observable<Int>
+
+    fun insertAllSaleReturnDetail(list: List<SaleReturnDetail>)
 
 }

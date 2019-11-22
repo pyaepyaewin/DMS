@@ -499,14 +499,14 @@
                         </LinearLayout>
 
                         <LinearLayout
-                                android:id="@+id/SaleExchangeLayout"
+                                android:id="@+id/saleExchangeLayout"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:orientation="vertical"
                                 android:visibility="gone">
 
                             <LinearLayout
-                                    android:id="@+id/SaleReturnAmountLayout"
+                                    android:id="@+id/saleReturnAmountLayout"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:layout_marginTop="10dp">
@@ -520,11 +520,11 @@
                                         android:text="Sale Return Amount" />
 
                                 <TextView
-                                        android:id="@+id/salereturnAmount"
+                                        android:id="@+id/tvSaleReturnAmount"
                                         android:layout_width="0dp"
                                         android:layout_height="wrap_content"
                                         android:layout_weight="3"
-                                        android:text="100,000" />
+                                        android:text="0" />
 
 
                             </LinearLayout>
@@ -544,11 +544,11 @@
                                         android:text="PayAmount From Customer" />
 
                                 <TextView
-                                        android:id="@+id/payamountfromcustomer"
+                                        android:id="@+id/tvPayAmountFromCustomer"
                                         android:layout_width="0dp"
                                         android:layout_height="wrap_content"
                                         android:layout_weight="3"
-                                        android:text="100,000" />
+                                        android:text="0" />
 
 
                             </LinearLayout>
@@ -568,11 +568,11 @@
                                         android:text="Refund to Customer" />
 
                                 <TextView
-                                        android:id="@+id/refundtocustomer"
+                                        android:id="@+id/tvRefundToCustomer"
                                         android:layout_width="0dp"
                                         android:layout_height="wrap_content"
                                         android:layout_weight="3"
-                                        android:text="100,000" />
+                                        android:text="0" />
 
 
                             </LinearLayout>
@@ -883,7 +883,8 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="10dp"
-                            android:weightSum="4">
+                            android:weightSum="4"
+                            android:visibility="gone">
 
                         <TextView
                                 android:id="@+id/tvSaleStatus"
