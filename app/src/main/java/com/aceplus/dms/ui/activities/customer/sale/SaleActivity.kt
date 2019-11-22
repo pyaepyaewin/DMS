@@ -79,6 +79,8 @@ class SaleActivity : BaseActivity(), KodeinAware {
     private val giftCategoryClassId: HashMap<String, Integer> = HashMap()
     private val percentAmount: HashMap<String, Double> = HashMap()
     private val giftAmount: HashMap<String, Double> = HashMap()
+    private var saleReturnAmount: Double = 0.0
+    private var saleReturnInvoiceNo: String? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -421,8 +423,14 @@ class SaleActivity : BaseActivity(), KodeinAware {
 
         if (isFocPass){
 
-            val intent = SaleCheckoutActivity.newIntentFromSale(this, customer!!, mSoldProductListAdapter.getDataList() as ArrayList, this.promotionList)
-            startActivityForResult(intent, Utils.RQ_BACK_TO_CUSTOMER)
+            if (isSaleExchange){
+                val intent = SaleCheckoutActivity.newIntentFromSaleForSaleExchange(
+                    this, customer!!, mSoldProductListAdapter.getDataList() as ArrayList, this.promotionList, saleReturnInvoiceNo!!, saleReturnAmount)
+                startActivityForResult(intent, Utils.RQ_BACK_TO_CUSTOMER)
+            } else{
+                val intent = SaleCheckoutActivity.newIntentFromSale(this, customer!!, mSoldProductListAdapter.getDataList() as ArrayList, this.promotionList)
+                startActivityForResult(intent, Utils.RQ_BACK_TO_CUSTOMER)
+            }
 
         }
 
@@ -469,12 +477,10 @@ class SaleActivity : BaseActivity(), KodeinAware {
     }
 
     private fun getIntentData() {
-
-        if (intent.getParcelableExtra<Customer>(IE_CUSTOMER_DATA) != null)
-            customer = intent.getParcelableExtra(IE_CUSTOMER_DATA)
-
         isSaleExchange = intent.getBooleanExtra(IE_SALE_EXCHANGE, false)
-
+        customer = intent.getParcelableExtra(IE_CUSTOMER_DATA)
+        saleReturnAmount = intent.getDoubleExtra(IE_RETURN_AMOUNT, 0.0)
+        saleReturnInvoiceNo = intent.getStringExtra(IE_SALE_RETURN_INVOICE_ID_KEY)
     }
 
     private fun updatePromotionProductList(){
