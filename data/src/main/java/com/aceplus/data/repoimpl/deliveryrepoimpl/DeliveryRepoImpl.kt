@@ -1,13 +1,12 @@
 package com.aceplus.data.repoimpl.deliveryrepoimpl
 
 import com.aceplus.data.database.MyDatabase
-import com.aceplus.domain.entity.delivery.Delivery
-import com.aceplus.domain.entity.delivery.DeliveryItem
-import com.aceplus.domain.entity.delivery.DeliveryItemUpload
-import com.aceplus.domain.entity.delivery.DeliveryPresent
+import com.aceplus.domain.entity.CompanyInformation
+import com.aceplus.domain.entity.delivery.*
 import com.aceplus.domain.entity.invoice.Invoice
 import com.aceplus.domain.entity.invoice.InvoiceProduct
 import com.aceplus.domain.entity.route.RouteScheduleV2
+import com.aceplus.domain.entity.sale.SaleMan
 import com.aceplus.domain.model.Product
 import com.aceplus.domain.model.customer.Customer
 import com.aceplus.domain.model.delivery.Deliver
@@ -18,6 +17,25 @@ import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
 
 class DeliveryRepoImpl(private val db: MyDatabase) : DeliveryRepo {
+    override fun getDeliveryName(invoiceId: String): Observable<Invoice> {
+        return Observable.just(db.invoiceDao().getSaleHistoryReportForPrint(invoiceId = invoiceId))
+    }
+
+    override fun getSaleManName(saleManId: Int): Observable<List<SaleMan>> {
+        return Observable.just(db.saleManDao().allData)
+    }
+
+    override fun saveDeliveryUpload(cvDeliveryUpload: DeliveryUpload) {
+        Observable.fromCallable { db.deliveryUploadDao().insert(cvDeliveryUpload) }
+            .subscribeOn(Schedulers.io())
+            .observeOn(Schedulers.io())
+            .subscribe()
+    }
+
+    override fun getTaxTypeList(): Observable<List<CompanyInformation>> {
+        return Observable.just(db.companyInformationDao().allData)
+    }
+
     override fun saveInvoiceData(invoice: Invoice) {
         Observable.fromCallable { db.invoiceDao().insert(invoice) }
             .subscribeOn(Schedulers.io())

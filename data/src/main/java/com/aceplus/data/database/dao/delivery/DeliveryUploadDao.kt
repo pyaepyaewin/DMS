@@ -23,6 +23,9 @@ interface DeliveryUploadDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(list: List<DeliveryUpload>)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insert(deliveryUpload: DeliveryUpload)
+
     @Query("Delete from delivery_upload")
     fun deleteAll()
 

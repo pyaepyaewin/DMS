@@ -1,13 +1,16 @@
 package com.aceplus.dms.viewmodel.customer.delivery
 
 import android.arch.lifecycle.MutableLiveData
+import com.aceplus.domain.entity.CompanyInformation
 import com.aceplus.domain.entity.customer.Customer
 import com.aceplus.domain.entity.delivery.Delivery
 import com.aceplus.domain.entity.delivery.DeliveryItem
 import com.aceplus.domain.entity.delivery.DeliveryItemUpload
+import com.aceplus.domain.entity.invoice.Invoice
 import com.aceplus.domain.entity.invoice.InvoiceProduct
 import com.aceplus.domain.entity.product.Product
 import com.aceplus.domain.entity.route.RouteScheduleV2
+import com.aceplus.domain.entity.sale.SaleMan
 import com.aceplus.domain.model.forApi.delivery.DeliveryItemApi
 import com.aceplus.domain.repo.deliveryrepo.DeliveryRepo
 import com.aceplus.domain.vo.SoldProductInfo
@@ -47,7 +50,17 @@ class DeliveryViewModel(
                 }
         }
     }
-
+    val taxTypeList = MutableLiveData<List<CompanyInformation>>()
+    fun loadTaxTypeList(){
+        launch {
+            deliveryRepo.getTaxTypeList()
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.mainThread())
+                .subscribe {
+                    taxTypeList.postValue(it)
+                }
+        }
+    }
     fun loadAllDeliveryItemList(deliveryId: Int, customerId: Int) {
         var deliveryItemDataList = mutableListOf<DeliveryItem>()
         var deliveryCustomerDataList: Customer
@@ -163,8 +176,7 @@ class DeliveryViewModel(
             deliveryItemApi.deliveryId = invoiceId
             deliveryItemApi.stockId = soldProduct.product.product_id!!.toInt()
             deliveryItemApi.deliveryQty = soldProduct.quantity
-            deliveryItemApi.foc =
-                (java.lang.Short.parseShort(if (soldProduct.isFocStatus) "1" else "0"))
+            deliveryItemApi.foc = (java.lang.Short.parseShort(if (soldProduct.isFocStatus) "1" else "0"))
             insertDeliveryItemUpload(deliveryItemApi)
 
             deliveryRepo.updateRelatedProduct(soldProduct.quantity, soldProduct.product.id)
@@ -189,5 +201,27 @@ class DeliveryViewModel(
         cvDeliveryUploadItem.quantity = deliveryItemApi.deliveryQty.toString()
         cvDeliveryUploadItem.foc = deliveryItemApi.foc.toString()
         deliveryRepo.saveDeliveryItemUpload(cvDeliveryUploadItem)
+    }
+    val userNameDataList = MutableLiveData<List<SaleMan>>()
+    val invoiceData = MutableLiveData<Invoice>()
+     fun loadOrderPerson(saleManId: Int){
+         launch {
+             deliveryRepo.getSaleManName(saleManId)
+                 .subscribeOn(schedulerProvider.io())
+                 .observeOn(schedulerProvider.mainThread())
+                 .subscribe {
+                     userNameDataList.postValue(it)
+                 }
+         }
+     }
+    fun loadDeliveryPerson(invoiceId: String){
+        launch {
+            deliveryRepo.getDeliveryName(invoiceId)
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.mainThread())
+                .subscribe {
+                    invoiceData.postValue(it)
+                }
+        }
     }
 }

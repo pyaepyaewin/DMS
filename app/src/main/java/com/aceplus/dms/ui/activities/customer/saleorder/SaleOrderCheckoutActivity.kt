@@ -5,9 +5,7 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.app.PendingIntent
-import android.content.ContentValues
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -34,9 +32,12 @@ import com.aceplus.dms.viewmodel.customer.delivery.DeliveryViewModel
 import com.aceplus.dms.viewmodel.customer.sale.SaleCheckoutViewModel
 import com.aceplus.domain.entity.SMSRecord
 import com.aceplus.domain.entity.customer.Customer
+import com.aceplus.domain.entity.delivery.DeliveryUpload
 import com.aceplus.domain.entity.invoice.Invoice
 import com.aceplus.domain.entity.promotion.Promotion
 import com.aceplus.domain.model.delivery.Deliver
+import com.aceplus.domain.model.forApi.delivery.DeliveryApi
+import com.aceplus.domain.model.forApi.delivery.DeliveryItemApi
 import com.aceplus.domain.repo.CustomerVisitRepo
 import com.aceplus.domain.repo.deliveryrepo.DeliveryRepo
 import com.aceplus.domain.vo.SoldProductInfo
@@ -56,6 +57,7 @@ import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.math.roundToInt
 import kotlinx.android.synthetic.main.activity_sale_checkout.activity_sale_checkout_radio_bank as activity_sale_checkout_radio_bank1
 import kotlinx.android.synthetic.main.activity_sale_checkout.activity_sale_checkout_radio_group as activity_sale_checkout_radio_group1
 import kotlinx.android.synthetic.main.activity_sale_checkout.bank_account_layout as bank_account_layout1
@@ -137,12 +139,14 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
             saleOrderActivity: SaleOrderActivity,
             isDelivery:Boolean,
             soldProductList: java.util.ArrayList<SoldProductInfo>,
-            orderedInvoice:Deliver
+            orderedInvoice:Deliver,
+            deliveryCustomer:Customer
         ): Intent? {
             val intent = Intent(saleOrderActivity, SaleOrderCheckoutActivity::class.java)
             intent.putExtra(IE_SOLD_PRODUCT_LIST,soldProductList)
             intent.putExtra(ORDERED_INVOICE_KEY,orderedInvoice)
             intent.putExtra(IE_IS_DELIVERY,isDelivery)
+            intent.putExtra(IE_CUSTOMER_DATA,deliveryCustomer)
             return intent
         }
 
@@ -195,18 +199,15 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
         initializeData()
         setupUI()
         catchEvents()
-
         orderCheckoutListAdapter.setNewList(soldProductList)
 
     }
 
     private fun setupUI(){
-//        edtVolumeDiscountPercent.setText(orderedInvoice!!.discountPercent.toString())
-//        edtVolumeDiscountAmt.setText(orderedInvoice!!.amount.toString())
-//        payAmount.setText(orderedInvoice!!.paidAmount.toString())
         if (isDelivery){
             deliveryHeaderLayout.tvTitle.text = "DELIVERY CHECKOUT"
             tvInvoiceId.text = orderedInvoice!!.invoiceNo
+            tvNetAmount.text = (orderedInvoice!!.amount - orderedInvoice!!.paidAmount).toString()
             tvTotalAmount.text = orderedInvoice!!.amount.toString()
             btn_disOk.visibility = View.GONE
             btn_amtOk.visibility = View.GONE
@@ -249,12 +250,10 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
     }
 
     private fun initializeData(){
-
         calculateTotalAmount()
         saleCheckoutViewModel.calculateFinalAmount(soldProductList, totalAmount) // Check - should do only for pre-order
         salePersonId = saleCheckoutViewModel.getSaleManID()
         locationCode = saleCheckoutViewModel.getRouteID() // Check point
-
     }
 
     private fun catchEvents(){
@@ -332,9 +331,9 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
 
             val paidAmount = if (tvPrepaidAmount.text.isNotBlank()) tvPrepaidAmount.text.toString().toDouble() else 0.0
 
-            if (validationInput(paymentMethod == "B", paidAmount)){
 
-                if (!isDelivery){
+            if (!isDelivery){
+                if (validationInput(paymentMethod == "B", paidAmount)){
 
                     if (paidAmount < netAmount){
                         // ToDo - check insufficient amount
@@ -344,22 +343,23 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
                         setInvoiceId()
                         savePreOrderInformation("CA")
                     }
-
-                } else{
-                    if (this@SaleOrderCheckoutActivity.receiptPerson.text.isEmpty()) {
-                        AlertDialog.Builder(this@SaleOrderCheckoutActivity)
-                            .setTitle("Delivery")
-                            .setMessage("You must provide 'Receipt Person'.")
-                            .setPositiveButton(
-                                "OK"
-                            ) { arg0, arg1 -> receiptPerson.requestFocus() }
-                            .show()
-
-                        return
-                    }
-                    insertDeliveryDataToDatabase(orderedInvoice!!)
                 }
+            }
+            else{
+                if (this@SaleOrderCheckoutActivity.receiptPerson.text.isEmpty()) {
+                    AlertDialog.Builder(this@SaleOrderCheckoutActivity)
+                        .setTitle("Delivery")
+                        .setMessage("You must provide 'Receipt Person'.")
+                        .setPositiveButton(
+                            "OK"
+                        ) { arg0, arg1 -> receiptPerson.requestFocus() }
+                        .show()
 
+                    return
+                }else {
+                    // insertDeliveryDataToDatabase()
+                    toPrintActivity("D")
+                }
             }
 
         }
@@ -469,13 +469,21 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
             tax_label_saleCheckout.text = "Tax (Include) : "
             netAmount = totalAmount
         }
-
-        // ToDo - for delivery
+        // for delivery
+        val volDiscount = java.lang.Double.parseDouble(String.format("%.3f", totalAmount * orderedInvoice!!.discountPercent / 100))
+        orderedInvoice!!.discount = volDiscount
+        netAmount = java.lang.Double.parseDouble(String.format("%.3f", netAmount - orderedInvoice!!.discount - orderedInvoice!!.paidAmount))
+        edtVolumeDiscountAmt.setText("${orderedInvoice!!.discount}")
+        edtVolumeDiscountPercent.setText("${orderedInvoice!!.discountPercent}")
+        tvPrepaidAmount.setText("${orderedInvoice!!.paidAmount}")
+        edtVolumeDiscountAmt.isEnabled = false
+        edtVolumeDiscountPercent.isEnabled = false
+        tvPrepaidAmount.isEnabled = false
+        tax_txtView.text = Utils.formatAmount((orderedInvoice!!.amount - orderedInvoice!!.discount)/21)
 
     }
 
     private fun calculateTax(): Double{
-
         var taxAmt = 0.0
         if (taxPercent != 0)
             taxAmt = netAmount / 21
@@ -487,13 +495,10 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
     }
 
     private fun validationInput(withBankInfo: Boolean, paidAmount: Double): Boolean{
-
         var deliDate = false
         var bank = false
         var acc = false
-
         if (paidAmount > netAmount){
-
             AlertDialog.Builder(this)
                 .setTitle("Delivery")
                 .setMessage("Your pay amount must be less than Net Amount.")
@@ -642,7 +647,7 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
                 val phoneNo = phoneNoEditText.text.toString()
                 if (phoneNo.isNotBlank()){
                     saleCheckoutViewModel.getMessageInfo(phoneNo, invoiceId, promotionList, checkout_remark_edit_text.text.toString())
-                    toPrintActivity()
+                    toPrintActivity("S")
                 }
 
                 alertDialog.dismiss()
@@ -650,7 +655,7 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
 
             alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener {
                 alertDialog.dismiss()
-                toPrintActivity()
+                toPrintActivity("S")
             }
 
         }
@@ -698,31 +703,24 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
 
     }
 
-    private fun toPrintActivity(){
-
-        val intent = PrintInvoiceActivity.newIntentFromSaleOrderCheckout(
-            this,
-            invoice!!,
-            soldProductList,
-            promotionList
-        )
-
-        startActivityForResult(intent, Utils.RQ_BACK_TO_CUSTOMER)
-
+    private fun toPrintActivity(mode:String){
+        if (mode == "S") {
+            val intent = PrintInvoiceActivity.newIntentFromSaleOrderCheckout(this, invoice!!, soldProductList, promotionList)
+            startActivityForResult(intent, Utils.RQ_BACK_TO_CUSTOMER)
+        }else{
+            val intent = PrintInvoiceActivity.newIntent(this,soldProductList,"D",orderedInvoice!!,customer!!)
+            startActivity(intent)
+        }
     }
 
-    private fun insertDeliveryDataToDatabase(deliver:Deliver){
+    private fun insertDeliveryDataToDatabase(){
         val saleDate = Utils.getCurrentDate(true)
-        var invoiceId = ""
+        var invoiceId1 = ""
         var salePersonId = ""
         val customerVisitRepo: CustomerVisitRepo? = null
 
         try {
-            invoiceId = Utils.getInvoiceNo(
-                AppUtils.getStringFromShp(Constant.SALEMAN_NO, this)!!,
-                locationCode.toString(),
-                Constant.FOR_DELIVERY,
-                customerVisitRepo!!.getLastCountForInvoiceNumber(Constant.FOR_DELIVERY)
+            invoiceId1 = Utils.getInvoiceNo(AppUtils.getStringFromShp(Constant.SALEMAN_NO, this)!!, locationCode.toString(), Constant.FOR_DELIVERY, customerVisitRepo!!.getLastCountForInvoiceNumber(Constant.FOR_DELIVERY)
             )
             salePersonId = AppUtils.getStringFromShp(Constant.SALEMAN_ID, this)!!
         } catch (e: NullPointerException) {
@@ -735,7 +733,7 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
             0
         val dueDate = Utils.getCurrentDate(true)
         val invoiceTime = Utils.getCurrentDate(true)
-        val totalQuantity = deliveryCheckoutViewModel.insertDeliveryDataItemToDatabase(soldProductList, invoiceId)
+        val totalQuantity = deliveryCheckoutViewModel.insertDeliveryDataItemToDatabase(soldProductList, invoiceId.toString())
         totalDiscountAmount = orderedInvoice!!.discount
         totalVolumeDiscountPercent = orderedInvoice!!.discountPercent
         var caOrCr = "CR"
@@ -744,31 +742,46 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
                 caOrCr = "CA"
             }
         }
-
         deliveryCheckoutViewModel.routeDataList.observe(this,android.arch.lifecycle.Observer {
             val sale_man_id = it!!.sale_man_id
-            val invoice = Invoice()
-            invoice.invoice_id = invoiceId
-//            invoice.customer_id = customer!!.id.toString()
-            invoice.sale_date = saleDate
-            invoice.total_amount = totalAmount.toString()
-            invoice.total_quantity = totalQuantity.toDouble()
-            invoice.total_discount_amount = totalDiscountAmount
-            invoice.pay_amount = paidAmount.toString()
-            invoice.receipt_person_name = receiptPerson.text.toString()
-            invoice.sale_person_id = salePersonId
-            invoice.location_code = sale_man_id
-            invoice.device_id = Utils.getDeviceId(this@SaleOrderCheckoutActivity)
-            invoice.invoice_time = invoiceTime
-            invoice.invoice_status = caOrCr
-            invoice.total_discount_percent = totalVolumeDiscountPercent.toString()
-            invoice.rate = "1"
-            invoice.tax_amount = taxAmt
-            invoice.due_date = dueDate
-            deliveryRepo!!.saveInvoiceData(invoice)
+           val invoice1 = Invoice()
+            invoice!!.invoice_id = invoiceId1
+            invoice!!.customer_id = customer!!.id.toString()
+            invoice!!.sale_date = saleDate
+            invoice!!.total_amount = totalAmount.toString()
+            invoice!!.total_quantity = totalQuantity.toDouble()
+            invoice!!.total_discount_amount = totalDiscountAmount
+            invoice!!.pay_amount = paidAmount.toString()
+            invoice!!.receipt_person_name = receiptPerson.text.toString()
+            invoice!!.sale_person_id = salePersonId
+            invoice!!.location_code = sale_man_id
+            invoice!!.device_id = Utils.getDeviceId(this@SaleOrderCheckoutActivity)
+            invoice!!.invoice_time = invoiceTime
+            invoice!!.invoice_status = caOrCr
+            invoice!!.total_discount_percent = totalVolumeDiscountPercent.toString()
+            invoice!!.rate = "1"
+            invoice!!.tax_amount = taxAmt
+            invoice!!.due_date = dueDate
+            deliveryRepo!!.saveInvoiceData(invoice1)
         })
-
         deliveryCheckoutViewModel.loadRouteId(saleManId)
+//        val deliveryApi = DeliveryApi()
+//        deliveryApi.invoiceNo = invoiceId.toString()
+//        deliveryApi.invoiceDate = saleDate
+//        deliveryApi.saleId = invoiceId.toString()
+//        deliveryApi.remark = ""
+//        insertDeliveryUpload(deliveryApi)
+    }
+
+    private fun insertDeliveryUpload(deliveryApi:DeliveryApi){
+        val cvDeliveryUpload = DeliveryUpload()
+        cvDeliveryUpload.invoice_no =  deliveryApi.invoiceNo.toDouble().roundToInt()
+        cvDeliveryUpload.invoice_date = deliveryApi.invoiceDate
+        cvDeliveryUpload.customer_id = customer!!.id
+        cvDeliveryUpload.sale_id =  deliveryApi.saleId.toInt()
+        cvDeliveryUpload.remark =  deliveryApi.remark
+        deliveryRepo!!.saveDeliveryUpload(cvDeliveryUpload)
+
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -781,8 +794,8 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
     }
 
     override fun onBackPressed() {
-//        val intent = Intent(this@SaleOrderCheckoutActivity, DeliveryActivity::class.java)
-//        startActivity(intent)
+        val intent = Intent(this@SaleOrderCheckoutActivity, DeliveryActivity::class.java)
+        startActivity(intent)
         finish()
     }
 

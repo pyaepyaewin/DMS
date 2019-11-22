@@ -56,7 +56,6 @@ class SaleOrderActivity : BaseActivity(), KodeinAware {
 
         private const val IE_CUSTOMER_DATA = "IE_CUSTOMER_DATA"
         private const val IE_IS_DELIVERY = "is-delivery"
-        private const val IE_CUSTOMER_INFO_KEY = "customer-info-key"
         private const val IE_SOLD_PRODUCT_LIST_KEY = "sold-product-list-key"
         private const val IE_ORDERED_INVOICE_KEY = "ordered_invoice_key"
         private const val IE_FROM = "IE_FROM"
@@ -83,7 +82,7 @@ class SaleOrderActivity : BaseActivity(), KodeinAware {
             val intent = Intent(context, SaleOrderActivity::class.java)
             intent.putExtra(IE_FROM,"fragmentDeliveryReport")
             intent.putExtra(IE_IS_DELIVERY, b)
-            intent.putExtra(IE_CUSTOMER_INFO_KEY, customer)
+            intent.putExtra(IE_CUSTOMER_DATA, customer)
             intent.putExtra(IE_SOLD_PRODUCT_LIST_KEY, soldProductList)
             intent.putExtra(IE_ORDERED_INVOICE_KEY, deliver)
             return intent
@@ -99,7 +98,6 @@ class SaleOrderActivity : BaseActivity(), KodeinAware {
     private var promotionList: ArrayList<Promotion> = ArrayList()
     private var isDelivery: Boolean = false
     private var customer: Customer? = null
-    private var deliveryCustomer: Customer? = null
     private var soldProductList = ArrayList<SoldProductInfo>()
     private var orderedInvoice: Deliver? = null
     private var from: String? = null
@@ -112,7 +110,6 @@ class SaleOrderActivity : BaseActivity(), KodeinAware {
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
 
         getIntentData()
-        Log.d("Product List","${soldProductList.size}")
         setupUI()
         catchEvents()
         saleViewModel.loadProductList()
@@ -121,14 +118,8 @@ class SaleOrderActivity : BaseActivity(), KodeinAware {
 
     private fun getIntentData(){
         from = intent.getStringExtra(IE_FROM)
-        if (from != "fragmentDeliveryReport") {
-            if (intent.getParcelableExtra<Customer>(IE_CUSTOMER_DATA) != null) customer =
-                intent.getParcelableExtra(IE_CUSTOMER_DATA)
-        }else{
-            if (intent.getSerializableExtra(IE_CUSTOMER_INFO_KEY) != null) {
-                deliveryCustomer = intent.getSerializableExtra(IE_CUSTOMER_INFO_KEY) as Customer
-            }
-        }
+        if (intent.getParcelableExtra<Customer>(IE_CUSTOMER_DATA) != null) customer = intent.getParcelableExtra(IE_CUSTOMER_DATA)
+
         isDelivery = intent.getBooleanExtra(IE_IS_DELIVERY, false)
 
         if (intent.getSerializableExtra(IE_SOLD_PRODUCT_LIST_KEY) != null) {
@@ -174,7 +165,7 @@ class SaleOrderActivity : BaseActivity(), KodeinAware {
         cancelImg.setOnClickListener { onBackPressed() }
         checkoutImg.setOnClickListener {
             if (from == "fragmentDeliveryReport"){
-                val intent = SaleOrderCheckoutActivity.getIntentForDeliveryFromSaleOrder(this,isDelivery, soldProductList,orderedInvoice!!)
+                val intent = SaleOrderCheckoutActivity.getIntentForDeliveryFromSaleOrder(this,isDelivery, soldProductList,orderedInvoice!!,customer!!)
                 startActivity(intent)
             }else{
                 checkoutOrder()
