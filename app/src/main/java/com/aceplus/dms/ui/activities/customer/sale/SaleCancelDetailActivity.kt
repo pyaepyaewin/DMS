@@ -253,35 +253,6 @@ class SaleCancelDetailActivity : AppCompatActivity(), KodeinAware {
         builder.setSingleChoiceItems(
             values, -1
         ) { dialog, item ->
-            //            soldInvoiceDataList.map {
-//                val invoiceCancel = InvoiceCancel()
-//                invoiceCancel.id = it.invoice_id.toInt()
-//                invoiceCancel.customer_id = it.customer_id!!.toInt()
-//                invoiceCancel.invoice_id = it.invoice_product_id
-//                invoiceCancel.bank_account_no = it.bank_account_no
-//                invoiceCancel.bank_name = it.bank_name
-//                invoiceCancel.cash_or_credit = it.cash_or_credit
-//                invoiceCancel.device_id = it.device_id
-//                invoiceCancel.invoice_status = it.invoice_status
-//                invoiceCancel.device_id = it.device_id
-//                invoiceCancel.invoice_time = it.invoice_time
-//                invoiceCancel.due_date = it.due_date
-//                invoiceCancel.location_code = it.location_code
-//                invoiceCancel.package_grade = it.package_grade
-//                invoiceCancel.package_invoice_number = it.package_invoice_number.toString()
-//                invoiceCancel.pay_amount = it.pay_amount!!.toDouble()
-//                invoiceCancel.rate = it.rate
-//                invoiceCancel.receipt_person_name = it.receipt_person_name
-//                invoiceCancel.refund_amount = it.refund_amount!!.toDouble()
-//                invoiceCancel.sale_date = it.sale_date
-//                invoiceCancel.sale_flag = it.sale_flag.toString()
-//                invoiceCancel.tax_amount = it.tax_amount
-//                invoiceCancel.total_amount = it.total_amount!!.toDouble()
-//                invoiceCancel.total_discount_amount = it.total_discount_amount
-//                invoiceCancel.total_discount_percent = it.total_discount_percent
-//                invoiceCancel.volume_amount = it.volume_amount.toInt()
-//                invoiceCancelList.add(invoiceCancel)
-//            }
 
             if (item == 0) {
 
@@ -302,9 +273,6 @@ class SaleCancelDetailActivity : AppCompatActivity(), KodeinAware {
     private fun insertSaleCancelToDb() {
         val invoiceID = intent.getStringExtra("INVOICE_ID")
         saleCancelDetailViewModel.loadInvoiceCancel(invoiceID)
-
-
-
 
     }
 

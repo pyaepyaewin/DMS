@@ -141,22 +141,6 @@ class SaleCancelDetailViewModel(
 
     }
 
-    fun deleteInvoice(invoiceID: String) {
-        saleCancelRepo.deleteInvoiceData(invoiceID)
-    }
-
-    fun deleteInvoiceProduct(invoiceId: String) {
-        saleCancelRepo.deleteInvoiceProduct(invoiceId)
-    }
-
-    fun updateQty(invoiceId: String, productId: String, qty: Int) {
-        saleCancelRepo.updateQuantity(invoiceId, productId, qty)
-    }
-
-
-
-
-
     fun calculateSoldProductData(soldProductList: ArrayList<SoldProductInfo>) {
 
         val calculatedSoldProductList = ArrayList<SoldProductInfo>()
