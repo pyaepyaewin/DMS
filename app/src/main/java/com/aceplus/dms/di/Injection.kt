@@ -133,7 +133,7 @@ val repoModule = Kodein.Module {
         CreditCollectionRepoImpl(instance())
     }
     bind<SaleCancelRepo>() with singleton {
-        SaleCancelRepoImpl(instance())
+        SaleCancelRepoImpl(instance(),instance())
     }
    
 }

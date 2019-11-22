@@ -24,6 +24,9 @@ interface InvoiceCancelDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(list: List<InvoiceCancel>)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insert(invoiceCancel: InvoiceCancel)
+
     @Query("Delete from invoice_cancel")
     fun deleteAll()
 

@@ -7,7 +7,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
-import android.os.Parcelable
 import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
 import android.view.View
@@ -22,11 +21,9 @@ import com.aceplus.dms.utils.PrintUtils
 import com.aceplus.dms.utils.Utils
 import com.aceplus.dms.viewmodel.PrintInvoiceViewModel
 import com.aceplus.dms.viewmodel.customer.delivery.DeliveryViewModel
-import com.aceplus.domain.entity.credit.Credit
 import com.aceplus.domain.entity.customer.Customer
 import com.aceplus.domain.entity.delivery.Delivery
 import com.aceplus.domain.entity.invoice.Invoice
-import com.aceplus.domain.entity.product.Product
 import com.aceplus.domain.entity.promotion.Promotion
 import com.aceplus.domain.model.credit.CreditInvoice
 import com.aceplus.domain.model.delivery.Deliver
@@ -157,12 +154,26 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
         }
 
         fun newIntent(saleOrderCheckoutActivity: SaleOrderCheckoutActivity,soldProductList: ArrayList<SoldProductInfo>,mode:String,orderInvoice:Deliver,customer: Customer): Intent? {
-            val intent = Intent(saleOrderCheckoutActivity,PrintInvoiceActivity::class.java)
-            intent.putExtra(IE_SOLD_PRODUCT_LIST,soldProductList)
-            intent.putExtra(IE_PRINT_MODE,mode)
-            intent.putExtra(ORDERED_INVOICE_KEY,orderInvoice)
-            intent.putExtra(IE_CUSTOMER_DATA,customer)
+            val intent = Intent(saleOrderCheckoutActivity, PrintInvoiceActivity::class.java)
+            intent.putExtra(IE_SOLD_PRODUCT_LIST, soldProductList)
+            intent.putExtra(IE_PRINT_MODE, mode)
+            intent.putExtra(ORDERED_INVOICE_KEY, orderInvoice)
+            intent.putExtra(IE_CUSTOMER_DATA, customer)
             //intent.putExtra(IE_INVOICE,invoice)
+            return intent
+        }
+
+        fun newIntentFromSaleCancelCheckout(
+            context: Context,
+            invoice: Invoice,
+            soldProductList: ArrayList<SoldProductInfo>
+
+        ): Intent {
+            val intent = Intent(context, PrintInvoiceActivity::class.java)
+            intent.putExtra(IE_SOLD_PRODUCT_LIST, soldProductList)
+            intent.putExtra(IE_PRINT_MODE, "S")
+            intent.putExtra(IE_INVOICE, invoice)
+
             return intent
         }
 
@@ -173,6 +184,7 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
     private val printDeliveryViewModel: DeliveryViewModel by viewModel()
     private val soldProductPrintListAdapter: SoldProductPrintListAdapter by lazy { SoldProductPrintListAdapter(printMode)}
     private val historySoldProductPrintListAdapter: HistorySoldProductPrintListAdapter by lazy { HistorySoldProductPrintListAdapter() }
+
 
     private var invoice: Invoice? = null
     private var customer: Customer? = null
