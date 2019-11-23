@@ -44,11 +44,15 @@ import com.aceplus.domain.entity.invoice.InvoiceCancelProduct
 import com.aceplus.domain.entity.promotion.Promotion
 import com.aceplus.domain.model.forApi.invoice.InvoiceDetail
 import com.aceplus.domain.model.sale.salecancel.SaleCancelItem
+import com.aceplussolutions.rms.ui.activities.BaseActivity
 import io.fabric.sdk.android.services.common.CommonUtils.isNullOrEmpty
 
 
-class SaleCancelDetailActivity : AppCompatActivity(), KodeinAware {
+class SaleCancelDetailActivity : BaseActivity(), KodeinAware {
     override val kodein: Kodein by kodein()
+     override val layoutId: Int
+        get() = com.aceplus.dms.R.layout.activity_sale
+
     var soldProductList1 = mutableListOf<String>()
     val invoiceCancelProductList: ArrayList<InvoiceCancelProduct> = ArrayList()
     var invoiceCancelList = ArrayList<InvoiceCancel>()
@@ -82,10 +86,7 @@ class SaleCancelDetailActivity : AppCompatActivity(), KodeinAware {
         }
     }
 
-    private val saleCancelDetailViewModel: SaleCancelDetailViewModel by lazy {
-        ViewModelProviders.of(this, KodeinViewModelFactory((kodein)))
-            .get(SaleCancelDetailViewModel::class.java)
-    }
+    private val saleCancelDetailViewModel: SaleCancelDetailViewModel by viewModel()
 
     private val saleCancelDetailAdapter: SaleCancelDetailAdapter by lazy {
         SaleCancelDetailAdapter(this::onClickQtyButton, this::onLongClickSoldProductListItem)
@@ -93,7 +94,6 @@ class SaleCancelDetailActivity : AppCompatActivity(), KodeinAware {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(com.aceplus.dms.R.layout.activity_sale)
         tvTitle.text = "SALES CANCEL"
         tableHeaderOrderedQty.visibility = View.GONE
         headerFoc.visibility = View.GONE

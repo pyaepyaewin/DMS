@@ -1,4 +1,4 @@
-package com.aceplus.dms.ui.activities
+package com.aceplus.dms.ui.activities.creditcollection
 
 import android.app.AlertDialog
 import android.arch.lifecycle.ViewModelProviders
@@ -12,6 +12,7 @@ import android.text.TextWatcher
 import android.view.View
 import com.aceplus.data.utils.Constant
 import com.aceplus.dms.R
+import com.aceplus.dms.ui.activities.PrintInvoiceActivity
 import com.aceplus.dms.ui.adapters.creditcollectionadapters.CreditCollectionCheckOutAdapter
 import com.aceplus.dms.utils.Utils
 import com.aceplus.dms.viewmodel.creditcollection.CreditCollectionCheckOutViewModel
@@ -19,24 +20,24 @@ import com.aceplus.dms.viewmodel.factory.KodeinViewModelFactory
 import com.aceplus.domain.entity.credit.Credit
 import com.aceplus.domain.model.credit.CreditInvoice
 import com.aceplussolutions.rms.constants.AppUtils
+import com.aceplussolutions.rms.ui.activities.BaseActivity
 import kotlinx.android.synthetic.main.activity_credit_collection.*
-import kotlinx.android.synthetic.main.list_row_route.*
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.kodein
 
-class CreditCollectionCheckoutActivity : AppCompatActivity(), KodeinAware {
-
+class CreditCollectionCheckoutActivity : BaseActivity(), KodeinAware {
+    override val kodein: Kodein by kodein()
+    override val layoutId: Int
+        get() = R.layout.activity_credit_collection
     private var listViewPosition = 0
     var calculateList = mutableListOf<Credit>()
-    override val kodein: Kodein by kodein()
+
     private val creditCollectionCheckOutAdapter: CreditCollectionCheckOutAdapter by lazy {
         CreditCollectionCheckOutAdapter(this::onClickNoticeListItem)
     }
-    private val creditCollectionCheckOutViewModel: CreditCollectionCheckOutViewModel by lazy {
-        ViewModelProviders.of(this, KodeinViewModelFactory((kodein)))
-            .get(CreditCollectionCheckOutViewModel::class.java)
-    }
+    private val creditCollectionCheckOutViewModel: CreditCollectionCheckOutViewModel by viewModel()
+
 
     companion object {
         fun getIntent(
@@ -146,7 +147,6 @@ class CreditCollectionCheckoutActivity : AppCompatActivity(), KodeinAware {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_credit_collection)
         val saleManId = AppUtils.getStringFromShp(Constant.SALEMAN_ID, this)
         val salePersonName = AppUtils.getStringFromShp(Constant.SALEMAN_NAME,this)
         side_total_amt_layout!!.visibility = View.GONE
@@ -209,7 +209,8 @@ class CreditCollectionCheckoutActivity : AppCompatActivity(), KodeinAware {
                                 listViewPosition,
                                 townShipName,
                                 salePersonName.toString(),
-                                customerName)
+                                customerName
+                            )
                         )
                     }
                 }

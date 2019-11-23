@@ -87,7 +87,7 @@
                 android:name=".ui.activities.customer.AddNewCustomerActivity"
                 android:screenOrientation="landscape" />
         <activity
-                android:name=".ui.activities.customer.CreditCollectionActivity"
+                android:name=".ui.activities.creditcollection.CreditCollectionActivity"
                 android:screenOrientation="landscape" />
         <activity
                 android:name=".ui.activities.customer.DeliveryActivity"
@@ -117,7 +117,7 @@
                 android:name=".ui.activities.customer.sale.SaleCheckoutActivity"
                 android:screenOrientation="landscape" />
         <activity
-                android:name=".ui.activities.CreditCollectionCheckoutActivity"
+                android:name=".ui.activities.creditcollection.CreditCollectionCheckoutActivity"
                 android:screenOrientation="landscape" />
         <activity
                 android:name=".ui.activities.PrintInvoiceActivity"

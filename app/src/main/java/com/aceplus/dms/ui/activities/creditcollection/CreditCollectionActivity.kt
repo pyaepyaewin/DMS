@@ -1,29 +1,22 @@
-package com.aceplus.dms.ui.activities.customer
+package com.aceplus.dms.ui.activities.creditcollection
 
-import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
-import android.util.Log
 import android.util.Log.i
 import android.widget.Toast
 import com.aceplus.dms.R
-import com.aceplus.dms.ui.activities.CreditCollectionCheckoutActivity
-import com.aceplus.dms.ui.activities.CustomerVisitActivity
 import com.aceplus.dms.ui.adapters.creditcollectionadapters.CreditCollectionAdapter
-import com.aceplus.dms.viewmodel.PrintInvoiceViewModel
 import com.aceplus.dms.viewmodel.creditcollection.CreditCollectionViewModel
 import com.aceplus.dms.viewmodel.factory.KodeinViewModelFactory
 import com.aceplus.domain.model.creditcollectiondataclass.CreditCollectionDataClass
 import com.aceplussolutions.rms.ui.activities.BaseActivity
 import kotlinx.android.synthetic.main.activity_credit_collect.*
-import kotlinx.android.synthetic.main.dialogbox_competitor_activity.*
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.kodein
-import org.kodein.di.android.support.kodein
 
 class CreditCollectionActivity : BaseActivity(), KodeinAware {
     override val kodein: Kodein by kodein()
@@ -42,10 +35,8 @@ class CreditCollectionActivity : BaseActivity(), KodeinAware {
         startActivity(CreditCollectionCheckoutActivity.getIntent(this,data.id,data.customer_name))
     }
 
-    private val creditCollectionViewModel: CreditCollectionViewModel by lazy {
-        ViewModelProviders.of(this, KodeinViewModelFactory((kodein)))
-            .get(CreditCollectionViewModel::class.java)
-    }
+    private val creditCollectionViewModel: CreditCollectionViewModel by viewModel()
+
 
 
     companion object {

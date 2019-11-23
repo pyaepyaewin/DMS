@@ -32,10 +32,8 @@ class SaleCancelActivity : BaseActivity(), KodeinAware {
         }
     }
 
-    private val saleCancelViewModel: SaleCancelViewModel by lazy {
-        ViewModelProviders.of(this, KodeinViewModelFactory((kodein)))
-            .get(SaleCancelViewModel::class.java)
-    }
+    private val saleCancelViewModel: SaleCancelViewModel by viewModel()
+
 
     private val saleCancelAdapter: SalesCancelAdapter by lazy {
         SalesCancelAdapter(this::onClickNoticeListItem)

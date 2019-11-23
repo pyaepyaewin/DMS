@@ -186,6 +186,10 @@ class SaleCancelCheckoutActivity : BaseActivity(), KodeinAware {
                 this::onClickSaveButton
             )
         }
+        back_img.setOnClickListener {
+            onBackPressed()
+            true
+        }
         activity_sale_checkout_radio_bank.setOnCheckedChangeListener { button, isChecked ->
             bank_branch_layout.visibility = if (isChecked) View.VISIBLE else View.GONE
             bank_account_layout.visibility = if (isChecked) View.VISIBLE else View.GONE
