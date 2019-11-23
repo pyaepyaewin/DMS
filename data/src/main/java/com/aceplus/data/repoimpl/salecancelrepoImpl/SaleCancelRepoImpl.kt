@@ -104,16 +104,14 @@ class SaleCancelRepoImpl(val database: MyDatabase,val shf:SharedPreferences) : S
 
 
     override fun updateQuantity(invoiceId: String, productId: String, qty: Int) {
-        return database.invoiceProductDao().updateQtyForInvoiceProduct(invoiceId,productId,qty)
+         database.invoiceProductDao().updateQtyForInvoiceProduct(invoiceId,productId,qty)
 
     }
 
 
 
-
-
     override fun deleteInvoiceData(invoiceId: String) {
-        return database.invoiceDao().deleteAll(invoiceId)
+         database.invoiceDao().deleteAll(invoiceId)
 
     }
 
