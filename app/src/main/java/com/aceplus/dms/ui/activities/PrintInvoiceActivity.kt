@@ -185,7 +185,6 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
     private val soldProductPrintListAdapter: SoldProductPrintListAdapter by lazy { SoldProductPrintListAdapter(printMode)}
     private val historySoldProductPrintListAdapter: HistorySoldProductPrintListAdapter by lazy { HistorySoldProductPrintListAdapter() }
 
-
     private var invoice: Invoice? = null
     private var customer: Customer? = null
     private var soldProductList: ArrayList<SoldProductInfo> = ArrayList()
@@ -411,10 +410,6 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
             credit_net_amount.text = Utils.formatAmount(creditList[0].amt)
             credit_receive_amt.text = Utils.formatAmount(creditList[0].payAmt)
             credit_discount.text = "0.0 (0%)"
-
-        } else if (printMode == "C") {
-
-            // ToDo
 
         } else if (printMode == "D") {
 

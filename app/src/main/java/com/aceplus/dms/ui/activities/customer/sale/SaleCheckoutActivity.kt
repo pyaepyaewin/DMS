@@ -12,6 +12,7 @@ import android.text.TextWatcher
 import android.util.Log
 import android.view.View
 import android.view.WindowManager
+import android.widget.Toast
 import com.aceplus.data.utils.Constant
 import com.aceplus.dms.R
 import com.aceplus.dms.ui.activities.PrintInvoiceActivity
@@ -98,6 +99,7 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
     private var volDisAmount:Double = 0.0
     private var saleReturnAmount: Double = 0.0
     private var saleReturnInvoiceNo: String? = null
+    private var saleExchangeAmount: Double = 0.0
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -137,6 +139,7 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
         rvSoldProductList.layoutManager = LinearLayoutManager(this)
 
         saleExchangeLayout.visibility = if (isSaleExchange) View.VISIBLE else View.GONE
+        payAmount.isEnabled = !isSaleExchange
 
     }
 
@@ -156,6 +159,7 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) { "Nothing to do" }
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
                 calculateRefundAmount()
+                Log.d("Testing", "Text change event")
             }
         })
 
@@ -234,16 +238,8 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
         tax_txtView.text = df.format(taxAmt)
 
         if (isSaleExchange){
-
-            val totalItemDiscountAmount = 0.0 // To Check
-            val saleExchangeAmount = totalAmount - totalItemDiscountAmount - totalVolumeDiscount
-
             tvSaleReturnAmount.text = Utils.formatAmount(saleReturnAmount)
-//            tvPayAmountFromCustomer
-//            tvRefundToCustomer
-
-            // ToDo
-
+            calculateSaleExchangeData()
         }
 
     }
@@ -279,7 +275,11 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
             tvNetAmount.text = netAmount.toString()
             this.netAmount = netAmount
             this.volDisAmount = discountAmount
-            calculateRefundAmount()
+
+            if (isSaleExchange)
+                calculateSaleExchangeData()
+            else
+                calculateRefundAmount()
         }
 
     }
@@ -298,7 +298,11 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
             tvNetAmount.text = netAmount.toString()
             this.netAmount = netAmount
             this.volDisAmount = discountAmount
-            calculateRefundAmount()
+
+            if (isSaleExchange)
+                calculateSaleExchangeData()
+            else
+                calculateRefundAmount()
         }
 
     }
@@ -311,18 +315,19 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
 
             if (refundAmount >= 0){
                 refundAmount = df.format(refundAmount).toDouble()
-                refund.text = Utils.formatAmount(refundAmount)
+                this.refundAmount = refundAmount
             }
-            else refund.text = "0"
+            else this.refundAmount = 0.0
 
-            this.refundAmount = refundAmount
+            refund.text = Utils.formatAmount(this.refundAmount)
+
         }
 
     }
 
     private fun setInvoiceId(){
 
-        try {
+        /*try {
             if (!isSaleExchange){
                 val invoiceCount = AppUtils.getIntFromShp(Constant.INVOICE_COUNT, this) ?: 0
 
@@ -340,7 +345,18 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
         } catch (e: NullPointerException){
             e.printStackTrace()
             finish() // need to change back to login
-        }
+        }*/
+
+        val invoiceCount = AppUtils.getIntFromShp(Constant.INVOICE_COUNT, this) ?: 0
+
+        if (invoiceCount >= 0) AppUtils.saveIntToShp(Constant.INVOICE_COUNT, invoiceCount + 1, this)
+
+        invoiceId = if (isSaleExchange)
+            saleCheckoutViewModel.getInvoiceNumber( salePersonId!!, locationCode, Constant.FOR_SALE_EXCHANGE)
+        else
+            saleCheckoutViewModel.getInvoiceNumber( salePersonId!!, locationCode, Constant.FOR_SALE)
+
+        tvInvoiceId.text = invoiceId
 
     }
 
@@ -370,6 +386,30 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
 
     }
 
+    private fun calculateSaleExchangeData(){
+
+        // To check -> saleExchangeAmount or netAmount
+        val totalItemDiscountAmount = 0.0 // To Check - for what?
+        saleExchangeAmount = totalAmount - totalItemDiscountAmount - totalVolumeDiscount // should be (netAmt-ReturnAmt)
+
+        if (netAmount > saleReturnAmount){
+
+            val payAmountFromCustomer = netAmount - saleReturnAmount
+            tvPayAmountFromCustomer.text = Utils.formatAmount(payAmountFromCustomer)
+            tvRefundToCustomer.text = "0"
+
+        } else{
+
+            val refundAmountToCustomer = saleReturnAmount - netAmount
+            tvRefundToCustomer.text = Utils.formatAmount(refundAmountToCustomer)
+            tvPayAmountFromCustomer.text = "0"
+
+        }
+
+        payAmount.setText("${netAmount - saleReturnAmount}")
+
+    }
+
     private fun onClickSaveButton(type: String){
 
         if (type == "save"){
@@ -382,7 +422,9 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
 
             if (validationInput(paymentMethod == "B")){
 
-                if (refundAmount < 0 || payAmount.text.isBlank()){
+                val payAmt = if (payAmount.text.isNotBlank()) payAmount.text.toString().toDouble() else 0.0
+
+                if (payAmt < netAmount){
                     setInvoiceId()
                     saveData("CR")
                 } else{
@@ -469,7 +511,8 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
             edit_txt_branch_name.text.toString(),
             edit_txt_account_name.text.toString(),
             volDisAmount,
-            volDisPercent
+            volDisPercent,
+            saleReturnInvoiceNo
         )
 
     }
@@ -496,7 +539,9 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
     }
 
     private fun toSaleExchange(){
-        // ToDo - go to sale exchange
+
+        // ToDo
+
     }
 
 }

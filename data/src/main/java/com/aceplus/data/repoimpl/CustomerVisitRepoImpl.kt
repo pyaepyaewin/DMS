@@ -487,4 +487,8 @@ class CustomerVisitRepoImpl(
         db.saleReturnDetailDao().insertAll(list)
     }
 
+    override fun updateSaleIdInSaleReturn(saleReturnInvoiceNo: String, saleID: String) {
+        db.saleReturnDao().updateSaleIdInSaleReturn(saleReturnInvoiceNo, saleID)
+    }
+
 }

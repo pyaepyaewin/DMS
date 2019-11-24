@@ -111,6 +111,7 @@ interface CustomerVisitRepo {
     fun insertSaleReturn(saleReturn: SaleReturn)
     fun getAllSaleReturn(): Observable<List<SaleReturn>>
     fun getSaleReturnCountByID(id: String): Observable<Int>
+    fun updateSaleIdInSaleReturn(saleReturnInvoiceNo: String, saleID: String)
 
     fun insertAllSaleReturnDetail(list: List<SaleReturnDetail>)
 

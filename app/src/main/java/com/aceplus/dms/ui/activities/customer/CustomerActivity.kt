@@ -304,11 +304,6 @@ class CustomerActivity : BaseActivity(), KodeinAware {
 
     }
 
-    override fun onBackPressed() {
-        val intent = Intent(this, CustomerVisitActivity::class.java)
-        startActivity(intent)
-        finish()
-    }
     private fun onClickAddress(){
 
         /*if (didCustomerSelected()) {
@@ -347,5 +342,11 @@ class CustomerActivity : BaseActivity(), KodeinAware {
             }
 
     }
+
+    /*override fun onBackPressed() {
+        val intent = Intent(this, CustomerVisitActivity::class.java)
+        startActivity(intent)
+        finish()
+    }*/
 
 }
