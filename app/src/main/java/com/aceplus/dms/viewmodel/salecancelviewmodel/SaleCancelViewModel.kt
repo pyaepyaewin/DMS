@@ -110,9 +110,13 @@ class SaleCancelViewModel(
             if (soldProduct.promotionPlanId.toString().isNullOrEmpty())
                 invoiceCancelProduct.promotion_plan_id = soldProduct.promotionPlanId.toInt()
             invoiceProductList.add(invoiceCancelProduct)
-            saleCancelRepo.updateProductRemainingQty(soldProduct.quantity, soldProduct.product.id)
+            saleCancelRepo.updateProductRemainingQty(soldProduct.quantity,soldProduct.product.id)
 
         }
+//        saleCancelRepo.updateProductRemainingQty(
+//            soldProductList[0].quantity,
+//            soldProductList[0].product.id
+//        )
         var invoiceCancel = InvoiceCancel()
         invoiceCancel.id = invoice.invoice_id
         invoiceCancel.invoice_id = invoice.invoice_product_id.toString()
@@ -146,12 +150,10 @@ class SaleCancelViewModel(
 
         saleCancelRepo.insertInvoiceCancel(invoiceCancel, invoiceProductList)
 
-
-
-
         saleCancelRepo.deleteInvoiceProduct(invoiceID)
         saleCancelRepo.deleteInvoiceData(invoiceID)
         saleCancelRepo.deleteInvoicePresent(invoiceID)
+
 
 
     }

@@ -40,14 +40,6 @@ class SaleCancelCheckOutViewModel(
 
     }
 
-    fun updateQty(invoiceID: String, productId: String, qty: Int) {
-        saleCancelRepo.updateQuantity(invoiceID, productId, qty)
-    }
-
-    fun updateTotalQty(invoiceID: String, totalQty: Int) {
-        saleCancelRepo.updateTotalQtyForInvoice(invoiceID, totalQty)
-    }
-
     fun updateProductRemainingQty(soldProductInfo: SoldProductInfo) {
         saleCancelRepo.updateProductRemainingQty(soldProductInfo)
     }
@@ -75,6 +67,7 @@ class SaleCancelCheckOutViewModel(
     fun deleteInvoiceProductData(invoiceID: String) {
         saleCancelRepo.deleteInvoiceProduct(invoiceID)
     }
+
     fun deleteInvoicePresenttData(invoiceID: String) {
         saleCancelRepo.deleteInvoicePresent(invoiceID)
     }
@@ -153,7 +146,7 @@ class SaleCancelCheckOutViewModel(
             if (soldProduct.totalAmt != 0.0) {
                 invoiceProductList.add(invoiceProduct)
             }
-
+            saleCancelRepo.updateProductRemainingQty(soldProduct.quantity, soldProduct.product.id)
 
         }
         saleCancelRepo.insertInvoiceProduct(invoiceProductList)

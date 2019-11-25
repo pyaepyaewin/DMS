@@ -1,5 +1,6 @@
 package com.aceplus.dms.ui.activities.customer.sale
 
+import android.app.Activity
 import android.arch.lifecycle.Observer
 import android.content.Context
 import android.content.Intent
@@ -30,7 +31,7 @@ import com.aceplussolutions.rms.ui.activities.BaseActivity
 
 class SaleCancelDetailActivity : BaseActivity(), KodeinAware {
     override val kodein: Kodein by kodein()
-     override val layoutId: Int
+    override val layoutId: Int
         get() = com.aceplus.dms.R.layout.activity_sale
 
     var soldProductList1 = mutableListOf<String>()
@@ -38,7 +39,7 @@ class SaleCancelDetailActivity : BaseActivity(), KodeinAware {
     var invoiceCancelList = ArrayList<InvoiceCancel>()
     private var invoiceList: ArrayList<InvoiceCancel> = ArrayList()
     var invoice = Invoice()
-    var indexList = arrayListOf<Int>()
+    var productIdList = arrayListOf<Int>()
     var soldInvoiceDataList = mutableListOf<Invoice>()
 
     //    val customerId = intent.getStringExtra("CUSTOMER_ID")
@@ -93,7 +94,7 @@ class SaleCancelDetailActivity : BaseActivity(), KodeinAware {
             true
         }
         checkoutImg.setOnClickListener {
-            startActivity(
+           startActivityForResult(
                 SaleCancelCheckoutActivity.getSaleCancelDetailIntent(
                     this,
                     saleCancelDetailAdapter.getDataList() as ArrayList,
@@ -101,8 +102,9 @@ class SaleCancelDetailActivity : BaseActivity(), KodeinAware {
                     invoicedate,
                     customerId,
                     customerName,
-                    indexList
-                )
+                    productIdList
+                ),
+               Utils.RQ_BACK_TO_CUSTOMER
             )
         }
         saleCancelViewModel.productIdListSuccessState.observe(
@@ -112,7 +114,6 @@ class SaleCancelDetailActivity : BaseActivity(), KodeinAware {
                 soldProductList1 = it as MutableList<String>
 
                 saleCancelViewModel.loadSoldProductList(it)
-
 
 
             })
@@ -188,20 +189,11 @@ class SaleCancelDetailActivity : BaseActivity(), KodeinAware {
                         soldProductInfo.quantity = it.sale_quantity.toInt()
                         soldProductInfo.discountAmount = it.discount_amount
                         soldProductInfo.discountPercent = it.discount_percent
-                         soldProductInfo.exclude = it.exclude
+                        soldProductInfo.exclude = it.exclude
                         soldProductInfo.promotionPlanId = it.promotion_plan_id.toString()
 
                         soldProductInfoList.add(soldProductInfo)
                         saleCancelViewModel.calculateSoldProductData(soldProductInfoList)
-
-//                        var totalAmt: Double = 0.00
-//                        for (i in soldProductInfoList) {
-//
-//                            val amount = i.totalAmt
-//                            totalAmt += amount
-//                            tvNetAmount.text = totalAmt.toString()
-//                        }
-//
 
                         invoiceId.text = invoiceid
                         saleDateTextView.text = Utils.getCurrentDate(false)
@@ -231,8 +223,6 @@ class SaleCancelDetailActivity : BaseActivity(), KodeinAware {
 
 
     fun alertDialogWithRadioButtons() {
-        val invoiceID = intent.getStringExtra("INVOICE_ID")
-        var invoiceList = intent.getSerializableExtra("INVOICE_LIST")
         val values = arrayOf<String>("Cancel the whole invoice", "Cancel only quantity")
         var builder = AlertDialog.Builder(this)
         builder.setTitle("Select Your Choice")
@@ -313,7 +303,7 @@ class SaleCancelDetailActivity : BaseActivity(), KodeinAware {
 
                 var oldList = saleCancelDetailAdapter.getDataList() as ArrayList
                 oldList.removeAt(position)
-                indexList.add(soldProduct.product.id)
+                productIdList.add(soldProduct.product.id)
                 saleCancelDetailAdapter.notifyDataSetChanged()
                 saleCancelViewModel.calculateSoldProductData(oldList)
 
@@ -321,92 +311,14 @@ class SaleCancelDetailActivity : BaseActivity(), KodeinAware {
             .setNegativeButton("No", null)
             .show()
     }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == Utils.RQ_BACK_TO_CUSTOMER)
+            if (resultCode == Activity.RESULT_OK){
+                setResult(Activity.RESULT_OK)
+                finish()
+            }
+    }
 }
 
 
-//        val invoiceCancel = InvoiceCancel()
-//        var invoiceId = intent.getStringExtra("INVOICE_ID")
-//        var customerId = intent.getStringExtra("CUSTOMER_ID")
-//        val saleDate = Utils.getCurrentDate(true)
-//
-//
-//        for (soldProduct in soldProductDataList) {
-//
-//            val invoiceDetail = InvoiceDetail()
-//            invoiceDetail.tsaleId = invoiceId
-//            invoiceDetail.productId = soldProduct.id
-//            invoiceDetail.qty = soldProduct.sale_quantity.toInt()
-//            invoiceDetail.discountAmt = soldProduct.discount_amount
-//            invoiceDetail.amt = soldProduct.total_amount
-//            invoiceDetail.discountPercent = soldProduct.discount_percent
-//            invoiceDetail.s_price = soldProduct.selling_price!!.toDouble()
-//            invoiceDetail.p_price = soldProduct.purchase_price!!.toDouble()
-//            invoiceDetail.promotionPrice = soldProduct.promotion_price
-//            invoiceDetail.exclude = soldProduct.exclude?.toInt()
-//            invoiceDetail.itemDiscountPercent = soldProduct.discount_percent
-//            invoiceDetail.itemDiscountAmount = soldProduct.discount_amount
-//            if (!soldProduct.promotion_plan_id.toString().isNullOrEmpty())
-//                invoiceDetail.promotion_plan_id = soldProduct.promotion_plan_id
-//
-//            invoiceDetailList.add(invoiceDetail)
-//            val invoiceCancelProduct = InvoiceCancelProduct()
-//            invoiceCancelProduct.invoice_product_id = invoiceId.toInt()
-//            invoiceCancelProduct.product_id = soldProduct.id
-//            invoiceCancelProduct.sale_quantity = soldProduct.sale_quantity.toDouble()
-//            invoiceCancelProduct.discount_amount = soldProduct.discount_amount
-//            invoiceCancelProduct.total_amount = soldProduct.total_amount
-//            invoiceCancelProduct.discount_percent = soldProduct.discount_percent
-//            invoiceCancelProduct.s_price = soldProduct.selling_price!!.toDouble()
-//            invoiceCancelProduct.p_price = soldProduct.purchase_price!!.toDouble()
-//            invoiceCancelProduct.promotion_price =
-//                soldProduct.promotion_price // Check promo price or promo price by disc
-//            invoiceCancelProduct.volume_discount_percent = soldProduct.discount_percent
-//            invoiceCancelProduct.exclude = "${soldProduct.exclude}"
-//
-//            if (!soldProduct.promotion_plan_id.toString().isNullOrEmpty())
-//                invoiceCancelProduct.promotion_plan_id = soldProduct.promotion_plan_id!!
-//
-//
-//            invoiceCancelProductList.add(invoiceCancelProduct)
-//
-//
-//            invoiceCancel.invoice_id = invoiceId.toInt()
-//            invoiceCancel.customer_id = customerId.toInt()
-//            invoiceCancel.sale_date = saleDate
-//            invoiceCancel.total_amount = totalAmount
-//            invoiceCancel.total_discount_amount = totalDiscountAmount // Need to check
-//            invoiceCancel.pay_amount = payAmount
-//            invoiceCancel.refund_amount = refundAmount.toString()
-//            invoiceCancel.receipt_person_name = receiptPerson
-//            invoiceCancel.sale_person_id = salePersonId
-//            invoiceCancel.due_date = dueDate
-//            invoiceCancel.cash_or_credit = cashOrLoanOrBank
-//            invoiceCancel.location_code = "" // Need to add - route id
-//            invoiceCancel.device_id = deviceId
-//            invoiceCancel.invoice_time = invoiceTime
-//            invoiceCancel.package_invoice_number = 0 // Need to add
-//            invoiceCancel.package_status = 0 // Need to check
-//            invoiceCancel.volume_amount = 0.0 // Need to check
-//            invoiceCancel.package_grade = "" // Need to check
-//            invoiceCancel.invoice_product_id = 0 // Need to check
-//            invoiceCancel.total_quantity = totalQtyForInvoice.toDouble() // Check int or double
-//            invoiceCancel.invoice_status = cashOrLoanOrBank
-//            invoiceCancel.total_discount_percent =
-//                totalVolumeDiscountPercent.toString()  // Need to check
-//            invoiceCancel.rate = "1"
-//            invoiceCancel.tax_amount = taxAmt
-//            invoiceCancel.bank_name = bank
-//            invoiceCancel.bank_account_no = acc
-//            invoiceCancel.sale_flag = 0 // Need to check
-//
-//            customerVisitRepo.insertNewInvoice(invoice)
-//            this.invoice.postValue(invoice)
-//
-//
-//            ///  saleCancelDetailViewModel.updateProductRemainingQty(soldProduct) // Need to remind !!!
-//        }
-//
-//
-//    }
-
-//}

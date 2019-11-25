@@ -1,5 +1,6 @@
 package com.aceplus.dms.ui.activities.customer.sale
 
+import android.app.Activity
 import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.content.ContentValues
@@ -53,7 +54,7 @@ class SaleCancelCheckoutActivity : BaseActivity(), KodeinAware {
     private var invoice = arrayListOf<Invoice>()
     var totalQtyForInvoice = 0
     val invoiceProductList: ArrayList<InvoiceProduct> = ArrayList()
-    var indexList: ArrayList<Int> = ArrayList()
+    var productIdList: ArrayList<Int> = ArrayList()
 
 
     private val df = DecimalFormat(".##")
@@ -67,7 +68,7 @@ class SaleCancelCheckoutActivity : BaseActivity(), KodeinAware {
             date: String,
             customerID: String,
             customerName: String,
-            indexList: ArrayList<Int>
+            productIdList: ArrayList<Int>
 
 
         ): Intent {
@@ -77,7 +78,7 @@ class SaleCancelCheckoutActivity : BaseActivity(), KodeinAware {
             saleCancelDetailIntent.putExtra("DATE", date)
             saleCancelDetailIntent.putExtra("CUSTOMER_ID", customerID)
             saleCancelDetailIntent.putExtra("CUSTOMER_NAME", customerName)
-            saleCancelDetailIntent.putIntegerArrayListExtra("INDEX_LIST", indexList)
+            saleCancelDetailIntent.putIntegerArrayListExtra("INDEX_LIST", productIdList)
 
 
             return saleCancelDetailIntent
@@ -100,7 +101,7 @@ class SaleCancelCheckoutActivity : BaseActivity(), KodeinAware {
         llSaleStatus.visibility = View.GONE
         tableHeaderDiscount.text = "Promotion Price"
         soldProductList = intent.getParcelableArrayListExtra("SOLD_PRODUCT_LIST")
-        indexList = intent.getIntegerArrayListExtra("INDEX_LIST")
+        productIdList = intent.getIntegerArrayListExtra("INDEX_LIST")
         saleDateTextView.text = Utils.getCurrentDate(false)
 
         for (i in soldProductList) {
@@ -151,12 +152,12 @@ class SaleCancelCheckoutActivity : BaseActivity(), KodeinAware {
 
                 it?.let {
                     if (it.isNotEmpty()) {
-                        startActivity(
+                        startActivityForResult(
                             PrintInvoiceActivity.newIntentFromSaleCancelCheckout(
                                 this,
                                 it[0],
                                 soldProductList
-                            )
+                            ),Utils.RQ_BACK_TO_CUSTOMER
                         )
 
                         saleCancelCheckOutViewModel.soldInvoiceListSuccessState.value = null
@@ -338,19 +339,9 @@ class SaleCancelCheckoutActivity : BaseActivity(), KodeinAware {
         edit_txt_branch_name.error = null
         edit_txt_account_name.error = null
 
-        if (payAmount.text.isNotBlank()) {
-
             dateAndPayment = true
 
-        } else if (payAmount.text.isBlank()) {
 
-            AlertDialog.Builder(this)
-                .setTitle("Alert")
-                .setMessage("You must specify due date.")
-                .setPositiveButton("OK", null)
-                .show()
-
-       }
 
         if (receiptPerson.text.isNotBlank()) name = true
         else receiptPerson.error = "Please enter receipt person"
@@ -379,6 +370,13 @@ class SaleCancelCheckoutActivity : BaseActivity(), KodeinAware {
 
         return taxAmt
 
+    }
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == Utils.RQ_BACK_TO_CUSTOMER)
+            if (resultCode == Activity.RESULT_OK){
+                setResult(Activity.RESULT_OK)
+                finish()
+            }
     }
 }
 
