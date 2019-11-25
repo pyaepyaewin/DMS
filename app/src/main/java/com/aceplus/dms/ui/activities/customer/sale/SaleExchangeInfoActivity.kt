@@ -17,6 +17,7 @@ import android.widget.RelativeLayout
 import android.widget.Toast
 import com.aceplus.data.utils.Constant
 import com.aceplus.dms.R
+import com.aceplus.dms.ui.activities.DeviceListActivity
 import com.aceplus.dms.ui.activities.PrintInvoiceActivity
 import com.aceplus.dms.ui.adapters.sale.SaleExchangeInfoAdapter
 import com.aceplus.dms.utils.BluetoothService
@@ -144,14 +145,14 @@ class SaleExchangeInfoActivity: BaseActivity(), KodeinAware {
         val height = point.y
 
         val exListLayout = RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, height / 4)
-        exListLayout.leftMargin = 10
-        exListLayout.rightMargin = 10
+        exListLayout.leftMargin = 20
+        exListLayout.rightMargin = 20
         exListLayout.addRule(RelativeLayout.BELOW, R.id.sale_return_headerLayout)
         sx_info_sale_exchange_list.layoutParams = exListLayout
 
         val exListLayout1 = RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, height / 4)
-        exListLayout1.leftMargin = 10
-        exListLayout1.rightMargin = 10
+        exListLayout1.leftMargin = 20
+        exListLayout1.rightMargin = 20
         exListLayout1.addRule(RelativeLayout.BELOW, R.id.sale_exchange_headerLayout)
         sx_info_sale_list.layoutParams = exListLayout1
 
@@ -170,7 +171,7 @@ class SaleExchangeInfoActivity: BaseActivity(), KodeinAware {
             finish()
         }
 
-        print_img.setOnClickListener { "ToDo" }
+        print_img.setOnClickListener { onConnecting() }
 
     }
 
@@ -183,6 +184,7 @@ class SaleExchangeInfoActivity: BaseActivity(), KodeinAware {
         //tvSaleExchangeAmount
         //tvPayAmountFromCustomer
         //tvRefundToCustomer
+        // ToDo - not confirmed yet!!
 
         printInvoiceViewModel.getSaleReturnProductInfo(saleReturnInvoiceNo!!)
         printInvoiceViewModel.getExchangeProductInfo(soldProductList)
@@ -195,6 +197,13 @@ class SaleExchangeInfoActivity: BaseActivity(), KodeinAware {
             if (it != null) saleExchangeInfoAdapterForExchange.setNewList(it as ArrayList<Product>)
         })
 
+    }
+
+    private fun onConnecting() {
+        startActivityForResult(
+            DeviceListActivity.getIntentFromPrintInvoice(this),
+            IR_REQUEST_CONNECT_DEVICE
+        )
     }
 
     private val mHandler = Handler {
@@ -222,6 +231,32 @@ class SaleExchangeInfoActivity: BaseActivity(), KodeinAware {
 
         }
         true
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+
+        when (requestCode) {
+            IR_REQUEST_CONNECT_DEVICE -> {
+                if (resultCode == Activity.RESULT_OK) {
+                    val address =
+                        data?.getStringExtra(DeviceListActivity.IR_EXTRA_DEVICE_ADDRESS)
+                    if (BluetoothAdapter.checkBluetoothAddress(address)) {
+                        val device = mBluetoothAdapter!!.getRemoteDevice(address)
+                        mBluetoothService?.connect(device)
+                    }
+                }
+            }
+            IR_REQUEST_ENABLE_BT -> {
+                if (resultCode == Activity.RESULT_OK) {
+                    if (mBluetoothService == null)
+                        mBluetoothService = BluetoothService(this, mHandler)
+                } else {
+                    Toast.makeText(this, "Bluetooth isn't enabled!", Toast.LENGTH_SHORT).show()
+                    onBackPressed()
+                }
+            }
+        }
+
     }
 
     override fun onBackPressed() {
