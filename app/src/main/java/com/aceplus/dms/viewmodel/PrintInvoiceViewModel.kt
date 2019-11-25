@@ -17,6 +17,8 @@ class PrintInvoiceViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
     var taxInfo = MutableLiveData<Triple<String, Int, Int>>()
     var salePersonName = MutableLiveData<String>()
     var relatedDataForPrint = MutableLiveData<RelatedDataForPrint>()
+    var saleReturnProducts = MutableLiveData<List<Product>>()
+    var exchangeProducts = MutableLiveData<List<Product>>()
 
     fun getSalePersonName(salePersonID: String){
         launch {
@@ -182,6 +184,41 @@ class PrintInvoiceViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
         }
 
         return newSoldProductList
+
+    }
+
+    fun getSaleReturnProductInfo(saleReturnInvoiceNo: String){
+        launch {
+            customerVisitRepo.getSaleReturnProductInfo(saleReturnInvoiceNo)
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.mainThread())
+                .subscribe{
+
+                    val saleReturnProductList = ArrayList<Product>()
+                    for (i in it){
+                        val product = Product()
+                        product.product_name = i.product_name
+                        product.total_quantity = i.quantity
+                        product.selling_price = i.price.toString()
+                        saleReturnProductList.add(product)
+                    }
+                    this.saleReturnProducts.postValue(saleReturnProductList)
+
+                }
+        }
+    }
+
+    fun getExchangeProductInfo(soldProductList: ArrayList<SoldProductInfo>){
+
+        val saleExchangeProductList = ArrayList<Product>()
+        for (soldProduct in soldProductList){
+            val product = Product()
+            product.product_name = soldProduct.product.product_name
+            product.total_quantity = soldProduct.quantity
+            product.selling_price = soldProduct.product.selling_price
+            saleExchangeProductList.add(product)
+        }
+        this.exchangeProducts.postValue(saleExchangeProductList)
 
     }
 

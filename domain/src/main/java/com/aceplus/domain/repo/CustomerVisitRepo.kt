@@ -27,6 +27,7 @@ import com.aceplus.domain.entity.volumediscount.VolumeDiscountFilter
 import com.aceplus.domain.entity.volumediscount.VolumeDiscountFilterItem
 import com.aceplus.domain.model.forApi.invoice.InvoiceResponse
 import com.aceplus.domain.model.forApi.preorder.PreOrderPresentApi
+import com.aceplus.domain.vo.SaleExchangeProductInfo
 import io.reactivex.Observable
 
 interface CustomerVisitRepo {
@@ -114,5 +115,6 @@ interface CustomerVisitRepo {
     fun updateSaleIdInSaleReturn(saleReturnInvoiceNo: String, saleID: String)
 
     fun insertAllSaleReturnDetail(list: List<SaleReturnDetail>)
+    fun getSaleReturnProductInfo(saleReturnInvoiceNo: String): Observable<List<SaleExchangeProductInfo>>
 
 }

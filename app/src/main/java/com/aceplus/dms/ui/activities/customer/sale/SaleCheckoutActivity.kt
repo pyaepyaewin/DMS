@@ -520,7 +520,8 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
     private fun saleOrExchange(){
 
         if (isSaleExchange){
-            toSaleExchange()
+            val intent = SaleExchangeInfoActivity.getIntentFromSaleCheckout(this, customer!!, saleReturnInvoiceNo!!, invoice!!, soldProductList, promotionList)
+            startActivityForResult(intent, Utils.RQ_BACK_TO_CUSTOMER)
         } else{
             saleCheckoutViewModel.updateDepartureTimeForSaleManRoute( salePersonId!!, customer!!.id.toString())
             saleCheckoutViewModel.updateSaleVisitRecord(customer!!.id)
@@ -536,12 +537,6 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
                 setResult(Activity.RESULT_OK)
                 finish()
             }
-    }
-
-    private fun toSaleExchange(){
-
-        // ToDo
-
     }
 
 }

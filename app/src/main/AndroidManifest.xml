@@ -131,6 +131,9 @@
         <activity
                 android:name=".ui.activities.customer.sale.SaleCancelCheckoutActivity"
                 android:screenOrientation="landscape"/>
+        <activity
+                android:name=".ui.activities.customer.sale.SaleExchangeInfoActivity"
+                android:screenOrientation="landscape"/>
     </application>
 
 </manifest>

@@ -34,6 +34,7 @@ import com.aceplus.domain.entity.volumediscount.VolumeDiscountFilterItem
 import com.aceplus.domain.model.forApi.invoice.InvoiceResponse
 import com.aceplus.domain.model.forApi.preorder.PreOrderPresentApi
 import com.aceplus.domain.repo.CustomerVisitRepo
+import com.aceplus.domain.vo.SaleExchangeProductInfo
 import com.aceplus.shared.utils.GPSTracker
 import com.aceplussolutions.rms.constants.AppUtils
 import io.reactivex.Observable
@@ -489,6 +490,10 @@ class CustomerVisitRepoImpl(
 
     override fun updateSaleIdInSaleReturn(saleReturnInvoiceNo: String, saleID: String) {
         db.saleReturnDao().updateSaleIdInSaleReturn(saleReturnInvoiceNo, saleID)
+    }
+
+    override fun getSaleReturnProductInfo(saleReturnInvoiceNo: String): Observable<List<SaleExchangeProductInfo>> {
+        return Observable.just(db.saleReturnDetailDao().getSaleReturnProductInfo(saleReturnInvoiceNo))
     }
 
 }
