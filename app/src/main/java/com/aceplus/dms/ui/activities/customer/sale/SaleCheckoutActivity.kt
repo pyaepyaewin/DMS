@@ -410,13 +410,7 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
 
             dateAndPayment = true
 
-        } else if (payAmount.text.isBlank()){
 
-            AlertDialog.Builder(this)
-                .setTitle("Alert")
-                .setMessage("You must specify due date.")
-                .setPositiveButton("OK", null)
-                .show()
 
         }
 

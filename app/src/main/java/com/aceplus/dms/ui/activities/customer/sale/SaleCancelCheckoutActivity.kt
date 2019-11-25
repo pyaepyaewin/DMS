@@ -7,6 +7,8 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.util.Log.i
 import android.view.View
@@ -101,7 +103,6 @@ class SaleCancelCheckoutActivity : BaseActivity(), KodeinAware {
         indexList = intent.getIntegerArrayListExtra("INDEX_LIST")
         saleDateTextView.text = Utils.getCurrentDate(false)
 
-
         for (i in soldProductList) {
 
             val amt = i.quantity.toDouble() * i.product.selling_price!!.toDouble()
@@ -176,7 +177,6 @@ class SaleCancelCheckoutActivity : BaseActivity(), KodeinAware {
 
         btn_disOk.setOnClickListener { calculateDiscPercentToAmt() }
         btn_amtOk.setOnClickListener { calculateDiscAmtToPercent() }
-        edt_dueDate.setOnClickListener { chooseDueDate() }
         confirmAndPrint_img.setOnClickListener {
             Utils.askConfirmationDialog(
                 "Save",
@@ -195,6 +195,13 @@ class SaleCancelCheckoutActivity : BaseActivity(), KodeinAware {
             bank_account_layout.visibility = if (isChecked) View.VISIBLE else View.GONE
         }
 
+        payAmount.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(p0: Editable?) { "Nothing to do" }
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) { "Nothing to do" }
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                calculateRefundAmount()
+            }
+        })
 
     }
 
@@ -255,26 +262,6 @@ class SaleCancelCheckoutActivity : BaseActivity(), KodeinAware {
 
     }
 
-    private fun chooseDueDate() {
-
-        val myCalendar = Calendar.getInstance()
-        val sdf = SimpleDateFormat("yyyy/MM/dd")
-
-        val dateDialog = DatePickerDialog(
-            this,
-            DatePickerDialog.OnDateSetListener { view, year, month, dayOfMonth ->
-                myCalendar.set(year, month, dayOfMonth)
-                edt_dueDate.setText(sdf.format(myCalendar.time))
-            },
-            myCalendar.get(Calendar.YEAR),
-            myCalendar.get(Calendar.MONTH),
-            myCalendar.get(Calendar.DAY_OF_MONTH)
-        )
-
-        dateDialog.show()
-
-    }
-
     private fun onClickSaveButton(type: String) {
 
         if (type == "save") {
@@ -312,30 +299,10 @@ class SaleCancelCheckoutActivity : BaseActivity(), KodeinAware {
         var dueDate = ""
         if (cashOrLoanOrBank == "CR") dueDate = saleDate
         if (edt_dueDate.text.isNotBlank()) dueDate = edt_dueDate.text.toString()
-        //old code // saleCancelCheckOutViewModel.deleteInvoiceProductForLongClick(invoiceId,indexList)
-//old code//        saleCancelCheckOutViewModel.saveCheckoutData(
-//            customerId,
-//            saleDate,
-//            invoiceId,
-//            payAmt,
-//            refundAmount,
-//            receiptPerson,
-//            salePersonId!!,
-//            invoiceTime,
-//            dueDate,
-//            deviceId,
-//            cashOrLoanOrBank,
-//            soldProductList,
-//            totalAmt,
-//            taxAmt,
-//            edit_txt_branch_name.text.toString(),
-//            edit_txt_account_name.text.toString(),
-//            volDisAmount,
-//            volDisPercent
-//        )
-//old code        saleCancelCheckOutViewModel.loadSoldInvoiceData(invoiceId)
+
         saleCancelCheckOutViewModel.deleteInvoiceData(invoiceId)
         saleCancelCheckOutViewModel.deleteInvoiceProductData(invoiceId)
+        saleCancelCheckOutViewModel.deleteInvoicePresenttData(invoiceId)
         saleCancelCheckOutViewModel.saveCheckoutData(
             customerId,
             saleDate,
@@ -363,7 +330,7 @@ class SaleCancelCheckoutActivity : BaseActivity(), KodeinAware {
 
     private fun validationInput(withBankInfo: Boolean): Boolean {
 
-        var dateAndPayment = false
+        var dateAndPayment =false
         var name = false
         var bank = false
         var acc = false
@@ -371,7 +338,7 @@ class SaleCancelCheckoutActivity : BaseActivity(), KodeinAware {
         edit_txt_branch_name.error = null
         edit_txt_account_name.error = null
 
-        if (edt_dueDate.text.isNotBlank() || payAmount.text.isNotBlank()) {
+        if (payAmount.text.isNotBlank()) {
 
             dateAndPayment = true
 
@@ -383,7 +350,7 @@ class SaleCancelCheckoutActivity : BaseActivity(), KodeinAware {
                 .setPositiveButton("OK", null)
                 .show()
 
-        }
+       }
 
         if (receiptPerson.text.isNotBlank()) name = true
         else receiptPerson.error = "Please enter receipt person"

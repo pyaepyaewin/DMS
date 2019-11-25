@@ -36,7 +36,6 @@ import com.aceplus.dms.viewmodel.report.ReportViewModel
 import com.aceplus.dms.viewmodel.routeviewmodels.CustomerLocationViewModel
 import com.aceplus.dms.viewmodel.routeviewmodels.ViewByListViewModel
 import com.aceplus.dms.viewmodel.salecancelviewmodel.SaleCancelCheckOutViewModel
-import com.aceplus.dms.viewmodel.salecancelviewmodel.SaleCancelDetailViewModel
 import com.aceplus.dms.viewmodel.salecancelviewmodel.SaleCancelViewModel
 import com.aceplus.domain.repo.CustomerVisitRepo
 import com.aceplus.domain.repo.LoginRepo
@@ -161,7 +160,6 @@ val vmModule = Kodein.Module {
 
     bind() from singleton { PrintInvoiceViewModel(instance(), instance()) }
     bind() from singleton { SaleCancelViewModel(instance(), instance()) }
-    bind() from singleton { SaleCancelDetailViewModel(instance(), instance()) }
     bind() from singleton { SaleCancelCheckOutViewModel(instance(), instance()) }
 
 

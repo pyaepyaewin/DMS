@@ -19,6 +19,7 @@ interface SaleCancelRepo {
     fun getSoldProductList(productIdList: List<String>): Observable<List<SaleCancelDetailItem>>
     fun deleteInvoiceData(invoiceId: String)
     fun deleteInvoiceProduct(invoiceId: String)
+    fun deleteInvoicePresent(invoiceId: String)
     fun updateQuantity(invoiceId: String, productId: String, qty: Int)
     fun deleteInvoiceProductForLongClick(invoiceId: String, productIdList: List<Int>)
     fun getTaxPercent(): Observable<List<CompanyInformation>>
@@ -38,6 +39,7 @@ interface SaleCancelRepo {
     )
 
     fun getInvoiceCancel(invoiceId: String): Observable<Invoice>
+    fun updateProductRemainingQty(soldQty:Int,productId: Int)
 
 
 }

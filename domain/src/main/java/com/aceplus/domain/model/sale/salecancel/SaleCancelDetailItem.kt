@@ -50,7 +50,7 @@ data class SaleCancelDetailItem(
     var sale_quantity: String,
     var discount_amount: Double = 0.0,
     var discount_percent:Double=0.0,
-    var exclude:String?,
+    var exclude:Int?,
     var promotion_plan_id:Int?
 ) {
 

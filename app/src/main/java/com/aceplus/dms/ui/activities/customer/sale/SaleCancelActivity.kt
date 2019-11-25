@@ -12,9 +12,7 @@ import com.aceplus.dms.ui.adapters.sale.SalesCancelAdapter
 import com.aceplus.dms.viewmodel.factory.KodeinViewModelFactory
 import com.aceplus.dms.viewmodel.salecancelviewmodel.SaleCancelViewModel
 import com.aceplus.domain.model.sale.salecancel.SaleCancelItem
-import com.aceplus.domain.vo.SoldProductInfo
 import com.aceplussolutions.rms.ui.activities.BaseActivity
-import kotlinx.android.synthetic.main.activity_credit_collection.*
 import kotlinx.android.synthetic.main.activity_sale_cancel.*
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware

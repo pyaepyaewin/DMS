@@ -19,6 +19,15 @@ import com.aceplussolutions.rms.constants.AppUtils
 import io.reactivex.Observable
 
 class SaleCancelRepoImpl(val database: MyDatabase,val shf:SharedPreferences) : SaleCancelRepo {
+    override fun updateProductRemainingQty(soldQty: Int, productId: Int) {
+        database.productDao().updateProductRemainingQty(soldQty,productId)
+    }
+
+    override fun deleteInvoicePresent(invoiceId: String) {
+        database.invoicePresentDao().deleteAll(invoiceId)
+
+    }
+
     override fun getInvoiceCancel(invoiceId: String): Observable<Invoice> {
         return Observable.just(database.invoiceDao().getInvoiceCancel(invoiceId))
     }

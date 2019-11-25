@@ -1,29 +1,19 @@
 package com.aceplus.dms.ui.activities.customer.sale
 
 import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
-import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
-import android.widget.EditText
-import android.widget.LinearLayout
-import android.widget.RadioButton
-import android.widget.TextView
 import com.aceplus.dms.ui.adapters.sale.SaleCancelDetailAdapter
 import com.aceplus.dms.utils.Utils
-import com.aceplus.dms.viewmodel.factory.KodeinViewModelFactory
-import com.aceplus.dms.viewmodel.salecancelviewmodel.SaleCancelDetailViewModel
+import com.aceplus.dms.viewmodel.salecancelviewmodel.SaleCancelViewModel
 import com.aceplus.domain.entity.product.Product
 import com.aceplus.domain.model.sale.salecancel.SaleCancelDetailItem
-import com.aceplus.domain.model.sale.salecancel.SoldProductDataClass
 import com.aceplus.domain.vo.SoldProductInfo
 import kotlinx.android.synthetic.main.activity_sale.*
 import kotlinx.android.synthetic.main.dialog_box_sale_quantity.*
@@ -31,21 +21,11 @@ import kotlinx.android.synthetic.main.dialog_box_sale_quantity.view.*
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.kodein
-import java.util.*
 import kotlin.collections.ArrayList
-import kotlin.reflect.jvm.internal.impl.load.kotlin.JvmType
-import android.support.v4.content.ContextCompat.getSystemService
-import android.icu.lang.UCharacter.GraphemeClusterBreak.T
-import android.R
-import android.content.ContentValues
 import com.aceplus.domain.entity.invoice.Invoice
 import com.aceplus.domain.entity.invoice.InvoiceCancel
 import com.aceplus.domain.entity.invoice.InvoiceCancelProduct
-import com.aceplus.domain.entity.promotion.Promotion
-import com.aceplus.domain.model.forApi.invoice.InvoiceDetail
-import com.aceplus.domain.model.sale.salecancel.SaleCancelItem
 import com.aceplussolutions.rms.ui.activities.BaseActivity
-import io.fabric.sdk.android.services.common.CommonUtils.isNullOrEmpty
 
 
 class SaleCancelDetailActivity : BaseActivity(), KodeinAware {
@@ -86,7 +66,7 @@ class SaleCancelDetailActivity : BaseActivity(), KodeinAware {
         }
     }
 
-    private val saleCancelDetailViewModel: SaleCancelDetailViewModel by viewModel()
+    private val saleCancelViewModel: SaleCancelViewModel by viewModel()
 
     private val saleCancelDetailAdapter: SaleCancelDetailAdapter by lazy {
         SaleCancelDetailAdapter(this::onClickQtyButton, this::onLongClickSoldProductListItem)
@@ -98,6 +78,10 @@ class SaleCancelDetailActivity : BaseActivity(), KodeinAware {
         tableHeaderOrderedQty.visibility = View.GONE
         headerFoc.visibility = View.GONE
         headerDiscount.visibility = View.GONE
+        if (soldProductDataList.size == 0) {
+            Utils.commonDialog("No issued product", this, 2)
+
+        }
         alertDialogWithRadioButtons()
         var invoiceid = intent.getStringExtra("INVOICE_ID")
         var invoicedate = intent.getStringExtra("INVOICE_DATE")
@@ -121,31 +105,32 @@ class SaleCancelDetailActivity : BaseActivity(), KodeinAware {
                 )
             )
         }
-        saleCancelDetailViewModel.productIdListSuccessState.observe(
+        saleCancelViewModel.productIdListSuccessState.observe(
             this,
             android.arch.lifecycle.Observer {
 
                 soldProductList1 = it as MutableList<String>
 
-                saleCancelDetailViewModel.loadSoldProductList(it)
+                saleCancelViewModel.loadSoldProductList(it)
+
 
 
             })
 
-        saleCancelDetailViewModel.productIdListErrorState.observe(
+        saleCancelViewModel.productIdListErrorState.observe(
             this,
             android.arch.lifecycle.Observer {
 
             })
 
-        saleCancelDetailViewModel.loadSoldProductIdList(invoiceid)
-        saleCancelDetailViewModel.invoiceCancelSuccessState.observe(
+        saleCancelViewModel.loadSoldProductIdList(invoiceid)
+        saleCancelViewModel.invoiceCancelSuccessState.observe(
             this,
             android.arch.lifecycle.Observer {
                 it?.let {
                     if (it != null) {
                         invoice = it!!
-                        saleCancelDetailViewModel.saveDeleteInvoice(
+                        saleCancelViewModel.saveDeleteInvoice(
                             saleCancelDetailAdapter.getDataList() as ArrayList<SoldProductInfo>,
                             invoice,
                             invoiceid
@@ -156,21 +141,21 @@ class SaleCancelDetailActivity : BaseActivity(), KodeinAware {
 
             })
 
-        saleCancelDetailViewModel.invoiceCancelErrorState.observe(
+        saleCancelViewModel.invoiceCancelErrorState.observe(
             this,
             android.arch.lifecycle.Observer {
 
             })
 
-        saleCancelDetailViewModel.calculatedSoldProductList.observe(this, Observer {
+        saleCancelViewModel.calculatedSoldProductList.observe(this, Observer {
             if (it != null) {
                 saleCancelDetailAdapter.setNewList(it.first)
                 tvNetAmount.text = Utils.formatAmount(it.second)
-                saleCancelDetailViewModel.calculatedSoldProductList.value = null
+                saleCancelViewModel.calculatedSoldProductList.value = null
             }
         })
 
-        saleCancelDetailViewModel.soldProductListSuccessState.observe(
+        saleCancelViewModel.soldProductListSuccessState.observe(
             this,
             android.arch.lifecycle.Observer { it ->
                 if (it!!.isNotEmpty()) {
@@ -203,10 +188,11 @@ class SaleCancelDetailActivity : BaseActivity(), KodeinAware {
                         soldProductInfo.quantity = it.sale_quantity.toInt()
                         soldProductInfo.discountAmount = it.discount_amount
                         soldProductInfo.discountPercent = it.discount_percent
-                        // soldProductInfo.exclude = it.exclude?.toInt()
+                         soldProductInfo.exclude = it.exclude
                         soldProductInfo.promotionPlanId = it.promotion_plan_id.toString()
 
                         soldProductInfoList.add(soldProductInfo)
+                        saleCancelViewModel.calculateSoldProductData(soldProductInfoList)
 
 //                        var totalAmt: Double = 0.00
 //                        for (i in soldProductInfoList) {
@@ -229,7 +215,7 @@ class SaleCancelDetailActivity : BaseActivity(), KodeinAware {
 
 
 
-        saleCancelDetailViewModel.soldProductListErrorState.observe(
+        saleCancelViewModel.soldProductListErrorState.observe(
             this,
             android.arch.lifecycle.Observer {
 
@@ -272,7 +258,7 @@ class SaleCancelDetailActivity : BaseActivity(), KodeinAware {
 
     private fun insertSaleCancelToDb() {
         val invoiceID = intent.getStringExtra("INVOICE_ID")
-        saleCancelDetailViewModel.loadInvoiceCancel(invoiceID)
+        saleCancelViewModel.loadInvoiceCancel(invoiceID)
 
     }
 
@@ -297,19 +283,9 @@ class SaleCancelDetailActivity : BaseActivity(), KodeinAware {
                     }
 
                     soldProduct.quantity = quantity
-                    // saleCancelDetailViewModel.updateQty(quantity,soldProduct.product.product_id!!)
                     val newList = saleCancelDetailAdapter.getDataList() as ArrayList
                     newList[position] = soldProduct
-                    saleCancelDetailViewModel.calculateSoldProductData(newList)
-
-//                    var totalAmt: Double = 0.00
-//                    for (i in newList) {
-//
-//                        val amt = i.quantity.toDouble() * i.product.selling_price!!.toDouble()
-//                        totalAmt += amt
-//                        tvNetAmount.text = totalAmt.toString()
-//                    }
-
+                    saleCancelViewModel.calculateSoldProductData(newList)
                     saleCancelDetailAdapter.notifyItemChanged(position)
 
                 }
@@ -339,7 +315,7 @@ class SaleCancelDetailActivity : BaseActivity(), KodeinAware {
                 oldList.removeAt(position)
                 indexList.add(soldProduct.product.id)
                 saleCancelDetailAdapter.notifyDataSetChanged()
-                saleCancelDetailViewModel.calculateSoldProductData(oldList)
+                saleCancelViewModel.calculateSoldProductData(oldList)
 
             }
             .setNegativeButton("No", null)
@@ -432,39 +408,5 @@ class SaleCancelDetailActivity : BaseActivity(), KodeinAware {
 //
 //
 //    }
-//
-//    customerVisitRepo.insertAllInvoiceProduct(invoiceProductList)
-//
-//
-//    saleCancelDetailViewModel.deleteInvoice(invoiceId)
-//    saleCancelDetailViewModel.deleteInvoiceProduct(invoiceId)
-//
-//}
-//saleCancelDetailViewModel.insertInvoiceCancelList()
-//for (soldProduct in soldProductDataList) {
-////
-////            val invoiceProductList = InvoiceCancelProduct()
-////            invoiceProductList.add("INVOICE_PRODUCT_ID", invoiceId)
-////            invoiceProductList.put("PRODUCT_ID", soldProduct.product_id)
-////            invoiceProductList.put("SALE_QUANTITY", soldProduct.sale_quantity)
-////            invoiceProductList.put("DISCOUNT_AMOUNT", soldProduct.discount_amount)
-////            //to change netAmt
-////            invoiceProductList.put("TOTAL_AMOUNT", soldProduct.total_amount)
-////            invoiceProductList.put("DISCOUNT_PERCENT", soldProduct.discount_percent)
-////            invoiceProductList.put("S_PRICE", soldProduct.selling_price)
-////            invoiceProductList.put("P_PRICE", soldProduct.purchase_price)
-////
-////            var promoPrice = soldProduct.promotion_price
-////            if (promoPrice == 0.0) {
-////                promoPrice = soldProduct.selling_price.toDouble()
-////            }
-////
-////            invoiceProductList.put("PROMOTION_PRICE", promoPrice)
-//    saleCancelDetailViewModel.insertInvoiceCancelProduct(invoiceProductList)
-//
-////            val query =
-////                ("UPDATE PRODUCT SET REMAINING_QTY = REMAINING_QTY + " + soldProduct.getQuantity()
-////                        + ", SOLD_QTY = SOLD_QTY - " + soldProduct.getQuantity() + " WHERE ID = \'" + soldProduct.getProduct().getId() + "\'")
-////            sqLiteDatabase.execSQL(query)
-//
+
 //}
