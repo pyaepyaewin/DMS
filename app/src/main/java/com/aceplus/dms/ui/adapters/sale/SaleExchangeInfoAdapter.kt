@@ -5,9 +5,10 @@ import android.view.ViewGroup
 import com.aceplus.dms.R
 import com.aceplus.dms.ui.viewholders.sale.SaleExchangeInfoViewHolder
 import com.aceplus.domain.entity.product.Product
+import com.aceplus.domain.vo.SaleExchangeProductInfo
 import com.aceplus.shared.ui.adapter.BaseRecyclerViewAdapter
 
-class SaleExchangeInfoAdapter: BaseRecyclerViewAdapter<SaleExchangeInfoViewHolder, Product>() {
+class SaleExchangeInfoAdapter: BaseRecyclerViewAdapter<SaleExchangeInfoViewHolder, SaleExchangeProductInfo>() {
 
     override fun onCreateViewHolder(p0: ViewGroup, p1: Int): SaleExchangeInfoViewHolder {
 

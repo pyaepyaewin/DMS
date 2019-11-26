@@ -203,9 +203,7 @@ object PrintUtils{
         printDataByteArrayList.add("Invoice No    :   $invoiceNumber\n".toByteArray())
         printDataByteArrayList.add("Sale Person   :   $salePersonName\n".toByteArray())
         printDataByteArrayList.add("RouteNo       :   $routeName\n".toByteArray()) // ToDo
-        printDataByteArrayList.add(("Sale Date     :   " + SimpleDateFormat("dd/MM/yyyy hh:mm", Locale.US).format(
-            Date()
-        ) + "\n").toByteArray())
+        printDataByteArrayList.add(("Sale Date     :   " + SimpleDateFormat("dd/MM/yyyy hh:mm", Locale.US).format(Date()) + "\n").toByteArray())
 
         if (invoice.due_date != null && printMode.equals("sale", true))
             printDataByteArrayList.add("Delivery Date :   ${invoice.due_date}\n".toByteArray())
@@ -241,9 +239,8 @@ object PrintUtils{
 
             for (soldProduct in soldProductList){
                 val quantity = soldProduct.quantity
-                var pricePerUnit = 0.0
 
-                pricePerUnit = if (soldProduct.promotionPrice == 0.0)
+                var pricePerUnit: Double = if (soldProduct.promotionPrice == 0.0)
                     soldProduct.product.selling_price?.toDouble() ?: 0.0
                 else
                     soldProduct.promotionPrice
@@ -632,6 +629,91 @@ object PrintUtils{
         printDataByteArrayList.add("\n".toByteArray())
 
         return printDataByteArrayList
+    }
+
+    private fun getPrintDataByteArrayListForSaleExchange(
+        imgByte: ByteArray,
+        companyInfo: CompanyInformation,
+        customerName: String?,
+        cus_address: String?,
+        townshipName: String,
+        invoiceNumber: String,
+        salePersonName: String?,
+        routeName: String?,
+        soldProductList: ArrayList<SoldProductInfo>
+    ){
+
+        val printDataByteArrayList = java.util.ArrayList<ByteArray>()
+        printDataByteArrayList.add(imgByte)
+        printDataByteArrayList.add("\n".toByteArray())
+
+        var totalAmount = 0.0
+        var totalNetAmount = 0.0
+        var totalReturnAmount = 0.0
+
+        val address = companyInfo.address
+        val companyTaxRegNo = companyInfo.company_tax_reg_no
+        val phNo = companyInfo.phone_number
+
+        printDataByteArrayList.add((address + "\n").toByteArray())
+        printDataByteArrayList.add("Ph No         :   $phNo\n".toByteArray(charset("UTF-8")))
+        printDataByteArrayList.add("Tax Reg No    :   $companyTaxRegNo\n".toByteArray(charset("UTF-8")))
+        printDataByteArrayList.add("Customer      :   $customerName\n".toByteArray(charset("UTF-8")))
+        printDataByteArrayList.add("Township      :   $townshipName\n".toByteArray(charset("UTF-8")))
+        printDataByteArrayList.add("Address       :   $cus_address\n".toByteArray(charset("UTF-8")))
+        printDataByteArrayList.add("Invoice No    :   $invoiceNumber\n".toByteArray())
+        printDataByteArrayList.add("Sale Person   :   $salePersonName\n".toByteArray())
+        printDataByteArrayList.add("RouteNo       :   $routeName\n".toByteArray()) // ToDo
+        printDataByteArrayList.add(("Sale Date     :   " + SimpleDateFormat("dd/MM/yyyy hh:mm", Locale.US).format(Date()) + "\n").toByteArray())
+        printDataByteArrayList.add("------------------------------------------------\n".toByteArray())
+
+        formatter = Formatter(StringBuilder(), Locale.US)
+        printDataByteArrayList.add(formatter!!.format("%1$-20s \t %2$4s \t %3$5s \t %4$7s\n", "Sales", "Qty", "Price", "Amount").toString().toByteArray())
+        formatter!!.close()
+        printDataByteArrayList.add("------------------------------------------------\n".toByteArray())
+
+        for (soldProduct in soldProductList){
+
+            val quantity = soldProduct.product.sold_quantity
+            var pricePerUnit: Double = soldProduct.product.selling_price?.toDouble() ?: 0.0
+            val amount = pricePerUnit * quantity // To check with other function
+            val netAmount = soldProduct.totalAmt - soldProduct.discountAmount
+
+            totalAmount += amount
+            totalNetAmount += netAmount
+
+            val nameFragments = soldProduct.product.product_name!!.split("")
+            val nameList = setupPrintLayoutNoPromo(nameFragments as ArrayList<String>)
+
+            formatter = Formatter(StringBuilder(), Locale.US)
+            printDataByteArrayList.add(
+                formatter!!.format(
+                    "%1$-20s \t %2$4s \t %3$5s \t %4$9s\n",
+                    nameList[0],
+                    quantity,
+                    Utils.decimalFormatterWithoutComma.format(pricePerUnit),
+                    Utils.decimalFormatterWithComma.format(amount)
+                ).toString().toByteArray()
+            )
+            formatter!!.close()
+
+            nameList.removeAt(0)
+            for (cutName in nameList) {
+                formatter = Formatter(StringBuilder(), Locale.US)
+                printDataByteArrayList.add(
+                    formatter!!.format(
+                        "%1$-20s \t %2$1s \t %3$1s \t %4$1s\n", cutName, "", "", ""
+                    ).toString().toByteArray()
+                )
+                formatter!!.close()
+            }
+
+            printDataByteArrayList.add("\n".toByteArray())
+
+        }
+
+        printDataByteArrayList.add("------------------------------------------------\n".toByteArray())
+
     }
 
     private fun getPrintDataByteArrayListForCredit(

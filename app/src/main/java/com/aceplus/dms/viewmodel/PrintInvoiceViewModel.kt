@@ -8,6 +8,7 @@ import com.aceplus.domain.entity.product.Product
 import com.aceplus.domain.entity.promotion.Promotion
 import com.aceplus.domain.repo.CustomerVisitRepo
 import com.aceplus.domain.vo.RelatedDataForPrint
+import com.aceplus.domain.vo.SaleExchangeProductInfo
 import com.aceplus.domain.vo.SoldProductInfo
 import com.aceplus.shared.viewmodel.BaseViewModel
 import com.kkk.githubpaging.network.rx.SchedulerProvider
@@ -17,8 +18,8 @@ class PrintInvoiceViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
     var taxInfo = MutableLiveData<Triple<String, Int, Int>>()
     var salePersonName = MutableLiveData<String>()
     var relatedDataForPrint = MutableLiveData<RelatedDataForPrint>()
-    var saleReturnProducts = MutableLiveData<List<Product>>()
-    var exchangeProducts = MutableLiveData<List<Product>>()
+    var saleReturnProducts = MutableLiveData<List<SaleExchangeProductInfo>>()
+    var exchangeProducts = MutableLiveData<List<SaleExchangeProductInfo>>()
 
     fun getSalePersonName(salePersonID: String){
         launch {
@@ -193,29 +194,20 @@ class PrintInvoiceViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.mainThread())
                 .subscribe{
-
-                    val saleReturnProductList = ArrayList<Product>()
-                    for (i in it){
-                        val product = Product()
-                        product.product_name = i.product_name
-                        product.total_quantity = i.quantity
-                        product.selling_price = i.price.toString()
-                        saleReturnProductList.add(product)
-                    }
-                    this.saleReturnProducts.postValue(saleReturnProductList)
-
+                    this.saleReturnProducts.postValue(it)
                 }
         }
     }
 
     fun getExchangeProductInfo(soldProductList: ArrayList<SoldProductInfo>){
 
-        val saleExchangeProductList = ArrayList<Product>()
+        val saleExchangeProductList = ArrayList<SaleExchangeProductInfo>()
         for (soldProduct in soldProductList){
-            val product = Product()
-            product.product_name = soldProduct.product.product_name
-            product.total_quantity = soldProduct.quantity
-            product.selling_price = soldProduct.product.selling_price
+            val product = SaleExchangeProductInfo(
+                soldProduct.product.product_name,
+                soldProduct.quantity,
+                soldProduct.product.selling_price
+            )
             saleExchangeProductList.add(product)
         }
         this.exchangeProducts.postValue(saleExchangeProductList)

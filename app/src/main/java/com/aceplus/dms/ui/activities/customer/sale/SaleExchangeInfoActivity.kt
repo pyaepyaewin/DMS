@@ -27,6 +27,7 @@ import com.aceplus.domain.entity.customer.Customer
 import com.aceplus.domain.entity.invoice.Invoice
 import com.aceplus.domain.entity.product.Product
 import com.aceplus.domain.entity.promotion.Promotion
+import com.aceplus.domain.vo.SaleExchangeProductInfo
 import com.aceplus.domain.vo.SoldProductInfo
 import com.aceplus.domain.vo.report.SaleInvoiceDetailReport
 import com.aceplussolutions.rms.ui.activities.BaseActivity
@@ -190,11 +191,11 @@ class SaleExchangeInfoActivity: BaseActivity(), KodeinAware {
         printInvoiceViewModel.getExchangeProductInfo(soldProductList)
 
         printInvoiceViewModel.saleReturnProducts.observe(this, Observer {
-            if (it != null) saleExchangeInfoAdapterForReturn.setNewList(it as ArrayList<Product>)
+            if (it != null) saleExchangeInfoAdapterForReturn.setNewList(it as ArrayList<SaleExchangeProductInfo>)
         })
 
         printInvoiceViewModel.exchangeProducts.observe(this, Observer {
-            if (it != null) saleExchangeInfoAdapterForExchange.setNewList(it as ArrayList<Product>)
+            if (it != null) saleExchangeInfoAdapterForExchange.setNewList(it as ArrayList<SaleExchangeProductInfo>)
         })
 
     }
@@ -252,10 +253,20 @@ class SaleExchangeInfoActivity: BaseActivity(), KodeinAware {
                         mBluetoothService = BluetoothService(this, mHandler)
                 } else {
                     Toast.makeText(this, "Bluetooth isn't enabled!", Toast.LENGTH_SHORT).show()
-                    onBackPressed()
                 }
             }
         }
+
+    }
+
+    private fun onPrint(){
+
+        val v1 = window.decorView.rootView
+        v1.isDrawingCacheEnabled = true
+        val myBitmap = v1.drawingCache
+
+        Utils.saveInvoiceImageIntoGallery(invoice!!.invoice_id, this, myBitmap, "Sale") // Doesn't work
+        val editProductList = printInvoiceViewModel.arrangeProductList(soldProductList, promotionList)
 
     }
 
