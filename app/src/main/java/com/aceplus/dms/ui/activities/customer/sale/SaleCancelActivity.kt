@@ -1,7 +1,6 @@
 package com.aceplus.dms.ui.activities.customer.sale
 
-import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProviders
+
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -9,7 +8,6 @@ import android.support.v7.widget.LinearLayoutManager
 import android.util.Log.i
 import com.aceplus.dms.R
 import com.aceplus.dms.ui.adapters.sale.SalesCancelAdapter
-import com.aceplus.dms.viewmodel.factory.KodeinViewModelFactory
 import com.aceplus.dms.viewmodel.salecancelviewmodel.SaleCancelViewModel
 import com.aceplus.domain.model.sale.salecancel.SaleCancelItem
 import com.aceplussolutions.rms.ui.activities.BaseActivity

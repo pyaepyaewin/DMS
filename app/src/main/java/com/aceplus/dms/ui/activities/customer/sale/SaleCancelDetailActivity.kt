@@ -130,7 +130,7 @@ class SaleCancelDetailActivity : BaseActivity(), KodeinAware {
             android.arch.lifecycle.Observer {
                 it?.let {
                     if (it != null) {
-                        invoice = it!!
+                        invoice = it
                         saleCancelViewModel.saveDeleteInvoice(
                             saleCancelDetailAdapter.getDataList() as ArrayList<SoldProductInfo>,
                             invoice,

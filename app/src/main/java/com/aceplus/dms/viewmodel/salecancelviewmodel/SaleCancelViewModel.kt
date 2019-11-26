@@ -76,6 +76,7 @@ class SaleCancelViewModel(
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     invoiceCancelSuccessState.value = it
+                    invoiceCancelSuccessState.value=null
 
                 }, {
                     invoiceCancelErrorState.value = it.localizedMessage
