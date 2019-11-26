@@ -8,10 +8,10 @@ import com.aceplus.domain.entity.CompanyInformation
 import com.aceplus.domain.entity.invoice.Invoice
 import com.aceplus.domain.entity.promotion.Promotion
 import com.aceplus.domain.model.credit.CreditInvoice
+import com.aceplus.domain.vo.SaleExchangeProductInfo
 import com.aceplus.domain.vo.SoldProductInfo
 import gems.com.command.sdk.PrintPicture
 import java.io.UnsupportedEncodingException
-import java.lang.StringBuilder
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
@@ -640,7 +640,9 @@ object PrintUtils{
         invoiceNumber: String,
         salePersonName: String?,
         routeName: String?,
-        soldProductList: ArrayList<SoldProductInfo>
+        soldProductList: ArrayList<SoldProductInfo>,
+        invoice: Invoice,
+        returnProductList: ArrayList<SaleExchangeProductInfo>
     ){
 
         val printDataByteArrayList = java.util.ArrayList<ByteArray>()
@@ -700,11 +702,7 @@ object PrintUtils{
             nameList.removeAt(0)
             for (cutName in nameList) {
                 formatter = Formatter(StringBuilder(), Locale.US)
-                printDataByteArrayList.add(
-                    formatter!!.format(
-                        "%1$-20s \t %2$1s \t %3$1s \t %4$1s\n", cutName, "", "", ""
-                    ).toString().toByteArray()
-                )
+                printDataByteArrayList.add(formatter!!.format("%1$-20s \t %2$1s \t %3$1s \t %4$1s\n", cutName, "", "", "").toString().toByteArray())
                 formatter!!.close()
             }
 
@@ -713,6 +711,56 @@ object PrintUtils{
         }
 
         printDataByteArrayList.add("------------------------------------------------\n".toByteArray())
+
+        val taxType = companyInfo.tax_type
+        var taxText: String
+
+        if (taxType.equals("E", ignoreCase = true)) {
+            taxText = "(Tax " + String.format("%.2f", invoice.tax_amount) + " Excluded)"
+            totalNetAmount = invoice.total_amount!!.toDouble() - invoice.total_discount_amount + invoice.tax_amount
+        } else {
+            taxText = "(Tax " + String.format("%.2f", invoice.tax_amount) + " Included)"
+            totalNetAmount = invoice.total_amount!!.toDouble() - invoice.total_discount_amount
+        }
+
+        formatter = Formatter(StringBuilder(), Locale.US)
+        printDataByteArrayList.add(
+            formatter!!.format(
+                "%1$-13s%2$19s\n%3$-13s%4$19s\n%5$-13s\n%6$-13s%7$19s\n\n",
+                "Total Amount       :        ", Utils.decimalFormatterWithComma.format(totalAmount),
+                "Discount           :        ", Utils.decimalFormatterWithComma.format(invoice.total_discount_amount).toString() + " (" + DecimalFormat("#0.00").format(invoice.total_discount_percent) + "%)",
+                taxText,
+                "Net Amount         :        ",
+                Utils.decimalFormatterWithComma.format(totalNetAmount)
+            ).toString().toByteArray()
+        )
+        formatter!!.close()
+
+        formatter = Formatter(StringBuilder(), Locale.US)
+        printDataByteArrayList.add(
+            formatter!!.format(
+                "%1$-20s \t %2$4s \t %3$5s \t %4$7s\n",
+                "Return",
+                "Qty",
+                "Price",
+                "Amount"
+            ).toString().toByteArray()
+        )
+        formatter!!.close()
+        printDataByteArrayList.add("----------------------------------------------\n".toByteArray())
+
+        for(returnProduct in returnProductList){
+
+            val quantity = returnProduct.quantity
+            val unitPrice = returnProduct.price?.toDouble() ?: 0.0
+            val amount = unitPrice * quantity
+            // No discount data to calculate
+            totalReturnAmount += amount
+
+            val nameFragments = returnProduct.product_name.toString().split(" ")
+            // ToDo
+
+        }
 
     }
 
