@@ -60,6 +60,7 @@ class SaleCancelViewModel(
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     soldProductListSuccessState.value = it
+                    //soldProductListSuccessState.value=null
 
                 }, {
                     soldProductListErrorState.value = it.localizedMessage

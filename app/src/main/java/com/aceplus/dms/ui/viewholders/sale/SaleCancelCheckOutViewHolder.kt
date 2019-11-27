@@ -14,7 +14,7 @@ class SaleCancelCheckOutViewHolder (itemView: View): BaseViewHolder<SoldProductI
         itemView.qty.text = data.quantity.toString()
         val price=data.product.selling_price!!.toDouble()
         val qty=data.quantity
-        val amt:Double=price*qty
+        val amt:Double=data.promotionPrice*qty
         itemView.price.text = Utils.formatAmount(data.product.selling_price!!.toDouble())
         itemView.discount.text = Utils.formatAmount(data.promoPriceByDiscount)
         itemView.amt.text = Utils.formatAmount(amt)
