@@ -88,7 +88,7 @@ class PrintInvoiceViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
                     for (i in it){
                         companyInfo = i
                     }
-                    return@flatMap customerVisitRepo.getSaleManName(orderSaleManID!!)
+                    return@flatMap customerVisitRepo.getSaleManName(orderSaleManID)
                 }
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.mainThread())
@@ -179,7 +179,7 @@ class PrintInvoiceViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
 
         }
 
-        for (i in positionList.size downTo 0){
+        for (i in positionList.size downTo 1){
             val pos = positionList[i - 1]
             newPresentList.removeAt(pos)
         }

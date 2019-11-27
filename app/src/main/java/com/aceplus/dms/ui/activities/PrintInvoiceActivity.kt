@@ -138,10 +138,7 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
         ): Intent? {
             val intent = Intent(context, PrintInvoiceActivity::class.java)
             intent.putExtra(IE_INVOICE, invoice)
-            intent.putExtra(
-                HISTORY_REPORT_SOLD_PRODUCT_LIST,
-                saleHistoryDetailList as ArrayList<SaleInvoiceDetailReport>
-            )
+            intent.putExtra(HISTORY_REPORT_SOLD_PRODUCT_LIST, saleHistoryDetailList as ArrayList<SaleInvoiceDetailReport>)
             intent.putExtra(IE_PRINT_MODE, "RP")
             return intent
         }
@@ -169,7 +166,6 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
 
             return intent
         }
-
 
     }
 
@@ -272,6 +268,7 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
             if (it != null) {
                 relatedDataForPrint = it
                 onPrint()
+                printInvoiceViewModel.relatedDataForPrint.value = null
             }
         })
 
@@ -456,6 +453,7 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
         val v1 = window.decorView.rootView
         v1.isDrawingCacheEnabled = true
         val myBitmap = v1.drawingCache
+        val saleManName = if (invoice!!.receipt_person_name.isNullOrBlank()) "To Find" else invoice!!.receipt_person_name
 
         if (printMode == "C" && !creditFlg.isNullOrBlank()){
 
@@ -473,7 +471,7 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
                     creditList[pos],
                     mBluetoothService!!,
                     relatedDataForPrint!!.companyInfo
-                )
+                ) //To check sale person name
             }
 
         } else if (printMode == "S"){
@@ -487,7 +485,7 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
                 customerData.customer_name,
                 customerData.address,
                 invoice!!.invoice_id,
-                salePersonName,
+                saleManName,
                 relatedDataForPrint!!.routeName,
                 relatedDataForPrint!!.customerTownShipName,
                 invoice!!,
@@ -521,7 +519,7 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
                 mBluetoothService!!,
                 relatedDataForPrint!!.companyInfo,
                 "report"
-            )
+            ) //To check sale person name
 
         } else if (printMode == "D"){
 
@@ -546,7 +544,7 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
                 PrintUtils.FOR_OTHERS,
                 mBluetoothService!!,
                 relatedDataForPrint!!.companyInfo
-            )
+            ) //To check sale person name
 
         } else if (printMode == "SR"){
 
@@ -569,7 +567,7 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
                 mBluetoothService!!,
                 relatedDataForPrint!!.companyInfo,
                 null
-            )
+            ) //To check sale person name
 
         }
 
@@ -617,7 +615,7 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
             Constant.HM_MESSAGE_DEVICE_NAME -> {
                 val connectedDeviceName = it.data.getString(DEVICE_NAME)
                 Toast.makeText(this, "Connected to $connectedDeviceName", Toast.LENGTH_SHORT).show()
-                printInvoiceViewModel.getRelatedDataAndPrint(invoice!!.customer_id!!, invoice!!.sale_person_id!!, orderedInvoice?.sale_man_id)
+                printInvoiceViewModel.getRelatedDataAndPrint(invoice!!.customer_id!!, invoice!!.sale_person_id!!, orderedInvoice?.sale_man_id) //Sale man id to name //Why from sale order
             }
             Constant.HM_MESSAGE_TOAST -> {
                 Toast.makeText(this, it.data.getString(TOAST), Toast.LENGTH_SHORT).show()

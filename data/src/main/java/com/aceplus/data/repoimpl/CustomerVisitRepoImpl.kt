@@ -62,7 +62,7 @@ class CustomerVisitRepoImpl(
         return saleMan
     }
 
-    override fun getSaleManName(saleManId: String): Observable<List<String?>> {
+    override fun getSaleManName(saleManId: String?): Observable<List<String?>> {
         return Observable.just(db.saleManDao().getSaleManNameByID(saleManId))
     }
 
@@ -129,7 +129,7 @@ class CustomerVisitRepoImpl(
     }
 
     override fun getCustomerTownshipName(customerID: Int): Observable<String> {
-        return Observable.just(db.townshipDao().townshipNameByID(customerID)?.data)
+        return Observable.just(db.townshipDao().townshipNameByID(customerID))
     }
 
     override fun updateCustomerData(customer: Customer) {

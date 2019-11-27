@@ -72,7 +72,7 @@ object PrintUtils{
                     presentList,
                     printFor,
                     mode,
-                    ByteArray(7),
+                    printBmp(activity),
                     companyInfo,
                     printMode
                 )
@@ -137,7 +137,7 @@ object PrintUtils{
         try {
             val printDataByteArray = convertFromListByteArrayToByteArray(
                 getPrintDataByteArrayListDeliver(
-                    activity,
+                    printBmp(activity),
                     customerName,
                     cus_address,
                     orderInvoiceNo,
@@ -161,6 +161,44 @@ object PrintUtils{
         }
     }
 
+    fun printSaleExchangeWithHSPOS(
+        activity: Activity,
+        mBTService: BluetoothService,
+        companyInfo: CompanyInformation,
+        customerName: String?,
+        cus_address: String?,
+        townshipName: String,
+        invoiceNumber: String,
+        salePersonName: String?,
+        routeName: String?,
+        soldProductList: ArrayList<SoldProductInfo>,
+        invoice: Invoice,
+        returnProductList: ArrayList<SaleExchangeProductInfo>,
+        returnDiscountAmt: Double
+    ){
+        try {
+            val printDataByteArray = convertFromListByteArrayToByteArray(
+                getPrintDataByteArrayListForSaleExchange(
+                    printBmp(activity),
+                    companyInfo,
+                    customerName,
+                    cus_address,
+                    townshipName,
+                    invoiceNumber,
+                    salePersonName,
+                    routeName,
+                    soldProductList,
+                    invoice,
+                    returnProductList,
+                    returnDiscountAmt
+                )
+            )
+            sendDataByte2BT(activity, mBTService, printDataByteArray)
+        } catch (e: UnsupportedEncodingException) {
+            e.printStackTrace()
+        }
+    }
+
     @Throws(UnsupportedEncodingException::class)
     private fun getPrintDataByteArrayList(
         customerName: String?,
@@ -174,13 +212,14 @@ object PrintUtils{
         presentList: ArrayList<Promotion>,
         printFor: String,
         mode: String,
-        imgByte: ByteArray,
+        imgByte: ByteArray?,
         companyInfo: CompanyInformation,
         printMode: String?
     ): ArrayList<ByteArray>{
 
         val printDataByteArrayList: ArrayList<ByteArray> = ArrayList()
-        printDataByteArrayList.add(imgByte)
+
+        imgByte?.let { printDataByteArrayList.add(it) }
         printDataByteArrayList.add("\n".toByteArray())
 
         val focProductList: ArrayList<SoldProductInfo> = ArrayList()
@@ -537,7 +576,7 @@ object PrintUtils{
                         "Net Amount        :        ",
                         Utils.decimalFormatterWithComma.format(totalNetAmount),
                         "Pay Amount        :        ",
-                        Utils.decimalFormatterWithComma.format(invoice.pay_amount),
+                        Utils.decimalFormatterWithComma.format(invoice.pay_amount?.toDouble() ?: 0.0),
                         "Credit Balance    :        ",
                         Utils.decimalFormatterWithComma.format(abs(creditBalance!!)),
                         "Refund            :        ",
@@ -632,7 +671,7 @@ object PrintUtils{
     }
 
     private fun getPrintDataByteArrayListForSaleExchange(
-        imgByte: ByteArray,
+        imgByte: ByteArray?,
         companyInfo: CompanyInformation,
         customerName: String?,
         cus_address: String?,
@@ -642,11 +681,13 @@ object PrintUtils{
         routeName: String?,
         soldProductList: ArrayList<SoldProductInfo>,
         invoice: Invoice,
-        returnProductList: ArrayList<SaleExchangeProductInfo>
-    ){
+        returnProductList: ArrayList<SaleExchangeProductInfo>,
+        returnDiscountAmt: Double
+    ): ArrayList<ByteArray>{
 
         val printDataByteArrayList = java.util.ArrayList<ByteArray>()
-        printDataByteArrayList.add(imgByte)
+
+        imgByte?.let { printDataByteArrayList.add(it) }
         printDataByteArrayList.add("\n".toByteArray())
 
         var totalAmount = 0.0
@@ -758,12 +799,66 @@ object PrintUtils{
             totalReturnAmount += amount
 
             val nameFragments = returnProduct.product_name.toString().split(" ")
-            // ToDo
+            val nameList = setupPrintLayoutNoPromo(nameFragments as ArrayList<String>)
+            formatter = Formatter(StringBuilder(), Locale.US)
+            printDataByteArrayList.add(
+                formatter!!.format(
+                    "%1$-20s \t %2$4s \t %3$5s \t %4$9s\n",
+                    nameList[0],
+                    quantity,
+                    Utils.decimalFormatterWithoutComma.format(unitPrice),
+                    Utils.decimalFormatterWithComma.format(amount)
+                ).toString().toByteArray()
+            )
+            formatter!!.close()
+
+            nameList.removeAt(0)
+            for (cutName in nameList) {
+                formatter = Formatter(StringBuilder(), Locale.US)
+                printDataByteArrayList.add(formatter!!.format("%1$-20s \t %2$1s \t %3$1s \t %4$1s\n", cutName, "", "", "").toString().toByteArray())
+                formatter!!.close()
+            }
+            printDataByteArrayList.add("\n".toByteArray())
 
         }
 
+        printDataByteArrayList.add("----------------------------------------------\n".toByteArray())
+
+        var taxReturnText: String = if (taxType.equals("E", ignoreCase = true))
+            "Tax ${invoice.tax_amount} Excluded"
+        else
+            "Tax ${invoice.tax_amount} Included"
+
+        formatter = Formatter(StringBuilder(), Locale.US)
+        printDataByteArrayList.add(
+            formatter!!.format(
+                "%1$-13s%2$19s\n%3$-13s%4$19s\n%5$-13s\n%6$-13s%7$19s\n",
+                "Total Amount       :        ", Utils.decimalFormatterWithComma.format(totalReturnAmount),
+                "Discount           :        ", Utils.decimalFormatterWithComma.format(returnDiscountAmt) + " (" + DecimalFormat("#0.00").format(invoice.total_discount_percent) + "%)",
+                taxReturnText,
+                "Net Amount         :        ", Utils.decimalFormatterWithComma.format(totalReturnAmount - returnDiscountAmt)
+            ).toString().toByteArray() // Check disc percent
+        )
+        formatter!!.close()
+
+        printDataByteArrayList.add("----------------------------------------------\n".toByteArray())
+
+        formatter = Formatter(StringBuilder(), Locale.US)
+        printDataByteArrayList.add(
+            formatter!!.format(
+                "%1$-13s%2$19s\n%3$-13s%4$19s\n%5$-13s%6$19s\n",
+                "Sale Amount        :        ", Utils.decimalFormatterWithComma.format(totalAmount),
+                "Sale Return Amount :        ", Utils.decimalFormatterWithComma.format(totalReturnAmount - returnDiscountAmt),
+                "Net Cash           :        ", Utils.decimalFormatterWithComma.format(abs(totalAmount - (totalReturnAmount - returnDiscountAmt)))
+            ).toString().toByteArray()
+        )
+        formatter!!.close()
+        printDataByteArrayList.add("\nSignature          :\n\n                 Thank You. \n\n".toByteArray())
+
+        return printDataByteArrayList
     }
 
+    // To add image
     private fun getPrintDataByteArrayListForCredit(
         customerName: String?,
         cus_address: String?,
@@ -803,7 +898,7 @@ object PrintUtils{
     }
 
     private fun getPrintDataByteArrayListDeliver(
-        activity: Activity,
+        imgByte: ByteArray?,
         customerName: String?,
         cus_address: String?,
         orderInvoiceNo: String,
@@ -822,7 +917,6 @@ object PrintUtils{
     ): ArrayList<ByteArray>{
 
         val printDataByteArrayList = ArrayList<ByteArray>()
-        val imgByte = printBmp(activity)
 
         imgByte?.let { printDataByteArrayList.add(it) }
         printDataByteArrayList.add("\n".toByteArray())

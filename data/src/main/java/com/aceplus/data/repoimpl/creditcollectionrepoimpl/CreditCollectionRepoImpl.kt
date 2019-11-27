@@ -17,7 +17,7 @@ class CreditCollectionRepoImpl(val database: MyDatabase):CreditCollectionRepo {
     }
     override fun getTownShipName(customerID: Int): String {
         val township = database.townshipDao().townshipNameByID(customerID)
-        return township?.data ?: ""
+        return township ?: ""
     }
 
 

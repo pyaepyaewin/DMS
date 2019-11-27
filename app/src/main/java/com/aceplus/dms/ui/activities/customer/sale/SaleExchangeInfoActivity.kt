@@ -21,12 +21,14 @@ import com.aceplus.dms.ui.activities.DeviceListActivity
 import com.aceplus.dms.ui.activities.PrintInvoiceActivity
 import com.aceplus.dms.ui.adapters.sale.SaleExchangeInfoAdapter
 import com.aceplus.dms.utils.BluetoothService
+import com.aceplus.dms.utils.PrintUtils
 import com.aceplus.dms.utils.Utils
 import com.aceplus.dms.viewmodel.PrintInvoiceViewModel
 import com.aceplus.domain.entity.customer.Customer
 import com.aceplus.domain.entity.invoice.Invoice
 import com.aceplus.domain.entity.product.Product
 import com.aceplus.domain.entity.promotion.Promotion
+import com.aceplus.domain.vo.RelatedDataForPrint
 import com.aceplus.domain.vo.SaleExchangeProductInfo
 import com.aceplus.domain.vo.SoldProductInfo
 import com.aceplus.domain.vo.report.SaleInvoiceDetailReport
@@ -84,6 +86,7 @@ class SaleExchangeInfoActivity: BaseActivity(), KodeinAware {
     private var soldProductList: ArrayList<SoldProductInfo> = ArrayList()
     private var promotionList: ArrayList<Promotion> = ArrayList()
     private var saleReturnInvoiceNo: String? = null
+    private var relatedDataForPrint: RelatedDataForPrint? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -174,6 +177,14 @@ class SaleExchangeInfoActivity: BaseActivity(), KodeinAware {
 
         print_img.setOnClickListener { onConnecting() }
 
+        printInvoiceViewModel.relatedDataForPrint.observe(this, Observer {
+            if (it != null) {
+                relatedDataForPrint = it
+                onPrint()
+                printInvoiceViewModel.relatedDataForPrint.value = null
+            }
+        })
+
     }
 
     private fun getInfoAndSetData(){
@@ -218,7 +229,7 @@ class SaleExchangeInfoActivity: BaseActivity(), KodeinAware {
             Constant.HM_MESSAGE_DEVICE_NAME -> {
                 val connectedDeviceName = it.data.getString(PrintInvoiceActivity.DEVICE_NAME)
                 Toast.makeText(this, "Connected to $connectedDeviceName", Toast.LENGTH_SHORT).show()
-                //printInvoiceViewModel.getRelatedDataAndPrint(invoice!!.customer_id!!, invoice!!.sale_person_id!!, orderedInvoice?.sale_man_id)
+                printInvoiceViewModel.getRelatedDataAndPrint(invoice!!.customer_id!!, invoice!!.sale_person_id!!, null)
             }
             Constant.HM_MESSAGE_TOAST -> {
                 Toast.makeText(this, it.data.getString(PrintInvoiceActivity.TOAST), Toast.LENGTH_SHORT).show()
@@ -264,9 +275,10 @@ class SaleExchangeInfoActivity: BaseActivity(), KodeinAware {
         val v1 = window.decorView.rootView
         v1.isDrawingCacheEnabled = true
         val myBitmap = v1.drawingCache
-
         Utils.saveInvoiceImageIntoGallery(invoice!!.invoice_id, this, myBitmap, "Sale") // Doesn't work
+
         val editProductList = printInvoiceViewModel.arrangeProductList(soldProductList, promotionList)
+        //PrintUtils
 
     }
 
