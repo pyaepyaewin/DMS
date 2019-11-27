@@ -53,9 +53,9 @@ class SaleCancelViewModel(
 
     var soldProductListSuccessState = MutableLiveData<List<SaleCancelDetailItem>>()
     var soldProductListErrorState = MutableLiveData<String>()
-    fun loadSoldProductList(productIdList: List<String>) {
+    fun loadSoldProductList(productIdList: List<String>,invoiceID: String) {
         launch {
-            saleCancelRepo.getSoldProductList(productIdList)
+            saleCancelRepo.getSoldProductList(productIdList,invoiceID)
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
@@ -112,7 +112,7 @@ class SaleCancelViewModel(
             if (soldProduct.promotionPlanId.toString().isNullOrEmpty())
                 invoiceCancelProduct.promotion_plan_id = soldProduct.promotionPlanId.toInt()
             invoiceProductList.add(invoiceCancelProduct)
-            saleCancelRepo.updateProductRemainingQty(soldProduct.quantity,soldProduct.product.id)
+            saleCancelRepo.updateProductRemainingQtyForSaleCancel(soldProduct.quantity,soldProduct.product.id)
 
         }
 //        saleCancelRepo.updateProductRemainingQty(

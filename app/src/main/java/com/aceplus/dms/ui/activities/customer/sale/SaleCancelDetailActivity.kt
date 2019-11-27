@@ -113,7 +113,7 @@ class SaleCancelDetailActivity : BaseActivity(), KodeinAware {
 
                 soldProductList1 = it as MutableList<String>
 
-                saleCancelViewModel.loadSoldProductList(it)
+                saleCancelViewModel.loadSoldProductList(it,invoiceid)
 
 
             })

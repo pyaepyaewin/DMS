@@ -16,7 +16,7 @@ import io.reactivex.Observable
 interface SaleCancelRepo {
     fun getSaleCancelList(): Observable<List<SaleCancelItem>>
     fun getProductIdList(invoiceID: String): Observable<List<String>>
-    fun getSoldProductList(productIdList: List<String>): Observable<List<SaleCancelDetailItem>>
+    fun getSoldProductList(productIdList: List<String>,invoiceId: String): Observable<List<SaleCancelDetailItem>>
     fun deleteInvoiceData(invoiceId: String)
     fun deleteInvoiceProduct(invoiceId: String)
     fun deleteInvoicePresent(invoiceId: String)
@@ -39,7 +39,8 @@ interface SaleCancelRepo {
     )
 
     fun getInvoiceCancel(invoiceId: String): Observable<Invoice>
-    fun updateProductRemainingQty(soldQty:Int,productId: Int)
+    fun updateProductRemainingQtyForSaleCancel(qty:Int,productId: Int)
+
 
 
 }

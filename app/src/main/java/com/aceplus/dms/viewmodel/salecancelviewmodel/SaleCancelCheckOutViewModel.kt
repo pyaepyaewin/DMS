@@ -146,7 +146,7 @@ class SaleCancelCheckOutViewModel(
             if (soldProduct.totalAmt != 0.0) {
                 invoiceProductList.add(invoiceProduct)
             }
-            saleCancelRepo.updateProductRemainingQty(soldProduct.quantity, soldProduct.product.id)
+            saleCancelRepo.updateProductRemainingQtyForSaleCancel(soldProduct.quantity, soldProduct.product.id)
 
         }
         saleCancelRepo.insertInvoiceProduct(invoiceProductList)

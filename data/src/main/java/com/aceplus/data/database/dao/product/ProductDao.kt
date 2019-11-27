@@ -44,15 +44,18 @@ interface ProductDao {
     @Query("update product set remaining_quantity = remaining_quantity + :qty, return_quantity = return_quantity + :qty where product.id = :productID")
     fun updateProductRemainingQtyWithSaleReturn(qty: Int, productID: Int)
 
+    @Query("update product set remaining_quantity = remaining_quantity + :qty,  sold_quantity= sold_quantity + :qty where product.id = :productID")
+    fun updateProductRemainingQtyWithSaleCancel(qty: Int, productID: Int)
+
     @Query("Delete from product")
     fun deleteAll()
 
     @Query("select product_name,total_quantity,order_quantity,sold_quantity,exchange_quantity,return_quantity,delivery_quantity,present_quantity,remaining_quantity from product")
     fun getProductBalanceReport(): List<ProductBalanceReport>
 
-    @Query("select IP.total_amount,IP.discount_amount,IP.discount_percent,IP.exclude,IP.promotion_plan_id,p.id, p.product_id, p.product_name, p.category_id, p.group_id, p.total_quantity, p.remaining_quantity, p.selling_price, p.purchase_price, p.discount_type, u.name as um, p.sold_quantity, p.order_quantity, p.exchange_quantity, p.return_quantity, p.delivery_quantity, p.present_quantity, p.device_issue_status, p.class_id,IP.promotion_price ,IP.sale_quantity from product as p, um as u,invoice_product as IP where p.um = u.id and p.id in (:productIDList) and p.id=IP.product_id")
+    @Query("select IP.total_amount,IP.discount_amount,IP.discount_percent,IP.exclude,IP.promotion_plan_id,p.id, p.product_id, p.product_name, p.category_id, p.group_id, p.total_quantity, p.remaining_quantity, p.selling_price, p.purchase_price, p.discount_type, u.name as um, p.sold_quantity, p.order_quantity, p.exchange_quantity, p.return_quantity, p.delivery_quantity, p.present_quantity, p.device_issue_status, p.class_id,IP.promotion_price ,IP.sale_quantity from product as p, um as u,invoice_product as IP where p.um = u.id and p.id in (:productIDList) and p.id=IP.product_id and IP.invoice_product_id=:invoiceId")
 //    @Query("select IP.total_amount,IP.discount_amount,IP.discount_percent,IP.exclude,IP.promotion_plan_id,p.id, p.product_id, p.product_name, p.category_id, p.group_id, p.total_quantity, p.remaining_quantity, p.selling_price, p.purchase_price, p.discount_type, u.name as um, p.sold_quantity, p.order_quantity, p.exchange_quantity, p.return_quantity, p.delivery_quantity, p.present_quantity, p.device_issue_status, p.class_id,IP.promotion_price ,IP.sale_quantity from product as p, um as u,invoice_product as IP where p.id in (:productIDList)")
-    fun allProductDataList(productIDList: List<String>): List<SaleCancelDetailItem>
+    fun allProductDataList(productIDList: List<String>,invoiceId:String): List<SaleCancelDetailItem>
 
     @Query("select * from product where id in (:stockIdList)")
     fun deliveryProductDataList(stockIdList:List<String>): List<Product>
