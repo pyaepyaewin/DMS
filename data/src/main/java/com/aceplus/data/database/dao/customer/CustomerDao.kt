@@ -50,7 +50,7 @@ interface CustomerDao {
     fun deleteAll()
 
     @Query("update customer set latitude = :latitude, longitude = :longitude where id = :customerID")
-    fun updateCustomerData(customerID: Int, latitude: String?, longitude: String?)
+    fun updateCustomerLocation(customerID: Int, latitude: String?, longitude: String?)
 
     @Query("select customer.latitude,customer.longitude from customer where customer.route_schedule_status=1")
     fun getCustomerLocation():List<CustomerLocationDataClass>

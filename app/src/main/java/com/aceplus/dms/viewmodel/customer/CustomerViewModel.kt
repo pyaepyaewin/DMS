@@ -105,10 +105,11 @@ class CustomerViewModel(
 
     fun insertDataForTempSaleManRouteAndSaleVisitRecord(selectedCustomer: Customer, currentDate: String, gpsTracker: GPSTracker) {
         val arrivalStatus = if (isSameCustomer(selectedCustomer,gpsTracker)) 1 else 0
-        customerVisitRepo.saveDataForTempSaleManRoute(selectedCustomer, currentDate,arrivalStatus)
+        customerVisitRepo.saveDataForTempSaleManRoute(selectedCustomer, currentDate, arrivalStatus)
         customerVisitRepo.saveSaleVisitRecord(selectedCustomer, arrivalStatus)
     }
 
+    // Can it move to utils?
     private fun isSameCustomer(customer: Customer, gpsTracker: GPSTracker): Boolean {
         var arrivalStatus = false
         if (gpsTracker.canGetLocation()) {
@@ -145,8 +146,16 @@ class CustomerViewModel(
     }
 
 
-    fun updateCustomerData(customer: Customer){
+    fun updateCustomerLocation(customer: Customer){
         customerVisitRepo.updateCustomerData(customer)
+    }
+
+    fun saveOrUpdateSaleManRoute(customer: Customer){
+        customerVisitRepo.saveDataForTempSaleManRoute(
+            customer,
+            Utils.getCurrentDate(true),
+            1
+        ) //Is this need arrival check? Now it's solid data!
     }
 
 }

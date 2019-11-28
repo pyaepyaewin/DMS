@@ -133,7 +133,7 @@ class CustomerVisitRepoImpl(
     }
 
     override fun updateCustomerData(customer: Customer) {
-        db.customerDao().updateCustomerData(customer.id, customer.latitude, customer.longitude)
+        db.customerDao().updateCustomerLocation(customer.id, customer.latitude, customer.longitude)
     }
 
     override fun getAllDidFeedback(): Observable<List<String>> {

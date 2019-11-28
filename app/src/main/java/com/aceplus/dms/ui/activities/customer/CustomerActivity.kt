@@ -1,5 +1,6 @@
 package com.aceplus.dms.ui.activities.customer
 
+import android.app.Activity
 import android.app.AlertDialog
 import android.arch.lifecycle.Observer
 import android.content.Context
@@ -45,6 +46,7 @@ class CustomerActivity : BaseActivity(), KodeinAware {
     companion object {
 
         private const val IE_SALE_EXCHANGE = "IE_SALE_EXCHANGE"
+        private const val IE_CUSTOMER_DATA = "IE_CUSTOMER_DATA"
 
         fun newIntent(context: Context): Intent {
             return Intent(context, CustomerActivity::class.java)
@@ -76,6 +78,10 @@ class CustomerActivity : BaseActivity(), KodeinAware {
         setupUI()
         catchEvents()
 
+    }
+
+    override fun onResume() {
+        super.onResume()
         customerViewModel.loadCustomer()
     }
 
@@ -160,8 +166,10 @@ class CustomerActivity : BaseActivity(), KodeinAware {
         })
 
         customerViewModel.dialogStatus.observe(this, Observer {
-            Utils.commonDialog(it!!, this@CustomerActivity, 2)
-            customerViewModel.dialogStatus.value = null
+            if (it != null){
+                Utils.commonDialog(it!!, this@CustomerActivity, 2)
+                customerViewModel.dialogStatus.value = null
+            }
         })
 
         tvAddress.setOnClickListener { onClickAddress() }
@@ -299,7 +307,7 @@ class CustomerActivity : BaseActivity(), KodeinAware {
                 salesmanId = AppUtils.getStringFromShp(Constant.SALEMAN_ID, applicationContext) ?: "",
                 customer = selectedCustomer!!
             )
-            startActivity(intent)
+            startActivityForResult(intent, Constant.RQC_GET_LOCATION)
         }
 
     }
@@ -335,6 +343,23 @@ class CustomerActivity : BaseActivity(), KodeinAware {
             customerViewModel.insertDataForTempSaleManRouteAndSaleVisitRecord(selectedCustomer!!, Utils.getCurrentDate(true), gspTracker)
             val intent = SaleReturnActivity.newIntentFromCustomer(applicationContext, true, selectedCustomer!!)
             startActivity(intent)
+        }
+
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == Constant.RQC_GET_LOCATION){
+            if (resultCode == Activity.RESULT_OK){
+                if (data != null){
+
+                    val customer = data.getSerializableExtra(IE_CUSTOMER_DATA) as Customer
+                    selectedCustomer = customer
+                    onClickCustomerListItem(customer)
+
+                }
+            }
         }
 
     }

@@ -69,6 +69,9 @@ class Constant {
         const val HM_MESSAGE_TOAST = 5
         const val HM_MESSAGE_CONNECTION_LOST = 6
         const val HM_MESSAGE_UNABLE_CONNECT = 7
+
+        const val RQC_GET_LOCATION = 100
+
     }
 
 }
