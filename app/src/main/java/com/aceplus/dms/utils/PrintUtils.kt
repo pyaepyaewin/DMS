@@ -2,6 +2,7 @@ package com.aceplus.dms.utils
 
 import android.app.Activity
 import android.graphics.BitmapFactory
+import android.util.Log
 import android.widget.Toast
 import com.aceplus.dms.R
 import com.aceplus.domain.entity.CompanyInformation
@@ -725,7 +726,7 @@ object PrintUtils{
             totalAmount += amount
             totalNetAmount += netAmount
 
-            val nameFragments = soldProduct.product.product_name!!.split("")
+            val nameFragments = soldProduct.product.product_name!!.split(" ")
             val nameList = setupPrintLayoutNoPromo(nameFragments as ArrayList<String>)
 
             formatter = Formatter(StringBuilder(), Locale.US)
@@ -769,7 +770,7 @@ object PrintUtils{
             formatter!!.format(
                 "%1$-13s%2$19s\n%3$-13s%4$19s\n%5$-13s\n%6$-13s%7$19s\n\n",
                 "Total Amount       :        ", Utils.decimalFormatterWithComma.format(totalAmount),
-                "Discount           :        ", Utils.decimalFormatterWithComma.format(invoice.total_discount_amount).toString() + " (" + DecimalFormat("#0.00").format(invoice.total_discount_percent) + "%)",
+                "Discount           :        ", Utils.decimalFormatterWithComma.format(invoice.total_discount_amount).toString() + " (" + DecimalFormat("#0.00").format(invoice.total_discount_percent?.toDouble() ?: 0.0) + "%)",
                 taxText,
                 "Net Amount         :        ",
                 Utils.decimalFormatterWithComma.format(totalNetAmount)
@@ -825,16 +826,16 @@ object PrintUtils{
         printDataByteArrayList.add("----------------------------------------------\n".toByteArray())
 
         var taxReturnText: String = if (taxType.equals("E", ignoreCase = true))
-            "Tax ${invoice.tax_amount} Excluded"
+            "(Tax ${invoice.tax_amount} Excluded)"
         else
-            "Tax ${invoice.tax_amount} Included"
+            "(Tax ${invoice.tax_amount} Included)"
 
         formatter = Formatter(StringBuilder(), Locale.US)
         printDataByteArrayList.add(
             formatter!!.format(
                 "%1$-13s%2$19s\n%3$-13s%4$19s\n%5$-13s\n%6$-13s%7$19s\n",
                 "Total Amount       :        ", Utils.decimalFormatterWithComma.format(totalReturnAmount),
-                "Discount           :        ", Utils.decimalFormatterWithComma.format(returnDiscountAmt) + " (" + DecimalFormat("#0.00").format(invoice.total_discount_percent) + "%)",
+                "Discount           :        ", Utils.decimalFormatterWithComma.format(returnDiscountAmt) + " (" + DecimalFormat("#0.00").format(invoice.total_discount_percent?.toDouble() ?: 0.0) + "%)",
                 taxReturnText,
                 "Net Amount         :        ", Utils.decimalFormatterWithComma.format(totalReturnAmount - returnDiscountAmt)
             ).toString().toByteArray() // Check disc percent

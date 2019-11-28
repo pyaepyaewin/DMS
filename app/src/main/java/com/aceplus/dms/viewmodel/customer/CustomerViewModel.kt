@@ -20,6 +20,7 @@ class CustomerViewModel(
 ) : BaseViewModel() {
 
     var customerDataList = MutableLiveData<List<Customer>>()
+    var dialogStatus = MutableLiveData<String>()
 
     fun loadCustomer() {
         launch {
@@ -61,7 +62,7 @@ class CustomerViewModel(
                                     val feedbackDate = customerFeedbackList[descriptionPosition].invoice_date
                                     val serialNumber = ""
                                     val description = customerFeedbackList[descriptionPosition].remark
-                                    val routeId = customerVisitRepo.getRouteScheduleIDV2()
+                                    val routeId = customerVisitRepo.getRouteScheduleIDV2() // Main Thread
 
                                     val invoiceNumber = Utils.getInvoiceNo(
                                         saleManId,
@@ -85,13 +86,10 @@ class CustomerViewModel(
                                     didCustomerFeedbackEntity.route_id = routeId
 
                                     customerVisitRepo.saveCustomerFeedback(didCustomerFeedbackEntity)
-                                    val arrivalStatus = if (isSameCustomer(selectedCustomer,gpsTracker)){
-                                        1
-                                    }else{
-                                        0
-                                    }
-                                    customerVisitRepo.saveSaleVisitRecord(selectedCustomer, arrivalStatus)
 
+                                    val arrivalStatus = if (isSameCustomer(selectedCustomer,gpsTracker)) 1 else 0
+
+                                    customerVisitRepo.saveSaleVisitRecord(selectedCustomer, arrivalStatus)
                                     customerVisitRepo.updateDepartureTimeForSaleManRoute(
                                         saleManId,
                                         selectedCustomer.customer_id!!,
@@ -106,11 +104,7 @@ class CustomerViewModel(
     }
 
     fun insertDataForTempSaleManRouteAndSaleVisitRecord(selectedCustomer: Customer, currentDate: String, gpsTracker: GPSTracker) {
-        val arrivalStatus = if (isSameCustomer(selectedCustomer,gpsTracker)){
-            1
-        }else{
-            0
-        }
+        val arrivalStatus = if (isSameCustomer(selectedCustomer,gpsTracker)) 1 else 0
         customerVisitRepo.saveDataForTempSaleManRoute(selectedCustomer, currentDate,arrivalStatus)
         customerVisitRepo.saveSaleVisitRecord(selectedCustomer, arrivalStatus)
     }
@@ -120,8 +114,6 @@ class CustomerViewModel(
         if (gpsTracker.canGetLocation()) {
             val customerLatitude = customer.latitude?.toDouble() ?: 0.0
             val customerLongitude = customer.longitude?.toDouble() ?: 0.0
-            //            double customerLatitude = 16.850304;
-            //            double customerLongitude = 96.128192;
 
             val saleManLatitude = gpsTracker.getLatitude()
             val saleManLongitude = gpsTracker.getLongitude()
@@ -139,10 +131,12 @@ class CustomerViewModel(
                 if (distance < 50) {
                     arrivalStatus = true
                 } else {
-//                    Utils.commonDialog("You are not near customer's shop", this@CustomerActivity, 2)//will show this alert?
+                    dialogStatus.postValue("You are not near customer's shop")
+                    //Utils.commonDialog("You are not near customer's shop", this@CustomerActivity, 2)//will show this alert?
                 }
             } else {
-//                Utils.commonDialog("Customer's location is not detected", this@CustomerActivity, 2)//will show this alert?
+                dialogStatus.postValue("Customer's location is not detected")
+                //Utils.commonDialog("Customer's location is not detected", this@CustomerActivity, 2)//will show this alert?
             }
         } else {
             gpsTracker.showSettingsAlert()

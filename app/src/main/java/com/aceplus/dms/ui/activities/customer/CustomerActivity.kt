@@ -1,6 +1,5 @@
 package com.aceplus.dms.ui.activities.customer
 
-import android.app.Activity
 import android.app.AlertDialog
 import android.arch.lifecycle.Observer
 import android.content.Context
@@ -19,7 +18,6 @@ import android.widget.EditText
 import android.widget.Spinner
 import com.aceplus.data.utils.Constant
 import com.aceplus.dms.R
-import com.aceplus.dms.ui.activities.CustomerVisitActivity
 import com.aceplus.dms.ui.activities.customer.sale.SaleActivity
 import com.aceplus.dms.ui.activities.customer.sale.SaleReturnActivity
 import com.aceplus.dms.ui.activities.customer.saleorder.SaleOrderActivity
@@ -69,6 +67,7 @@ class CustomerActivity : BaseActivity(), KodeinAware {
     private val gspTracker by lazy{ GPSTracker(applicationContext) }
 
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -76,11 +75,6 @@ class CustomerActivity : BaseActivity(), KodeinAware {
 
         setupUI()
         catchEvents()
-
-        customerViewModel.customerDataList.observe(this, Observer {
-            mCustomerListAdapter.setNewList(it as ArrayList<Customer>)
-            allCustomerDataList = it
-        })
 
         customerViewModel.loadCustomer()
     }
@@ -144,6 +138,11 @@ class CustomerActivity : BaseActivity(), KodeinAware {
 
     private fun catchEvents() {
 
+        customerViewModel.customerDataList.observe(this, Observer {
+            mCustomerListAdapter.setNewList(it as ArrayList<Customer>)
+            allCustomerDataList = it
+        })
+
         edtSearch.addTextChangedListener(object : TextWatcher {
 
             override fun onTextChanged(characterSequence: CharSequence, arg1: Int, arg2: Int, arg3: Int) {
@@ -155,9 +154,14 @@ class CustomerActivity : BaseActivity(), KodeinAware {
                 }
                 mCustomerListAdapter.setNewList(newCustomerList as ArrayList<Customer>)
             }
-            override fun beforeTextChanged(arg0: CharSequence, arg1: Int, arg2: Int, arg3: Int) {}
-            override fun afterTextChanged(arg0: Editable) {}
+            override fun beforeTextChanged(arg0: CharSequence, arg1: Int, arg2: Int, arg3: Int) { "Nothing To Do" }
+            override fun afterTextChanged(arg0: Editable) { "Nothing To Do" }
 
+        })
+
+        customerViewModel.dialogStatus.observe(this, Observer {
+            Utils.commonDialog(it!!, this@CustomerActivity, 2)
+            customerViewModel.dialogStatus.value = null
         })
 
         tvAddress.setOnClickListener { onClickAddress() }
@@ -168,18 +172,12 @@ class CustomerActivity : BaseActivity(), KodeinAware {
         btnSaleOrder.setOnClickListener { onClickSaleOrderButton() }
         btnUnsellReason.setOnClickListener { onClickUnSellReasonButton() }
         btnSaleReturn.setOnClickListener { onClickSaleReturnButton() }
-        //btnPosm.setOnClickListener { onClickPosmButton() }
         btnLocation.setOnClickListener { onClickBtnLocation() }
     }
 
     private fun onClickSaleButton() {
 
         if (didCustomerSelected()) {
-            customerViewModel.insertDataForTempSaleManRouteAndSaleVisitRecord(
-                selectedCustomer!!,
-                Utils.getCurrentDate(true),
-                gspTracker
-            )
             customerViewModel.insertDataForTempSaleManRouteAndSaleVisitRecord(selectedCustomer!!, Utils.getCurrentDate(true), gspTracker)
             val intent = SaleActivity.newIntentFromCustomer(applicationContext, selectedCustomer!!)
             startActivity(intent)
@@ -190,11 +188,6 @@ class CustomerActivity : BaseActivity(), KodeinAware {
     private fun onClickSaleOrderButton() {
 
         if (didCustomerSelected()) {
-            customerViewModel.insertDataForTempSaleManRouteAndSaleVisitRecord(
-                selectedCustomer!!,
-                Utils.getCurrentDate(true),
-                gspTracker
-            )
             customerViewModel.insertDataForTempSaleManRouteAndSaleVisitRecord(selectedCustomer!!, Utils.getCurrentDate(true), gspTracker)
             val intent = SaleOrderActivity.newIntentFromCustomer(applicationContext, selectedCustomer!!)
             startActivity(intent)
@@ -205,7 +198,18 @@ class CustomerActivity : BaseActivity(), KodeinAware {
     private fun onClickUnSellReasonButton() {
 
         if (didCustomerSelected()) {
+
             customerViewModel.insertDataForTempSaleManRouteAndSaleVisitRecord(selectedCustomer!!, Utils.getCurrentDate(true), gspTracker)
+
+            if (selectedCustomer!!.flag == "1"){
+                AlertDialog.Builder(this)
+                    .setTitle("No Authority")
+                    .setMessage("You need to select old customer.")
+                    .setPositiveButton("OK", null)
+                    .show()
+                return
+            }
+
             customerViewModel.loadDidCustomerFeedback(selectedCustomer!!,
                 {
                     AlertDialog.Builder(this@CustomerActivity)
@@ -239,7 +243,8 @@ class CustomerActivity : BaseActivity(), KodeinAware {
                             makeFeedbackAction(
                                 deviceId,
                                 descriptionsSpinner.selectedItemPosition,
-                                remarkEditText.text.toString(),gspTracker
+                                remarkEditText.text.toString(),
+                                gspTracker
                             )
                         }
                         .setNegativeButton("Cancel", null)
@@ -269,12 +274,7 @@ class CustomerActivity : BaseActivity(), KodeinAware {
 
         if (didCustomerSelected()) {
             customerViewModel.insertDataForTempSaleManRouteAndSaleVisitRecord(selectedCustomer!!, Utils.getCurrentDate(true), gspTracker)
-            val intent = SaleReturnActivity.newIntentFromCustomer(
-                applicationContext,
-                false,
-                selectedCustomer!!
-            )
-            customerViewModel.insertDataForTempSaleManRouteAndSaleVisitRecord(selectedCustomer!!, Utils.getCurrentDate(true), gspTracker)
+            val intent = SaleReturnActivity.newIntentFromCustomer(applicationContext, false, selectedCustomer!!)
             startActivity(intent)
         }
 
@@ -333,20 +333,10 @@ class CustomerActivity : BaseActivity(), KodeinAware {
 
         if (didCustomerSelected()) {
             customerViewModel.insertDataForTempSaleManRouteAndSaleVisitRecord(selectedCustomer!!, Utils.getCurrentDate(true), gspTracker)
-                val intent = SaleReturnActivity.newIntentFromCustomer(
-                    applicationContext,
-                    true,
-                    selectedCustomer!!
-                )
+            val intent = SaleReturnActivity.newIntentFromCustomer(applicationContext, true, selectedCustomer!!)
             startActivity(intent)
-            }
+        }
 
     }
-
-    /*override fun onBackPressed() {
-        val intent = Intent(this, CustomerVisitActivity::class.java)
-        startActivity(intent)
-        finish()
-    }*/
 
 }

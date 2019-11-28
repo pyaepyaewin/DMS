@@ -44,6 +44,7 @@ class AddNewCustomerLocationActivity : BaseActivity(), KodeinAware {
     private var lonDouble = 0.0
 
     companion object {
+
         private const val IE_FROM = "IE_FROM"
         private const val IE_SALE_MAN_ID = "IE_SALE_MAN_ID"
         private const val IE_CUSTOMER_DATA = "IE_CUSTOMER_DATA"
@@ -98,6 +99,7 @@ class AddNewCustomerLocationActivity : BaseActivity(), KodeinAware {
             intent.putExtra(IE_STATE_DIVISION_ID, stateDivisionId)
             return intent
         }
+
     }
 
     private val customerViewModel: CustomerViewModel by viewModel()
@@ -125,6 +127,7 @@ class AddNewCustomerLocationActivity : BaseActivity(), KodeinAware {
 
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
+
         getIntentData()
         if (from == "customerActivity") {
             setupUI()
@@ -136,6 +139,7 @@ class AddNewCustomerLocationActivity : BaseActivity(), KodeinAware {
     }
 
     private fun getIntentData() {
+
         customer = intent.getParcelableExtra(IE_CUSTOMER_DATA)
         from = intent.getStringExtra(IE_FROM)
         salesmanId = intent.getStringExtra(IE_SALE_MAN_ID)
@@ -160,18 +164,12 @@ class AddNewCustomerLocationActivity : BaseActivity(), KodeinAware {
             val requestCode = 10
             GooglePlayServicesUtil.getErrorDialog(status, this, requestCode).show()
         } else {
-            val mapView =
-                supportFragmentManager.findFragmentById(R.id.mapView) as SupportMapFragment
+            val mapView = supportFragmentManager.findFragmentById(R.id.mapView) as SupportMapFragment
             mapView.getMapAsync {
                 this.map = it
                 map!!.uiSettings.isMyLocationButtonEnabled = true
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    if (ContextCompat.checkSelfPermission(
-                            this,
-                            Manifest.permission.ACCESS_FINE_LOCATION
-                        )
-                        == PackageManager.PERMISSION_GRANTED
-                    ) {
+                    if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
 
                         map!!.isMyLocationEnabled = true
                         val gpsTracker = GPSTracker(this)

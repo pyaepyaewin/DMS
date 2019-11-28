@@ -53,11 +53,12 @@ interface CustomerVisitRepo {
     fun updateProductRemainingQty(soldProductInfo: SoldProductInfo)
     fun updateRemainingQtyWithExchangeOrReturn(isSaleExchange: Boolean, qty: Int, productID: Int)
 
-    fun saveDataForTempSaleManRoute(selectedCustomer: Customer, currentDate: String,arrivalStatus:Int)
     fun saveCustomerFeedback(didCustomerFeedbackEntity: DidCustomerFeedback)
+
     fun saveSaleVisitRecord(selectedCustomer: Customer,arrivalStatus: Int)
     fun updateSaleVisitRecord(customerId: Int, visitFlag: String, saleFlag: String)
 
+    fun saveDataForTempSaleManRoute(selectedCustomer: Customer, currentDate: String, arrivalStatus:Int)
     fun updateDepartureTimeForSaleManRoute(saleManId: String, customerId: String, currentDate: String)
 
     fun getClassDiscountByPrice(currentDate: String): Observable<List<ClassDiscountByPrice>>

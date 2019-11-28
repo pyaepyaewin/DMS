@@ -168,11 +168,8 @@ class CustomerVisitRepoImpl(
             db.productDao().updateProductRemainingQtyWithSaleReturn(qty, productID)
     }
 
-    override fun saveDataForTempSaleManRoute(
-        selectedCustomer: Customer,
-        currentDate: String,
-        arrivalStatus: Int
-    ) {
+    override fun saveDataForTempSaleManRoute(selectedCustomer: Customer, currentDate: String, arrivalStatus: Int) {
+
         val saleManId = AppUtils.getStringFromShp(Constant.SALEMAN_ID, shf)
         if (db.tempForSaleManRouteDao().dataById(
                 saleManId ?: "0",
@@ -195,6 +192,7 @@ class CustomerVisitRepoImpl(
                 currentDate
             )
         }
+
     }
 
     override fun saveCustomerFeedback(didCustomerFeedbackEntity: DidCustomerFeedback) {

@@ -1,5 +1,6 @@
 package com.aceplus.dms.ui.activities.customer.sale
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.arch.lifecycle.Observer
 import android.bluetooth.BluetoothAdapter
@@ -187,13 +188,14 @@ class SaleExchangeInfoActivity: BaseActivity(), KodeinAware {
 
     }
 
+    @SuppressLint("SetTextI18n")
     private fun getInfoAndSetData(){
 
         tvDate.text = Utils.getCurrentDate(false)
         tvCustomerName.text = customer!!.customer_name
         //tvSaleReturnAmount
         //tvSaleReturnDiscAmount
-        //tvSaleExchangeAmount
+        tvSaleExchangeAmount.text = Utils.formatAmount(invoice!!.total_amount?.toDouble() ?: 0.0) + " MMK"
         //tvPayAmountFromCustomer
         //tvRefundToCustomer
         // ToDo - not confirmed yet!!
@@ -278,7 +280,21 @@ class SaleExchangeInfoActivity: BaseActivity(), KodeinAware {
         Utils.saveInvoiceImageIntoGallery(invoice!!.invoice_id, this, myBitmap, "Sale") // Doesn't work
 
         val editProductList = printInvoiceViewModel.arrangeProductList(soldProductList, promotionList)
-        //PrintUtils
+        PrintUtils.printSaleExchangeWithHSPOS(
+            this,
+            mBluetoothService!!,
+            relatedDataForPrint!!.companyInfo,
+            relatedDataForPrint!!.customer.customer_name,
+            relatedDataForPrint!!.customer.address,
+            relatedDataForPrint!!.customerTownShipName,
+            invoice!!.invoice_id,
+            "To Find",
+            relatedDataForPrint!!.routeName,
+            editProductList,
+            invoice!!,
+            saleExchangeInfoAdapterForReturn.getDataList() as ArrayList<SaleExchangeProductInfo>,
+            9999.9
+        )
 
     }
 
