@@ -42,6 +42,9 @@ interface SaleReturnDao {
     @Query("update sale_return set delete_flag = 1 WHERE delete_flag = 0")
     fun updateAllInactiveData()
 
+    @Query("update sale_return set sale_id = :saleID where sale_return_id = :saleReturnInvoiceNo")
+    fun updateSaleIdInSaleReturn(saleReturnInvoiceNo: String, saleID: String)
+
     @Query("select invoice.invoice_id,customer_name,address,return_date,total_quantity,total_amount from invoice inner join customer on customer.id = invoice.customer_id inner join sale_return on sale_return.customer_id = customer.customer_id")
     fun getSalesReturnReport(): List<SalesReturnReport>
 

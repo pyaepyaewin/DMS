@@ -1,6 +1,7 @@
 package com.aceplus.data.utils
 
 class Constant {
+
     companion object {
         var REAL_TIME_URL = "http://acedms-001-site1.atempurl.com/api/v1/upload.svc/"
         var REAL_TIME_AP_URL = "http://128.199.102.103:8080/api/v1/"
@@ -60,5 +61,17 @@ class Constant {
         const val PRINT_FOR_C = "print-for-c"
         const val PRINT_FOR_PRE_ORDER = "print-for-preorder"
         const val FOR_VAN_ISSUE = "for-van-issue"
+
+        const val HM_MESSAGE_STATE_CHANGE = 1
+        const val HM_MESSAGE_READ = 2
+        const val HM_MESSAGE_WRITE = 3
+        const val HM_MESSAGE_DEVICE_NAME = 4
+        const val HM_MESSAGE_TOAST = 5
+        const val HM_MESSAGE_CONNECTION_LOST = 6
+        const val HM_MESSAGE_UNABLE_CONNECT = 7
+
+        const val RQC_GET_LOCATION = 100
+
     }
+
 }

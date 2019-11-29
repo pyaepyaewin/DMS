@@ -8,6 +8,7 @@ import com.aceplus.domain.entity.product.Product
 import com.aceplus.domain.entity.promotion.Promotion
 import com.aceplus.domain.repo.CustomerVisitRepo
 import com.aceplus.domain.vo.RelatedDataForPrint
+import com.aceplus.domain.vo.SaleExchangeProductInfo
 import com.aceplus.domain.vo.SoldProductInfo
 import com.aceplus.shared.viewmodel.BaseViewModel
 import com.kkk.githubpaging.network.rx.SchedulerProvider
@@ -17,6 +18,8 @@ class PrintInvoiceViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
     var taxInfo = MutableLiveData<Triple<String, Int, Int>>()
     var salePersonName = MutableLiveData<String>()
     var relatedDataForPrint = MutableLiveData<RelatedDataForPrint>()
+    var saleReturnProducts = MutableLiveData<List<SaleExchangeProductInfo>>()
+    var exchangeProducts = MutableLiveData<List<SaleExchangeProductInfo>>()
 
     fun getSalePersonName(salePersonID: String){
         launch {
@@ -85,7 +88,7 @@ class PrintInvoiceViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
                     for (i in it){
                         companyInfo = i
                     }
-                    return@flatMap customerVisitRepo.getSaleManName(orderSaleManID!!)
+                    return@flatMap customerVisitRepo.getSaleManName(orderSaleManID)
                 }
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.mainThread())
@@ -176,12 +179,38 @@ class PrintInvoiceViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
 
         }
 
-        for (i in positionList.size downTo 0){
+        for (i in positionList.size downTo 1){
             val pos = positionList[i - 1]
             newPresentList.removeAt(pos)
         }
 
         return newSoldProductList
+
+    }
+
+    fun getSaleReturnProductInfo(saleReturnInvoiceNo: String){
+        launch {
+            customerVisitRepo.getSaleReturnProductInfo(saleReturnInvoiceNo)
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.mainThread())
+                .subscribe{
+                    this.saleReturnProducts.postValue(it)
+                }
+        }
+    }
+
+    fun getExchangeProductInfo(soldProductList: ArrayList<SoldProductInfo>){
+
+        val saleExchangeProductList = ArrayList<SaleExchangeProductInfo>()
+        for (soldProduct in soldProductList){
+            val product = SaleExchangeProductInfo(
+                soldProduct.product.product_name,
+                soldProduct.quantity,
+                soldProduct.product.selling_price
+            )
+            saleExchangeProductList.add(product)
+        }
+        this.exchangeProducts.postValue(saleExchangeProductList)
 
     }
 

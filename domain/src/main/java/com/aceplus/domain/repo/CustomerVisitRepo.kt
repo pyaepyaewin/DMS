@@ -27,13 +27,14 @@ import com.aceplus.domain.entity.volumediscount.VolumeDiscountFilter
 import com.aceplus.domain.entity.volumediscount.VolumeDiscountFilterItem
 import com.aceplus.domain.model.forApi.invoice.InvoiceResponse
 import com.aceplus.domain.model.forApi.preorder.PreOrderPresentApi
+import com.aceplus.domain.vo.SaleExchangeProductInfo
 import io.reactivex.Observable
 
 interface CustomerVisitRepo {
 
     fun getLocationCode(): Int
     fun getSaleManData(): SaleMan
-    fun getSaleManName(saleManId: String): Observable<List<String?>>
+    fun getSaleManName(saleManId: String?): Observable<List<String?>>
     fun getRouteID(saleManId: String): Observable<List<String>>
     fun getRouteScheduleByID(saleManId: String): Observable<RouteScheduleV2>
     fun getRouteNameByID(routeID: Int): Observable<String?>
@@ -52,11 +53,12 @@ interface CustomerVisitRepo {
     fun updateProductRemainingQty(soldProductInfo: SoldProductInfo)
     fun updateRemainingQtyWithExchangeOrReturn(isSaleExchange: Boolean, qty: Int, productID: Int)
 
-    fun saveDataForTempSaleManRoute(selectedCustomer: Customer, currentDate: String,arrivalStatus:Int)
     fun saveCustomerFeedback(didCustomerFeedbackEntity: DidCustomerFeedback)
+
     fun saveSaleVisitRecord(selectedCustomer: Customer,arrivalStatus: Int)
     fun updateSaleVisitRecord(customerId: Int, visitFlag: String, saleFlag: String)
 
+    fun saveDataForTempSaleManRoute(selectedCustomer: Customer, currentDate: String, arrivalStatus:Int)
     fun updateDepartureTimeForSaleManRoute(saleManId: String, customerId: String, currentDate: String)
 
     fun getClassDiscountByPrice(currentDate: String): Observable<List<ClassDiscountByPrice>>
@@ -111,7 +113,9 @@ interface CustomerVisitRepo {
     fun insertSaleReturn(saleReturn: SaleReturn)
     fun getAllSaleReturn(): Observable<List<SaleReturn>>
     fun getSaleReturnCountByID(id: String): Observable<Int>
+    fun updateSaleIdInSaleReturn(saleReturnInvoiceNo: String, saleID: String)
 
     fun insertAllSaleReturnDetail(list: List<SaleReturnDetail>)
+    fun getSaleReturnProductInfo(saleReturnInvoiceNo: String): Observable<List<SaleExchangeProductInfo>>
 
 }

@@ -275,7 +275,8 @@ class SaleCheckoutViewModel(
         bank: String,
         acc: String,
         totalDiscountAmount: Double,
-        totalVolumeDiscountPercent: Double
+        totalVolumeDiscountPercent: Double,
+        saleReturnInvoiceNo: String?
     ) {
 
         var totalQtyForInvoice = 0
@@ -324,8 +325,7 @@ class SaleCheckoutViewModel(
                             invoiceProduct.discount_percent = soldProduct.discountPercent
                             invoiceProduct.s_price = soldProduct.product.selling_price!!.toDouble()
                             invoiceProduct.p_price = soldProduct.product.purchase_price!!.toDouble()
-                            invoiceProduct.promotion_price =
-                                soldProduct.promoPriceByDiscount // Check promo price or promo price by disc
+                            invoiceProduct.promotion_price = soldProduct.promoPriceByDiscount // Check promo price or promo price by disc
                             invoiceProduct.item_discount_percent = soldProduct.focPercent
                             invoiceProduct.item_discount_amount = soldProduct.focAmount
                             invoiceProduct.exclude = "${soldProduct.exclude}"
@@ -373,11 +373,9 @@ class SaleCheckoutViewModel(
                         invoice.volume_amount = 0.0 // Need to check
                         invoice.package_grade = "" // Need to check
                         invoice.invoice_product_id = 0 // Need to check
-                        invoice.total_quantity =
-                            totalQtyForInvoice.toDouble() // Check int or double
+                        invoice.total_quantity = totalQtyForInvoice.toDouble() // Check int or double
                         invoice.invoice_status = cashOrLoanOrBank
-                        invoice.total_discount_percent =
-                            totalVolumeDiscountPercent.toString()  // Need to check
+                        invoice.total_discount_percent = totalVolumeDiscountPercent.toString()  // Need to check
                         invoice.rate = "1"
                         invoice.tax_amount = taxAmt
                         invoice.bank_name = bank
@@ -387,7 +385,9 @@ class SaleCheckoutViewModel(
                         customerVisitRepo.insertNewInvoice(invoice)
                         this.invoice.postValue(invoice)
 
-                        // ToDo - for sale return
+                        if (!saleReturnInvoiceNo.isNullOrBlank()){
+                            customerVisitRepo.updateSaleIdInSaleReturn(saleReturnInvoiceNo!!, invoiceId)
+                        }
 
                         customerVisitRepo.getAllInvoice()
                             .flatMap { invoiceList ->

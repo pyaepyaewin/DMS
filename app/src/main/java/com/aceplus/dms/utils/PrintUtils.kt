@@ -2,16 +2,17 @@ package com.aceplus.dms.utils
 
 import android.app.Activity
 import android.graphics.BitmapFactory
+import android.util.Log
 import android.widget.Toast
 import com.aceplus.dms.R
 import com.aceplus.domain.entity.CompanyInformation
 import com.aceplus.domain.entity.invoice.Invoice
 import com.aceplus.domain.entity.promotion.Promotion
 import com.aceplus.domain.model.credit.CreditInvoice
+import com.aceplus.domain.vo.SaleExchangeProductInfo
 import com.aceplus.domain.vo.SoldProductInfo
 import gems.com.command.sdk.PrintPicture
 import java.io.UnsupportedEncodingException
-import java.lang.StringBuilder
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
@@ -72,7 +73,7 @@ object PrintUtils{
                     presentList,
                     printFor,
                     mode,
-                    ByteArray(7),
+                    printBmp(activity),
                     companyInfo,
                     printMode
                 )
@@ -137,7 +138,7 @@ object PrintUtils{
         try {
             val printDataByteArray = convertFromListByteArrayToByteArray(
                 getPrintDataByteArrayListDeliver(
-                    activity,
+                    printBmp(activity),
                     customerName,
                     cus_address,
                     orderInvoiceNo,
@@ -161,6 +162,44 @@ object PrintUtils{
         }
     }
 
+    fun printSaleExchangeWithHSPOS(
+        activity: Activity,
+        mBTService: BluetoothService,
+        companyInfo: CompanyInformation,
+        customerName: String?,
+        cus_address: String?,
+        townshipName: String,
+        invoiceNumber: String,
+        salePersonName: String?,
+        routeName: String?,
+        soldProductList: ArrayList<SoldProductInfo>,
+        invoice: Invoice,
+        returnProductList: ArrayList<SaleExchangeProductInfo>,
+        returnDiscountAmt: Double
+    ){
+        try {
+            val printDataByteArray = convertFromListByteArrayToByteArray(
+                getPrintDataByteArrayListForSaleExchange(
+                    printBmp(activity),
+                    companyInfo,
+                    customerName,
+                    cus_address,
+                    townshipName,
+                    invoiceNumber,
+                    salePersonName,
+                    routeName,
+                    soldProductList,
+                    invoice,
+                    returnProductList,
+                    returnDiscountAmt
+                )
+            )
+            sendDataByte2BT(activity, mBTService, printDataByteArray)
+        } catch (e: UnsupportedEncodingException) {
+            e.printStackTrace()
+        }
+    }
+
     @Throws(UnsupportedEncodingException::class)
     private fun getPrintDataByteArrayList(
         customerName: String?,
@@ -174,13 +213,14 @@ object PrintUtils{
         presentList: ArrayList<Promotion>,
         printFor: String,
         mode: String,
-        imgByte: ByteArray,
+        imgByte: ByteArray?,
         companyInfo: CompanyInformation,
         printMode: String?
     ): ArrayList<ByteArray>{
 
         val printDataByteArrayList: ArrayList<ByteArray> = ArrayList()
-        printDataByteArrayList.add(imgByte)
+
+        imgByte?.let { printDataByteArrayList.add(it) }
         printDataByteArrayList.add("\n".toByteArray())
 
         val focProductList: ArrayList<SoldProductInfo> = ArrayList()
@@ -203,9 +243,7 @@ object PrintUtils{
         printDataByteArrayList.add("Invoice No    :   $invoiceNumber\n".toByteArray())
         printDataByteArrayList.add("Sale Person   :   $salePersonName\n".toByteArray())
         printDataByteArrayList.add("RouteNo       :   $routeName\n".toByteArray()) // ToDo
-        printDataByteArrayList.add(("Sale Date     :   " + SimpleDateFormat("dd/MM/yyyy hh:mm", Locale.US).format(
-            Date()
-        ) + "\n").toByteArray())
+        printDataByteArrayList.add(("Sale Date     :   " + SimpleDateFormat("dd/MM/yyyy hh:mm", Locale.US).format(Date()) + "\n").toByteArray())
 
         if (invoice.due_date != null && printMode.equals("sale", true))
             printDataByteArrayList.add("Delivery Date :   ${invoice.due_date}\n".toByteArray())
@@ -241,9 +279,8 @@ object PrintUtils{
 
             for (soldProduct in soldProductList){
                 val quantity = soldProduct.quantity
-                var pricePerUnit = 0.0
 
-                pricePerUnit = if (soldProduct.promotionPrice == 0.0)
+                var pricePerUnit: Double = if (soldProduct.promotionPrice == 0.0)
                     soldProduct.product.selling_price?.toDouble() ?: 0.0
                 else
                     soldProduct.promotionPrice
@@ -540,7 +577,7 @@ object PrintUtils{
                         "Net Amount        :        ",
                         Utils.decimalFormatterWithComma.format(totalNetAmount),
                         "Pay Amount        :        ",
-                        Utils.decimalFormatterWithComma.format(invoice.pay_amount),
+                        Utils.decimalFormatterWithComma.format(invoice.pay_amount?.toDouble() ?: 0.0),
                         "Credit Balance    :        ",
                         Utils.decimalFormatterWithComma.format(abs(creditBalance!!)),
                         "Refund            :        ",
@@ -634,6 +671,195 @@ object PrintUtils{
         return printDataByteArrayList
     }
 
+    private fun getPrintDataByteArrayListForSaleExchange(
+        imgByte: ByteArray?,
+        companyInfo: CompanyInformation,
+        customerName: String?,
+        cus_address: String?,
+        townshipName: String,
+        invoiceNumber: String,
+        salePersonName: String?,
+        routeName: String?,
+        soldProductList: ArrayList<SoldProductInfo>,
+        invoice: Invoice,
+        returnProductList: ArrayList<SaleExchangeProductInfo>,
+        returnDiscountAmt: Double
+    ): ArrayList<ByteArray>{
+
+        val printDataByteArrayList = java.util.ArrayList<ByteArray>()
+
+        imgByte?.let { printDataByteArrayList.add(it) }
+        printDataByteArrayList.add("\n".toByteArray())
+
+        var totalAmount = 0.0
+        var totalNetAmount = 0.0
+        var totalReturnAmount = 0.0
+
+        val address = companyInfo.address
+        val companyTaxRegNo = companyInfo.company_tax_reg_no
+        val phNo = companyInfo.phone_number
+
+        printDataByteArrayList.add((address + "\n").toByteArray())
+        printDataByteArrayList.add("Ph No         :   $phNo\n".toByteArray(charset("UTF-8")))
+        printDataByteArrayList.add("Tax Reg No    :   $companyTaxRegNo\n".toByteArray(charset("UTF-8")))
+        printDataByteArrayList.add("Customer      :   $customerName\n".toByteArray(charset("UTF-8")))
+        printDataByteArrayList.add("Township      :   $townshipName\n".toByteArray(charset("UTF-8")))
+        printDataByteArrayList.add("Address       :   $cus_address\n".toByteArray(charset("UTF-8")))
+        printDataByteArrayList.add("Invoice No    :   $invoiceNumber\n".toByteArray())
+        printDataByteArrayList.add("Sale Person   :   $salePersonName\n".toByteArray())
+        printDataByteArrayList.add("RouteNo       :   $routeName\n".toByteArray()) // ToDo
+        printDataByteArrayList.add(("Sale Date     :   " + SimpleDateFormat("dd/MM/yyyy hh:mm", Locale.US).format(Date()) + "\n").toByteArray())
+        printDataByteArrayList.add("------------------------------------------------\n".toByteArray())
+
+        formatter = Formatter(StringBuilder(), Locale.US)
+        printDataByteArrayList.add(formatter!!.format("%1$-20s \t %2$4s \t %3$5s \t %4$7s\n", "Sales", "Qty", "Price", "Amount").toString().toByteArray())
+        formatter!!.close()
+        printDataByteArrayList.add("------------------------------------------------\n".toByteArray())
+
+        for (soldProduct in soldProductList){
+
+            val quantity = soldProduct.product.sold_quantity
+            var pricePerUnit: Double = soldProduct.product.selling_price?.toDouble() ?: 0.0
+            val amount = pricePerUnit * quantity // To check with other function
+            val netAmount = soldProduct.totalAmt - soldProduct.discountAmount
+
+            totalAmount += amount
+            totalNetAmount += netAmount
+
+            val nameFragments = soldProduct.product.product_name!!.split(" ")
+            val nameList = setupPrintLayoutNoPromo(nameFragments as ArrayList<String>)
+
+            formatter = Formatter(StringBuilder(), Locale.US)
+            printDataByteArrayList.add(
+                formatter!!.format(
+                    "%1$-20s \t %2$4s \t %3$5s \t %4$9s\n",
+                    nameList[0],
+                    quantity,
+                    Utils.decimalFormatterWithoutComma.format(pricePerUnit),
+                    Utils.decimalFormatterWithComma.format(amount)
+                ).toString().toByteArray()
+            )
+            formatter!!.close()
+
+            nameList.removeAt(0)
+            for (cutName in nameList) {
+                formatter = Formatter(StringBuilder(), Locale.US)
+                printDataByteArrayList.add(formatter!!.format("%1$-20s \t %2$1s \t %3$1s \t %4$1s\n", cutName, "", "", "").toString().toByteArray())
+                formatter!!.close()
+            }
+
+            printDataByteArrayList.add("\n".toByteArray())
+
+        }
+
+        printDataByteArrayList.add("------------------------------------------------\n".toByteArray())
+
+        val taxType = companyInfo.tax_type
+        var taxText: String
+
+        if (taxType.equals("E", ignoreCase = true)) {
+            taxText = "(Tax " + String.format("%.2f", invoice.tax_amount) + " Excluded)"
+            totalNetAmount = invoice.total_amount!!.toDouble() - invoice.total_discount_amount + invoice.tax_amount
+        } else {
+            taxText = "(Tax " + String.format("%.2f", invoice.tax_amount) + " Included)"
+            totalNetAmount = invoice.total_amount!!.toDouble() - invoice.total_discount_amount
+        }
+
+        formatter = Formatter(StringBuilder(), Locale.US)
+        printDataByteArrayList.add(
+            formatter!!.format(
+                "%1$-13s%2$19s\n%3$-13s%4$19s\n%5$-13s\n%6$-13s%7$19s\n\n",
+                "Total Amount       :        ", Utils.decimalFormatterWithComma.format(totalAmount),
+                "Discount           :        ", Utils.decimalFormatterWithComma.format(invoice.total_discount_amount).toString() + " (" + DecimalFormat("#0.00").format(invoice.total_discount_percent?.toDouble() ?: 0.0) + "%)",
+                taxText,
+                "Net Amount         :        ",
+                Utils.decimalFormatterWithComma.format(totalNetAmount)
+            ).toString().toByteArray()
+        )
+        formatter!!.close()
+
+        formatter = Formatter(StringBuilder(), Locale.US)
+        printDataByteArrayList.add(
+            formatter!!.format(
+                "%1$-20s \t %2$4s \t %3$5s \t %4$7s\n",
+                "Return",
+                "Qty",
+                "Price",
+                "Amount"
+            ).toString().toByteArray()
+        )
+        formatter!!.close()
+        printDataByteArrayList.add("----------------------------------------------\n".toByteArray())
+
+        for(returnProduct in returnProductList){
+
+            val quantity = returnProduct.quantity
+            val unitPrice = returnProduct.price?.toDouble() ?: 0.0
+            val amount = unitPrice * quantity
+            // No discount data to calculate
+            totalReturnAmount += amount
+
+            val nameFragments = returnProduct.product_name.toString().split(" ")
+            val nameList = setupPrintLayoutNoPromo(nameFragments as ArrayList<String>)
+            formatter = Formatter(StringBuilder(), Locale.US)
+            printDataByteArrayList.add(
+                formatter!!.format(
+                    "%1$-20s \t %2$4s \t %3$5s \t %4$9s\n",
+                    nameList[0],
+                    quantity,
+                    Utils.decimalFormatterWithoutComma.format(unitPrice),
+                    Utils.decimalFormatterWithComma.format(amount)
+                ).toString().toByteArray()
+            )
+            formatter!!.close()
+
+            nameList.removeAt(0)
+            for (cutName in nameList) {
+                formatter = Formatter(StringBuilder(), Locale.US)
+                printDataByteArrayList.add(formatter!!.format("%1$-20s \t %2$1s \t %3$1s \t %4$1s\n", cutName, "", "", "").toString().toByteArray())
+                formatter!!.close()
+            }
+            printDataByteArrayList.add("\n".toByteArray())
+
+        }
+
+        printDataByteArrayList.add("----------------------------------------------\n".toByteArray())
+
+        var taxReturnText: String = if (taxType.equals("E", ignoreCase = true))
+            "(Tax ${invoice.tax_amount} Excluded)"
+        else
+            "(Tax ${invoice.tax_amount} Included)"
+
+        formatter = Formatter(StringBuilder(), Locale.US)
+        printDataByteArrayList.add(
+            formatter!!.format(
+                "%1$-13s%2$19s\n%3$-13s%4$19s\n%5$-13s\n%6$-13s%7$19s\n",
+                "Total Amount       :        ", Utils.decimalFormatterWithComma.format(totalReturnAmount),
+                "Discount           :        ", Utils.decimalFormatterWithComma.format(returnDiscountAmt) + " (" + DecimalFormat("#0.00").format(invoice.total_discount_percent?.toDouble() ?: 0.0) + "%)",
+                taxReturnText,
+                "Net Amount         :        ", Utils.decimalFormatterWithComma.format(totalReturnAmount - returnDiscountAmt)
+            ).toString().toByteArray() // Check disc percent
+        )
+        formatter!!.close()
+
+        printDataByteArrayList.add("----------------------------------------------\n".toByteArray())
+
+        formatter = Formatter(StringBuilder(), Locale.US)
+        printDataByteArrayList.add(
+            formatter!!.format(
+                "%1$-13s%2$19s\n%3$-13s%4$19s\n%5$-13s%6$19s\n",
+                "Sale Amount        :        ", Utils.decimalFormatterWithComma.format(totalAmount),
+                "Sale Return Amount :        ", Utils.decimalFormatterWithComma.format(totalReturnAmount - returnDiscountAmt),
+                "Net Cash           :        ", Utils.decimalFormatterWithComma.format(abs(totalAmount - (totalReturnAmount - returnDiscountAmt)))
+            ).toString().toByteArray()
+        )
+        formatter!!.close()
+        printDataByteArrayList.add("\nSignature          :\n\n                 Thank You. \n\n".toByteArray())
+
+        return printDataByteArrayList
+    }
+
+    // To add image
     private fun getPrintDataByteArrayListForCredit(
         customerName: String?,
         cus_address: String?,
@@ -673,7 +899,7 @@ object PrintUtils{
     }
 
     private fun getPrintDataByteArrayListDeliver(
-        activity: Activity,
+        imgByte: ByteArray?,
         customerName: String?,
         cus_address: String?,
         orderInvoiceNo: String,
@@ -692,7 +918,6 @@ object PrintUtils{
     ): ArrayList<ByteArray>{
 
         val printDataByteArrayList = ArrayList<ByteArray>()
-        val imgByte = printBmp(activity)
 
         imgByte?.let { printDataByteArrayList.add(it) }
         printDataByteArrayList.add("\n".toByteArray())

@@ -18,8 +18,8 @@ interface TownshipDao{
     @get:Query("select * from township")
     val allData: List<Township>
 
-    @Query("select township_name as data from township where id = (select township_id from customer where id = :customerID)")
-    fun townshipNameByID(customerID: Int): StringObject?
+    @Query("select township_name from township where id = (select customer.township_number from customer where id = :customerID)")
+    fun townshipNameByID(customerID: Int): String
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(list: List<Township>)

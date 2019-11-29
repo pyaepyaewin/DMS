@@ -34,6 +34,7 @@ import com.aceplus.domain.entity.volumediscount.VolumeDiscountFilterItem
 import com.aceplus.domain.model.forApi.invoice.InvoiceResponse
 import com.aceplus.domain.model.forApi.preorder.PreOrderPresentApi
 import com.aceplus.domain.repo.CustomerVisitRepo
+import com.aceplus.domain.vo.SaleExchangeProductInfo
 import com.aceplus.shared.utils.GPSTracker
 import com.aceplussolutions.rms.constants.AppUtils
 import io.reactivex.Observable
@@ -61,7 +62,7 @@ class CustomerVisitRepoImpl(
         return saleMan
     }
 
-    override fun getSaleManName(saleManId: String): Observable<List<String?>> {
+    override fun getSaleManName(saleManId: String?): Observable<List<String?>> {
         return Observable.just(db.saleManDao().getSaleManNameByID(saleManId))
     }
 
@@ -128,11 +129,11 @@ class CustomerVisitRepoImpl(
     }
 
     override fun getCustomerTownshipName(customerID: Int): Observable<String> {
-        return Observable.just(db.townshipDao().townshipNameByID(customerID)?.data)
+        return Observable.just(db.townshipDao().townshipNameByID(customerID))
     }
 
     override fun updateCustomerData(customer: Customer) {
-        db.customerDao().updateCustomerData(customer.id, customer.latitude, customer.longitude)
+        db.customerDao().updateCustomerLocation(customer.id, customer.latitude, customer.longitude)
     }
 
     override fun getAllDidFeedback(): Observable<List<String>> {
@@ -167,11 +168,8 @@ class CustomerVisitRepoImpl(
             db.productDao().updateProductRemainingQtyWithSaleReturn(qty, productID)
     }
 
-    override fun saveDataForTempSaleManRoute(
-        selectedCustomer: Customer,
-        currentDate: String,
-        arrivalStatus: Int
-    ) {
+    override fun saveDataForTempSaleManRoute(selectedCustomer: Customer, currentDate: String, arrivalStatus: Int) {
+
         val saleManId = AppUtils.getStringFromShp(Constant.SALEMAN_ID, shf)
         if (db.tempForSaleManRouteDao().dataById(
                 saleManId ?: "0",
@@ -194,6 +192,7 @@ class CustomerVisitRepoImpl(
                 currentDate
             )
         }
+
     }
 
     override fun saveCustomerFeedback(didCustomerFeedbackEntity: DidCustomerFeedback) {
@@ -485,6 +484,14 @@ class CustomerVisitRepoImpl(
 
     override fun insertAllSaleReturnDetail(list: List<SaleReturnDetail>) {
         db.saleReturnDetailDao().insertAll(list)
+    }
+
+    override fun updateSaleIdInSaleReturn(saleReturnInvoiceNo: String, saleID: String) {
+        db.saleReturnDao().updateSaleIdInSaleReturn(saleReturnInvoiceNo, saleID)
+    }
+
+    override fun getSaleReturnProductInfo(saleReturnInvoiceNo: String): Observable<List<SaleExchangeProductInfo>> {
+        return Observable.just(db.saleReturnDetailDao().getSaleReturnProductInfo(saleReturnInvoiceNo))
     }
 
 }

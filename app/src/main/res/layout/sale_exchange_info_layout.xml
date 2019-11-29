@@ -66,7 +66,7 @@
                     android:layout_marginLeft="20dp" />
 
             <TextView
-                    android:id="@+id/textViewDate"
+                    android:id="@+id/tvDate"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/sale_date"
@@ -93,7 +93,7 @@
                     android:layout_marginLeft="20dp" />
 
             <TextView
-                    android:id="@+id/textViewCustomerName"
+                    android:id="@+id/tvCustomerName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/customer_name_label"
@@ -120,12 +120,12 @@
                     android:layout_marginLeft="20dp" />
 
             <TextView
-                    android:id="@+id/textViewSaleReturnAmt"
+                    android:id="@+id/tvSaleReturnAmount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/customer_name_label"
-                    android:textColor="@color/black"
-                    android:layout_marginLeft="20dp" />
+                    android:layout_marginLeft="20dp"
+                    android:text="Sale Return Amount"
+                    android:textColor="@color/black" />
 
         </LinearLayout>
 
@@ -147,10 +147,10 @@
                     android:layout_marginLeft="20dp" />
 
             <TextView
-                    android:id="@+id/textViewSaleReturnDiscountAmt"
+                    android:id="@+id/tvSaleReturnDiscAmount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/customer_name_label"
+                    android:text="Sale Return Discount Amount"
                     android:textColor="@color/black"
                     android:layout_marginLeft="20dp" />
 
@@ -174,10 +174,10 @@
                     android:layout_marginLeft="20dp" />
 
             <TextView
-                    android:id="@+id/textViewSaleExchangeAmt"
+                    android:id="@+id/tvSaleExchangeAmount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/customer_name_label"
+                    android:text="Sale Exchange Amount"
                     android:textColor="@color/black"
                     android:layout_marginLeft="20dp" />
 
@@ -202,10 +202,10 @@
                     android:layout_marginLeft="20dp" />
 
             <TextView
-                    android:id="@+id/textViewPayAmt"
+                    android:id="@+id/tvPayAmountFromCustomer"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/customer_name_label"
+                    android:text="Pay Amount From Customer"
                     android:textColor="@color/black"
                     android:layout_marginLeft="20dp" />
 
@@ -229,10 +229,10 @@
                     android:layout_marginLeft="20dp" />
 
             <TextView
-                    android:id="@+id/textViewRefund"
+                    android:id="@+id/tvRefundToCustomer"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/customer_name_label"
+                    android:text="Refund To Customer"
                     android:textColor="@color/black"
                     android:layout_marginLeft="20dp" />
 
@@ -250,7 +250,8 @@
             android:layout_marginStart="10dp"
             android:layout_marginRight="10dp"
             android:layout_marginEnd="10dp"
-            android:padding="5dp">
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp">
 
         <TextView
                 android:layout_width="0dp"
@@ -280,11 +281,13 @@
                 android:textStyle="bold" />
     </LinearLayout>
 
-    <ListView
+    <android.support.v7.widget.RecyclerView
             android:id="@+id/sx_info_sale_exchange_list"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/sale_return_headerLayout" />
+            android:layout_below="@+id/sale_return_headerLayout"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"/>
 
     <LinearLayout
             android:id="@+id/sale_exchange_headerLayout"
@@ -296,7 +299,8 @@
             android:layout_marginRight="10dp"
             android:layout_marginEnd="10dp"
             android:layout_below="@+id/sx_info_sale_exchange_list"
-            android:padding="3dp">
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp">
 
         <TextView
                 android:layout_width="0dp"
@@ -326,11 +330,13 @@
                 android:textStyle="bold" />
     </LinearLayout>
 
-    <ListView
+    <android.support.v7.widget.RecyclerView
             android:id="@+id/sx_info_sale_list"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/sale_exchange_headerLayout" />
+            android:layout_below="@+id/sale_exchange_headerLayout"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"/>
 
     <LinearLayout
             android:id="@+id/empty_layout"

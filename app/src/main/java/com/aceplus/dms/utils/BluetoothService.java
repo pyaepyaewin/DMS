@@ -11,6 +11,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
+import com.aceplus.data.utils.Constant;
 import com.aceplus.dms.ui.activities.PrintInvoiceActivity;
 
 import java.io.IOException;
@@ -71,7 +72,7 @@ public class BluetoothService {
         mState = state;
 
         // Give the new state to the Handler so the UI Activity can update
-        mHandler.obtainMessage(PrintInvoiceActivity.HM_MESSAGE_STATE_CHANGE, state, -1).sendToTarget();
+        mHandler.obtainMessage(Constant.HM_MESSAGE_STATE_CHANGE, state, -1).sendToTarget();
     }
 
     /**
@@ -143,7 +144,7 @@ public class BluetoothService {
         mConnectedThread.start();
 
         // Send the name of the connected device back to the UI Activity
-        Message msg = mHandler.obtainMessage(PrintInvoiceActivity.HM_MESSAGE_DEVICE_NAME);
+        Message msg = mHandler.obtainMessage(Constant.HM_MESSAGE_DEVICE_NAME);
         Bundle bundle = new Bundle();
         bundle.putString(PrintInvoiceActivity.DEVICE_NAME, device.getName());
         msg.setData(bundle);
@@ -186,7 +187,7 @@ public class BluetoothService {
         setState(STATE_LISTEN);
         
         // Send a failure message back to the Activity
-        Message msg = mHandler.obtainMessage(PrintInvoiceActivity.HM_MESSAGE_TOAST);
+        Message msg = mHandler.obtainMessage(Constant.HM_MESSAGE_TOAST);
         Bundle bundle = new Bundle();
         bundle.putString(PrintInvoiceActivity.TOAST, "Unable to connect device");
         msg.setData(bundle);
@@ -200,7 +201,7 @@ public class BluetoothService {
         //setState(STATE_LISTEN);
  
         // Send a failure message back to the Activity
-        Message msg = mHandler.obtainMessage(PrintInvoiceActivity.HM_MESSAGE_TOAST);
+        Message msg = mHandler.obtainMessage(Constant.HM_MESSAGE_TOAST);
         Bundle bundle = new Bundle();
         bundle.putString(PrintInvoiceActivity.TOAST, "Device connection was lost");
         msg.setData(bundle);
@@ -389,7 +390,7 @@ public class BluetoothService {
                     if(bytes>0)
                     {
 	                    // Send the obtained bytes to the UI Activity
-	                    mHandler.obtainMessage(PrintInvoiceActivity.HM_MESSAGE_READ, bytes, -1, buffer)
+	                    mHandler.obtainMessage(Constant.HM_MESSAGE_READ, bytes, -1, buffer)
 	                            .sendToTarget();
                     }
                     else
@@ -435,7 +436,7 @@ public class BluetoothService {
                 }*/
                 Log.i("BTPWRITE", new String(buffer,"GBK"));
                 // Share the sent message back to the UI Activity
-                mHandler.obtainMessage(PrintInvoiceActivity.HM_MESSAGE_WRITE, -1, -1, buffer)
+                mHandler.obtainMessage(Constant.HM_MESSAGE_WRITE, -1, -1, buffer)
                         .sendToTarget();
             } catch (IOException e) {
                 Log.e(TAG, "Exception during write", e);
