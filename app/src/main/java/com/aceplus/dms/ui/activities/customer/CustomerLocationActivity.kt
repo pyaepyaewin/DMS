@@ -83,37 +83,14 @@ class CustomerLocationActivity : BaseActivity(), KodeinAware {
                 this.map?.uiSettings?.isMyLocationButtonEnabled = true
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
 
+                    if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
                         map?.isMyLocationEnabled = true
-
-                        /*val gpsTracker = GPSTracker(this)
-                        var lat = 0.0
-                        var lon = 0.0
-
-                        if (gpsTracker.canGetLocation()) {
-                            lat = gpsTracker.getLatitude()
-                            lon = gpsTracker.getLongitude()
-                        }
-                        map?.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(lat, lon), 15f))*/
-
-                    } else {
+                    else
                         checkLocationPermission() //To Request Location Permission
-                    }
+
                 } else{
-
                     map?.isMyLocationEnabled = true
-
-                    /*val gpsTracker = GPSTracker(this)
-                    var lat = 0.0
-                    var lon = 0.0
-
-                    if (gpsTracker.canGetLocation()) {
-                        lat = gpsTracker.getLatitude()
-                        lon = gpsTracker.getLongitude()
-                    }
-                    map?.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(lat, lon), 15f))*/
-
                 }
 
                 if (customer?.latitude != null) {
@@ -126,6 +103,18 @@ class CustomerLocationActivity : BaseActivity(), KodeinAware {
                         drawMarker(point, customer!!.customer_name.toString(), customer!!.address.toString())
 
                     //To check - visit record null
+
+                } else{
+
+                    val gpsTracker = GPSTracker(this)
+                    var lat = 0.0
+                    var lon = 0.0
+
+                    if (gpsTracker.canGetLocation()) {
+                        lat = gpsTracker.getLatitude()
+                        lon = gpsTracker.getLongitude()
+                    }
+                    map?.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(lat, lon), 15f))
 
                 }
 

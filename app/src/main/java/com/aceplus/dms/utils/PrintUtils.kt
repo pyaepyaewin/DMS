@@ -561,7 +561,7 @@ object PrintUtils{
                 }
                 var refundAmt = 0.0
                 if (invoice.refund_amount != null)
-                    refundAmt = invoice.refund_amount!!.toDouble()
+                    refundAmt = invoice.refund_amount?.toDouble() ?: 0.0
 
                 printDataByteArrayList.add(
                     formatter!!.format(

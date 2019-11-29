@@ -45,7 +45,7 @@ class Invoice() : Parcelable {
     @ColumnInfo(name = "refund_amount")
     @SerializedName("refund_amount")
     @Expose
-    var refund_amount: String? = ""
+    var refund_amount: String? = null
 
     @ColumnInfo(name = "receipt_person_name")
     @SerializedName("receipt_person_name")
