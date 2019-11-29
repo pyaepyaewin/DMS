@@ -132,11 +132,11 @@ class CustomerViewModel(
                 if (distance < 50) {
                     arrivalStatus = true
                 } else {
-                    dialogStatus.postValue("You are not near customer's shop")
+                    //dialogStatus.postValue("You are not near customer's shop")
                     //Utils.commonDialog("You are not near customer's shop", this@CustomerActivity, 2)//will show this alert?
                 }
             } else {
-                dialogStatus.postValue("Customer's location is not detected")
+                //dialogStatus.postValue("Customer's location is not detected")
                 //Utils.commonDialog("Customer's location is not detected", this@CustomerActivity, 2)//will show this alert?
             }
         } else {
@@ -150,12 +150,13 @@ class CustomerViewModel(
         customerVisitRepo.updateCustomerData(customer)
     }
 
-    fun saveOrUpdateSaleManRoute(customer: Customer){
+    fun saveOrUpdateSaleManRoute(customer: Customer, gpsTracker: GPSTracker){
+        val arrivalStatus = if (isSameCustomer(customer, gpsTracker)) 1 else 0
         customerVisitRepo.saveDataForTempSaleManRoute(
             customer,
             Utils.getCurrentDate(true),
-            1
-        ) //Is this need arrival check? Now it's solid data!
+            arrivalStatus
+        )
     }
 
 }

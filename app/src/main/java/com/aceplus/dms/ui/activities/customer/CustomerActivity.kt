@@ -11,6 +11,7 @@ import android.os.Bundle
 import android.support.v7.widget.GridLayoutManager
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
@@ -314,17 +315,18 @@ class CustomerActivity : BaseActivity(), KodeinAware {
 
     private fun onClickAddress(){
 
-        /*if (didCustomerSelected()) {
-                val intent = CustomerLocationActivity.newIntent(
+        if (didCustomerSelected()) {
+            /*val intent = CustomerLocationActivity.newIntent(
                     applicationContext,
                     latitude = tvLatitude.text.toString(),
                     longitude = tvLongitude.text.toString(),
                     customerName = tvCustomerNameCA.text.toString(),
                     address = tvAddress.text.toString(),
                     visitRecord = this.selectedCustomer!!.visit_record.toString()
-                )
-                startActivity(intent)
-            }*/
+                )*/
+            val intent = CustomerLocationActivity.newIntentFromCustomer(this, selectedCustomer!!)
+            startActivity(intent)
+        }
 
     }
 
@@ -353,11 +355,11 @@ class CustomerActivity : BaseActivity(), KodeinAware {
         if (requestCode == Constant.RQC_GET_LOCATION){
             if (resultCode == Activity.RESULT_OK){
                 if (data != null){
-
-                    val customer = data.getSerializableExtra(IE_CUSTOMER_DATA) as Customer
+                    val customer = data.getParcelableExtra<Customer>(IE_CUSTOMER_DATA)
                     selectedCustomer = customer
                     onClickCustomerListItem(customer)
-
+                    customerViewModel.saveOrUpdateSaleManRoute(customer, gspTracker)
+                    Log.d("Testing", "Data Updated")
                 }
             }
         }

@@ -338,15 +338,15 @@ class AddNewCustomerLocationActivity : BaseActivity(), KodeinAware {
                         ActivityCompat.requestPermissions(
                             this,
                             arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                            Companion.MY_PERMISSIONS_REQUEST_LOCATION
+                            MY_PERMISSIONS_REQUEST_LOCATION
                         )
                     }
                     .create()
                     .show()
 
             } else {
-                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                    Companion.MY_PERMISSIONS_REQUEST_LOCATION
+                ActivityCompat.requestPermissions(
+                    this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), MY_PERMISSIONS_REQUEST_LOCATION
                 )
             }
 
@@ -357,7 +357,7 @@ class AddNewCustomerLocationActivity : BaseActivity(), KodeinAware {
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
 
         when (requestCode) {
-            Companion.MY_PERMISSIONS_REQUEST_LOCATION -> {
+            MY_PERMISSIONS_REQUEST_LOCATION -> {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     if (ContextCompat.checkSelfPermission(
                             this, Manifest.permission.ACCESS_FINE_LOCATION
@@ -374,41 +374,51 @@ class AddNewCustomerLocationActivity : BaseActivity(), KodeinAware {
 
     }
 
-    override fun onBackPressed() {
-        Log.d("LAT", "$latDouble")
-        if (from.equals("AddNewCustomerActivity", true)) {
-            val intent = AddNewCustomerActivity.newIntentFromAddNewCustomerLocation(
-                applicationContext,
-                name!!,
-                person!!,
-                phone!!,
-                address!!,
-                latDouble,
-                lonDouble,
-                paymentType!!,
-                streetId!!,
-                townshipId!!,
-                shopTypeId!!,
-                districtId!!,
-                stateDivisionId!!
-            )
-            startActivity(intent) //Better with intent result (YLA commended)
-            finish()
-        } else if (from == "customerActivity") {
-
-            customer!!.flag = "2"
-            customerViewModel.updateCustomerLocation(customer!!)
-            if (customer!!.latitude != null) customerViewModel.saveOrUpdateSaleManRoute(customer!!)
-            setResult(Activity.RESULT_OK, Intent().putExtra(IE_CUSTOMER_DATA, customer))
-            finish()
-
-        } else super.onBackPressed()
-    }
-
     private fun drawMarker(point: LatLng) {
         val markerOptions = MarkerOptions()
         markerOptions.position(point)
         map!!.addMarker(markerOptions)
+    }
+
+    override fun onBackPressed() {
+
+        Log.d("LAT", "$latDouble")
+        when {
+            from.equals("AddNewCustomerActivity", true) -> {
+
+                val intent = AddNewCustomerActivity.newIntentFromAddNewCustomerLocation(
+                    applicationContext,
+                    name!!,
+                    person!!,
+                    phone!!,
+                    address!!,
+                    latDouble,
+                    lonDouble,
+                    paymentType!!,
+                    streetId!!,
+                    townshipId!!,
+                    shopTypeId!!,
+                    districtId!!,
+                    stateDivisionId!!
+                )
+                startActivity(intent) //Better with intent result (YLA commended)
+                finish()
+
+            }
+            from == "customerActivity" -> {
+
+                if (customer!!.latitude != null){
+                    customer!!.flag = "2"
+                    customerViewModel.updateCustomerLocation(customer!!)
+                    val resIntent = Intent()
+                    resIntent.putExtra(IE_CUSTOMER_DATA, customer)
+                    setResult(Activity.RESULT_OK, resIntent)
+                }
+                finish()
+
+            }
+            else -> super.onBackPressed()
+        }
     }
 
 }
