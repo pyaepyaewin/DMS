@@ -16,21 +16,19 @@ import com.aceplus.dms.utils.Utils
 import com.aceplus.dms.viewmodel.factory.KodeinViewModelFactory
 import com.aceplus.dms.viewmodel.promotionviewmodels.PromotionViewModel
 import com.aceplus.domain.model.promotionDataClass.ClassDiscountByPriceDataClass
+import com.aceplus.shared.ui.activities.BaseFragment
 import kotlinx.android.synthetic.main.tab_fragment_category_discount_quantity.*
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.support.kodein
 
-class ClassDiscountByPriceFragment:Fragment(),KodeinAware {
+class ClassDiscountByPriceFragment:BaseFragment(),KodeinAware {
     override val kodein: Kodein by kodein()
     private val classDiscountByPriceAdapter: ClassDiscountByPriceAdapter by lazy {
         ClassDiscountByPriceAdapter()
     }
+    private val classDiscountByPriceViewModel: PromotionViewModel by viewModel()
 
-    private val classDiscountByPriceViewModel: PromotionViewModel by lazy {
-        ViewModelProviders.of(this, KodeinViewModelFactory((kodein)))
-            .get(PromotionViewModel::class.java)
-    }
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -48,8 +46,8 @@ class ClassDiscountByPriceFragment:Fragment(),KodeinAware {
 
         }
 
-        category_discount_title.setText("CLASS DISCOUNT BY PRICE")
-        product_name.setText("CLASS ID")
+        category_discount_title.text = "CLASS DISCOUNT BY PRICE"
+        product_name.text = "CLASS ID"
         classDiscountByPriceViewModel.classDiscountByPriceSuccessState.observe(this, android.arch.lifecycle.Observer {
             classDiscountByPriceAdapter.setNewList(it as ArrayList<ClassDiscountByPriceDataClass>)
         })

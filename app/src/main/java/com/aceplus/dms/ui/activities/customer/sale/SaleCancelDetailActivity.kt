@@ -26,6 +26,7 @@ import kotlin.collections.ArrayList
 import com.aceplus.domain.entity.invoice.Invoice
 import com.aceplus.domain.entity.invoice.InvoiceCancel
 import com.aceplus.domain.entity.invoice.InvoiceCancelProduct
+import com.aceplus.domain.entity.promotion.Promotion
 import com.aceplussolutions.rms.ui.activities.BaseActivity
 
 
@@ -46,6 +47,7 @@ class SaleCancelDetailActivity : BaseActivity(), KodeinAware {
     var soldProductDataList = mutableListOf<SaleCancelDetailItem>()
     private var isPreOrder: Boolean = false
     private var duplicateProductList = mutableListOf<SoldProductInfo>()
+    private var promotionArrayList = ArrayList<Promotion>()
 
 
     lateinit var alertDialog1: AlertDialog
@@ -79,6 +81,11 @@ class SaleCancelDetailActivity : BaseActivity(), KodeinAware {
         tableHeaderOrderedQty.visibility = View.GONE
         headerFoc.visibility = View.GONE
         headerDiscount.visibility = View.GONE
+//        if (intent.getSerializableExtra(SaleCheckoutActivity.PRESENT_PROUDCT_LIST_KEY) != null) {
+//
+//            promotionArrayList =
+//                intent.getSerializableExtra(SaleCheckoutActivity.PRESENT_PROUDCT_LIST_KEY) as ArrayList<Promotion>
+//        }
         if (soldProductDataList.size == 0) {
             Utils.commonDialog("No issued product", this, 2)
 
@@ -94,7 +101,7 @@ class SaleCancelDetailActivity : BaseActivity(), KodeinAware {
             true
         }
         checkoutImg.setOnClickListener {
-           startActivityForResult(
+            startActivityForResult(
                 SaleCancelCheckoutActivity.getSaleCancelDetailIntent(
                     this,
                     saleCancelDetailAdapter.getDataList() as ArrayList,
@@ -104,7 +111,7 @@ class SaleCancelDetailActivity : BaseActivity(), KodeinAware {
                     customerName,
                     productIdList
                 ),
-               Utils.RQ_BACK_TO_CUSTOMER
+                Utils.RQ_BACK_TO_CUSTOMER
             )
         }
         saleCancelViewModel.productIdListSuccessState.observe(
@@ -113,7 +120,7 @@ class SaleCancelDetailActivity : BaseActivity(), KodeinAware {
 
                 soldProductList1 = it as MutableList<String>
 
-                saleCancelViewModel.loadSoldProductList(it,invoiceid)
+                saleCancelViewModel.loadSoldProductList(it, invoiceid)
 
 
             })
@@ -217,6 +224,42 @@ class SaleCancelDetailActivity : BaseActivity(), KodeinAware {
             layoutManager = LinearLayoutManager(context)
             adapter = saleCancelDetailAdapter
         }
+        saleCancelViewModel.promotionDateSuccessState.observe(
+            this,
+            android.arch.lifecycle.Observer {
+                it?.let {
+                    if (it != null) {
+                        val promotionPlanId = it[0].promotion_plan_id
+                        saleCancelViewModel.loadPromotionPriceList(
+                            promotionPlanId!!,
+                            soldProductDataList[0].sale_quantity.toInt(),
+                            soldProductDataList[0].product_id
+                        )
+
+                    }
+
+                }
+            })
+
+        saleCancelViewModel.promotionDateErrorState.observe(
+            this,
+            android.arch.lifecycle.Observer {
+
+            })
+        saleCancelViewModel.promotionPriceSuccessState.observe(
+            this,
+            android.arch.lifecycle.Observer {
+                it?.let {
+
+
+                }
+            })
+
+        saleCancelViewModel.promotionPriceErrorState.observe(
+            this,
+            android.arch.lifecycle.Observer {
+
+            })
 
 
     }
@@ -264,7 +307,7 @@ class SaleCancelDetailActivity : BaseActivity(), KodeinAware {
             .setPositiveButton("Confirm") { arg0, arg1 ->
 
                 if (view.quantity.text.isBlank()) {
-                    message.text = "You must specify quantity."
+                    view.message.text = "You must specify quantity."
                     Log.i("qty", "qqqqqqqqqqqqqqqqqqq")
                 } else {
                     val quantity = view.quantity.text.toString().toInt()
@@ -301,12 +344,20 @@ class SaleCancelDetailActivity : BaseActivity(), KodeinAware {
 
             .setPositiveButton("Yes") { arg0, arg1 ->
 
-                var oldList = saleCancelDetailAdapter.getDataList() as ArrayList
-                oldList.removeAt(position)
+                var oldSoldProductList = saleCancelDetailAdapter.getDataList() as ArrayList
+                oldSoldProductList.removeAt(position)
                 productIdList.add(soldProduct.product.id)
                 saleCancelDetailAdapter.notifyDataSetChanged()
-                saleCancelViewModel.calculateSoldProductData(oldList)
+                saleCancelViewModel.calculateSoldProductData(oldSoldProductList)
+                if (oldSoldProductList.size != 0) {
+//                    //calculatePromotinPriceAndGift(
+//                        oldSoldProductList[oldSoldProductList.size - 1]
+//                    )
+                } else {
+                    promotionArrayList.clear()
+                    // updatePromotionProductList()
 
+                }
             }
             .setNegativeButton("No", null)
             .show()
@@ -314,11 +365,15 @@ class SaleCancelDetailActivity : BaseActivity(), KodeinAware {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == Utils.RQ_BACK_TO_CUSTOMER)
-            if (resultCode == Activity.RESULT_OK){
+            if (resultCode == Activity.RESULT_OK) {
                 setResult(Activity.RESULT_OK)
                 finish()
             }
     }
+
+
+
 }
+
 
 

@@ -5,6 +5,9 @@ import com.aceplus.domain.entity.invoice.Invoice
 import com.aceplus.domain.entity.invoice.InvoiceCancel
 import com.aceplus.domain.entity.invoice.InvoiceCancelProduct
 import com.aceplus.domain.entity.product.Product
+import com.aceplus.domain.entity.promotion.Promotion
+import com.aceplus.domain.entity.promotion.PromotionDate
+import com.aceplus.domain.entity.promotion.PromotionPrice
 import com.aceplus.domain.model.sale.salecancel.SaleCancelDetailItem
 import com.aceplus.domain.model.sale.salecancel.SaleCancelItem
 import com.aceplus.domain.repo.salecancelrepo.SaleCancelRepo
@@ -68,6 +71,37 @@ class SaleCancelViewModel(
         }
     }
 
+
+    var promotionDateSuccessState = MutableLiveData<List<PromotionDate>>()
+    var promotionDateErrorState = MutableLiveData<String>()
+    fun loadPromotionDateList(currentDate: String) {
+        launch {
+            saleCancelRepo.getPromotionDateList(currentDate)
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    promotionDateSuccessState.value = it
+
+                }, {
+                    promotionDateErrorState.value = it.localizedMessage
+                })
+        }
+    }
+    var promotionPriceSuccessState = MutableLiveData<List<PromotionPrice>>()
+    var promotionPriceErrorState = MutableLiveData<String>()
+    fun loadPromotionPriceList(promotionPlanId: String, buy_qty: Int, stockID: String) {
+        launch {
+            saleCancelRepo.getPromotionPriceById(promotionPlanId,buy_qty,stockID)
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    promotionPriceSuccessState.value = it
+
+                }, {
+                    promotionPriceErrorState.value = it.localizedMessage
+                })
+        }
+    }
     var invoiceCancelSuccessState = MutableLiveData<Invoice>()
     var invoiceCancelErrorState = MutableLiveData<String>()
     fun loadInvoiceCancel(invoiceId: String) {
@@ -90,6 +124,7 @@ class SaleCancelViewModel(
         invoice: Invoice,
         invoiceID: String
     ) {
+        var totalQty=0
         val invoiceProductList: ArrayList<InvoiceCancelProduct> = ArrayList()
 
         for (soldProduct in soldProductList) {
@@ -112,9 +147,11 @@ class SaleCancelViewModel(
             if (soldProduct.promotionPlanId.toString().isNullOrEmpty())
                 invoiceCancelProduct.promotion_plan_id = soldProduct.promotionPlanId.toInt()
             invoiceProductList.add(invoiceCancelProduct)
-            saleCancelRepo.updateProductRemainingQtyForSaleCancel(soldProduct.quantity,soldProduct.product.id)
 
+            totalQty+=soldProduct.quantity
+           saleCancelRepo.updateProductRemainingQty(soldProduct)
         }
+
 //        saleCancelRepo.updateProductRemainingQty(
 //            soldProductList[0].quantity,
 //            soldProductList[0].product.id

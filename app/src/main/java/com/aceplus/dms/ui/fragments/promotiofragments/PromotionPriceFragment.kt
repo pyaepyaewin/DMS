@@ -16,21 +16,18 @@ import com.aceplus.dms.ui.adapters.promotionadapters.PromotionPriceAdapter
 import com.aceplus.dms.viewmodel.factory.KodeinViewModelFactory
 import com.aceplus.dms.viewmodel.promotionviewmodels.PromotionViewModel
 import com.aceplus.domain.model.promotionDataClass.PromotionPriceDataClass
+import com.aceplus.shared.ui.activities.BaseFragment
 import kotlinx.android.synthetic.main.tab_fragment_promotion_price.*
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.support.kodein
 
-class PromotionPriceFragment: Fragment() , KodeinAware {
+class PromotionPriceFragment: BaseFragment() , KodeinAware {
     override val kodein: Kodein by kodein()
     private val promotionPriceAdapter: PromotionPriceAdapter by lazy {
         PromotionPriceAdapter()
     }
-
-    private val promotionPriceViewModel: PromotionViewModel by lazy {
-        ViewModelProviders.of(this, KodeinViewModelFactory((kodein)))
-            .get(PromotionViewModel::class.java)
-    }
+    private val promotionPriceViewModel: PromotionViewModel by viewModel()
 
     override fun onCreateView(
         inflater: LayoutInflater,

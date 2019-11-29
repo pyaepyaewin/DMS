@@ -21,6 +21,7 @@ import com.aceplus.dms.R
 import com.aceplus.dms.viewmodel.factory.KodeinViewModelFactory
 import com.aceplus.dms.viewmodel.routeviewmodels.CustomerLocationViewModel
 import com.aceplus.domain.model.routedataclass.CustomerLocationDataClass
+import com.aceplus.shared.ui.activities.BaseFragment
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -33,19 +34,14 @@ import org.kodein.di.android.support.kodein
 import org.kodein.di.generic.M
 import java.util.zip.Inflater
 
-class ViewByMapFragment : Fragment(), KodeinAware {
+class ViewByMapFragment : BaseFragment(), KodeinAware {
 
     var latlngList: MutableList<CustomerLocationDataClass>? = null
-//    private lateinit var mMap: GoogleMap
-
     var mMap: GoogleMap? = null
 
     override val kodein: Kodein by kodein()
     final val MY_PERMISSIONS_REQUEST_LOCATION = 99
-    private val customerLocationViewModel: CustomerLocationViewModel by lazy {
-        ViewModelProviders.of(this, KodeinViewModelFactory((kodein)))
-            .get(CustomerLocationViewModel::class.java)
-    }
+    private val customerLocationViewModel: CustomerLocationViewModel by viewModel()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -59,33 +55,28 @@ class ViewByMapFragment : Fragment(), KodeinAware {
     ): View? {
         val fragmentView = inflater.inflate(R.layout.fragment_e_route_map, container, false)
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
-        mapFragment.getMapAsync(object : OnMapReadyCallback {
+        mapFragment.getMapAsync { p0 ->
+            mMap = p0!!
 
-            override fun onMapReady(p0: GoogleMap?) {
-                mMap = p0!!
-
-                if (mMap != null) {
-                    mMap!!.isTrafficEnabled = true
-                    mMap!!.uiSettings.isMyLocationButtonEnabled = true
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        if (ContextCompat.checkSelfPermission(
-                                context!!,
-                                Manifest.permission.ACCESS_FINE_LOCATION
-                            ) == PackageManager.PERMISSION_GRANTED
-                        ) {
-                            mMap!!.setMyLocationEnabled(true)
-                        } else {
-                            CheckLocationPermission()
-                        }
+            if (mMap != null) {
+                mMap!!.isTrafficEnabled = true
+                mMap!!.uiSettings.isMyLocationButtonEnabled = true
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    if (ContextCompat.checkSelfPermission(
+                            context!!,
+                            Manifest.permission.ACCESS_FINE_LOCATION
+                        ) == PackageManager.PERMISSION_GRANTED
+                    ) {
+                        mMap!!.isMyLocationEnabled = true
                     } else {
-                        mMap!!.setMyLocationEnabled(true)
+                        CheckLocationPermission()
                     }
-
+                } else {
+                    mMap!!.isMyLocationEnabled = true
                 }
 
             }
-
-        })
+        }
 
         customerLocationViewModel.customerLocationSuccessState.observe(this, Observer {
             latlngList = it as MutableList<CustomerLocationDataClass>
@@ -106,7 +97,7 @@ class ViewByMapFragment : Fragment(), KodeinAware {
 
             var latlng = LatLng(i.latitude, i.longitude)
             val latlng1 = LatLng(0.0, 0.0)
-            if (!latlng.equals(latlng1)) {
+            if (latlng != latlng1) {
                 var markerOptions = MarkerOptions().position(latlng)
 
                 if (mMap != null) {
@@ -142,17 +133,15 @@ class ViewByMapFragment : Fragment(), KodeinAware {
             ) {
                 AlertDialog.Builder(activity).setTitle("Location Permission Needed")
                     .setMessage("This app needs the Location permission, please accept to use location functionality")
-                    .setPositiveButton("OK", object : DialogInterface.OnClickListener {
-                        override fun onClick(dialog: DialogInterface?, which: Int) {
-                            ActivityCompat.requestPermissions(
-                                activity!!,
-                                arrayOf<String>
-                                    (Manifest.permission.ACCESS_FINE_LOCATION),
-                                MY_PERMISSIONS_REQUEST_LOCATION
-                            )
-                        }
-
-                    }).create().show()
+                    .setPositiveButton("OK"
+                    ) { dialog, which ->
+                        ActivityCompat.requestPermissions(
+                            activity!!,
+                            arrayOf<String>
+                                (Manifest.permission.ACCESS_FINE_LOCATION),
+                            MY_PERMISSIONS_REQUEST_LOCATION
+                        )
+                    }.create().show()
 
             }
 
@@ -175,7 +164,7 @@ class ViewByMapFragment : Fragment(), KodeinAware {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
             MY_PERMISSIONS_REQUEST_LOCATION -> {
-                if (grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     if (ContextCompat.checkSelfPermission(
                             context!!,
                             Manifest.permission.ACCESS_FINE_LOCATION

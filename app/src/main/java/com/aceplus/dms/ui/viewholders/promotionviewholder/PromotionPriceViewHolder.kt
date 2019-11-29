@@ -1,6 +1,7 @@
 package com.aceplus.dms.ui.viewholders.promotionviewholder
 
 import android.view.View
+import com.aceplus.dms.utils.Utils
 
 
 import com.aceplus.domain.model.promotion.PromotionPriceForReport
@@ -14,7 +15,7 @@ class PromotionPriceViewHolder(itemView: View):BaseViewHolder<PromotionPriceData
         itemView.product_name.text=data.product_name
         itemView.fromQty.text=data.from_quantity
         itemView.toQty.text=data.to_quantity
-        itemView.promotion_price.text=data.promotion_price
+        itemView.promotion_price.text=Utils.formatAmount(data.promotion_price?.toDouble())
 
     }
 }

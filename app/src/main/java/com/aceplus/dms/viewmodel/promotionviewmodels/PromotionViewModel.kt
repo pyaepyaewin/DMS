@@ -110,9 +110,9 @@ class PromotionViewModel(
     //classdiscountbygift
     var classDiscountByGiftSuccessState = MutableLiveData<List<ClassDiscountByGiftDataClass>>()
     var classDiscountByGiftErrorState = MutableLiveData<String>()
-    fun loadClassDiscountByGift() {
+    fun loadClassDiscountByGift(currentDate: String) {
         launch {
-            promotionRepo.getClassDiscountByGift()
+            promotionRepo.getClassDiscountByGift(currentDate)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
@@ -125,9 +125,9 @@ class PromotionViewModel(
     //classdiscountforshowprice
     var classDiscountForShowPriceSuccessState = MutableLiveData<List<ClassDiscountForShowPriceDataClass>>()
     var classDiscountForShowPriceErrorState = MutableLiveData<String>()
-    fun loadClassDiscountByPrice() {
+    fun loadClassDiscountForShowPrice(currentDate: String) {
         launch {
-            promotionRepo.getClassDiscountForShowPrice()
+            promotionRepo.getClassDiscountForShowPrice(currentDate)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
@@ -140,9 +140,9 @@ class PromotionViewModel(
     //classdiscountforshowgift
     var classDiscountForShowGiftSuccessState = MutableLiveData<List<ClassDiscountForShowGiftDataClass>>()
     var classDiscountForShowGiftErrorState = MutableLiveData<String>()
-    fun loadClassDiscountForShowGift() {
+    fun loadClassDiscountForShowGift(currentDate: String) {
         launch {
-            promotionRepo.getClassDiscountForShowGift()
+            promotionRepo.getClassDiscountForShowGift(currentDate)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({

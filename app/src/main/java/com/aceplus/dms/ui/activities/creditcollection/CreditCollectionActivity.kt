@@ -9,6 +9,7 @@ import android.util.Log.i
 import android.widget.Toast
 import com.aceplus.dms.R
 import com.aceplus.dms.ui.adapters.creditcollectionadapters.CreditCollectionAdapter
+import com.aceplus.dms.utils.Utils
 import com.aceplus.dms.viewmodel.creditcollection.CreditCollectionViewModel
 import com.aceplus.dms.viewmodel.factory.KodeinViewModelFactory
 import com.aceplus.domain.model.creditcollectiondataclass.CreditCollectionDataClass
@@ -27,12 +28,13 @@ class CreditCollectionActivity : BaseActivity(), KodeinAware {
     }
 
     private fun onClickNoticeListItem(data: CreditCollectionDataClass) {
-        Toast.makeText(
-            applicationContext,
-            "You clicked at ${data.customer_name}",
-            Toast.LENGTH_SHORT
-        ).show()
-        startActivity(CreditCollectionCheckoutActivity.getIntent(this,data.id,data.customer_name))
+        val unpaidAmt=data.amount-data.pay_amount!!
+        if (unpaidAmt !== 0.0) {
+            startActivity(CreditCollectionCheckoutActivity.getIntent(this,data.id,data.customer_name))
+
+        } else {
+            Utils.commonDialog("No credit for this customer", this, 2)
+        }
     }
 
     private val creditCollectionViewModel: CreditCollectionViewModel by viewModel()
@@ -55,10 +57,13 @@ class CreditCollectionActivity : BaseActivity(), KodeinAware {
         creditCollectionViewModel.creditCollectionSuccessState.observe(
             this,
             android.arch.lifecycle.Observer {
+                it?.let {
+                    if (it.isEmpty()) {
+                        Utils.commonDialog("No credit to pay", this, 2)
+                    } else
 
-
-                    creditCollectionAdapter.setNewList(it as ArrayList<CreditCollectionDataClass>)
-
+                        creditCollectionAdapter.setNewList(it as ArrayList<CreditCollectionDataClass>)
+                }
 
             })
 

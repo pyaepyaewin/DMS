@@ -12,24 +12,23 @@ import android.widget.Toast
 import com.aceplus.dms.R
 import com.aceplus.dms.ui.activities.MainActivity
 import com.aceplus.dms.ui.adapters.promotionadapters.ClassDiscountForShowPriceAdapter
+import com.aceplus.dms.utils.Utils
 import com.aceplus.dms.viewmodel.factory.KodeinViewModelFactory
 import com.aceplus.dms.viewmodel.promotionviewmodels.PromotionViewModel
 import com.aceplus.domain.model.promotionDataClass.ClassDiscountForShowPriceDataClass
+import com.aceplus.shared.ui.activities.BaseFragment
 import kotlinx.android.synthetic.main.tab_fragment_category_discount_quantity.*
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.support.kodein
 
-class ClassDiscountForShowPriceFragment:Fragment(),KodeinAware {
+class ClassDiscountForShowPriceFragment:BaseFragment(),KodeinAware {
     override val kodein: Kodein by kodein()
     private val classDiscountForShowPriceAdapter: ClassDiscountForShowPriceAdapter by lazy {
         ClassDiscountForShowPriceAdapter()
     }
 
-    private val classDiscountForShowPriceViewModel: PromotionViewModel by lazy {
-        ViewModelProviders.of(this, KodeinViewModelFactory((kodein)))
-            .get(PromotionViewModel::class.java)
-    }
+    private val classDiscountForShowPriceViewModel: PromotionViewModel by viewModel()
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -46,8 +45,8 @@ class ClassDiscountForShowPriceFragment:Fragment(),KodeinAware {
             startActivity(intent)
 
         }
-        product_name.setText("CLASS ID")
-        category_discount_title.setText("CLASS DISCOUNT FOR SHOW PRICE")
+        product_name.text = "CLASS ID"
+        category_discount_title.text = "CLASS DISCOUNT FOR SHOW PRICE"
         classDiscountForShowPriceViewModel.classDiscountForShowPriceSuccessState.observe(this, android.arch.lifecycle.Observer {
             classDiscountForShowPriceAdapter.setNewList(it as ArrayList<ClassDiscountForShowPriceDataClass>)
         })
@@ -59,7 +58,7 @@ class ClassDiscountForShowPriceFragment:Fragment(),KodeinAware {
             layoutManager = LinearLayoutManager(activity)
             adapter = classDiscountForShowPriceAdapter
         }
-        classDiscountForShowPriceViewModel.loadClassDiscountByPrice()
+        classDiscountForShowPriceViewModel.loadClassDiscountForShowPrice(Utils.getCurrentDate(true))
     }
     }
 

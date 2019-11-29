@@ -9,6 +9,8 @@ import com.aceplus.domain.entity.invoice.InvoiceCancel
 import com.aceplus.domain.entity.invoice.InvoiceCancelProduct
 import com.aceplus.domain.entity.invoice.InvoiceProduct
 import com.aceplus.domain.entity.product.Product
+import com.aceplus.domain.entity.promotion.PromotionDate
+import com.aceplus.domain.entity.promotion.PromotionPrice
 import com.aceplus.domain.entity.sale.SaleMan
 import com.aceplus.domain.model.sale.salecancel.SaleCancelDetailItem
 import com.aceplus.domain.model.sale.salecancel.SaleCancelItem
@@ -19,9 +21,25 @@ import com.aceplussolutions.rms.constants.AppUtils
 import io.reactivex.Observable
 
 class SaleCancelRepoImpl(val database: MyDatabase,val shf:SharedPreferences) : SaleCancelRepo {
-    override fun updateProductRemainingQtyForSaleCancel(qty: Int, productId: Int) {
-        database.productDao().updateProductRemainingQtyWithSaleCancel(qty,productId)
+
+    override fun getPromotionPriceById(
+        promotionPlanId: String,
+        buy_qty: Int,
+        stockID: String
+    ): Observable<List<PromotionPrice>> {
+        return Observable.just(database.promotionPriceDao().getPromotionPriceByID(promotionPlanId,buy_qty,stockID))
+
     }
+
+
+    override fun getPromotionDateList(currentDate: String): Observable<List<PromotionDate>> {
+        return Observable.just(database.promotionDateDao().getCurrentDatePromotion(currentDate))
+
+    }
+
+//    override fun updateProductRemainingQtyForSaleCancel(qty: Int, productId: Int) {
+//        database.productDao().updateProductRemainingQtyWithSaleCancel(qty,productId)
+//    }
 
 
     override fun deleteInvoicePresent(invoiceId: String) {
@@ -40,15 +58,6 @@ class SaleCancelRepoImpl(val database: MyDatabase,val shf:SharedPreferences) : S
         database.invoiceCancelDao().insert(invoiceCancel)
         database.invoiceCancelProductDao().insertAll(invoiceCancelProduct)
     }
-//    override fun insertInvoiceCancelProduct(invoiceCancelProduct: List<InvoiceCancelProduct>) {
-//        return database.invoiceCancelProductDao().insertAll(invoiceCancelProduct)
-//
-//    }
-//
-//    override fun insertInvoiceCancel(invoiceCancel: List<InvoiceCancel>) {
-//        return database.invoiceCancelDao().insertAll(invoiceCancel)
-//
-//    }
 
 
     override fun deleteInvoiceProductForLongClick(invoiceId: String, productIdList: List<Int>) {

@@ -12,9 +12,11 @@ import android.widget.Toast
 import com.aceplus.dms.R
 import com.aceplus.dms.ui.activities.MainActivity
 import com.aceplus.dms.ui.adapters.promotionadapters.ClassDiscountForShowGiftAdapter
+import com.aceplus.dms.utils.Utils
 import com.aceplus.dms.viewmodel.factory.KodeinViewModelFactory
 import com.aceplus.dms.viewmodel.promotionviewmodels.PromotionViewModel
 import com.aceplus.domain.model.promotionDataClass.ClassDiscountForShowGiftDataClass
+import com.aceplus.shared.ui.activities.BaseFragment
 import kotlinx.android.synthetic.main.tab_frag_class_dis_gift.*
 import kotlinx.android.synthetic.main.tab_frag_class_dis_gift.cancel_img
 import kotlinx.android.synthetic.main.tab_frag_class_dis_gift.category_discount_title
@@ -22,16 +24,13 @@ import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.support.kodein
 
-class ClassDiscountForShowGiftFragment :Fragment(),KodeinAware{
+class ClassDiscountForShowGiftFragment :BaseFragment(),KodeinAware{
     override val kodein: Kodein by kodein()
     private val classDiscountForShowGiftAdapter: ClassDiscountForShowGiftAdapter by lazy {
         ClassDiscountForShowGiftAdapter()
     }
 
-    private val classDiscountForShowGiftViewModel: PromotionViewModel by lazy {
-        ViewModelProviders.of(this, KodeinViewModelFactory((kodein)))
-            .get(PromotionViewModel::class.java)
-    }
+    private val classDiscountForShowGiftViewModel: PromotionViewModel by viewModel()
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -48,8 +47,8 @@ class ClassDiscountForShowGiftFragment :Fragment(),KodeinAware{
 
         }
 
-        product_name.setText("CLASS ID")
-        category_discount_title.setText("CLASS DISCOUNT FOR SHOW GIFT")
+        product_name.text = "CLASS ID"
+        category_discount_title.text = "CLASS DISCOUNT FOR SHOW GIFT"
 
         classDiscountForShowGiftViewModel.classDiscountForShowGiftSuccessState.observe(this, android.arch.lifecycle.Observer {
             classDiscountForShowGiftAdapter.setNewList(it as ArrayList<ClassDiscountForShowGiftDataClass>)
@@ -62,7 +61,7 @@ class ClassDiscountForShowGiftFragment :Fragment(),KodeinAware{
             layoutManager = LinearLayoutManager(activity)
             adapter = classDiscountForShowGiftAdapter
         }
-        classDiscountForShowGiftViewModel.loadClassDiscountForShowGift()
+        classDiscountForShowGiftViewModel.loadClassDiscountForShowGift(Utils.getCurrentDate(true))
     }
 }
 

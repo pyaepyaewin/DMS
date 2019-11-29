@@ -40,9 +40,6 @@ class SaleCancelCheckOutViewModel(
 
     }
 
-    fun updateProductRemainingQty(soldProductInfo: SoldProductInfo) {
-        saleCancelRepo.updateProductRemainingQty(soldProductInfo)
-    }
 
     var soldInvoiceListSuccessState = MutableLiveData<List<Invoice>>()
     var soldInvoiceListErrorState = MutableLiveData<String>()
@@ -146,9 +143,10 @@ class SaleCancelCheckOutViewModel(
             if (soldProduct.totalAmt != 0.0) {
                 invoiceProductList.add(invoiceProduct)
             }
-            saleCancelRepo.updateProductRemainingQtyForSaleCancel(soldProduct.quantity, soldProduct.product.id)
 
+            saleCancelRepo.updateProductRemainingQty(soldProduct)
         }
+
         saleCancelRepo.insertInvoiceProduct(invoiceProductList)
 
         val invoice = Invoice()

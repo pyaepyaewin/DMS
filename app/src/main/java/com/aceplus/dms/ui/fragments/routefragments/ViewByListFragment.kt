@@ -18,6 +18,7 @@ import com.aceplus.domain.model.route.Route_Township
 import com.aceplus.domain.model.route.Routedata
 import com.aceplus.domain.model.routedataclass.TownshipDataClass
 import com.aceplus.domain.model.routedataclass.ViewByListDataClass
+import com.aceplus.shared.ui.activities.BaseFragment
 import kotlinx.android.synthetic.main.fragment_e_route_listview.*
 import kotlinx.android.synthetic.main.fragment_e_route_listview.view.*
 import org.kodein.di.Kodein
@@ -25,16 +26,11 @@ import org.kodein.di.KodeinAware
 import org.kodein.di.android.support.kodein
 import java.util.ArrayList
 
-class ViewByListFragment : Fragment(), KodeinAware {
+class ViewByListFragment : BaseFragment(), KodeinAware {
     override val kodein: Kodein by kodein()
     private val  viewByListAdapter: ViewByListAdapter by lazy { ViewByListAdapter() }
 
-
-    private val viewByListViewModel: ViewByListViewModel by lazy {
-        ViewModelProviders.of(this, KodeinViewModelFactory((kodein)))
-            .get(ViewByListViewModel::class.java)
-    }
-
+    private val viewByListViewModel: ViewByListViewModel by viewModel()
     var route_townships = ArrayList<TownshipDataClass>()
    //var routedataArrayList= mutableListOf<ViewByListDataClass>()
 

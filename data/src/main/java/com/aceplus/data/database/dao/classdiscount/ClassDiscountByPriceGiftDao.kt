@@ -24,6 +24,6 @@ interface ClassDiscountByPriceGiftDao {
     @Query("Delete from class_discount_by_price_gift")
     fun deleteAll()
 
-    @Query("select CDP.discount_type,class.name,CDPI.from_quantity,CDPI.to_quantity,CDPI.from_amount,CDPI.to_amount,P.product_name,CDPG.quantity from class_discount_by_price as CDP,class_discount_by_price_item as CDPI,product as P,class_discount_by_price_gift as CDPG,class where CDP.discount_type='G' and CDP.id=CDPI.class_discount_id and class.class_id=CDPI.class_id and CDPG.class_discount_id=CDPI.class_discount_id and P.id=CDPG.stock_id")
-    fun getClassDiscountByGiftList(): List<ClassDiscountByGiftDataClass>
+    @Query("select CDP.discount_type,class.name,CDPI.from_quantity,CDPI.to_quantity,CDPI.from_amount,CDPI.to_amount,P.product_name,CDPG.quantity from class_discount_by_price as CDP,class_discount_by_price_item as CDPI,product as P,class_discount_by_price_gift as CDPG,class where date(:currentDate) BETWEEN date(start_date) AND date(end_date) and CDP.discount_type='G' and CDP.id=CDPI.class_discount_id and class.class_id=CDPI.class_id and CDPG.class_discount_id=CDPI.class_discount_id and P.id=CDPG.stock_id")
+    fun getClassDiscountByGiftList(currentDate: String): List<ClassDiscountByGiftDataClass>
 }

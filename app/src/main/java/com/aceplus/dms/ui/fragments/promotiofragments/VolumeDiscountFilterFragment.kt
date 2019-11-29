@@ -15,21 +15,19 @@ import com.aceplus.dms.ui.adapters.promotionadapters.VolumeDiscountFilterAdapter
 import com.aceplus.dms.viewmodel.factory.KodeinViewModelFactory
 import com.aceplus.dms.viewmodel.promotionviewmodels.PromotionViewModel
 import com.aceplus.domain.model.promotionDataClass.VolumeDiscountFilterDataClass
+import com.aceplus.shared.ui.activities.BaseFragment
 import kotlinx.android.synthetic.main.tab_fragment_volume_discount_filter.*
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.support.kodein
 
-class VolumeDiscountFilterFragment:Fragment(),KodeinAware {
+class VolumeDiscountFilterFragment:BaseFragment(),KodeinAware {
     override val kodein: Kodein by kodein()
     private val volumeDiscountFilteradapter: VolumeDiscountFilterAdapter by lazy {
         VolumeDiscountFilterAdapter()
     }
+    private val volumeDiscountFilterViewModel: PromotionViewModel by viewModel()
 
-    private val volumeDiscountFilterViewModel: PromotionViewModel by lazy {
-        ViewModelProviders.of(this, KodeinViewModelFactory((kodein)))
-            .get(PromotionViewModel::class.java)
-    }
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,

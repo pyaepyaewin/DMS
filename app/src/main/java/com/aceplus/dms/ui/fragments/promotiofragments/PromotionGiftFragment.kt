@@ -16,22 +16,19 @@ import com.aceplus.dms.ui.adapters.promotionadapters.PromotionGiftAdapter
 import com.aceplus.dms.viewmodel.factory.KodeinViewModelFactory
 import com.aceplus.dms.viewmodel.promotionviewmodels.PromotionViewModel
 import com.aceplus.domain.model.promotionDataClass.PromotionGiftDataClass
+import com.aceplus.shared.ui.activities.BaseFragment
 import kotlinx.android.synthetic.main.tab_fragment_promotion_gift.*
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.support.kodein
 import java.util.ArrayList
 
-class PromotionGiftFragment:Fragment() ,KodeinAware{
+class PromotionGiftFragment:BaseFragment() ,KodeinAware{
     override val kodein: Kodein by kodein()
     private val promotionGiftAdapter: PromotionGiftAdapter by lazy {
         PromotionGiftAdapter()
     }
-
-    private val promotionGiftViewModel: PromotionViewModel by lazy {
-        ViewModelProviders.of(this, KodeinViewModelFactory((kodein)))
-            .get(PromotionViewModel::class.java)
-    }
+    private val promotionGiftViewModel: PromotionViewModel by viewModel()
 
     override fun onCreateView(
         inflater: LayoutInflater,

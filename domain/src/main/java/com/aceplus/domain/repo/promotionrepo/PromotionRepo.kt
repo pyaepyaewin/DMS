@@ -10,9 +10,9 @@ interface PromotionRepo {
     fun getVolumeDiscountList(): Observable<List<VolumeDiscountDataClass>>
     fun getVolumeDiscountFilterList(): Observable<List<VolumeDiscountFilterDataClass>>
     fun getClassDiscountByPrice(currentDate:String): Observable<List<ClassDiscountByPriceDataClass>>
-    fun getClassDiscountByGift(): Observable<List<ClassDiscountByGiftDataClass>>
-    fun getClassDiscountForShowPrice(): Observable<List<ClassDiscountForShowPriceDataClass>>
-    fun getClassDiscountForShowGift(): Observable<List<ClassDiscountForShowGiftDataClass>>
+    fun getClassDiscountByGift(currentDate: String): Observable<List<ClassDiscountByGiftDataClass>>
+    fun getClassDiscountForShowPrice(currentDate: String): Observable<List<ClassDiscountForShowPriceDataClass>>
+    fun getClassDiscountForShowGift(currentDate: String): Observable<List<ClassDiscountForShowGiftDataClass>>
 
 
 }

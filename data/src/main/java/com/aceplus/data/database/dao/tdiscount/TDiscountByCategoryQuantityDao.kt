@@ -23,7 +23,8 @@ interface TDiscountByCategoryQuantityDao{
 
     @Query("Delete from t_discount_by_category_quantity")
     fun deleteAll()
-    @Query("select product_category.category_name,t_discount_by_category_quantity_item.from_quantity,t_discount_by_category_quantity_item.to_quantity,t_discount_by_category_quantity_item.discount_percent from product_category,t_discount_by_category_quantity_item where t_discount_by_category_quantity_item.t_promotion_plan_id=product_category.id")
+
+    @Query("select product_category.category_name,t_discount_by_category_quantity_item.from_quantity,t_discount_by_category_quantity_item.to_quantity,t_discount_by_category_quantity_item.discount_percent from product_category,t_discount_by_category_quantity_item,t_discount_by_category_quantity where t_discount_by_category_quantity.category_id=product_category.category_id and t_discount_by_category_quantity_item.t_promotion_plan_id=t_discount_by_category_quantity.id")
     fun getCategoryDiscount():List<CategoryDiscountDataClass>
 
 }

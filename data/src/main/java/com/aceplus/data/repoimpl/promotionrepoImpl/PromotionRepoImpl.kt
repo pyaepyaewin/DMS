@@ -36,18 +36,18 @@ class PromotionRepoImpl(val database: MyDatabase):PromotionRepo {
 
     }
 
-    override fun getClassDiscountByGift(): Observable<List<ClassDiscountByGiftDataClass>> {
-        return Observable.just(database.classDiscountByPriceGiftDao().getClassDiscountByGiftList())
+    override fun getClassDiscountByGift(currentDate: String): Observable<List<ClassDiscountByGiftDataClass>> {
+        return Observable.just(database.classDiscountByPriceGiftDao().getClassDiscountByGiftList(currentDate))
 
     }
 
-    override fun getClassDiscountForShowPrice(): Observable<List<ClassDiscountForShowPriceDataClass>> {
-        return Observable.just(database.classDiscountForShowItemDao().getClassDiscountForShowPriceList())
+    override fun getClassDiscountForShowPrice(currentDate: String): Observable<List<ClassDiscountForShowPriceDataClass>> {
+        return Observable.just(database.classDiscountForShowItemDao().getClassDiscountForShowPriceList(currentDate))
 
     }
 
-    override fun getClassDiscountForShowGift(): Observable<List<ClassDiscountForShowGiftDataClass>> {
-        return Observable.just(database.classDiscountForShowGiftDao().getClassDiscountForShowGift())
+    override fun getClassDiscountForShowGift(currentDate: String): Observable<List<ClassDiscountForShowGiftDataClass>> {
+        return Observable.just(database.classDiscountForShowGiftDao().getClassDiscountForShowGift(currentDate))
 
     }
 

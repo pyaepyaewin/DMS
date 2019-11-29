@@ -6,6 +6,8 @@ import com.aceplus.domain.entity.invoice.InvoiceCancel
 import com.aceplus.domain.entity.invoice.InvoiceCancelProduct
 import com.aceplus.domain.entity.invoice.InvoiceProduct
 import com.aceplus.domain.entity.product.Product
+import com.aceplus.domain.entity.promotion.PromotionDate
+import com.aceplus.domain.entity.promotion.PromotionPrice
 import com.aceplus.domain.entity.sale.SaleMan
 import com.aceplus.domain.model.sale.salecancel.SaleCancelDetailItem
 import com.aceplus.domain.model.sale.salecancel.SaleCancelItem
@@ -39,7 +41,10 @@ interface SaleCancelRepo {
     )
 
     fun getInvoiceCancel(invoiceId: String): Observable<Invoice>
-    fun updateProductRemainingQtyForSaleCancel(qty:Int,productId: Int)
+
+    //fun updateProductRemainingQtyForSaleCancel(qty:Int,productId: Int)
+    fun getPromotionDateList(currentDate:String):Observable<List<PromotionDate>>
+    fun getPromotionPriceById(promotionPlanId: String, buy_qty: Int, stockID: String):Observable<List<PromotionPrice>>
 
 
 

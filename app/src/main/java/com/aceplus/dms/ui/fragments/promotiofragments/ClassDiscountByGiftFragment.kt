@@ -12,9 +12,11 @@ import android.widget.Toast
 import com.aceplus.dms.R
 import com.aceplus.dms.ui.activities.MainActivity
 import com.aceplus.dms.ui.adapters.promotionadapters.ClassDiscountByGiftAdapter
+import com.aceplus.dms.utils.Utils
 import com.aceplus.dms.viewmodel.factory.KodeinViewModelFactory
 import com.aceplus.dms.viewmodel.promotionviewmodels.PromotionViewModel
 import com.aceplus.domain.model.promotionDataClass.ClassDiscountByGiftDataClass
+import com.aceplus.shared.ui.activities.BaseFragment
 import kotlinx.android.synthetic.main.tab_frag_class_dis_gift.*
 import kotlinx.android.synthetic.main.tab_fragment_category_discount_quantity.cancel_img
 import kotlinx.android.synthetic.main.tab_fragment_category_discount_quantity.category_discount_title
@@ -23,16 +25,13 @@ import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.support.kodein
 
-class ClassDiscountByGiftFragment:Fragment(),KodeinAware {
+class ClassDiscountByGiftFragment:BaseFragment(),KodeinAware {
     override val kodein: Kodein by kodein()
     private val classDiscountByGiftAdapter: ClassDiscountByGiftAdapter by lazy {
         ClassDiscountByGiftAdapter()
     }
 
-    private val classDiscountByGiftViewModel: PromotionViewModel by lazy {
-        ViewModelProviders.of(this, KodeinViewModelFactory((kodein)))
-            .get(PromotionViewModel::class.java)
-    }
+    private val classDiscountByGiftViewModel: PromotionViewModel by viewModel()
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -61,7 +60,7 @@ class ClassDiscountByGiftFragment:Fragment(),KodeinAware {
             layoutManager = LinearLayoutManager(activity)
             adapter = classDiscountByGiftAdapter
         }
-        classDiscountByGiftViewModel.loadClassDiscountByPrice()
+        classDiscountByGiftViewModel.loadClassDiscountByGift(Utils.getCurrentDate(true))
     }
 
 
