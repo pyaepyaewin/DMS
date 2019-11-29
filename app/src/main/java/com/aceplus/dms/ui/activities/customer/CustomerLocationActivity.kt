@@ -37,12 +37,6 @@ class CustomerLocationActivity : BaseActivity(), KodeinAware {
 
     companion object {
 
-        private const val IE_LATITUDE: String = "IE_LATITUDE"
-        private const val IE_LONGITUDE: String = "IE_LONGITUDE"
-        private const val IE_CUSTOMER_NAME: String = "IE_CUSTOMER_NAME"
-        private const val IE_ADDRESS = "IE_ADDRESS"
-        private const val IE_VISIT_RECORD = "IE_VISIT_RECORD"
-
         private const val IE_CUSTOMER_DATA = "IE_CUSTOMER_DATA"
         private const val MY_PERMISSIONS_REQUEST_LOCATION = 99
 
@@ -52,23 +46,6 @@ class CustomerLocationActivity : BaseActivity(), KodeinAware {
             intent.putExtra(IE_CUSTOMER_DATA, customer)
             return intent
 
-        }
-
-        fun newIntent(
-            context: Context,
-            latitude: String,
-            longitude: String,
-            customerName: String,
-            address: String,
-            visitRecord: String
-        ): Intent {
-            val intent = Intent(context, CustomerLocationActivity::class.java)
-            intent.putExtra(IE_LATITUDE, latitude)
-            intent.putExtra(IE_LONGITUDE, longitude)
-            intent.putExtra(IE_CUSTOMER_NAME, customerName)
-            intent.putExtra(IE_ADDRESS, address)
-            intent.putExtra(IE_VISIT_RECORD, visitRecord)
-            return intent
         }
 
     }
@@ -110,7 +87,7 @@ class CustomerLocationActivity : BaseActivity(), KodeinAware {
 
                         map?.isMyLocationEnabled = true
 
-                        val gpsTracker = GPSTracker(this)
+                        /*val gpsTracker = GPSTracker(this)
                         var lat = 0.0
                         var lon = 0.0
 
@@ -118,7 +95,7 @@ class CustomerLocationActivity : BaseActivity(), KodeinAware {
                             lat = gpsTracker.getLatitude()
                             lon = gpsTracker.getLongitude()
                         }
-                        map?.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(lat, lon), 15f))
+                        map?.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(lat, lon), 15f))*/
 
                     } else {
                         checkLocationPermission() //To Request Location Permission
@@ -127,7 +104,7 @@ class CustomerLocationActivity : BaseActivity(), KodeinAware {
 
                     map?.isMyLocationEnabled = true
 
-                    val gpsTracker = GPSTracker(this)
+                    /*val gpsTracker = GPSTracker(this)
                     var lat = 0.0
                     var lon = 0.0
 
@@ -135,7 +112,7 @@ class CustomerLocationActivity : BaseActivity(), KodeinAware {
                         lat = gpsTracker.getLatitude()
                         lon = gpsTracker.getLongitude()
                     }
-                    map?.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(lat, lon), 15f))
+                    map?.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(lat, lon), 15f))*/
 
                 }
 
@@ -218,6 +195,7 @@ class CustomerLocationActivity : BaseActivity(), KodeinAware {
             .title(title)
             .snippet(snippet)
         this.map?.addMarker(markerOptions)
+        this.map?.moveCamera(CameraUpdateFactory.newLatLngZoom(point, 15f))
     }
 
     private fun drawMarker2(point: LatLng, title: String, snippet: String) {
@@ -228,6 +206,7 @@ class CustomerLocationActivity : BaseActivity(), KodeinAware {
             .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
             .snippet(snippet)
         this.map?.addMarker(markerOptions)
+        this.map?.moveCamera(CameraUpdateFactory.newLatLngZoom(point, 15f))
     }
 
 }
