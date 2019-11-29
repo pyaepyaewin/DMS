@@ -4,6 +4,7 @@ import com.aceplus.data.database.MyDatabase
 import com.aceplus.domain.entity.CompanyInformation
 import com.aceplus.domain.entity.credit.Credit
 import com.aceplus.domain.entity.customer.Customer
+import com.aceplus.domain.entity.delivery.DeliveryItemUpload
 import com.aceplus.domain.entity.invoice.Invoice
 import com.aceplus.domain.entity.preorder.PreOrder
 import com.aceplus.domain.entity.preorder.PreOrderProduct
@@ -15,6 +16,7 @@ import com.aceplus.domain.entity.route.RouteScheduleItemV2
 import com.aceplus.domain.entity.sale.SaleMan
 import com.aceplus.domain.entity.sale.saleexchange.SaleExchange
 import com.aceplus.domain.entity.sale.salereturn.SaleReturn
+import com.aceplus.domain.entity.sale.salereturn.SaleReturnDetail
 import com.aceplus.domain.entity.sale.saletarget.SaleTargetCustomer
 import com.aceplus.domain.entity.sale.saletarget.SaleTargetSaleMan
 import com.aceplus.domain.entity.sale.salevisit.SaleVisitRecordUpload
@@ -23,14 +25,21 @@ import com.aceplus.domain.vo.report.*
 import io.reactivex.Observable
 
 class ReportRepoImpl(private val db: MyDatabase) : ReportRepo {
-
     //deliver report
-    override fun deliverReport(): Observable<List<DeliverReport>> {
-        return Observable.just(db.deliveryDao().getDeliverReport())
+    override fun inCompleteDeliverReport(): Observable<List<IncompleteDeliverReport>> {
+        return Observable.just(db.deliveryUploadDao().getIncompleteDeliverReport())
+    }
+
+    override fun getDeliveryItemUploadList(invoiceNo: List<String>): Observable<List<DeliveryItemUpload>> {
+        return Observable.just(db.deliveryItemUpload().getDeliveryItemList(invoiceNo))
+    }
+
+    override fun getTotalAmountForDeliveryReport(list: List<String>): Observable<List<TotalAmountForDeliveryReport>> {
+        return Observable.just(db.deliveryItemUpload().getQtyAndAmount(list))
     }
 
     override fun deliverDetailReport(invoiceId: String): Observable<List<DeliverDetailReport>> {
-        return Observable.just(db.deliveryDao().getDeliverDetailReport(invoiceId))
+        return Observable.just(db.deliveryItemUpload().getDeliverDetailReport(invoiceId))
     }
 
     //preOrder report
@@ -53,6 +62,10 @@ class ReportRepoImpl(private val db: MyDatabase) : ReportRepo {
     //sale invoice report
     override fun saleInvoiceReport(): Observable<List<SaleInvoiceReport>> {
         return Observable.just(db.invoicePresentDao().getSaleInvoiceReport())
+    }
+
+    override fun saleExchangeTab2Report(): Observable<List<SaleInvoiceReport>> {
+        return Observable.just(db.invoicePresentDao().getSaleExchangeTab2Report())
     }
 
     //sale history report
@@ -97,6 +110,9 @@ class ReportRepoImpl(private val db: MyDatabase) : ReportRepo {
     override fun salesCancelDetailReport(invoiceId: String): Observable<List<SaleCancelInvoiceDetailReport>> {
         return Observable.just(db.invoiceCancelProductDao().getSaleCancelDetailReport(invoiceId))
     }
+//    override fun saleCancelReportForDate(fromDate: String, toDate: String): Observable<List<SalesCancelReport>> {
+//       return Observable.just(db.invoiceCancelDao().getSaleCancelReportForDate(fromDate,toDate))
+//    }
 
     //sale order history report
     override fun salesOrderHistoryReport(): Observable<List<SalesOrderHistoryFullDataReport>> {
@@ -104,12 +120,21 @@ class ReportRepoImpl(private val db: MyDatabase) : ReportRepo {
     }
 
     //sale return report
-    override fun salesReturnReport(): Observable<List<SalesReturnReport>> {
-        return Observable.just(db.saleReturnDao().getSalesReturnReport())
+    override fun salesReturnQtyReport(): Observable<List<SalesReturnQtyReport>> {
+        return Observable.just(db.saleReturnDao().getSalesReturnQtyReport())
+    }
+
+    override fun salesExchangeTab1Report(): Observable<List<SalesReturnQtyReport>> {
+       return Observable.just(db.saleReturnDao().getSalesExchangeTab1())
+    }
+
+
+    override fun salesReturnReport(idList:List<String>): Observable<List<SaleReturnDetail>> {
+        return Observable.just(db.saleReturnDetailDao().getSalesReturnReport(idList))
     }
 
     override fun salesReturnDetailReport(invoiceId: String): Observable<List<SalesReturnDetailReport>> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+       return Observable.just(db.saleReturnDetailDao().getSalesReturnDetailList(invoiceId))
     }
 
     //sale visit history report

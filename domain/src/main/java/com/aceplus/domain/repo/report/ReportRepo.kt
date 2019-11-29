@@ -3,6 +3,7 @@ package com.aceplus.domain.repo.report
 import com.aceplus.domain.entity.CompanyInformation
 import com.aceplus.domain.entity.credit.Credit
 import com.aceplus.domain.entity.customer.Customer
+import com.aceplus.domain.entity.delivery.DeliveryItemUpload
 import com.aceplus.domain.entity.invoice.Invoice
 import com.aceplus.domain.entity.invoice.InvoiceProduct
 import com.aceplus.domain.entity.preorder.PreOrder
@@ -14,6 +15,7 @@ import com.aceplus.domain.entity.route.RouteScheduleItemV2
 import com.aceplus.domain.entity.sale.SaleMan
 import com.aceplus.domain.entity.sale.saleexchange.SaleExchange
 import com.aceplus.domain.entity.sale.salereturn.SaleReturn
+import com.aceplus.domain.entity.sale.salereturn.SaleReturnDetail
 import com.aceplus.domain.entity.sale.saletarget.SaleTargetCustomer
 import com.aceplus.domain.entity.sale.saletarget.SaleTargetSaleMan
 import com.aceplus.domain.entity.sale.salevisit.SaleVisitRecordUpload
@@ -25,8 +27,9 @@ import kotlin.collections.ArrayList
 
 interface ReportRepo {
     //deliver report
-    fun deliverReport(): Observable<List<DeliverReport>>
-
+    fun inCompleteDeliverReport(): Observable<List<IncompleteDeliverReport>>
+    fun getDeliveryItemUploadList(invoiceNo:List<String>):Observable<List<DeliveryItemUpload>>
+    fun getTotalAmountForDeliveryReport(list: List<String>): Observable<List<TotalAmountForDeliveryReport>>
     fun deliverDetailReport(invoiceId: String): Observable<List<DeliverDetailReport>>
 
     //preOrder report
@@ -38,8 +41,9 @@ interface ReportRepo {
     //product balance report
     fun productBalanceReport(): Observable<List<com.aceplus.domain.entity.product.Product>>
 
-    //sale invoice report
+    //sale invoice report and sale exchange tab2
     fun saleInvoiceReport(): Observable<List<SaleInvoiceReport>>
+    fun saleExchangeTab2Report(): Observable<List<SaleInvoiceReport>>
 
     //sale history report
     fun saleHistoryReport(): Observable<List<SaleInvoiceReport>>
@@ -47,23 +51,25 @@ interface ReportRepo {
 
     fun saleInvoiceDetailReport(invoiceId: String): Observable<List<SaleInvoiceDetailReport>>
     fun saleInvoiceDetlailPrint(invoiceId:String):Observable<Invoice>
+
     //spinner data
     fun getAllCustomerData(): Observable<List<Customer>>
-
     fun getAllGroupData(): Observable<List<ProductGroup>>
     fun getAllCategoryData(): Observable<List<ProductCategory>>
 
     //sale cancel report
     fun salesCancelReport(): Observable<List<SalesCancelReport>>
+    //fun saleCancelReportForDate(fromDate: String, toDate: String):  Observable<List<SalesCancelReport>>
 
     fun salesCancelDetailReport(invoiceId: String): Observable<List<SaleCancelInvoiceDetailReport>>
 
     //sale order history report
     fun salesOrderHistoryReport(): Observable<List<SalesOrderHistoryFullDataReport>>
 
-    //sale return report
-    fun salesReturnReport(): Observable<List<SalesReturnReport>>
-
+    //sale return report and exchange tab1
+    fun salesReturnQtyReport(): Observable<List<SalesReturnQtyReport>>
+    fun salesExchangeTab1Report(): Observable<List<SalesReturnQtyReport>>
+    fun salesReturnReport(idList:List<String>):Observable<List<SaleReturnDetail>>
     fun salesReturnDetailReport(invoiceId: String): Observable<List<SalesReturnDetailReport>>
 
     //sale visit history report
@@ -100,6 +106,5 @@ interface ReportRepo {
     fun getPlanCustomerList(): Observable<List<RouteScheduleItemV2>>
     fun getDataForNewCustomerList():Observable<List<Customer>>
     fun getDataNotVisitedCountList():Observable<List<SaleVisitRecordUpload>>
-
 
 }

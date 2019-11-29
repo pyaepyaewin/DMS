@@ -3,11 +3,13 @@ package com.aceplus.dms.viewmodel.report
 import android.arch.lifecycle.MutableLiveData
 import android.util.Log
 import com.aceplus.domain.entity.customer.Customer
+import com.aceplus.domain.entity.delivery.DeliveryItemUpload
 import com.aceplus.domain.entity.invoice.Invoice
 import com.aceplus.domain.entity.preorder.PreOrderProduct
 import com.aceplus.domain.entity.product.Product
 import com.aceplus.domain.entity.product.ProductCategory
 import com.aceplus.domain.entity.product.ProductGroup
+import com.aceplus.domain.entity.sale.salereturn.SaleReturnDetail
 import com.aceplus.domain.entity.sale.saletarget.SaleTargetCustomer
 import com.aceplus.domain.entity.sale.saletarget.SaleTargetSaleMan
 import com.aceplus.domain.repo.report.ReportRepo
@@ -24,20 +26,36 @@ class ReportViewModel(
 ) : BaseViewModel() {
     //deliver report
     var reportErrorState = MutableLiveData<String>()
-    var deliverReportSuccessState = MutableLiveData<List<DeliverReport>>()
+    var deliverReportSuccessState = MutableLiveData<Triple<List<IncompleteDeliverReport>,List<DeliveryItemUpload>,List<TotalAmountForDeliveryReport>>>()
     var deliverDetailReportSuccessState = MutableLiveData<List<DeliverDetailReport>>()
     fun loadDeliverReport() {
-
+        var incompleteList:List<IncompleteDeliverReport> = listOf()
+        var deliveryUploadList:List<DeliveryItemUpload> = listOf()
+        var totalAmountForDeliveryReport:List<TotalAmountForDeliveryReport>
         launch {
-            this.reportRepo.deliverReport()
+            reportRepo.inCompleteDeliverReport()
+                .flatMap {
+                    incompleteList = it
+                    val invoiceNoList:MutableList<String> = mutableListOf()
+                    for (data in it){
+                        invoiceNoList.add(data.invoiceId)
+                    }
+                    return@flatMap reportRepo.getDeliveryItemUploadList(invoiceNoList as List<String>)
+                }
+                .flatMap {
+                    deliveryUploadList = it
+                    val idList:MutableList<String> = mutableListOf()
+                    for (data in it){
+                        idList.add(data.delivery_id!!)
+                    }
+                    return@flatMap reportRepo.getTotalAmountForDeliveryReport(idList as List<String>)
+                }
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.mainThread())
-                .subscribe({
-                    deliverReportSuccessState.postValue(it)
-                    Log.d("Testing", "$it")
-                }, {
-                    reportErrorState.value = it.localizedMessage
-                })
+                .subscribe{
+                    totalAmountForDeliveryReport = it
+                    deliverReportSuccessState.postValue(Triple(incompleteList,deliveryUploadList,totalAmountForDeliveryReport))
+                }
         }
 
     }
@@ -47,17 +65,14 @@ class ReportViewModel(
             reportRepo.deliverDetailReport(invoiceId)
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.mainThread())
-                .subscribe({
+                .subscribe{
                     deliverDetailReportSuccessState.postValue(it)
-                    Log.d("Testing", "$it")
-                }, {
-                    reportErrorState.value = it.localizedMessage
-                })
+                }
         }
 
     }
 
-    //pre order report
+    //pre order report and sale order history report
     var preOrderReportSuccessState = MutableLiveData<Pair<List<PreOrderReport>,List<PreOrderProduct>>>()
     var preOrderDetailReportSuccessState = MutableLiveData<List<PreOrderDetailReport>>()
     fun loadPreOrderReport() {
@@ -92,7 +107,6 @@ class ReportViewModel(
                 .observeOn(schedulerProvider.mainThread())
                 .subscribe({
                     preOrderDetailReportSuccessState.postValue(it)
-                    Log.d("Testing", "$it")
                 }, {
                     reportErrorState.value = it.localizedMessage
                 })
@@ -118,15 +132,25 @@ class ReportViewModel(
 
     }
 
-    //sale invoice report
+    //sale invoice report and sale exchange tab2
     var saleInvoiceReportList = MutableLiveData<List<SaleInvoiceReport>>()
-    var saleInvoiceReportSuccessState =
-        MutableLiveData<Pair<List<SaleInvoiceReport>, List<Customer>>>()
+    var saleInvoiceReportSuccessState = MutableLiveData<Pair<List<SaleInvoiceReport>, List<Customer>>>()
     var saleInvoiceDetailReportSuccessState = MutableLiveData<List<SaleInvoiceDetailReport>>()
     var saleHistoryForPrintData = MutableLiveData<Invoice>()
     fun loadSaleInvoiceList() {
         launch {
             reportRepo.saleInvoiceReport()
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.mainThread())
+                .subscribe {
+                    saleInvoiceReportList.postValue(it)
+                }
+        }
+    }
+
+    fun loadSaleExchangeTab2List() {
+        launch {
+            reportRepo.saleExchangeTab2Report()
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.mainThread())
                 .subscribe {
@@ -158,35 +182,6 @@ class ReportViewModel(
         }
     }
 
-    fun loadSaleInvoiceReport() {
-        var customerDataList: List<Customer>
-        var saleInvoiceReport = listOf<SaleInvoiceReport>()
-        launch {
-            reportRepo.saleHistoryReport()
-                .subscribeOn(schedulerProvider.io())
-                .observeOn(schedulerProvider.mainThread())
-                .subscribe {
-                    saleInvoiceReport = it
-                }
-            reportRepo.getAllCustomerData()
-                .subscribeOn(schedulerProvider.io())
-                .observeOn(schedulerProvider.mainThread())
-                .subscribe({
-                    customerDataList = it
-                    saleInvoiceReportSuccessState.postValue(
-                        Pair(
-                            saleInvoiceReport,
-                            customerDataList
-                        )
-                    )
-                }, {
-                    reportErrorState.value = it.localizedMessage
-                })
-        }
-
-    }
-
-
     fun loadSaleInvoiceDetailReport(invoiceId: String) {
         launch {
             reportRepo.saleInvoiceDetailReport(invoiceId)
@@ -217,34 +212,17 @@ class ReportViewModel(
     }
 
     //sale cancel report
-    var salesCancelReportSuccessState =
-        MutableLiveData<Pair<List<SalesCancelReport>, List<Customer>>>()
-    var saleCancelDetailReportSuccessState =
-        MutableLiveData<List<SaleCancelInvoiceDetailReport>>()
+    var salesCancelReport = MutableLiveData<List<SalesCancelReport>>()
+    var saleCancelDetailReportSuccessState = MutableLiveData<List<SaleCancelInvoiceDetailReport>>()
 
     fun loadSalesCancelReport() {
-        var customerDataList: List<Customer>
-        var saleCancelReport = listOf<SalesCancelReport>()
         launch {
             reportRepo.salesCancelReport()
-                .doOnNext {
-                    saleCancelReport = it
-                }
-                .flatMap { reportRepo.getAllCustomerData() }
-
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.mainThread())
-                .subscribe({
-                    customerDataList = it
-                    salesCancelReportSuccessState.postValue(
-                        Pair(
-                            saleCancelReport,
-                            customerDataList
-                        )
-                    )
-                }, {
-                    reportErrorState.value = it.localizedMessage
-                })
+                .subscribe {
+                    salesCancelReport.postValue(it)
+                }
         }
 
     }
@@ -256,59 +234,85 @@ class ReportViewModel(
                 .observeOn(schedulerProvider.mainThread())
                 .subscribe({
                     saleCancelDetailReportSuccessState.postValue(it)
-                    Log.d("Testing", "$it")
                 }, {
                     reportErrorState.value = it.localizedMessage
                 })
         }
 
     }
+    var saleCancelInvoiceReportForDateList = MutableLiveData<List<SalesCancelReport>>()
+//    fun loadSaleCancelInvoiceForDateList(fromDate: String, toDate: String) {
+//        launch {
+//            reportRepo.saleCancelReportForDate(fromDate, toDate)
+//                .subscribeOn(schedulerProvider.io())
+//                .observeOn(schedulerProvider.mainThread())
+//                .subscribe {
+//                    saleCancelInvoiceReportForDateList.postValue(it)
+//                }
+//        }
+//    }
 
     //sale order history report
-    var salesOrderHistoryReportSuccessState =
-        MutableLiveData<Pair<List<SalesOrderHistoryFullDataReport>, List<Customer>>>()
-
+    var salesOrderHistoryReportSuccessState = MutableLiveData<List<SalesOrderHistoryFullDataReport>>()
     fun loadSalesOrderHistoryReport() {
-        var customerDataList = listOf<Customer>()
-        var saleOrderHistoryReport = listOf<SalesOrderHistoryFullDataReport>()
-        launch {
+         launch {
             reportRepo.salesOrderHistoryReport()
-                .flatMap {
-                    saleOrderHistoryReport = it
-                    return@flatMap reportRepo.getAllCustomerData()
-                }
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.mainThread())
-                .subscribe({
-                    customerDataList = it
-                    salesOrderHistoryReportSuccessState.postValue(
-                        Pair(
-                            saleOrderHistoryReport,
-                            customerDataList
-                        )
-                    )
-                }, {
-                    reportErrorState.value = it.localizedMessage
-                })
+                .subscribe{
+                    salesOrderHistoryReportSuccessState.postValue(it)
+
+                }
         }
 
     }
 
     //sale return report
-    var salesReturnReportSuccessState = MutableLiveData<List<SalesReturnReport>>()
+    var salesReturnReportSuccessState = MutableLiveData<Pair<List<SalesReturnQtyReport>,List<SaleReturnDetail>>>()
     var salesReturnDetailReportSuccessState = MutableLiveData<List<SalesReturnDetailReport>>()
     fun loadSalesReturnReport() {
-
+        var salesReturnReportList:List<SalesReturnQtyReport> = listOf()
+        var salesReturnQtyReportList:List<SaleReturnDetail>
         launch {
-            reportRepo.salesReturnReport()
+            reportRepo.salesReturnQtyReport()
+                .flatMap {
+                    salesReturnReportList = it
+                    val idList:MutableList<String> = mutableListOf()
+                    for (i in it){
+                        idList.add(i.saleReturnId)
+                    }
+                    return@flatMap  reportRepo.salesReturnReport(idList as List<String>)
+                }
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.mainThread())
-                .subscribe({
-                    salesReturnReportSuccessState.postValue(it)
-                    Log.d("Testing", "$it")
-                }, {
-                    reportErrorState.value = it.localizedMessage
-                })
+                .subscribe{
+                    salesReturnQtyReportList = it
+                    salesReturnReportSuccessState.postValue(Pair(salesReturnReportList,salesReturnQtyReportList))
+                }
+        }
+
+    }
+
+    //sale exchange tab1
+       fun loadSalesExchangeTab1Report() {
+        var salesReturnReportList:List<SalesReturnQtyReport> = listOf()
+        var salesReturnQtyReportList:List<SaleReturnDetail>
+        launch {
+            reportRepo.salesExchangeTab1Report()
+                .flatMap {
+                    salesReturnReportList = it
+                    val idList:MutableList<String> = mutableListOf()
+                    for (i in it){
+                        idList.add(i.saleReturnId)
+                    }
+                    return@flatMap  reportRepo.salesReturnReport(idList as List<String>)
+                }
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.mainThread())
+                .subscribe{
+                    salesReturnQtyReportList = it
+                    salesReturnReportSuccessState.postValue(Pair(salesReturnReportList,salesReturnQtyReportList))
+                }
         }
 
     }
@@ -320,7 +324,6 @@ class ReportViewModel(
                 .observeOn(schedulerProvider.mainThread())
                 .subscribe({
                     salesReturnDetailReportSuccessState.postValue(it)
-                    Log.d("Testing", "$it")
                 }, {
                     reportErrorState.value = it.localizedMessage
                 })
@@ -354,12 +357,9 @@ class ReportViewModel(
             reportRepo.unSellReasonReport()
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.mainThread())
-                .subscribe({
+                .subscribe{
                     unSellReasonReportSuccessState.postValue(it)
-                    Log.d("Testing", "$it")
-                }, {
-                    reportErrorState.value = it.localizedMessage
-                })
+                }
         }
 
     }
@@ -709,27 +709,7 @@ class ReportViewModel(
                 .observeOn(schedulerProvider.mainThread())
                 .subscribe {
                     notVisitedCount = it.size.toString()
-                    val allData = EndOfDayReport(
-                        userName,
-                        routeName,
-                        startTime,
-                        endTime,
-                        totalSales,
-                        totalSalesOrder,
-                        totalExchange,
-                        totalReturn,
-                        totalCashReceive,
-                        netCash,
-                        totalCustomer,
-                        newCustomer,
-                        planCustomer,
-                        totalSalesCount,
-                        totalOrderCount,
-                        totalSalesExchangeOnly,
-                        totalSalesReturnOnly,
-                        totalCashReceiptCount,
-                        notVisitedCount
-                    )
+                    val allData = EndOfDayReport(userName, routeName, startTime, endTime, totalSales, totalSalesOrder, totalExchange, totalReturn, totalCashReceive, netCash, totalCustomer, newCustomer, planCustomer, totalSalesCount, totalOrderCount, totalSalesExchangeOnly, totalSalesReturnOnly, totalCashReceiptCount, notVisitedCount)
                     endOfDayReportData.postValue(allData)
                 }
         }

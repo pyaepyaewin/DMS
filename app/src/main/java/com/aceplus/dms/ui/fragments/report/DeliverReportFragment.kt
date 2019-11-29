@@ -41,12 +41,24 @@ class DeliverReportFragment : BaseFragment(), KodeinAware {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         //delivery report list
         deliverReportViewModel.deliverReportSuccessState.observe(this, Observer {
-            deliveryReportAdapter.setNewList(it as ArrayList<DeliverReport>)
+           var completeDeliveryItemList = arrayListOf<DeliverReport>()
+            for (i in it!!.first){
+                var qty = 0
+                var amount = 0.0
+                for (data in it.second){
+                    if (i.invoiceId == data.delivery_id){
+                        qty += data.quantity!!.toInt()
+                    }
+                    for (item in it.third){
+                        amount += item.quantity.toDouble() * item.sellingPrice.toDouble()
+                    }
+                }
+                val completeDeliveryItem = DeliverReport(i.invoiceId,i.customerName,i.address,qty.toDouble(),amount.toString())
+                completeDeliveryItemList.add(completeDeliveryItem)
+            }
+            deliveryReportAdapter.setNewList(completeDeliveryItemList)
         })
 
-        deliverReportViewModel.reportErrorState.observe(this, Observer {
-            Toast.makeText(activity, it, Toast.LENGTH_LONG).show()
-        })
         deliveryReportRecyclerView.apply {
             layoutManager = LinearLayoutManager(activity)
             adapter = deliveryReportAdapter
@@ -62,13 +74,11 @@ class DeliverReportFragment : BaseFragment(), KodeinAware {
 
     private fun onClickItem(invoiceId: String) {
         //layout inflate for delivery report detail
-        val dialogBoxView =
-            activity!!.layoutInflater.inflate(
-                R.layout.dialog_box_deliveryinvoice_report,
-                null
-            )
+        val dialogBoxView = activity!!.layoutInflater.inflate(R.layout.dialog_box_deliveryinvoice_report, null)
         val builder = AlertDialog.Builder(activity)
         builder.setView(dialogBoxView)
+        builder.setTitle("Delivery Report")
+        builder.setPositiveButton("OK", null)
         builder.setCancelable(false)
         val dialog = builder.create()
 
@@ -77,19 +87,7 @@ class DeliverReportFragment : BaseFragment(), KodeinAware {
             adapter = deliverDetailReportAdapter
         }
         deliverReportViewModel.loadDeliverDetailReport(invoiceId = invoiceId)
-
-        //Action of dialog button
-        dialogBoxView.btn_print.setOnClickListener {
-            Toast.makeText(activity, "Continue to print", Toast.LENGTH_SHORT).show()
-            dialog.dismiss()
-        }
-        dialogBoxView.btn_ok.setOnClickListener {
-            dialog.dismiss()
-        }
-
         dialog.show()
 
     }
-
-
 }

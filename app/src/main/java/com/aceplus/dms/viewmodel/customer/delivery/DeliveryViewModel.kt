@@ -1,11 +1,10 @@
 package com.aceplus.dms.viewmodel.customer.delivery
 
 import android.arch.lifecycle.MutableLiveData
+import android.util.Log
 import com.aceplus.domain.entity.CompanyInformation
 import com.aceplus.domain.entity.customer.Customer
-import com.aceplus.domain.entity.delivery.Delivery
-import com.aceplus.domain.entity.delivery.DeliveryItem
-import com.aceplus.domain.entity.delivery.DeliveryItemUpload
+import com.aceplus.domain.entity.delivery.*
 import com.aceplus.domain.entity.invoice.Invoice
 import com.aceplus.domain.entity.invoice.InvoiceProduct
 import com.aceplus.domain.entity.product.Product
@@ -25,8 +24,7 @@ class DeliveryViewModel(
 ) : BaseViewModel() {
     var deliveryDataList = MutableLiveData<List<DeliveryVO>>()
     var deliveryAllDataList = MutableLiveData<List<Delivery>>()
-    var deliveryAllItemDataList =
-        MutableLiveData<Pair<List<SoldProductInfo>, Customer>>()
+    var deliveryAllItemDataList = MutableLiveData<Pair<List<SoldProductInfo>, Customer>>()
 
     //Testing
     fun loadAllDeliveryList() {
@@ -61,58 +59,68 @@ class DeliveryViewModel(
                 }
         }
     }
-    fun loadAllDeliveryItemList(deliveryId: Int, customerId: Int) {
+    fun loadAllDeliveryItemList(deliveryId: String, customerId: Int) {
         var deliveryItemDataList = mutableListOf<DeliveryItem>()
+        var deliveryPresentDataList = mutableListOf<DeliveryPresent>()
         var deliveryCustomerDataList: Customer
-        val stockIdList = mutableListOf<String>()
         var deliveryProductDataList = listOf<SoldProductInfo>()
 
         launch {
+            val innerSoldProductList = ArrayList<SoldProductInfo>()
             deliveryRepo.deliveryItemDataList(deliveryId)
                 .flatMap {
                     deliveryItemDataList = it as MutableList<DeliveryItem>
-                    return@flatMap deliveryRepo.deliveryPresentDataList(deliveryId)
-
-                }
-                .flatMap {
-                    for (i in it) {
-                        val deliveryItem = DeliveryItem()
-                        deliveryItem.delivery_id = i.sale_order_id
-                        deliveryItem.order_quantity = i.quantity
-                        deliveryItem.stock_id = i.stock_id
-                        deliveryItemDataList.add(deliveryItem)
-                    }
+                    val stockIdList = mutableListOf<String>()
                     for (i in deliveryItemDataList) {
                         stockIdList.add(i.stock_id!!)
                     }
                     return@flatMap deliveryRepo.deliveryProductList(stockIdList as List<String>)
                 }
                 .flatMap {
-                    val innerSoldProductList = ArrayList<SoldProductInfo>()
+                    for (product in it) {
+                        for (data in deliveryItemDataList) {
+                            if (data.stock_id == product.id.toString()) {
+                                val soldProduct = SoldProductInfo(product, false)
+                                val um = product.um
+                                soldProduct.product.um = um
+                                soldProduct.quantity = data.order_quantity!!.toDouble().roundToInt()
+                                soldProduct.orderedQuantity = data.order_quantity!!.toDouble().roundToInt()
+                                soldProduct.product.product_id = data.stock_id!!
+                                innerSoldProductList.add(soldProduct)
+                            }
+                        }
+                    }
+                    return@flatMap deliveryRepo.deliveryPresentDataList(deliveryId)
+                }
+                .flatMap {
+                    deliveryPresentDataList = it as MutableList<DeliveryPresent>
+                    val stockIdList = mutableListOf<String>()
+                    for (i in it) {
+                        stockIdList.add(i.stock_id!!)
+                    }
+                    return@flatMap deliveryRepo.deliveryProductList(stockIdList as List<String>)
+                }
+                .flatMap {
                     for (product in it) {
                         val productItem = Product()
-                        for (data in deliveryItemDataList) {
+                        for (data in deliveryPresentDataList) {
                             if (data.stock_id == product.id.toString()) {
                                 productItem.id = product.id
                                 productItem.product_name = product.product_name
-                                productItem.selling_price = product.selling_price
+                                productItem.selling_price = "0"
                                 productItem.purchase_price = product.purchase_price
                                 productItem.discount_type = product.discount_type
                                 productItem.remaining_quantity = product.remaining_quantity
                                 val soldProduct = SoldProductInfo(productItem, false)
                                 val um = product.um
                                 soldProduct.product.um = um
-                                soldProduct.quantity = data.order_quantity!!.toDouble().roundToInt()
-                                soldProduct.orderedQuantity = data.order_quantity!!.toDouble().roundToInt()
+                                soldProduct.quantity = data.quantity!!.toDouble().roundToInt()
+                                soldProduct.orderedQuantity = data.quantity!!.toDouble().roundToInt()
                                 soldProduct.product.product_id = data.stock_id!!
-                                if (data.s_price!!.toDouble() == 0.0) {
-                                    soldProduct.product.selling_price = 0.0.toString()
-                                }
+                                soldProduct.isFocIsChecked = true
                                 innerSoldProductList.add(soldProduct)
                             }
                         }
-
-
                     }
                     deliveryProductDataList = innerSoldProductList
 
@@ -122,9 +130,7 @@ class DeliveryViewModel(
                 .observeOn(schedulerProvider.mainThread())
                 .subscribe {
                     deliveryCustomerDataList = it
-                    deliveryAllItemDataList.postValue(
-                        Pair(deliveryProductDataList, deliveryCustomerDataList)
-                    )
+                    deliveryAllItemDataList.postValue(Pair(deliveryProductDataList, deliveryCustomerDataList))
                 }
         }
     }
@@ -141,18 +147,14 @@ class DeliveryViewModel(
         }
     }
 
-    fun insertDeliveryDataItemToDatabase(
-        soldProductList: ArrayList<SoldProductInfo>,
-        invoiceId: String
-    ): Int {
+    fun insertDeliveryDataItemToDatabase(soldProductList: ArrayList<SoldProductInfo>, invoiceId: String): Int {
         var totalQtyForInvoice = 0
+        val cvInvoiceProduct = InvoiceProduct()
         for (soldProduct in soldProductList) {
-            val cvInvoiceProduct = InvoiceProduct()
             cvInvoiceProduct.invoice_product_id = invoiceId
             cvInvoiceProduct.product_id = soldProduct.product.product_id
             cvInvoiceProduct.sale_quantity = soldProduct.quantity.toString()
-            val discount =
-                soldProduct.product.selling_price!!.toDouble() * soldProduct.discount / 100
+            val discount = soldProduct.product.selling_price!!.toDouble() * soldProduct.discount / 100
             cvInvoiceProduct.discount_amount = discount.toString()
             cvInvoiceProduct.total_amount = soldProduct.totalAmount
             cvInvoiceProduct.discount_percent = soldProduct.discount
@@ -170,7 +172,6 @@ class DeliveryViewModel(
 
             cvInvoiceProduct.promotion_price = promoPrice
             totalQtyForInvoice += soldProduct.quantity
-            deliveryRepo.saveDeliveryDataItem(cvInvoiceProduct)
 
             val deliveryItemApi = DeliveryItemApi()
             deliveryItemApi.deliveryId = invoiceId
@@ -180,28 +181,30 @@ class DeliveryViewModel(
             insertDeliveryItemUpload(deliveryItemApi)
 
             deliveryRepo.updateRelatedProduct(soldProduct.quantity, soldProduct.product.id)
-            // deliveryRepo.updateRelatedDeliveryItem(soldProduct.quantity,soldProduct.product.product_id!!)
-            if (soldProduct.product.selling_price!!.toDouble() == 0.0) {
-                deliveryRepo.updateRelatedDeliveryPresent(soldProduct.product.product_id!!)
-            }
-            deliveryRepo.updateCheckDeliveryItem(soldProduct.product.product_id!!)
+            deliveryRepo.updateRelatedDeliveryItem(soldProduct.quantity.toDouble(),soldProduct.product.product_id)
+            // if (soldProduct.product.selling_price!!.toDouble() == 0.0) {
+                deliveryRepo.updateRelatedDeliveryPresent(soldProduct.product.product_id)
+           // }
+            deliveryRepo.updateCheckDeliveryItem(soldProduct.product.product_id)
 
         }
+        deliveryRepo.saveDeliveryDataItem(cvInvoiceProduct)
         return totalQtyForInvoice
     }
 
     private fun insertDeliveryItemUpload(deliveryItemApi: DeliveryItemApi) {
         val cvDeliveryUploadItem = DeliveryItemUpload()
         if (deliveryItemApi.deliveryId == "") {
-            cvDeliveryUploadItem.delivery_id = 0
+            cvDeliveryUploadItem.delivery_id = "0"
         } else {
-            cvDeliveryUploadItem.delivery_id = deliveryItemApi.deliveryId.toInt()
+            cvDeliveryUploadItem.delivery_id = deliveryItemApi.deliveryId
         }
         cvDeliveryUploadItem.stock_id = deliveryItemApi.stockId
         cvDeliveryUploadItem.quantity = deliveryItemApi.deliveryQty.toString()
         cvDeliveryUploadItem.foc = deliveryItemApi.foc.toString()
         deliveryRepo.saveDeliveryItemUpload(cvDeliveryUploadItem)
     }
+
     val userNameDataList = MutableLiveData<List<SaleMan>>()
     val invoiceData = MutableLiveData<Invoice>()
      fun loadOrderPerson(saleManId: Int){
@@ -224,4 +227,12 @@ class DeliveryViewModel(
                 }
         }
     }
+
+    fun saveDeliveryUpload(cvDeliveryUpload: DeliveryUpload){
+        deliveryRepo.saveDeliveryUpload(cvDeliveryUpload)
+    }
+    fun saveInvoiceData(invoice1: Invoice){
+        deliveryRepo.saveInvoiceData(invoice1)
+    }
+
 }

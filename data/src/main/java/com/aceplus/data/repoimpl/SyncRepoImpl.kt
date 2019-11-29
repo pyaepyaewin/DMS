@@ -379,7 +379,7 @@ class SyncRepoImpl(
             deliveryApi.customerId = it.customer_id
             deliveryApi.locationId = locationCode
             deliveryApi.saleManId = salemanId.toInt()
-            val deliveryItemDataList = db.deliveryItemUpload().allDataById(it.invoice_no)
+            val deliveryItemDataList = db.deliveryItemUpload().allDataById(it.invoice_no!!)
             val deliveryItemApiList = ArrayList<DeliveryItemApi>()
             deliveryItemDataList.map {
                 val deliveryItemApi = DeliveryItemApi()
@@ -1351,8 +1351,8 @@ class SyncRepoImpl(
                     deliveryItemEntity.id = it.id.toInt()
                     deliveryItemEntity.delivery_id = it.saleOrderId
                     deliveryItemEntity.stock_id = it.stockNo
-                    deliveryItemEntity.order_quantity = it.orderQty
-                    deliveryItemEntity.received_quantity = it.receiveQty
+                    deliveryItemEntity.order_quantity = it.orderQty.toDouble()
+                    deliveryItemEntity.received_quantity = it.receiveQty.toDouble()
                     deliveryItemEntity.s_price = it.sPrice
                     deliveryItemEntity.foc_status = it.focStatus
 

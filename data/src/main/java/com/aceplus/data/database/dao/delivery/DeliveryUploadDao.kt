@@ -6,6 +6,8 @@ import android.arch.persistence.room.Dao
 import android.arch.persistence.room.Insert
 import android.arch.persistence.room.OnConflictStrategy
 import android.arch.persistence.room.Query
+import com.aceplus.domain.vo.report.DeliverReport
+import com.aceplus.domain.vo.report.IncompleteDeliverReport
 
 
 @Dao
@@ -28,5 +30,8 @@ interface DeliveryUploadDao {
 
     @Query("Delete from delivery_upload")
     fun deleteAll()
+
+    @Query("select delivery_upload.invoice_no,customer_name,address from delivery_upload inner join customer on customer.id = delivery_upload.customer_id")
+    fun getIncompleteDeliverReport(): List<IncompleteDeliverReport>
 
 }

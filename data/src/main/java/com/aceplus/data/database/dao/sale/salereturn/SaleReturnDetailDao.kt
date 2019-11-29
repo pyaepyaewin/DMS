@@ -6,8 +6,12 @@ import android.arch.persistence.room.Dao
 import android.arch.persistence.room.Insert
 import android.arch.persistence.room.OnConflictStrategy
 import android.arch.persistence.room.Query
+
 import com.aceplus.domain.entity.product.Product
 import com.aceplus.domain.vo.SaleExchangeProductInfo
+import com.aceplus.domain.vo.report.SalesReturnDetailReport
+import com.aceplus.domain.vo.report.SalesReturnReport
+
 
 
 @Dao
@@ -31,7 +35,14 @@ interface SaleReturnDetailDao {
     @Query("update sale_return_detail set delete_flag = 1 WHERE delete_flag = 0")
     fun updateAllInactiveData()
 
+
     @Query("select p.product_name, sr.quantity, sr.price from sale_return_detail as sr left join product as p on sr.product_id = p.id where sr.sale_return_id = :saleReturnInvoiceNo")
     fun getSaleReturnProductInfo(saleReturnInvoiceNo: String): List<SaleExchangeProductInfo>
 
+    @Query("select * from  sale_return_detail where sale_return_id in (:idList) ")
+    fun getSalesReturnReport(idList:List<String>): List<SaleReturnDetail>
+
+
+    @Query("select product_name,quantity from  sale_return_detail inner join product on product.id = sale_return_detail.product_id where sale_return_detail.sale_return_id = :invoiceId ")
+    fun getSalesReturnDetailList(invoiceId: String): List<SalesReturnDetailReport>?
 }

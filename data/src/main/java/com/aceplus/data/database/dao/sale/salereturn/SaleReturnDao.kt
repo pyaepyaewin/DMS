@@ -6,6 +6,7 @@ import android.arch.persistence.room.Insert
 import android.arch.persistence.room.OnConflictStrategy
 import android.arch.persistence.room.Query
 import com.aceplus.domain.entity.sale.salereturn.SaleReturn
+import com.aceplus.domain.vo.report.SalesReturnQtyReport
 import com.aceplus.domain.vo.report.SalesReturnReport
 
 
@@ -42,10 +43,14 @@ interface SaleReturnDao {
     @Query("update sale_return set delete_flag = 1 WHERE delete_flag = 0")
     fun updateAllInactiveData()
 
+
     @Query("update sale_return set sale_id = :saleID where sale_return_id = :saleReturnInvoiceNo")
     fun updateSaleIdInSaleReturn(saleReturnInvoiceNo: String, saleID: String)
 
-    @Query("select invoice.invoice_id,customer_name,address,return_date,total_quantity,total_amount from invoice inner join customer on customer.id = invoice.customer_id inner join sale_return on sale_return.customer_id = customer.customer_id")
-    fun getSalesReturnReport(): List<SalesReturnReport>
+    @Query("select sale_return_id,customer_name,address,return_date,pay_amount from  sale_return inner join customer on customer.id = sale_return.customer_id where sale_return.sale_return_id like 'SR%'")
+    fun getSalesReturnQtyReport(): List<SalesReturnQtyReport>
+
+    @Query("select sale_return_id,customer_name,address,return_date,pay_amount from  sale_return inner join customer on customer.id = sale_return.customer_id where sale_return.sale_return_id like 'SX%'")
+    fun getSalesExchangeTab1(): List<SalesReturnQtyReport>
 
 }

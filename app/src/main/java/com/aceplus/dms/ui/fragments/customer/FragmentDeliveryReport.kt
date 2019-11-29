@@ -73,21 +73,19 @@ class FragmentDeliveryReport : BaseFragment(), KodeinAware {
             if (list != null) {
                 soldProductList = list.first as ArrayList<SoldProductInfo>
                 customer = list.second
-                val copySoldProductList = soldProductList
-                for (product in copySoldProductList) {
-                    if (product.orderedQuantity == 0) {
-                        copySoldProductList.remove(product)
-                    }
-                }
-                soldProductList = copySoldProductList
-                if (soldProductList.size == 0) run {
+//                for (product in soldProductList) {
+//                    if (product.orderedQuantity == 0) {
+//                        soldProductList.remove(product)
+//                    }
+//                }
+                if (soldProductList.isEmpty()) {
                     AlertDialog.Builder(activity)
                         .setTitle("Delivery")
                         .setMessage("No products to deliver for this invoice.")
                         .setPositiveButton("OK", null)
                         .setIcon(R.drawable.info)
                         .show()
-                } else if (customer != null && soldProductList.size != 0) {
+                } else if (customer != null && soldProductList.isNotEmpty()){
                     val intent = SaleOrderActivity.newIntentFromDelivery(
                         activity!!,
                         true,
@@ -105,6 +103,6 @@ class FragmentDeliveryReport : BaseFragment(), KodeinAware {
 
     private fun onClickItem(deliver: Deliver) {
         delivery = deliver
-        fragmentDeliveryViewModel.loadAllDeliveryItemList(deliver.deliverId, deliver.customerId.toInt())
+        fragmentDeliveryViewModel.loadAllDeliveryItemList(deliver.deliverId.toString(), deliver.customerId.toInt())
     }
 }

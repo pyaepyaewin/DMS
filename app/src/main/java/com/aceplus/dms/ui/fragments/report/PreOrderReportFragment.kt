@@ -78,7 +78,9 @@ class PreOrderReportFragment : BaseFragment(), KodeinAware {
         val dialogBoxView = activity!!.layoutInflater.inflate(R.layout.dialog_box_pre_order_products, null)
         val builder = AlertDialog.Builder(activity)
         builder.setView(dialogBoxView)
-        builder.setCancelable(true)
+        builder.setTitle("PRE ORDER DETAIL")
+        builder.setPositiveButton("OK", null)
+        builder.setCancelable(false)
         val dialog = builder.create()
 
         dialogBoxView.preOrderProducts.apply {

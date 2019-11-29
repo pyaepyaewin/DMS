@@ -22,9 +22,7 @@ class OrderedProductListViewHolder(
 
             name.text = data.product.product_name
             um.text = data.product.um
-
             orderedQuantity.visibility = if (isDelivery) View.VISIBLE else View.GONE
-            if (isDelivery) orderedQuantity.text = data.orderedQuantity.toString()
 
             qty.text = data.quantity.toString()
             qty.setOnClickListener { onClickQtyButton(data, position) }
@@ -36,8 +34,7 @@ class OrderedProductListViewHolder(
             if (data.promotionPrice != 0.0) promoPrice = data.promotionPrice
             promotionPrice.text = Utils.formatAmount(promoPrice)
 
-//            amount.text = Utils.formatAmount(data.totalAmt)
-            amount.text = (data.quantity * sellingPrice!!.toInt()).toString()
+            amount.text = Utils.formatAmount(data.totalAmt)
 
             FocCheck.isChecked = data.isFocIsChecked
             FocCheck.setOnClickListener { onFocCheckChange(data, FocCheck.isChecked, position) }
@@ -45,6 +42,12 @@ class OrderedProductListViewHolder(
             btnfocPercent.visibility = View.GONE
 
             // ToDo - if it's delivery
+            if (isDelivery) {
+                orderedQuantity.text = data.orderedQuantity.toString()
+                amount.text = (data.quantity * sellingPrice!!.toInt()).toString()
+                qty.isEnabled = false
+                FocCheck.isEnabled = false
+            }
 
             setOnLongClickListener {
                 onLongClickProduct(data, position)

@@ -143,13 +143,13 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
             return intent
         }
 
-        fun newIntent(saleOrderCheckoutActivity: SaleOrderCheckoutActivity,soldProductList: ArrayList<SoldProductInfo>,mode:String,orderInvoice:Deliver,customer: Customer): Intent? {
+        fun newIntent(saleOrderCheckoutActivity: SaleOrderCheckoutActivity,soldProductList: ArrayList<SoldProductInfo>,mode:String,orderInvoice:Deliver,customer: Customer,invoice: Invoice): Intent? {
             val intent = Intent(saleOrderCheckoutActivity, PrintInvoiceActivity::class.java)
             intent.putExtra(IE_SOLD_PRODUCT_LIST, soldProductList)
             intent.putExtra(IE_PRINT_MODE, mode)
             intent.putExtra(ORDERED_INVOICE_KEY, orderInvoice)
             intent.putExtra(IE_CUSTOMER_DATA, customer)
-            //intent.putExtra(IE_INVOICE,invoice)
+            intent.putExtra(IE_INVOICE,invoice)
             return intent
         }
 
@@ -210,16 +210,16 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
         catchEvents()
         getTaxInfoAndSetData()
 
-        when (printMode) {
+        /*when (printMode) {
             "S" -> print_soldProductList.adapter = soldProductPrintListAdapter
             "RP" -> print_soldProductList.adapter = historySoldProductPrintListAdapter
             "D" -> {
                 soldProductPrintListAdapter.setNewList(soldProductList)
-                setUpUI()
                 print_soldProductList.adapter = soldProductPrintListAdapter
             }
-        }
-        print_soldProductList.layoutManager = LinearLayoutManager(this)
+            print_soldProductList.layoutManager = LinearLayoutManager(this)
+        }*/
+
     }
 
     override fun onStart() {
@@ -291,38 +291,22 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
 
     }
 
-    private fun setUpUI(){
-        deliverPrintHeaderLayout1.visibility = View.VISIBLE
-        salePrintHeaderLayout1.visibility = View.GONE
-        salePrintHeaderLayout2.visibility = View.GONE
-        deliver_customer_name.text = orderedDInvoice!!.customerName
-        deliver_township_name.text = orderedDInvoice!!.customerAddres
-        deliver_order_invoice_no.text = orderedDInvoice!!.invoiceNo
-        getOrderPerson(orderedDInvoice!!.saleManId)
-        //getSalePerson(orderedDInvoice!!.invoiceNo)
-        print_totalAmount.text = orderedDInvoice!!.amount.toString()
-        print_totalDiscount.text = orderedDInvoice!!.discount.toString()
-        print_net_amount.text = (orderedDInvoice!!.amount - orderedDInvoice!!.paidAmount).toString()
-        print_prepaidAmount.text = orderedDInvoice!!.paidAmount.toString()
-        print_discountAmount.text = orderedDInvoice!!.discountPercent.toString()
-    }
-
     private fun getOrderPerson(saleManId:Int){
         printDeliveryViewModel.userNameDataList.observe(this, Observer {
             for (i in it!!){
                 deliver_order_person.text = i.user_name!!
-                deliver_person.text = i.user_name!!
             }
         })
         printDeliveryViewModel.loadOrderPerson(saleManId)
     }
 
     private fun getSalePerson(salePersonId:String){
-        printDeliveryViewModel.invoiceData.observe(this, Observer {
-            deliver_invoice_no.text = it!!.invoice_id
-            deliver_date.text = it!!.sale_date
+        printDeliveryViewModel.userNameDataList.observe(this, Observer {
+            for (i in it!!){
+                deliver_person.text = i.user_name!!
+            }
         })
-        printDeliveryViewModel.loadDeliveryPerson(salePersonId)
+        printDeliveryViewModel.loadOrderPerson(salePersonId.toInt())
     }
 
     private fun getTaxInfoAndSetData() {
@@ -403,8 +387,25 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
             credit_discount.text = "0.0 (0%)"
 
         } else if (printMode == "D") {
+            deliverPrintHeaderLayout1.visibility = View.VISIBLE
+            salePrintHeaderLayout1.visibility = View.GONE
+            salePrintHeaderLayout2.visibility = View.GONE
+            deliver_customer_name.text = orderedDInvoice!!.customerName
+            deliver_township_name.text = orderedDInvoice!!.customerAddres
+            deliver_order_invoice_no.text = orderedDInvoice!!.invoiceNo
+            deliver_invoice_no.text = invoice!!.invoice_id
+            deliver_date.text = invoice!!.due_date
+            getOrderPerson(orderedDInvoice!!.saleManId)
+            getSalePerson(invoice!!.sale_person_id!!)
+            print_totalAmount.text = orderedDInvoice!!.amount.toString()
+            print_totalDiscount.text = orderedDInvoice!!.discount.toString()
+            print_net_amount.text = (orderedDInvoice!!.amount - orderedDInvoice!!.paidAmount).toString()
+            print_prepaidAmount.text = orderedDInvoice!!.paidAmount.toString()
+            print_discountAmount.text = orderedDInvoice!!.discountPercent.toString()
 
-            // ToDo
+            soldProductPrintListAdapter.setNewList(soldProductList)
+            print_soldProductList.adapter = soldProductPrintListAdapter
+            print_soldProductList.layoutManager = LinearLayoutManager(this)
 
         } else if (printMode == "SR") {
 

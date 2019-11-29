@@ -27,12 +27,6 @@ interface DeliveryDao {
     @Query("Delete from delivery")
     fun deleteAll()
 
-    @Query("select invoice.invoice_id,customer_name,address,total_quantity,total_amount from invoice inner  join customer on customer.customer_id = invoice.customer_id inner join delivery on delivery.invoice_no = invoice.invoice_id")
-    fun getDeliverReport(): List<DeliverReport>
-
-    @Query("select product_name,total_quantity from product inner  join delivery on delivery.invoice_no = :invoiceId")
-    fun getDeliverDetailReport(invoiceId:String): List<DeliverDetailReport>
-
     @Query("select customer.id as CID ,customer.customer_name,customer.address,delivery.id as DID,delivery.invoice_no,delivery.amount,delivery.paid_amount,delivery.discount,delivery.discount_percent,delivery.sale_man_id,delivery.remark from customer inner  join delivery on delivery.customer_id = customer.id")
     fun getDeliveryData(): List<DeliveryVO>
 

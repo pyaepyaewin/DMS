@@ -25,7 +25,7 @@ interface DeliveryPresentDao {
     fun deleteAll()
 
     @Query("select * from delivery_present where sale_order_id = :deliveryId and delivery_flag = 0")
-    fun getDeliveryPresentDataList(deliveryId:Int): List<DeliveryPresent>
+    fun getDeliveryPresentDataList(deliveryId:String): List<DeliveryPresent>
 
     @Query("update delivery_present set delivery_flag =  1 where stock_id = :stockID")
     fun updateDeliveryPresentQty(stockID: String)

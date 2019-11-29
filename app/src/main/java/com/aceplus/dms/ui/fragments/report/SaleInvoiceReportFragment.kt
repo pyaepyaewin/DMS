@@ -5,6 +5,7 @@ import android.app.DatePickerDialog
 import android.arch.lifecycle.Observer
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -132,10 +133,7 @@ class SaleInvoiceReportFragment : BaseFragment(), KodeinAware {
             adapter = saleInvoiceReportAdapter
         }
         saleInvoiceReportViewModel.loadSaleInvoiceList()
-        saleInvoiceReportViewModel.loadHistoryInvoiceForDateList(
-            "$fromDate",
-            "$toDate"
-        )
+        saleInvoiceReportViewModel.loadHistoryInvoiceForDateList("$fromDate", "$toDate")
         saleInvoiceReportViewModel.loadCustomer()
 
 
@@ -153,11 +151,7 @@ class SaleInvoiceReportFragment : BaseFragment(), KodeinAware {
     }
 
     private fun onClickItem(invoiceId: String) {
-        val dialogBoxView =
-            activity!!.layoutInflater.inflate(
-                R.layout.dialog_box_sale_invoice_report,
-                null
-            )
+        val dialogBoxView = activity!!.layoutInflater.inflate(R.layout.dialog_box_sale_invoice_report, null)
         val builder = AlertDialog.Builder(activity)
         builder.setView(dialogBoxView)
         builder.setCancelable(false)
