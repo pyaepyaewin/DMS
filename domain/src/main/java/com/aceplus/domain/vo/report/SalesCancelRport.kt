@@ -3,8 +3,8 @@ package com.aceplus.domain.vo.report
 import android.arch.persistence.room.ColumnInfo
 
 class SalesCancelReport (
-    @ColumnInfo(name = "invoice_id")
-    var invoiceId:Int,
+    @ColumnInfo(name = "id")
+    var invoiceId:String,
 
     @ColumnInfo(name = "customer_name")
     var customerName:String,

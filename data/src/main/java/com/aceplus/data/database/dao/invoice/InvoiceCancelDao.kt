@@ -30,8 +30,12 @@ interface InvoiceCancelDao {
     @Query("Delete from invoice_cancel")
     fun deleteAll()
 
-    @Query("select invoice_cancel.invoice_id,customer_name,total_amount,total_discount_amount from invoice_cancel inner join customer on customer.id = invoice_cancel.customer_id")
+    @Query("select invoice_cancel.id,customer_name,total_amount,total_discount_amount from invoice_cancel inner join customer on customer.id = invoice_cancel.customer_id")
     fun getSalesCancelReport(): List<SalesCancelReport>
+
+//    @Query("select invoice.invoice_id,customer_name,total_amount,total_discount_amount from invoice inner join customer on customer.id = invoice.customer_id where date(invoice.sale_date) between date(:fromDate) and date(:toDate)")
+//    fun getSaleCancelReportForDate(fromDate: String, toDate: String): List<SalesCancelReport>
+
 
 
 }

@@ -10,7 +10,7 @@ import com.google.gson.annotations.SerializedName
 @Entity(tableName = "delivery_item_upload")
 class DeliveryItemUpload {
 
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id")
     @SerializedName("id")
     @Expose
@@ -19,7 +19,7 @@ class DeliveryItemUpload {
     @ColumnInfo(name = "delivery_id")
     @SerializedName("delivery_id")
     @Expose
-    var delivery_id: Int = 0
+    var delivery_id: String? = null
 
     @ColumnInfo(name = "stock_id")
     @SerializedName("stock_id")

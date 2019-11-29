@@ -22,6 +22,9 @@ import java.util.*
 class SalesVisitHistoryReportFragment : BaseFragment(), KodeinAware {
     override val kodein: Kodein by kodein()
     var customerNameList = mutableListOf<String>()
+    var customerIdList = mutableListOf<String>()
+    var customerNextIdList = mutableListOf<String>()
+    var customerAddressList = mutableListOf<String>()
     private val salesVisitHistoryReportAdapter: SalesVisitHistoryReportAdapter by lazy { SalesVisitHistoryReportAdapter() }
     private val salesVisitHistoryReportViewModel: ReportViewModel by viewModel()
     override fun onCreateView(
@@ -36,20 +39,26 @@ class SalesVisitHistoryReportFragment : BaseFragment(), KodeinAware {
         btn_sale_visit_search.setOnClickListener { }
 
         //sale visit history list
-        salesVisitHistoryReportViewModel.salesVisitHistoryReportSuccessState.observe(
-            this,
-            Observer {
+        salesVisitHistoryReportViewModel.salesVisitHistoryReportSuccessState.observe(this, Observer {
                 salesVisitHistoryReportAdapter.setNewList(it as ArrayList<SalesVisitHistoryReport>)
-            })
-
-        salesVisitHistoryReportViewModel.reportErrorState.observe(this, Observer {
-            Toast.makeText(activity, it, Toast.LENGTH_LONG).show()
         })
+        getCustomersFromDb()
+        saleVisitList.apply {
+            layoutManager = LinearLayoutManager(activity)
+            adapter = salesVisitHistoryReportAdapter
+        }
+        salesVisitHistoryReportViewModel.loadSalesVisitHistoryReport()
+        salesVisitHistoryReportViewModel.loadCustomer()
+    }
 
+    private fun getCustomersFromDb(){
         //select customer name list in db
         salesVisitHistoryReportViewModel.customerDataList.observe(this, Observer {
             if (it != null) {
                 for (customer in it) {
+                    customerIdList.add(customer.id.toString())
+                    customerNextIdList.add(customer.customer_id.toString())
+                    customerAddressList.add(customer.address.toString())
                     customerNameList.add(customer.customer_name.toString())
                 }
 
@@ -62,12 +71,6 @@ class SalesVisitHistoryReportFragment : BaseFragment(), KodeinAware {
             fragment_sale_visit_spinner_to_customer.adapter = customerNameSpinnerAdapter
 
         })
-        saleVisitList.apply {
-            layoutManager = LinearLayoutManager(activity)
-            adapter = salesVisitHistoryReportAdapter
-        }
-        salesVisitHistoryReportViewModel.loadSalesVisitHistoryReport()
-        salesVisitHistoryReportViewModel.loadCustomer()
     }
 
 }

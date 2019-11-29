@@ -12,13 +12,13 @@ class SalesReturnReportViewHolder(
     BaseViewHolder<SalesReturnReport>(view) {
     override fun setData(data: SalesReturnReport) {
         view.apply {
-            sale_return_invoice.text = data.invoiceId
+            sale_return_invoice.text = data.saleReturnId
             tvCustomerName.text = data.customerName
             customerAddress.text = data.address
             date.text = data.returnDate
             sale_return_total_qty.text = data.totalQuantity.toString()
-            sale_return_total_amt.text = data.totalAmount
-            setOnClickListener { onClick(data.invoiceId) }
+            sale_return_total_amt.text = data.totalAmount.toString()
+            setOnClickListener { onClick(data.saleReturnId) }
         }
     }
 }

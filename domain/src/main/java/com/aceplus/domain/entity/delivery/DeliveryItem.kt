@@ -29,12 +29,12 @@ class DeliveryItem {
     @ColumnInfo(name = "order_quantity")
     @SerializedName("order_quantity")
     @Expose
-    var order_quantity: String? = null
+    var order_quantity: Double? = null
 
     @ColumnInfo(name = "received_quantity")
     @SerializedName("received_quantity")
     @Expose
-    var received_quantity: String? = null
+    var received_quantity: Double? = null
 
     @ColumnInfo(name = "s_price")
     @SerializedName("s_price")

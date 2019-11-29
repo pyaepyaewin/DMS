@@ -2,7 +2,7 @@ package com.aceplus.domain.vo.report
 
 import android.arch.persistence.room.ColumnInfo
 
-class SalesReturnReport(
+class SalesReturnQtyReport (
     @ColumnInfo(name = "sale_return_id")
     val saleReturnId: String,
 
@@ -14,9 +14,6 @@ class SalesReturnReport(
 
     @ColumnInfo(name = "return_date")
     val returnDate: String,
-
-    @ColumnInfo(name = "quantity")
-    val totalQuantity: Int,
 
     @ColumnInfo(name = "pay_amount")
     val totalAmount: Double

@@ -152,7 +152,6 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
         }
 
     }
-    private val deliveryRepo: DeliveryRepo? = null
     private val saleCheckoutViewModel: SaleCheckoutViewModel by viewModel()
     private val deliveryCheckoutViewModel: DeliveryViewModel by viewModel()
     private val orderCheckoutListAdapter: OrderCheckoutListAdapter by lazy { OrderCheckoutListAdapter() }
@@ -178,22 +177,15 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
     private var locationCode: Int = 0
     private var invoiceId: String = ""
     private var invoice: Invoice? = null
+    private var sale_man_id = ""
     private var saleManId = ""
     private var saleManNo = ""
-    private var saleManPwd = ""
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        try {
-            saleManId = AppUtils.getStringFromShp(Constant.SALEMAN_ID, this)!!
-            saleManNo = AppUtils.getStringFromShp(Constant.SALEMAN_NO, this)!!
-            saleManPwd = AppUtils.getStringFromShp(Constant.SALEMAN_PWD, this)!!
-        } catch (e: NullPointerException) {
-            e.printStackTrace()
-            Utils.backToLogin(this)
-        }
+        saleManId = AppUtils.getStringFromShp(Constant.SALEMAN_ID, this)!!
+        saleManNo = AppUtils.getStringFromShp(Constant.SALEMAN_NO, this)!!
 
 
         getIntentData()
@@ -241,9 +233,6 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
             checkout_delivery_date_layout.visibility = View.VISIBLE
             duedateLayout.visibility = View.GONE
         }
-//        if (isDelivery) {
-//            advancedPaidAmount.text = Utils.formatAmount(orderedInvoice!!.paidAmount)
-//        }
 
         rvSoldProductList.adapter = orderCheckoutListAdapter
         rvSoldProductList.layoutManager = LinearLayoutManager(this)
@@ -253,6 +242,7 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
     private fun initializeData(){
         calculateTotalAmount()
         saleCheckoutViewModel.calculateFinalAmount(soldProductList, totalAmount) // Check - should do only for pre-order
+        deliveryCheckoutViewModel.loadRouteId(saleManId)
         salePersonId = saleCheckoutViewModel.getSaleManID()
         locationCode = saleCheckoutViewModel.getRouteID() // Check point - route id or location id - main thread
     }
@@ -292,7 +282,6 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
             if (it != null){
                 invoice = it
                 saleCheckoutViewModel.invoice.value = null
-
                 if (Utils.isInternetAccess(this)){
                     Utils.callDialog("Please wait...", this)
                     saleCheckoutViewModel.getPreOrderRequest(salePersonId!!, locationCode.toString())
@@ -324,6 +313,9 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
                 }
                 saleCheckoutViewModel.uploadResult.value = null
             }
+        })
+        deliveryCheckoutViewModel.routeDataList.observe(this,android.arch.lifecycle.Observer {
+            sale_man_id = it!!.sale_man_id
         })
 
     }
@@ -375,7 +367,6 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
 
                     return
                 }else {
-                    // insertDeliveryDataToDatabase()
                     toPrintActivity("D")
                 }
             }
@@ -720,32 +711,22 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
             val intent = PrintInvoiceActivity.newIntentFromSaleOrderCheckout(this, invoice!!, soldProductList, promotionList)
             startActivityForResult(intent, Utils.RQ_BACK_TO_CUSTOMER)
         }else{
-            val intent = PrintInvoiceActivity.newIntent(this,soldProductList,"D",orderedInvoice!!,customer!!)
+            insertDeliveryDataToDatabase()
+            val intent = PrintInvoiceActivity.newIntent(this,soldProductList,"D",orderedInvoice!!,customer!!,invoice!!)
             startActivity(intent)
         }
     }
 
     private fun insertDeliveryDataToDatabase(){
         val saleDate = Utils.getCurrentDate(true)
-        var invoiceId1 = ""
-        var salePersonId = ""
-        val customerVisitRepo: CustomerVisitRepo? = null
-
-        try {
-            invoiceId1 = Utils.getInvoiceNo(AppUtils.getStringFromShp(Constant.SALEMAN_NO, this)!!, locationCode.toString(), Constant.FOR_DELIVERY, customerVisitRepo!!.getLastCountForInvoiceNumber(Constant.FOR_DELIVERY)
-            )
-            salePersonId = AppUtils.getStringFromShp(Constant.SALEMAN_ID, this)!!
-        } catch (e: NullPointerException) {
-            e.printStackTrace()
-            Utils.backToLogin(this)
-        }
+        val invoiceId1 = saleCheckoutViewModel.getInvoiceNumber( saleManNo, locationCode, Constant.FOR_DELIVERY)
         val paidAmount = if (tvPrepaidAmount.text.isNotEmpty())
             java.lang.Double.parseDouble(tvPrepaidAmount.text.toString().replace(",", ""))
         else
             0
         val dueDate = Utils.getCurrentDate(true)
         val invoiceTime = Utils.getCurrentDate(true)
-        val totalQuantity = deliveryCheckoutViewModel.insertDeliveryDataItemToDatabase(soldProductList, invoiceId.toString())
+        val totalQuantity = deliveryCheckoutViewModel.insertDeliveryDataItemToDatabase(soldProductList, invoiceId1)
         totalDiscountAmount = orderedInvoice!!.discount
         totalVolumeDiscountPercent = orderedInvoice!!.discountPercent
         var caOrCr = "CR"
@@ -754,46 +735,43 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
                 caOrCr = "CA"
             }
         }
-        deliveryCheckoutViewModel.routeDataList.observe(this,android.arch.lifecycle.Observer {
-            val sale_man_id = it!!.sale_man_id
-           val invoice1 = Invoice()
-            invoice!!.invoice_id = invoiceId1
-            invoice!!.customer_id = customer!!.id.toString()
-            invoice!!.sale_date = saleDate
-            invoice!!.total_amount = totalAmount.toString()
-            invoice!!.total_quantity = totalQuantity.toDouble()
-            invoice!!.total_discount_amount = totalDiscountAmount
-            invoice!!.pay_amount = paidAmount.toString()
-            invoice!!.receipt_person_name = receiptPerson.text.toString()
-            invoice!!.sale_person_id = salePersonId
-            invoice!!.location_code = sale_man_id
-            invoice!!.device_id = Utils.getDeviceId(this@SaleOrderCheckoutActivity)
-            invoice!!.invoice_time = invoiceTime
-            invoice!!.invoice_status = caOrCr
-            invoice!!.total_discount_percent = totalVolumeDiscountPercent.toString()
-            invoice!!.rate = "1"
-            invoice!!.tax_amount = taxAmt
-            invoice!!.due_date = dueDate
-            deliveryRepo!!.saveInvoiceData(invoice1)
-        })
-        deliveryCheckoutViewModel.loadRouteId(saleManId)
-//        val deliveryApi = DeliveryApi()
-//        deliveryApi.invoiceNo = invoiceId.toString()
-//        deliveryApi.invoiceDate = saleDate
-//        deliveryApi.saleId = invoiceId.toString()
-//        deliveryApi.remark = ""
-//        insertDeliveryUpload(deliveryApi)
+        val invoice1 = Invoice()
+        invoice1.invoice_id = invoiceId1
+        invoice1.customer_id = customer!!.id.toString()
+        invoice1.sale_date = saleDate
+        invoice1.total_amount = totalAmount.toString()
+        invoice1.total_quantity = totalQuantity.toDouble()
+        invoice1.total_discount_amount = totalDiscountAmount
+        invoice1.pay_amount = paidAmount.toString()
+        invoice1.receipt_person_name = receiptPerson.text.toString()
+        invoice1.location_code = sale_man_id
+        invoice1.sale_person_id = saleManId
+        invoice1.device_id = Utils.getDeviceId(this@SaleOrderCheckoutActivity)
+        invoice1.invoice_time = invoiceTime
+        invoice1.invoice_status = caOrCr
+        invoice1.total_discount_percent = totalVolumeDiscountPercent.toString()
+        invoice1.rate = "1"
+        invoice1.tax_amount = taxAmt
+        invoice1.due_date = dueDate
+        invoice = invoice1
+        deliveryCheckoutViewModel.saveInvoiceData(invoice1)
+
+        val deliveryApi = DeliveryApi()
+        deliveryApi.invoiceNo = invoiceId1
+        deliveryApi.invoiceDate = saleDate
+        deliveryApi.saleId = invoiceId1
+        deliveryApi.remark = ""
+        insertDeliveryUpload(deliveryApi)
     }
 
     private fun insertDeliveryUpload(deliveryApi:DeliveryApi){
         val cvDeliveryUpload = DeliveryUpload()
-        cvDeliveryUpload.invoice_no =  deliveryApi.invoiceNo.toDouble().roundToInt()
+        cvDeliveryUpload.invoice_no =  deliveryApi.invoiceNo
         cvDeliveryUpload.invoice_date = deliveryApi.invoiceDate
         cvDeliveryUpload.customer_id = customer!!.id
-        cvDeliveryUpload.sale_id =  deliveryApi.saleId.toInt()
+        cvDeliveryUpload.sale_id =  deliveryApi.saleId
         cvDeliveryUpload.remark =  deliveryApi.remark
-        deliveryRepo!!.saveDeliveryUpload(cvDeliveryUpload)
-
+        deliveryCheckoutViewModel.saveDeliveryUpload(cvDeliveryUpload)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

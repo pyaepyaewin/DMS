@@ -1,5 +1,6 @@
 package com.aceplus.dms.ui.fragments.report
 
+import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.arch.lifecycle.Observer
 import android.os.Bundle
@@ -10,26 +11,30 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import android.widget.Toast
 import com.aceplus.dms.R
+import com.aceplus.dms.ui.adapters.report.PreOrderDetailReportAdapter
 import com.aceplus.dms.ui.adapters.report.SalesOrderHistoryReportAdapter
 import com.aceplus.dms.viewmodel.report.ReportViewModel
-import com.aceplus.domain.vo.report.SalesOrderHistoryFullDataReport
+import com.aceplus.domain.vo.report.PreOrderDetailReport
 import com.aceplus.domain.vo.report.SalesOrderHistoryReport
 import com.aceplus.shared.ui.activities.BaseFragment
+import kotlinx.android.synthetic.main.dialog_box_pre_order_products.view.*
 import kotlinx.android.synthetic.main.fragment_sale_invoice_report.*
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.support.kodein
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.math.roundToInt
 
 class SalesOrderHistoryReportFragment : BaseFragment(), KodeinAware {
     override val kodein: Kodein by kodein()
     private var myCalendar = Calendar.getInstance()
     private lateinit var fromDate: Date
     private lateinit var toDate: Date
-    private val salesOrderHistoryReportAdapter: SalesOrderHistoryReportAdapter by lazy { SalesOrderHistoryReportAdapter() }
+    var saleOrderHistoryDataList: List<SalesOrderHistoryReport> = listOf()
+    private val salesOrderHistoryReportAdapter: SalesOrderHistoryReportAdapter by lazy { SalesOrderHistoryReportAdapter(this::onClickItem) }
+    private val preOrderDetailReportAdapter: PreOrderDetailReportAdapter by lazy { PreOrderDetailReportAdapter() }
     private val salesOrderHistoryReportViewModel: ReportViewModel by viewModel()
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -59,61 +64,57 @@ class SalesOrderHistoryReportFragment : BaseFragment(), KodeinAware {
         sale_order_report_advanced_amount_label.visibility = View.VISIBLE
         var saleInvoiceReports = view.findViewById(R.id.saleInvoceReports) as RecyclerView
         //sale order history list and customer list
-        salesOrderHistoryReportViewModel.salesOrderHistoryReportSuccessState.observe(
-            this,
-            Observer {
+        salesOrderHistoryReportViewModel.salesOrderHistoryReportSuccessState.observe(this, Observer {
                 val saleOrderHistoryReportList = arrayListOf<SalesOrderHistoryReport>()
-                for (i in it!!.first){
+                for (i in it!!) {
                     val netAmunt = i.netAmount.toDouble() - i.advancePaymentAmount.toDouble() - i.discount.toDouble()
-                    val saleOrderHistoryReport = SalesOrderHistoryReport(i.invoiceId,i.customerName,i.address,i.netAmount,i.advancePaymentAmount,i.discount,netAmunt.toString())
+                    val saleOrderHistoryReport = SalesOrderHistoryReport(i.invoiceId, i.customerName, i.address, i.netAmount, i.discount, i.advancePaymentAmount, netAmunt.toString())
                     saleOrderHistoryReportList.add(saleOrderHistoryReport)
                 }
                 salesOrderHistoryReportAdapter.setNewList(saleOrderHistoryReportList)
-
-                //select customer name list in db
-                if (it!!.second != null) {
-                    customerNameList.add("All")
-                    for (customer in it!!.second) {
-                        customerNameList.add(customer.customer_name.toString())
-                    }
+                saleOrderHistoryDataList = saleOrderHistoryReportList
+            //Calculate and setText for total,discount and net amounts
+                calculateAmount(saleOrderHistoryReportList)
+        })
+        salesOrderHistoryReportViewModel.customerDataList.observe(this, Observer {
+            //select customer name list in db
+            if (it!! != null) {
+                customerNameList.add("All")
+                for (customer in it!!) {
+                    customerNameList.add(customer.customer_name.toString())
                 }
-                //Bind customer name in fragment spinner
-                val customerNameSpinnerAdapter =
-                    ArrayAdapter(context, android.R.layout.simple_spinner_item, customerNameList)
-                customerNameSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                customer_spinner_fragment_invoice_report.adapter = customerNameSpinnerAdapter
-                customer_spinner_fragment_invoice_report.onItemSelectedListener =
-                    object : AdapterView.OnItemSelectedListener {
-                        override fun onItemSelected(
-                            p0: AdapterView<*>?,
-                            p1: View?,
-                            p2: Int,
-                            p3: Long
-                        ) {
-                            val filterList: ArrayList<SalesOrderHistoryReport> = ArrayList()
-                            for (c in saleOrderHistoryReportList) {
+            }
+            //Bind customer name in fragment spinner
+            val customerNameSpinnerAdapter =
+                ArrayAdapter(context, android.R.layout.simple_spinner_item, customerNameList)
+            customerNameSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            customer_spinner_fragment_invoice_report.adapter = customerNameSpinnerAdapter
+            customer_spinner_fragment_invoice_report.onItemSelectedListener =
+                object : AdapterView.OnItemSelectedListener {
+                    override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
+                        val filterList: ArrayList<SalesOrderHistoryReport> = ArrayList()
+                        if (customerNameList[p2] != "All") {
+                            for (c in saleOrderHistoryDataList) {
                                 if (c.customerName == customerNameList[p2]) {
-                                    filterList.add(c)
-                                }
-                                if (c.customerName == "All") {
                                     filterList.add(c)
                                 }
                             }
                             salesOrderHistoryReportAdapter.setNewList(filterList)
+                            calculateAmount(filterList)
+                        } else {
+                            for (c in saleOrderHistoryDataList) {
+                                filterList.add(c)
+                            }
                         }
+                        salesOrderHistoryReportAdapter.setNewList(filterList)
+                        calculateAmount(filterList)
+                    }
 
-                        override fun onNothingSelected(p0: AdapterView<*>?) {
-
-                        }
+                    override fun onNothingSelected(p0: AdapterView<*>?) {
 
                     }
-                //Calculate and setText for total,discount and net amounts
-                calculateAmount(it!!.first)
 
-            })
-
-        salesOrderHistoryReportViewModel.reportErrorState.observe(this, Observer {
-            Toast.makeText(activity, it, Toast.LENGTH_LONG).show()
+                }
         })
 
         saleInvoiceReports.apply {
@@ -121,9 +122,34 @@ class SalesOrderHistoryReportFragment : BaseFragment(), KodeinAware {
             adapter = salesOrderHistoryReportAdapter
         }
         salesOrderHistoryReportViewModel.loadSalesOrderHistoryReport()
+        salesOrderHistoryReportViewModel.loadCustomer()
+
+        //sale order history report detail list
+        salesOrderHistoryReportViewModel.preOrderDetailReportSuccessState.observe(this, Observer {
+            preOrderDetailReportAdapter.setNewList(it as ArrayList<PreOrderDetailReport>)
+        })
     }
 
-    private fun calculateAmount(allItems: List<SalesOrderHistoryFullDataReport>) {
+    private fun onClickItem(invoiceId: String) {
+        //layout inflate for pre order report detail
+        val dialogBoxView = activity!!.layoutInflater.inflate(R.layout.dialog_box_pre_order_products, null)
+        val builder = AlertDialog.Builder(activity)
+        builder.setView(dialogBoxView)
+        builder.setTitle("SALE ORDER HISTORY DETAIL")
+        builder.setPositiveButton("OK", null)
+        builder.setCancelable(false)
+        val dialog = builder.create()
+
+        dialogBoxView.preOrderProducts.apply {
+            layoutManager = LinearLayoutManager(activity)
+            adapter = preOrderDetailReportAdapter
+        }
+        salesOrderHistoryReportViewModel.loadPreOrderDetailReport(invoiceId = invoiceId)
+        dialog.show()
+
+    }
+
+    private fun calculateAmount(allItems: List<SalesOrderHistoryReport>) {
         var totalAmount = 0.0
         var discount = 0
         var netAmount = 0.0
@@ -131,7 +157,7 @@ class SalesOrderHistoryReportFragment : BaseFragment(), KodeinAware {
         //Calculate total,discount and net amounts
         for (i in allItems) {
             totalAmount += i.netAmount.toDouble()
-            discount += i.discount.toInt()
+            discount += i.discount.toDouble().roundToInt()
             advancePaymentAmount += i.advancePaymentAmount.toDouble()
             val netAddAmount = totalAmount - advancePaymentAmount - discount
             netAmount += netAddAmount

@@ -4,6 +4,7 @@ import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,10 +12,13 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import com.aceplus.dms.R
+import com.aceplus.dms.ui.activities.PrintInvoiceActivity
 import com.aceplus.dms.ui.adapters.report.SaleCancelDetailReportAdapter
 import com.aceplus.dms.ui.adapters.report.SalesCancelReportAdapter
 import com.aceplus.dms.viewmodel.report.ReportViewModel
+import com.aceplus.domain.entity.invoice.Invoice
 import com.aceplus.domain.vo.report.SaleCancelInvoiceDetailReport
+import com.aceplus.domain.vo.report.SaleInvoiceDetailReport
 import com.aceplus.domain.vo.report.SalesCancelReport
 import com.aceplus.shared.ui.activities.BaseFragment
 import kotlinx.android.synthetic.main.dialog_box_sale_cancel_report.view.*
@@ -36,6 +40,9 @@ class SalesCancelReportFragment : BaseFragment(), KodeinAware {
             this::onClickItem
         )
     }
+    var saleCancelDataList: List<SalesCancelReport> = listOf()
+    var saleCancelInvoiceDetailList: List<SaleCancelInvoiceDetailReport> = listOf()
+    private var invoice: Invoice? = null
     private val salesCancelReportViewModel: ReportViewModel by viewModel()
     private val saleCancelDetailReportAdapter: SaleCancelDetailReportAdapter by lazy { SaleCancelDetailReportAdapter() }
 
@@ -48,14 +55,20 @@ class SalesCancelReportFragment : BaseFragment(), KodeinAware {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        var customerNameList = mutableListOf<String>()
+        val customerNameList = mutableListOf<String>()
         edit_text_sale_cancel_report_from_date.setOnClickListener {
             chooseDob(1)
         }
         edit_text_sale_cancel_report_to_date.setOnClickListener {
             chooseDob(2)
         }
-        btn_sale_cancel_report_search.setOnClickListener { }
+        btn_sale_cancel_report_search.setOnClickListener {
+            //            salesCancelReportViewModel.saleCancelInvoiceReportForDateList.observe(this,android.arch.lifecycle.Observer {
+//                salesCancelReportAdapter.setNewList(it as ArrayList<SalesCancelReport>)
+//                saleCancelDataList = it
+//                calculateAmount(it)
+//            })
+        }
         btn_sale_cancel_report_clear.setOnClickListener {
             edit_text_sale_cancel_report_from_date.setText("")
             edit_text_sale_cancel_report_from_date.error = null
@@ -63,99 +76,90 @@ class SalesCancelReportFragment : BaseFragment(), KodeinAware {
             edit_text_sale_cancel_report_to_date.error = null
         }
         //sale cancel report list and customer list
-        salesCancelReportViewModel.salesCancelReportSuccessState.observe(
-            this,
-            android.arch.lifecycle.Observer {
-                salesCancelReportAdapter.setNewList(it!!.first as ArrayList<SalesCancelReport>)
+        salesCancelReportViewModel.salesCancelReport.observe(this, android.arch.lifecycle.Observer {
+            salesCancelReportAdapter.setNewList(it as ArrayList<SalesCancelReport>)
+            saleCancelDataList = it
+            //Calculate and setText for total,discount and net amounts
+            calculateAmount(it)
+        })
 
-                //select customer name list in db
-                if (it != null) {
-                    customerNameList.add("All")
-                    for (customer in it!!.second) {
-                        customerNameList.add(customer.customer_name.toString())
-                    }
-
+        salesCancelReportViewModel.customerDataList.observe(this, android.arch.lifecycle.Observer {
+            //select customer name list in db
+            if (it != null) {
+                customerNameList.add("All")
+                for (customer in it) {
+                    customerNameList.add(customer.customer_name.toString())
                 }
-                //Bind customer name in spinner
-                val customerNameSpinnerAdapter =
-                    ArrayAdapter(context, android.R.layout.simple_spinner_item, customerNameList)
-                customerNameSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                customer_spinner_fragment_invoice_cancel_report.adapter = customerNameSpinnerAdapter
-                customer_spinner_fragment_invoice_cancel_report.onItemSelectedListener =
-                    object : AdapterView.OnItemSelectedListener {
-                        override fun onItemSelected(
-                            p0: AdapterView<*>?,
-                            p1: View?,
-                            p2: Int,
-                            p3: Long
-                        ) {
-                            val filterList: ArrayList<SalesCancelReport> = ArrayList()
-                            for (c in it!!.first) {
+            }
+            //Bind customer name in spinner
+            val customerNameSpinnerAdapter =
+                ArrayAdapter(context, android.R.layout.simple_spinner_item, customerNameList)
+            customerNameSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            customer_spinner_fragment_invoice_cancel_report.adapter = customerNameSpinnerAdapter
+            customer_spinner_fragment_invoice_cancel_report.onItemSelectedListener =
+                object : AdapterView.OnItemSelectedListener {
+                    override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
+                        val filterList: ArrayList<SalesCancelReport> = ArrayList()
+                        if (customerNameList[p2] != "All") {
+                            for (c in saleCancelDataList) {
                                 if (c.customerName == customerNameList[p2]) {
-                                    filterList.add(c)
-                                }
-                                if (c.customerName == "All") {
                                     filterList.add(c)
                                 }
                             }
                             salesCancelReportAdapter.setNewList(filterList)
+                            calculateAmount(filterList)
+                        } else {
+                            for (c in saleCancelDataList) {
+                                filterList.add(c)
+                            }
                         }
+                        salesCancelReportAdapter.setNewList(filterList)
+                        calculateAmount(filterList)
+                    }
 
-                        override fun onNothingSelected(p0: AdapterView<*>?) {
-
-                        }
+                    override fun onNothingSelected(p0: AdapterView<*>?) {
 
                     }
-                //Calculate and setText for total,discount and net amounts
-                calculateAmount(it!!.first)
-            })
-        salesCancelReportViewModel.reportErrorState.observe(
-            this,
-            android.arch.lifecycle.Observer {
-                Toast.makeText(activity, it, Toast.LENGTH_LONG).show()
-            })
+
+                }
+        })
 
         recyclerSaleCancel.apply {
-            layoutManager = LinearLayoutManager(activity)
+            layoutManager = LinearLayoutManager(activity!!)
             adapter = salesCancelReportAdapter
         }
         salesCancelReportViewModel.loadSalesCancelReport()
+        salesCancelReportViewModel.loadCustomer()
+        //salesCancelReportViewModel.loadSaleCancelInvoiceForDateList("$fromDate","$toDate")
 
         //sale cancel report detail list
         salesCancelReportViewModel.saleCancelDetailReportSuccessState.observe(
             this,
             android.arch.lifecycle.Observer {
                 saleCancelDetailReportAdapter.setNewList(it as ArrayList<SaleCancelInvoiceDetailReport>)
+                saleCancelInvoiceDetailList = it
             })
     }
 
     private fun onClickItem(invoiceId: String) {
-        //layout inflate for sale exchange tab2 report detail
-        val dialogBoxView =
-            activity!!.layoutInflater.inflate(
-                R.layout.dialog_box_sale_cancel_report,
-                null
-            )
-        val builder = AlertDialog.Builder(activity)
+        val dialogBoxView = activity!!.layoutInflater.inflate(R.layout.dialog_box_sale_cancel_report, null)
+         val builder = AlertDialog.Builder(activity)
         builder.setView(dialogBoxView)
         builder.setCancelable(false)
         val dialog = builder.create()
 
-        //Dialog sale history report of invoice detail recycler view
+        //Dialog sale history report of invoice detail recycler view........
         dialogBoxView.saleCancelDialog.apply {
             layoutManager = LinearLayoutManager(activity)
             adapter = saleCancelDetailReportAdapter
         }
         salesCancelReportViewModel.loadSaleCancelDetailReport(invoiceId = invoiceId)
-
-        //Action of dialog button
-        dialogBoxView.btn_print.setOnClickListener {
-            Toast.makeText(activity, "Continue to print", Toast.LENGTH_SHORT).show()
-            dialog.dismiss()
-        }
+        //Action of dialog button............
+        dialogBoxView.btn_print.visibility = View.GONE
         dialogBoxView.btn_ok.setOnClickListener {
             dialog.dismiss()
         }
+        dialog.show()
 
     }
 

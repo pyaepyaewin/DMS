@@ -33,15 +33,9 @@ class UnsellReasonReportFragment : BaseFragment(), KodeinAware {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         //unSell reason report list
-        unSellReasonReportViewModel.unSellReasonReportSuccessState.observe(
-            this,
-            android.arch.lifecycle.Observer {
+        unSellReasonReportViewModel.unSellReasonReportSuccessState.observe(this, android.arch.lifecycle.Observer {
                 unSellReasonReportAdapter.setNewList(it as ArrayList<UnsellReasonReport>)
             })
-        unSellReasonReportViewModel.reportErrorState.observe(this, android.arch.lifecycle.Observer {
-            Toast.makeText(activity, it, Toast.LENGTH_LONG).show()
-        })
-
         customerFeedBacks.apply {
             layoutManager = LinearLayoutManager(activity)
             adapter = unSellReasonReportAdapter

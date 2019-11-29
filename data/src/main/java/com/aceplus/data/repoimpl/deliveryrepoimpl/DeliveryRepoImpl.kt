@@ -17,6 +17,11 @@ import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
 
 class DeliveryRepoImpl(private val db: MyDatabase) : DeliveryRepo {
+
+    override fun getDeliveryItemObject(productId: String):Observable<DeliveryItem> {
+        return Observable.just(db.deliveryItemDao().deliveryItemOnlyData(productId))
+    }
+
     override fun getDeliveryName(invoiceId: String): Observable<Invoice> {
         return Observable.just(db.invoiceDao().getSaleHistoryReportForPrint(invoiceId = invoiceId))
     }
@@ -55,8 +60,8 @@ class DeliveryRepoImpl(private val db: MyDatabase) : DeliveryRepo {
         db.deliveryPresentDao().updateDeliveryPresentQty(stockId)
     }
 
-    override fun updateRelatedDeliveryItem(quantity: Int, stockId: String) {
-       // db.deliveryItemDao().updateDeliveryItemQty(quantity,stockId)
+    override fun updateRelatedDeliveryItem(quantity: Double, stockId: String) {
+        db.deliveryItemDao().updateDeliveryItemQty(quantity,stockId)
     }
 
     override fun updateRelatedProduct(quantity: Int, id: Int) {
@@ -86,11 +91,11 @@ class DeliveryRepoImpl(private val db: MyDatabase) : DeliveryRepo {
         return Observable.just(db.deliveryDao().getDeliveryData())
     }
 
-    override fun deliveryItemDataList(deliveryId:Int): Observable<List<DeliveryItem>> {
+    override fun deliveryItemDataList(deliveryId:String): Observable<List<DeliveryItem>> {
         return Observable.just(db.deliveryItemDao().deliveryItemData(deliveryId))
     }
 
-    override fun deliveryPresentDataList(deliveryId:Int): Observable<List<DeliveryPresent>> {
+    override fun deliveryPresentDataList(deliveryId:String): Observable<List<DeliveryPresent>> {
         return Observable.just(db.deliveryPresentDao().getDeliveryPresentDataList(deliveryId))
     }
 

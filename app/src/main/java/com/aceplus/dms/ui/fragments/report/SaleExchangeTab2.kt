@@ -53,19 +53,15 @@ class SaleExchangeTab2 : BaseFragment(), KodeinAware {
         btn_sale_report_search.visibility = View.GONE
         btn_sale_report_clear.visibility = View.GONE
         // //sale exchange tab2 report list
-        saleInvoiceReportViewModel.saleInvoiceReportSuccessState.observe(this, Observer {
-            saleInvoiceReportAdapter.setNewList(it!!.first as ArrayList<SaleInvoiceReport>)
-        })
-
-        saleInvoiceReportViewModel.reportErrorState.observe(this, Observer {
-            Toast.makeText(activity, it, Toast.LENGTH_LONG).show()
+        saleInvoiceReportViewModel.saleInvoiceReportList.observe(this, Observer {
+            saleInvoiceReportAdapter.setNewList(it as ArrayList<SaleInvoiceReport>)
         })
 
         saleInvoceReports.apply {
             layoutManager = LinearLayoutManager(activity)
             adapter = saleInvoiceReportAdapter
         }
-        saleInvoiceReportViewModel.loadSaleInvoiceReport()
+        saleInvoiceReportViewModel.loadSaleExchangeTab2List()
 
         //sale exchange tab2 report detail list
         saleInvoiceReportViewModel.saleInvoiceDetailReportSuccessState.observe(this, Observer {
@@ -75,13 +71,11 @@ class SaleExchangeTab2 : BaseFragment(), KodeinAware {
 
     private fun onClickItem(invoiceId: String) {
         //layout inflate for sale exchange tab2 report detail
-        val dialogBoxView =
-            activity!!.layoutInflater.inflate(
-                R.layout.dialog_box_sale_invoice_report,
-                null
-            )
+        val dialogBoxView = activity!!.layoutInflater.inflate(R.layout.dialog_box_sale_invoice_report, null)
         val builder = AlertDialog.Builder(activity)
         builder.setView(dialogBoxView)
+        builder.setTitle("Sales Product")
+        builder.setPositiveButton("OK", null)
         builder.setCancelable(false)
         val dialog = builder.create()
 
@@ -90,15 +84,7 @@ class SaleExchangeTab2 : BaseFragment(), KodeinAware {
             adapter = saleInvoiceDetailReportAdapter
         }
         saleInvoiceReportViewModel.loadSaleInvoiceDetailReport(invoiceId = invoiceId)
-
-        //Action of dialog button
-        dialogBoxView.btn_print.setOnClickListener {
-            Toast.makeText(activity, "Continue to print", Toast.LENGTH_SHORT).show()
-            dialog.dismiss()
-        }
-        dialogBoxView.btn_ok.setOnClickListener {
-            dialog.dismiss()
-        }
+        dialog.show()
 
     }
 }
