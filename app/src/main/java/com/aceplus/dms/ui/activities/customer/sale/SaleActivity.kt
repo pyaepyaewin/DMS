@@ -30,6 +30,7 @@ import org.kodein.di.android.kodein
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
+import java.util.ConcurrentModificationException as ConcurrentModificationException1
 
 class SaleActivity : BaseActivity(), KodeinAware {
     override val kodein: Kodein by kodein()
@@ -148,7 +149,7 @@ class SaleActivity : BaseActivity(), KodeinAware {
                 mSoldProductListAdapter.updateList(it.first, it.second)
             }
         })*/
-        // Remove if it's possible
+        // Remove if it's possible - decide later
 
         saleViewModel.promotionList.observe(this, Observer {
             if (it != null){
@@ -262,7 +263,7 @@ class SaleActivity : BaseActivity(), KodeinAware {
                             // ToDo - remove promotion if same class id is founded
                             //ToDo - To check promoPlanID and classID not found in Promotion class
                         }
-                    } catch (exception: ConcurrentModificationException){
+                    } catch (exception: ConcurrentModificationException1){
                         exception.printStackTrace()
                     }
                     updatePromotionProductList()
@@ -304,6 +305,7 @@ class SaleActivity : BaseActivity(), KodeinAware {
         val remainingQtyTextView = view.findViewById(R.id.availableQuantity) as TextView
         val quantityEditText = view.findViewById(R.id.quantity) as EditText
         val messageTextView = view.findViewById(R.id.message) as TextView
+
         val alertDialog = AlertDialog.Builder(this@SaleActivity)
             .setView(view)
             .setTitle("Sale Quantity")
@@ -322,7 +324,6 @@ class SaleActivity : BaseActivity(), KodeinAware {
                     }
 
                     soldProduct.quantity = quantity
-                    soldProduct.product.selling_price
 
                     //saleViewModel.calculateSoldProductData(true, soldProduct, mSoldProductListAdapter.getDataList() as ArrayList, this.promotionList, position)
 

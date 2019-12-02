@@ -354,7 +354,7 @@ class SaleViewModel(
 
         for (soldProductInfo in soldProductList){
 
-            var promoPrice = soldProductInfo.product.selling_price!!.toDouble()
+            var promoPrice = soldProductInfo.product.selling_price?.toDouble() ?: 0.0
             if (soldProductInfo.promotionPrice != 0.0) promoPrice = soldProductInfo.promotionPrice
 
             if (soldProductInfo.focPercent != 0.0 || soldProductInfo.focAmount != 0.0){
