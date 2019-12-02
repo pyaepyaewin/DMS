@@ -359,7 +359,8 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
             print_prepaidAmount.text = Utils.formatAmount(invoice!!.pay_amount?.toDouble() ?: 0.0)
             print_discountAmount.text = "${Utils.formatAmount(invoice!!.total_discount_amount)} (${invoice?.total_discount_percent ?: 0.00}%)"
 
-        } else if (printMode == "C") {
+        }
+        else if (printMode == "C") {
 
             crditPrintHeaderLayout1.visibility = View.VISIBLE
             salePrintHeaderLayout1.visibility = View.GONE

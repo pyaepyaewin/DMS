@@ -1,5 +1,6 @@
 package com.aceplus.dms.ui.activities.creditcollection
 
+import android.app.Activity
 import android.app.AlertDialog
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
@@ -25,6 +26,10 @@ import kotlinx.android.synthetic.main.activity_credit_collection.*
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.kodein
+import java.text.DecimalFormat
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.ArrayList
 
 class CreditCollectionCheckoutActivity : BaseActivity(), KodeinAware {
     override val kodein: Kodein by kodein()
@@ -32,7 +37,11 @@ class CreditCollectionCheckoutActivity : BaseActivity(), KodeinAware {
         get() = R.layout.activity_credit_collection
     private var listViewPosition = 0
     var calculateList = mutableListOf<Credit>()
-
+    var total = 0.0
+    private val df = DecimalFormat(".##")
+    private var refundAmount: Double = 0.0
+    private var creditDate: String=""
+    private var invoiceId:String=""
     private val creditCollectionCheckOutAdapter: CreditCollectionCheckOutAdapter by lazy {
         CreditCollectionCheckOutAdapter(this::onClickNoticeListItem)
     }
@@ -61,103 +70,50 @@ class CreditCollectionCheckoutActivity : BaseActivity(), KodeinAware {
         date_txt.text = data.invoice_date
         invno_txt.text = data.invoice_no
         item_pay_edit.setText("")
-        item_pay_edit!!.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(s: Editable?) {
-                var tempPayAmount = 0.0
-                var tempNetAmount = 0.0
-                if (s.toString() != "" && invno_total_amount_txt.text.toString() != "" && !s.toString().endsWith(
-                        "."
-                    )
-                ) {
-                    tempPayAmount =
-                        s.toString().replace(",", "").toDouble()
-                    tempNetAmount =
-                        invno_total_amount_txt.text.toString().replace(
-                            ",",
-                            ""
-                        ).toDouble()
-
-                } else {
-                    refund_txt.text = "0"
-                }
-
-                if (tempPayAmount > tempNetAmount) {
-                    refund_txt.text = Utils.formatAmount(tempPayAmount - tempNetAmount)
-                }
-
+        item_pay_edit.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(p0: Editable?) {
+                "Nothing to do"
             }
 
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                "Nothing to do"
             }
 
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                if (s.toString().isNotEmpty() && !s.toString().endsWith(".")) {
-                    val convertedString = s.toString()
-                    if (item_pay_edit!!.text.toString() != convertedString && convertedString.isNotEmpty()) {
-                        item_pay_edit!!.setText(convertedString)
-                        item_pay_edit!!.setSelection(item_pay_edit!!.text.length)
-                    }
-                }
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                calculateRefundAmount()
             }
         })
 
-        payment_amount_edit!!.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(s: Editable?) {
-                var tempPayAmount = 0.0
-                var tempNetAmount = 0.0
-                if (s.toString() != "" && invno_total_amount_txt.text.toString() != "" && !s.toString().endsWith(
-                        "."
-                    )
-                ) {
-                    tempPayAmount =
-                        s.toString().replace(",", "").toDouble()
-                    tempNetAmount =
-                        invno_total_amount_txt.text.toString().replace(
-                            ",",
-                            ""
-                        ).toDouble()
-
-                } else {
-                    refund_txt.text = "0"
-                }
-
-                if (tempPayAmount > tempNetAmount) {
-                    refund_txt.text = Utils.formatAmount(tempPayAmount - tempNetAmount)
-                }
-
+        payment_amount_edit.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(p0: Editable?) {
+                "Nothing to do"
             }
 
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                "Nothing to do"
             }
 
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                if (s.toString().isNotEmpty() && !s.toString().endsWith(".")) {
-                    val convertedString = s.toString()
-                    if (payment_amount_edit.text.toString() != convertedString && convertedString.isNotEmpty()) {
-                        payment_amount_edit.setText(convertedString)
-                        payment_amount_edit.setSelection(payment_amount_edit.text.length)
-                    }
-                }
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                calculateRefundAmount()
             }
         })
 
 
     }
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val saleManId = AppUtils.getStringFromShp(Constant.SALEMAN_ID, this)
-        val salePersonName = AppUtils.getStringFromShp(Constant.SALEMAN_NAME,this)
-        side_total_amt_layout!!.visibility = View.GONE
-        side_credit_amt_layout!!.visibility = View.GONE
-        side_pay_amt_layout!!.visibility = View.GONE
+        val salePersonName = AppUtils.getStringFromShp(Constant.SALEMAN_NAME, this)
+//        side_total_amt_layout!!.visibility = View.GONE
+//        side_credit_amt_layout!!.visibility = View.GONE
+//        side_pay_amt_layout!!.visibility = View.GONE
+        creditDate = SimpleDateFormat("yyyy/MM/dd").format(Date())
 
         var customerId = intent.getSerializableExtra("CustomerID") as String
         var customerName = intent.getSerializableExtra("CustomerName") as String
-        var townShipName=creditCollectionCheckOutViewModel.getTownShipName(customerId.toInt())
+        var townShipName = creditCollectionCheckOutViewModel.getTownShipName(customerId.toInt())
 
-
+        setValueToCustomerAdapter()
         //val customerName=creditCollectionCheckOutViewModel.getCustomerName(customerId)
 
         cancel_img.setOnClickListener {
@@ -202,7 +158,7 @@ class CreditCollectionCheckoutActivity : BaseActivity(), KodeinAware {
                             creditInvoiceList.add(creditInvoice)
                         }
 
-                        startActivity(
+                        startActivityForResult(
                             PrintInvoiceActivity.getIntentFromCredit(
                                 this,
                                 creditInvoiceList,
@@ -210,7 +166,7 @@ class CreditCollectionCheckoutActivity : BaseActivity(), KodeinAware {
                                 townShipName,
                                 salePersonName.toString(),
                                 customerName
-                            )
+                            ),Utils.RQ_BACK_TO_CUSTOMER
                         )
                     }
                 }
@@ -221,7 +177,6 @@ class CreditCollectionCheckoutActivity : BaseActivity(), KodeinAware {
             android.arch.lifecycle.Observer {
                 creditCollectionCheckOutAdapter.setNewList(it as ArrayList<Credit>)
                 var totalUnpaid = 0.0
-                var total = 0.0
                 var totalPaid = 0.0
 
                 for (i in it) {
@@ -256,8 +211,55 @@ class CreditCollectionCheckoutActivity : BaseActivity(), KodeinAware {
             adapter = creditCollectionCheckOutAdapter
         }
         creditCollectionCheckOutViewModel.loadCreditCollectionCheckOut(customerId)
+        payment_amount_edit.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(p0: Editable?) {
+                "Nothing to do"
+            }
 
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                "Nothing to do"
+            }
 
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                calculateRefundAmount()
+            }
+        })
+
+    }
+
+    fun calculateRefundAmount() {
+
+        if (payment_amount_edit.text.isNotBlank()) {
+            val payAmount = payment_amount_edit.text.toString().toDouble()
+            var refundAmount = payAmount - total
+
+            if (refundAmount >= 0) {
+                refundAmount = df.format(refundAmount).toDouble()
+                refund_txt.text = Utils.formatAmount(refundAmount)
+            } else refund_txt.text = "0"
+
+            this.refundAmount = refundAmount
+        }
+
+    }
+    private fun setValueToCustomerAdapter() {
+        side_total_amt_layout.visibility=View.GONE
+        side_credit_amt_layout.visibility=View.GONE
+        side_pay_amt_layout.visibility=View.GONE
+        customer_name_txt.text=intent.getSerializableExtra("CustomerName") as String
+        date_txt.text=creditDate
+        invno_txt.text = invoiceId
+
+        payment_amount_edit.text = null
+        item_pay_edit.text = null
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == Utils.RQ_BACK_TO_CUSTOMER)
+            if (resultCode == Activity.RESULT_OK){
+                setResult(Activity.RESULT_OK)
+                finish()
+            }
     }
 }
 
