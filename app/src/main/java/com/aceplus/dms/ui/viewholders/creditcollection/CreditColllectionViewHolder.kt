@@ -24,6 +24,13 @@ class CreditCollectionViewHolder(itemView: View,val onClick: (data: CreditCollec
 
 
         }
+        else
+        {
+            itemView.credit_customer_name.setTextColor(itemView.resources.getColor(R.color.black))
+            itemView.credit_totalamt.setTextColor(itemView.resources.getColor(R.color.black))
+            itemView.credit_paidamt.setTextColor(itemView.resources.getColor(R.color.black))
+            itemView.credit_unpaidamt.setTextColor(itemView.resources.getColor(R.color.black))
+        }
         itemView.setOnClickListener {
             onClick(data)
         }
