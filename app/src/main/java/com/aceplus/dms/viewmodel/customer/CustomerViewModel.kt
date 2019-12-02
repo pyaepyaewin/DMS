@@ -28,7 +28,7 @@ class CustomerViewModel(
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.mainThread())
                 .subscribe {
-                    customerDataList.postValue(it)
+                    this.customerDataList.postValue(it)
                 }
         }
     }

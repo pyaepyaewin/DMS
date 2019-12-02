@@ -117,21 +117,14 @@ class CustomerActivity : BaseActivity(), KodeinAware {
     private fun onClickCustomerListItem(customer: Customer) {
 
         this.selectedCustomer = customer
+
         tvCustomerNameCA.text = customer.customer_name
-        tvPhone.apply {
-            paintFlags = Paint.UNDERLINE_TEXT_FLAG
-            text = customer.phone?.trim()
-        }
-        tvAddress.apply {
-            paintFlags = Paint.UNDERLINE_TEXT_FLAG
-            text = customer.address
-        }
         tvTownship.text = customer.township_number
         tvCreditTerms.text = customer.credit_term
         tvCreditLimit.text = customer.credit_limit
-        tvCreditAmount.text = customer.credit_amount
-        tvDueAmount.text = customer.due_amount
-        tvPrepaidAmount.text = customer.prepaid_amount
+        tvCreditAmount.text = customer.credit_amount ?: "0.0"
+        tvDueAmount.text = customer.due_amount ?: "0.0"
+        tvPrepaidAmount.text = customer.prepaid_amount ?: "0.0"
         tvPaymentType.text = customer.payment_type
         val latitude = Utils.onDecimalFormat(customer.latitude?.toDouble() ?: 0.0)
         val longitude = Utils.onDecimalFormat(customer.longitude?.toDouble() ?: 0.0)
@@ -140,6 +133,15 @@ class CustomerActivity : BaseActivity(), KodeinAware {
         tvLongitude.text = nf.format(longitude)
         tvCustomerRemark.text = customer.fax
         btnLocation.isEnabled = customer.flag?.toInt() ?: 0 != 1
+
+        tvPhone.apply {
+            paintFlags = Paint.UNDERLINE_TEXT_FLAG
+            text = customer.phone?.trim()
+        }
+        tvAddress.apply {
+            paintFlags = Paint.UNDERLINE_TEXT_FLAG
+            text = customer.address
+        }
 
     }
 
