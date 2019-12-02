@@ -46,7 +46,7 @@ class SaleViewModel(
                 .subscribe {
                     val productNameList = mutableListOf<String>()
                     for (product in it) {
-                        productNameList.add(product.product_name!!)
+                        productNameList.add(product.product_name.toString())
                     }
                     productDataList.postValue(Pair(it, productNameList))
                 }

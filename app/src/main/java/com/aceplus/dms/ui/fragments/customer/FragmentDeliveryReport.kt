@@ -88,7 +88,6 @@ class FragmentDeliveryReport : BaseFragment(), KodeinAware {
                 } else if (customer != null && soldProductList.isNotEmpty()){
                     val intent = SaleOrderActivity.newIntentFromDelivery(
                         activity!!,
-                        true,
                         customer!!,
                         soldProductList,
                         delivery!!

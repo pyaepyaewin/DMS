@@ -155,11 +155,11 @@ class SaleReturnActivity : BaseActivity(), KodeinAware {
             if (it != null){
                 if (isSaleExchange){
                     val intent = SaleActivity.newIntentFromSaleReturn(this, customer!!, it as Double, saleReturnID!!)
-                    startActivityForResult(intent, Utils.RQ_BACK_TO_CUSTOMER)
+                    startActivityForResult(intent, Constant.RQC_BACK_TO_CUSTOMER)
                 }
                 else{
                     val intent = PrintInvoiceActivity.newIntentFromSaleReturn(this, it as Invoice, mReturnProductListAdapter.getDataList() as ArrayList<SoldProductInfo>)
-                    startActivityForResult(intent, Utils.RQ_BACK_TO_CUSTOMER)
+                    startActivityForResult(intent, Constant.RQC_BACK_TO_CUSTOMER)
                 }
                 salesReturnViewModel.saleReturnSuccessState.value = null
             }
@@ -295,7 +295,7 @@ class SaleReturnActivity : BaseActivity(), KodeinAware {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == Utils.RQ_BACK_TO_CUSTOMER)
+        if (requestCode == Constant.RQC_BACK_TO_CUSTOMER)
             if (resultCode == Activity.RESULT_OK){
                 setResult(Activity.RESULT_OK)
                 finish()

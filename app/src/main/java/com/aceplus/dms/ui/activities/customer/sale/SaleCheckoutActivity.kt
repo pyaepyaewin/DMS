@@ -515,18 +515,18 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
 
         if (isSaleExchange){
             val intent = SaleExchangeInfoActivity.getIntentFromSaleCheckout(this, customer!!, saleReturnInvoiceNo!!, invoice!!, soldProductList, promotionList)
-            startActivityForResult(intent, Utils.RQ_BACK_TO_CUSTOMER)
+            startActivityForResult(intent, Constant.RQC_BACK_TO_CUSTOMER)
         } else{
             saleCheckoutViewModel.updateDepartureTimeForSaleManRoute( salePersonId!!, customer!!.id.toString())
             saleCheckoutViewModel.updateSaleVisitRecord(customer!!.id)
             val intent = PrintInvoiceActivity.newIntentFromSaleCheckout(this, invoice!!, soldProductList, promotionList)
-            startActivityForResult(intent, Utils.RQ_BACK_TO_CUSTOMER)
+            startActivityForResult(intent, Constant.RQC_BACK_TO_CUSTOMER)
         }
 
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == Utils.RQ_BACK_TO_CUSTOMER)
+        if (requestCode == Constant.RQC_BACK_TO_CUSTOMER)
             if (resultCode == Activity.RESULT_OK){
                 setResult(Activity.RESULT_OK)
                 finish()

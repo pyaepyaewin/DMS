@@ -156,6 +156,7 @@ object Utils {
     }
 
     fun commonDialog(message: String, activity: Activity?, flag: Int) {
+
         val handler = Handler()
         handler.post(Runnable {
             if (activity!!.isFinishing) {
@@ -163,15 +164,20 @@ object Utils {
             } else {
                 var statusImage = 0
                 var title = ""
-                if (flag == 0) {
-                    statusImage = R.drawable.success
-                    title = "Success"
-                } else if (flag == 1) {
-                    statusImage = R.drawable.fail
-                    title = "Error"
-                } else if (flag == 2) {
-                    statusImage = R.drawable.info
-                    title = "Info"
+
+                when (flag) {
+                    0 -> {
+                        statusImage = R.drawable.success
+                        title = "Success"
+                    }
+                    1 -> {
+                        statusImage = R.drawable.fail
+                        title = "Error"
+                    }
+                    2 -> {
+                        statusImage = R.drawable.info
+                        title = "Info"
+                    }
                 }
 
                 AlertDialog.Builder(activity)
@@ -183,6 +189,7 @@ object Utils {
                     .show()
             }
         })
+
     }
 
     fun encodePassword(str: String): String {
@@ -780,8 +787,7 @@ object Utils {
         val cm: ConnectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val activeNetwork = cm.activeNetworkInfo
 
-        if (activeNetwork != null)
-            return activeNetwork.isConnected
+        if (activeNetwork != null) return activeNetwork.isConnected
 
         return false
 

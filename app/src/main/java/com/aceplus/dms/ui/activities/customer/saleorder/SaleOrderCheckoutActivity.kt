@@ -775,7 +775,6 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-
         if (requestCode == Utils.RQ_BACK_TO_CUSTOMER)
             if (resultCode == Activity.RESULT_OK) {
                 setResult(Activity.RESULT_OK)
@@ -788,7 +787,7 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
             val intent = Intent(this@SaleOrderCheckoutActivity, DeliveryActivity::class.java)
             startActivity(intent)
             finish()
-        }
-
+        } else super.onBackPressed()
     }
+
 }

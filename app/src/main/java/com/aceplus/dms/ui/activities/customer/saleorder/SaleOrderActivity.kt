@@ -46,7 +46,6 @@ import kotlinx.android.synthetic.main.activity_sale1.searchAndSelectProductsLayo
 import kotlinx.android.synthetic.main.activity_sale1.tvNetAmount as tvNetAmount1
 
 class SaleOrderActivity : BaseActivity(), KodeinAware {
-
     override val kodein: Kodein by kodein()
 
     override val layoutId: Int
@@ -58,36 +57,29 @@ class SaleOrderActivity : BaseActivity(), KodeinAware {
         private const val IE_IS_DELIVERY = "is-delivery"
         private const val IE_SOLD_PRODUCT_LIST_KEY = "sold-product-list-key"
         private const val IE_ORDERED_INVOICE_KEY = "ordered_invoice_key"
-        private const val IE_FROM = "IE_FROM"
 
         fun newIntentFromCustomer(context: Context, customerData: Customer): Intent {
             val intent = Intent(context, SaleOrderActivity::class.java)
-            intent.putExtra(IE_FROM,"fromCustomer")
+            intent.putExtra(IE_IS_DELIVERY, false)
             intent.putExtra(IE_CUSTOMER_DATA, customerData)
             return intent
         }
 
-        fun newIntentFromSaleExchange(context: Context, customerId: String): Intent {
-            val intent = Intent(context, SaleOrderActivity::class.java)
-            intent.putExtra(IE_CUSTOMER_DATA, customerId)
-            return intent
-        }
         fun newIntentFromDelivery(
             context: FragmentActivity,
-            b: Boolean,
             customer: Customer,
             soldProductList: ArrayList<SoldProductInfo>,
             deliver: Deliver
         ): Intent? {
             val intent = Intent(context, SaleOrderActivity::class.java)
-            intent.putExtra(IE_FROM,"fragmentDeliveryReport")
-            intent.putExtra(IE_IS_DELIVERY, b)
+            intent.putExtra(IE_IS_DELIVERY, true)
             intent.putExtra(IE_CUSTOMER_DATA, customer)
             intent.putExtra(IE_SOLD_PRODUCT_LIST_KEY, soldProductList)
             intent.putExtra(IE_ORDERED_INVOICE_KEY, deliver)
             return intent
 
         }
+
     }
 
     private val saleViewModel: SaleViewModel by viewModel()
@@ -100,7 +92,6 @@ class SaleOrderActivity : BaseActivity(), KodeinAware {
     private var customer: Customer? = null
     private var soldProductList = ArrayList<SoldProductInfo>()
     private var orderedInvoice: Deliver? = null
-    private var from: String? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -117,7 +108,7 @@ class SaleOrderActivity : BaseActivity(), KodeinAware {
     }
 
     private fun getIntentData(){
-        from = intent.getStringExtra(IE_FROM)
+
         if (intent.getParcelableExtra<Customer>(IE_CUSTOMER_DATA) != null) customer = intent.getParcelableExtra(IE_CUSTOMER_DATA)
 
         isDelivery = intent.getBooleanExtra(IE_IS_DELIVERY, false)
@@ -128,21 +119,21 @@ class SaleOrderActivity : BaseActivity(), KodeinAware {
          if (intent.getSerializableExtra(IE_ORDERED_INVOICE_KEY) != null) {
             orderedInvoice = intent.getSerializableExtra(IE_ORDERED_INVOICE_KEY) as Deliver
         }
+
     }
 
     private fun setupUI(){
-        if (from == "fragmentDeliveryReport") {
-            tvTitle.text = "DELIVERY"
-            tvNetAmount.text = orderedInvoice!!.amount.toString()
-        }
-        headerDiscount.visibility = View.GONE
-        tableHeaderQty.visibility = View.GONE
-        saleDateTextView.text = Utils.getCurrentDate(false)
 
         if (isDelivery){
+            tvTitle.text = "DELIVERY"
+            tvNetAmount.text = orderedInvoice!!.amount.toString()
             tableHeaderQty.visibility = View.VISIBLE
             searchAndSelectProductsLayout.visibility = View.GONE
         }
+
+        headerDiscount.visibility = View.GONE
+        tableHeaderQty.visibility = View.GONE
+        saleDateTextView.text = Utils.getCurrentDate(false)
 
         rvProductList.adapter = mProductListAdapter
         rvProductList.layoutManager = GridLayoutManager(applicationContext, 1)
@@ -164,8 +155,8 @@ class SaleOrderActivity : BaseActivity(), KodeinAware {
 
         cancelImg.setOnClickListener { onBackPressed() }
         checkoutImg.setOnClickListener {
-            if (from == "fragmentDeliveryReport"){
-                val intent = SaleOrderCheckoutActivity.getIntentForDeliveryFromSaleOrder(this,isDelivery, soldProductList,orderedInvoice!!,customer!!)
+            if (isDelivery){
+                val intent = SaleOrderCheckoutActivity.getIntentForDeliveryFromSaleOrder(this, isDelivery, soldProductList,orderedInvoice!!,customer!!)
                 startActivity(intent)
             }else{
                 checkoutOrder()
@@ -341,24 +332,22 @@ class SaleOrderActivity : BaseActivity(), KodeinAware {
         }
 
 
-            val isFocPass = toEnableFocSameProduct()
-            if (isFocPass) {
-                val intent = SaleOrderCheckoutActivity.getIntentFromSaleOrder(
-                    this,
-                    customer!!,
-                    mOrderedProductListAdapter.getDataList() as ArrayList,
-                    this.promotionList
-                )
-                startActivityForResult(intent, Utils.RQ_BACK_TO_CUSTOMER)
-            }
-
-
-        if (orderedInvoice != null){
-            val intent = SaleOrderCheckoutActivity.getIntent(this, orderedInvoice!!)
-            startActivity(intent)
+        val isFocPass = toEnableFocSameProduct()
+        if (isFocPass) {
+            val intent = SaleOrderCheckoutActivity.getIntentFromSaleOrder(
+                this,
+                customer!!,
+                mOrderedProductListAdapter.getDataList() as ArrayList,
+                this.promotionList
+            )
+            startActivityForResult(intent, Utils.RQ_BACK_TO_CUSTOMER)
         }
 
 
+        /*if (orderedInvoice != null){
+            val intent = SaleOrderCheckoutActivity.getIntent(this, orderedInvoice!!)
+            startActivity(intent)
+        }*/
 
     }
 

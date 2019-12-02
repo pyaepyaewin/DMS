@@ -80,11 +80,10 @@ class CustomerVisitRepoImpl(
 
     override fun getRouteScheduleIDV2(): Int {
         val saleManId = AppUtils.getStringFromShp(Constant.SALEMAN_ID, shf)
-        val routeSchedule = db.routeScheduleV2Dao().dataBySaleManId(saleManId!!)
-        val routeScheduleItems =
-            db.routeScheduleItemV2Dao().allDataByRouteScheduleId(routeSchedule.id.toString())
-        return if (routeScheduleItems.count() > 0) routeScheduleItems[0].route_schedule_id
-        else 0
+        val routeSchedule = db.routeScheduleV2Dao().dataBySaleManId(saleManId ?: "")
+        val routeScheduleItems = db.routeScheduleItemV2Dao().allDataByRouteScheduleId(routeSchedule.id.toString())
+        return if (routeScheduleItems.count() > 0) routeScheduleItems[0].route_schedule_id else 0
+        // Route Schedule Item id was updated for auto generation by YLA
     }
 
     override fun getLastCountForInvoiceNumber(mode: String): Int {
@@ -171,14 +170,11 @@ class CustomerVisitRepoImpl(
     override fun saveDataForTempSaleManRoute(selectedCustomer: Customer, currentDate: String, arrivalStatus: Int) {
 
         val saleManId = AppUtils.getStringFromShp(Constant.SALEMAN_ID, shf)
-        if (db.tempForSaleManRouteDao().dataById(
-                saleManId ?: "0",
-                selectedCustomer.customer_id!!
-            ).isEmpty()
-        ) {
+
+        if (db.tempForSaleManRouteDao().dataById(saleManId ?: "0", selectedCustomer.customer_id!!).isEmpty()) {
             val tempForSaleManRoute = TempForSaleManRoute()
             tempForSaleManRoute.sale_man_id = saleManId?.toInt() ?: 0
-            tempForSaleManRoute.customer_id = selectedCustomer.customer_id //To Check
+            tempForSaleManRoute.customer_id = selectedCustomer.id.toString() //Updated - customer_id to id
             tempForSaleManRoute.latitude = selectedCustomer.latitude
             tempForSaleManRoute.longitude = selectedCustomer.longitude
             tempForSaleManRoute.arrival_time = currentDate

@@ -24,7 +24,6 @@ import com.aceplus.domain.entity.promotion.Promotion
 import com.aceplus.domain.vo.SoldProductInfo
 import com.aceplussolutions.rms.ui.activities.BaseActivity
 import kotlinx.android.synthetic.main.activity_sale1.*
-import kotlinx.android.synthetic.main.dialog_box_sale_quantity.*
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.kodein
@@ -67,8 +66,8 @@ class SaleActivity : BaseActivity(), KodeinAware {
     private val mProductListAdapter by lazy { ProductListAdapter(::onClickProductListItem) }
     private val mSoldProductListAdapter by lazy { SoldProductListAdapter(this::onLongClickSoldProductListItem, this::onFocCheckChange, this::onClickQtyButton, this::onClickFocButton) }
     private val mPromotionGiftPresentListAdapter by lazy { PromotionPlanGiftListAdapter() }
+    private val mSearchProductAdapter by lazy { ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, ArrayList<String>()) }
     /*private val mPromotionItemListAdapter by lazy { PromotionPlanItemListAdapter() }*/
-    private val mSearchProductAdapter by lazy { ArrayAdapter<String>(this@SaleActivity, android.R.layout.simple_list_item_1, ArrayList<String>()) }
 
     private val duplicateProductList = mutableListOf<Product>()
     private var customer: Customer? = null
@@ -122,10 +121,6 @@ class SaleActivity : BaseActivity(), KodeinAware {
 
         tableHeaderOrderedQty.visibility = View.GONE
 
-        //searchAndSelectProductsLayout.visibility = if (this.isDelivery) View.GONE else View.VISIBLE
-        //tableHeaderOrderedQty.visibility = if (this.isDelivery) View.VISIBLE else View.GONE
-        //tableHeaderDiscount.visibility = if (this.isPreOrder) View.GONE else View.VISIBLE
-
     }
 
     private fun catchEvents() {
@@ -148,11 +143,12 @@ class SaleActivity : BaseActivity(), KodeinAware {
                 ?: Utils.commonDialog("No issued product", this, 2)
         })
 
-        saleViewModel.updatedSoldProduct.observe(this, Observer {
+        /*saleViewModel.updatedSoldProduct.observe(this, Observer {
             if (it != null){
                 mSoldProductListAdapter.updateList(it.first, it.second)
             }
-        })
+        })*/
+        // Remove if it's possible
 
         saleViewModel.promotionList.observe(this, Observer {
             if (it != null){
@@ -180,7 +176,7 @@ class SaleActivity : BaseActivity(), KodeinAware {
         var sameProduct = false
 
         for (tempSoldProduct in mSoldProductListAdapter.getDataList()) {
-            if (tempSoldProduct.product.product_id === tempProduct.product_id) {
+            if (tempSoldProduct.product.id == tempProduct.id) {
                 sameProduct = true
                 if (duplicateProductList.contains(tempProduct))
                     Constant.PRODUCT_COUNT = 2
@@ -426,10 +422,10 @@ class SaleActivity : BaseActivity(), KodeinAware {
             if (isSaleExchange){
                 val intent = SaleCheckoutActivity.newIntentFromSaleForSaleExchange(
                     this, customer!!, mSoldProductListAdapter.getDataList() as ArrayList, this.promotionList, saleReturnInvoiceNo!!, saleReturnAmount)
-                startActivityForResult(intent, Utils.RQ_BACK_TO_CUSTOMER)
+                startActivityForResult(intent, Constant.RQC_BACK_TO_CUSTOMER)
             } else{
                 val intent = SaleCheckoutActivity.newIntentFromSale(this, customer!!, mSoldProductListAdapter.getDataList() as ArrayList, this.promotionList)
-                startActivityForResult(intent, Utils.RQ_BACK_TO_CUSTOMER)
+                startActivityForResult(intent, Constant.RQC_BACK_TO_CUSTOMER)
             }
 
         }
@@ -477,10 +473,15 @@ class SaleActivity : BaseActivity(), KodeinAware {
     }
 
     private fun getIntentData() {
+
         isSaleExchange = intent.getBooleanExtra(IE_SALE_EXCHANGE, false)
         customer = intent.getParcelableExtra(IE_CUSTOMER_DATA)
-        saleReturnAmount = intent.getDoubleExtra(IE_RETURN_AMOUNT, 0.0)
-        saleReturnInvoiceNo = intent.getStringExtra(IE_SALE_RETURN_INVOICE_ID_KEY)
+
+        if (isSaleExchange){
+            saleReturnAmount = intent.getDoubleExtra(IE_RETURN_AMOUNT, 0.0)
+            saleReturnInvoiceNo = intent.getStringExtra(IE_SALE_RETURN_INVOICE_ID_KEY)
+        }
+
     }
 
     private fun updatePromotionProductList(){
@@ -488,7 +489,7 @@ class SaleActivity : BaseActivity(), KodeinAware {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == Utils.RQ_BACK_TO_CUSTOMER)
+        if (requestCode == Constant.RQC_BACK_TO_CUSTOMER)
             if (resultCode == Activity.RESULT_OK){
                 setResult(Activity.RESULT_OK)
                 finish()
