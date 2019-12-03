@@ -6,25 +6,30 @@ import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import android.widget.Toast
 import com.aceplus.dms.R
 import com.aceplus.dms.ui.adapters.report.SalesVisitHistoryReportAdapter
+import com.aceplus.dms.utils.Utils
 import com.aceplus.dms.viewmodel.report.ReportViewModel
+import com.aceplus.domain.model.sale.SaleVisitForUI
 import com.aceplus.domain.vo.report.SalesVisitHistoryReport
 import com.aceplus.shared.ui.activities.BaseFragment
 import kotlinx.android.synthetic.main.fragment_sale_visit_report.*
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.support.kodein
+import java.text.SimpleDateFormat
 import java.util.*
 
 class SalesVisitHistoryReportFragment : BaseFragment(), KodeinAware {
     override val kodein: Kodein by kodein()
-    var customerNameList = mutableListOf<String>()
-    var customerIdList = mutableListOf<String>()
+    private var customerNameList = mutableListOf<String>()
+    var customerIdList = mutableListOf<Int>()
     var customerNextIdList = mutableListOf<String>()
     var customerAddressList = mutableListOf<String>()
+    private var fromId = 0
+    private var toId = 0
     private val salesVisitHistoryReportAdapter: SalesVisitHistoryReportAdapter by lazy { SalesVisitHistoryReportAdapter() }
     private val salesVisitHistoryReportViewModel: ReportViewModel by viewModel()
     override fun onCreateView(
@@ -36,27 +41,17 @@ class SalesVisitHistoryReportFragment : BaseFragment(), KodeinAware {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        btn_sale_visit_search.setOnClickListener { }
-
-        //sale visit history list
-        salesVisitHistoryReportViewModel.salesVisitHistoryReportSuccessState.observe(this, Observer {
-                salesVisitHistoryReportAdapter.setNewList(it as ArrayList<SalesVisitHistoryReport>)
-        })
         getCustomersFromDb()
-        saleVisitList.apply {
-            layoutManager = LinearLayoutManager(activity)
-            adapter = salesVisitHistoryReportAdapter
-        }
-        salesVisitHistoryReportViewModel.loadSalesVisitHistoryReport()
+        catchEvents()
         salesVisitHistoryReportViewModel.loadCustomer()
     }
 
-    private fun getCustomersFromDb(){
+    private fun getCustomersFromDb() {
         //select customer name list in db
         salesVisitHistoryReportViewModel.customerDataList.observe(this, Observer {
             if (it != null) {
                 for (customer in it) {
-                    customerIdList.add(customer.id.toString())
+                    customerIdList.add(customer.id)
                     customerNextIdList.add(customer.customer_id.toString())
                     customerAddressList.add(customer.address.toString())
                     customerNameList.add(customer.customer_name.toString())
@@ -69,8 +64,181 @@ class SalesVisitHistoryReportFragment : BaseFragment(), KodeinAware {
             customerNameSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             fragment_sale_visit_spinner_from_customer.adapter = customerNameSpinnerAdapter
             fragment_sale_visit_spinner_to_customer.adapter = customerNameSpinnerAdapter
+            fragment_sale_visit_spinner_from_customer.onItemSelectedListener =
+                object : AdapterView.OnItemSelectedListener {
+                    override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
+                       fromId = p2
+                    }
+
+                    override fun onNothingSelected(p0: AdapterView<*>?) {
+                    }
+                }
+
+            fragment_sale_visit_spinner_to_customer.onItemSelectedListener =
+                object : AdapterView.OnItemSelectedListener {
+                    override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
+                        toId = p2
+                    }
+
+                    override fun onNothingSelected(p0: AdapterView<*>?) {
+                    }
+                }
 
         })
     }
+
+    private fun catchEvents() {
+        btn_sale_visit_search.setOnClickListener { setupAdapter() }
+    }
+
+    private fun setupAdapter() {
+        var saleVisitDataList = ArrayList<SaleVisitForUI>()
+        saleVisitDataList = getSaleVisitFromDB()
+        for (ip in saleVisitDataList) {
+            var index = -1
+            for (i in customerIdList.indices) {
+                if (ip.customerId == customerIdList[i]) {
+                    index = i
+                }
+            }
+
+            ip.customerName = customerNameList[index]
+            ip.customerNo = customerNextIdList[index]
+            ip.address = customerAddressList[index]
+        }
+        salesVisitHistoryReportAdapter.setNewList(saleVisitDataList)
+        saleVisitList.apply {
+            layoutManager = LinearLayoutManager(activity)
+            adapter = salesVisitHistoryReportAdapter
+        }
+    }
+
+    private fun getSaleVisitFromDB(): ArrayList<SaleVisitForUI> {
+        val visitedCustomerMap = HashMap<Int, SaleVisitForUI>()
+        val ipList = ArrayList<SaleVisitForUI>()
+        var fromCusNo = 0
+        var toCusNo = 0
+        val sdf = SimpleDateFormat("yyyy-MM-dd")
+        fromCusNo = customerIdList[fromId]
+        toCusNo = customerIdList[toId]
+
+            if (fragment_sale_visit_spinner_from_customer.selectedItemPosition > fragment_sale_visit_spinner_to_customer.selectedItemPosition) {
+                fromCusNo = customerIdList[fragment_sale_visit_spinner_to_customer.selectedItemPosition]
+                toCusNo = customerIdList[fragment_sale_visit_spinner_from_customer.selectedItemPosition]
+            }
+
+        salesVisitHistoryReportViewModel.customerIdCollection.observe(this, Observer {
+            for (i in it!!.invoiceCustomerId){
+                for (data in customerIdList.indices){
+                    if (!visitedCustomerMap.containsKey(customerIdList[data])){
+                        if (customerIdList[data] == i ) {
+                            val saleVisitForUI = SaleVisitForUI()
+                            saleVisitForUI.customerId = customerIdList[data]
+                            saleVisitForUI.invoiceDate = sdf.format(Date())
+                            saleVisitForUI.status = "Visited"
+                            saleVisitForUI.task = "Sale"
+                            visitedCustomerMap[i] = saleVisitForUI
+                        }
+                    }
+                    else {
+                        var saleStatus = ""
+                        if (visitedCustomerMap[customerIdList[data]]!!.task != "Sale" && customerIdList[data] == i) {
+                            saleStatus = "Sale, " + visitedCustomerMap[customerIdList[data]]!!.task
+                            visitedCustomerMap[customerIdList[data]]!!.task = saleStatus
+                        }
+                    }
+                }
+
+            }
+            for (i in it!!.preOrderCustomerId){
+                for (data in customerIdList.indices) {
+                    if (!visitedCustomerMap.containsKey(customerIdList[data])) {
+                        if (customerIdList[data] == i) {
+                            val saleVisitForUI = SaleVisitForUI()
+                            saleVisitForUI.customerId = customerIdList.get(i)
+                            saleVisitForUI.invoiceDate = sdf.format(Date())
+                            saleVisitForUI.status = "Visited"
+                            saleVisitForUI.task = "Order"
+                            visitedCustomerMap[i] = saleVisitForUI
+                        }
+                    } else {
+                        var saleStatus = ""
+                        if (visitedCustomerMap[customerIdList[data]]!!.task != "Order" && customerIdList[data] == i) {
+                            saleStatus = visitedCustomerMap[customerIdList[data]]!!.task + ", Order"
+                            visitedCustomerMap[customerIdList[data]]!!.task = saleStatus
+                        }
+                    }
+                }
+            }
+            for (i in it!!.deliveryUploadCustomerId){
+                for (data in customerIdList.indices) {
+                    if (!visitedCustomerMap.containsKey(customerIdList[data])) {
+                        if (customerIdList[data] == i) {
+                            val saleVisitForUI = SaleVisitForUI()
+                            saleVisitForUI.customerId = customerIdList[data]
+                            saleVisitForUI.invoiceDate = sdf.format(Date())
+                            saleVisitForUI.status = "Visited"
+                            saleVisitForUI.task = "Delivery"
+                            visitedCustomerMap[i] = saleVisitForUI
+                        }
+                    } else {
+                        var saleStatus = ""
+                        if (visitedCustomerMap[customerIdList[data]]!!.task != "Delivery" && customerIdList[data] == i) {
+                            saleStatus = visitedCustomerMap[customerIdList[data]]!!.task + ", Delivery"
+                            visitedCustomerMap[customerIdList[data]]!!.task = saleStatus
+                        }
+                    }
+                }
+            }
+            for ( i in it!!.saleReturnCustomerId){
+                for (data in customerIdList.indices) {
+                    if (!visitedCustomerMap.containsKey(customerIdList[data])) {
+                        if (customerIdList[data] == i) {
+                            val saleVisitForUI = SaleVisitForUI()
+                            saleVisitForUI.customerId = customerIdList[data]
+                            saleVisitForUI.invoiceDate = sdf.format(Date())
+                            saleVisitForUI.status = "Visited"
+                            saleVisitForUI.task = "Return"
+                            visitedCustomerMap[i] = saleVisitForUI
+                        }
+                    } else {
+                        var saleStatus = ""
+                        if (visitedCustomerMap[customerIdList[data]]!!.task != "Return" && customerIdList[data] == i) {
+                            saleStatus = visitedCustomerMap[customerIdList[data]]!!.task + ", Return"
+                            visitedCustomerMap[customerIdList[data]]!!.task = saleStatus
+                        }
+                    }
+                }
+            }
+
+            for (i in it!!.didCustomerFeedBackCustomerId){
+                for (data in customerIdList.indices) {
+                    if (!visitedCustomerMap.containsKey(customerIdList[data])) {
+                        if (customerIdList[i] == i) {
+                            val saleVisitForUI = SaleVisitForUI()
+                            saleVisitForUI.customerId = customerIdList[data]
+                            saleVisitForUI.invoiceDate = sdf.format(Date())
+                            saleVisitForUI.status = "Visited"
+                            saleVisitForUI.task = "Unsell"
+                            visitedCustomerMap[i] = saleVisitForUI
+                        }
+                    } else {
+                        var saleStatus = ""
+                        if (visitedCustomerMap[customerIdList[data]]!!.task != "Unsell" && customerIdList[data] == i) {
+                            saleStatus = visitedCustomerMap[customerIdList[data]]!!.task + ", Unsell"
+                            visitedCustomerMap[customerIdList[data]]!!.task = saleStatus
+                        }
+                    }
+                }
+            }
+        })
+        salesVisitHistoryReportViewModel.checkFromAndToCustomer(fromCusNo,toCusNo,sdf.format(Date()))
+
+        for (value in visitedCustomerMap.values) {
+            ipList.add(value)
+        }
+        return ipList
+    }
+
 
 }

@@ -62,12 +62,20 @@ class SaleInvoiceReportFragment : BaseFragment(), KodeinAware {
             chooseDob(2)
         }
         btn_sale_report_search.setOnClickListener {
-            saleInvoiceReportViewModel.saleInvoiceReportForDateList.observe(this, Observer {
-                saleInvoiceReportAdapter.setNewList(it as ArrayList<SaleInvoiceReport>)
-                saleInvoiceDataList = it!!
-                //Calculate and setText for total,discount and net amounts
-                calculateAmount(it)
-            })
+            when {
+                edit_text_sale_report_from_date.text.isEmpty() -> edit_text_sale_report_from_date.error = ""
+                edit_text_sale_report_to_date.text.isEmpty() -> edit_text_sale_report_to_date.error = ""
+                else -> {
+                    saleInvoiceReportViewModel.saleInvoiceReportForDateList.observe(this, Observer {
+                        saleInvoiceReportAdapter.setNewList(it as ArrayList<SaleInvoiceReport>)
+                        saleInvoiceDataList = it!!
+                        //Calculate and setText for total,discount and net amounts
+                        calculateAmount(it)
+                    })
+                    saleInvoiceReportViewModel.loadHistoryInvoiceForDateList("$fromDate", "$toDate")
+
+                }
+            }
         }
         btn_sale_report_clear.setOnClickListener {
             edit_text_sale_report_from_date.setText("")
@@ -133,7 +141,6 @@ class SaleInvoiceReportFragment : BaseFragment(), KodeinAware {
             adapter = saleInvoiceReportAdapter
         }
         saleInvoiceReportViewModel.loadSaleInvoiceList()
-        saleInvoiceReportViewModel.loadHistoryInvoiceForDateList("$fromDate", "$toDate")
         saleInvoiceReportViewModel.loadCustomer()
 
 
@@ -213,13 +220,7 @@ class SaleInvoiceReportFragment : BaseFragment(), KodeinAware {
                     toDate = sdf.format(myCalendar.time)
                 }
             }
-        val dateDialog = DatePickerDialog(
-            this.context!!,
-            datePicker,
-            myCalendar.get(Calendar.YEAR),
-            myCalendar.get(Calendar.MONTH),
-            myCalendar.get(Calendar.DAY_OF_MONTH)
-        )
+        val dateDialog = DatePickerDialog(this.context!!, datePicker, myCalendar.get(Calendar.YEAR), myCalendar.get(Calendar.MONTH), myCalendar.get(Calendar.DAY_OF_MONTH))
         dateDialog.show()
     }
 

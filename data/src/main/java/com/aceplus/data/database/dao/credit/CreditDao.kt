@@ -38,5 +38,8 @@ interface CreditDao {
    @Query("UPDATE credit SET pay_amount = pay_amount+:payAmt WHERE invoice_no=:invoiceNo")
    fun update(payAmt:Double,invoiceNo:String)
 
+    @Query("select * from credit where date(invoice_date) = date(:now)")
+    fun getCashReceiveListForEndOfDay(now:String):List<Credit>
+
 
 }

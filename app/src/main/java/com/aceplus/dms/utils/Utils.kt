@@ -28,6 +28,7 @@ import com.aceplus.domain.entity.promotion.Promotion
 import com.aceplus.domain.model.INVOICECANCEL
 import com.aceplus.domain.model.credit.CreditInvoice
 import com.aceplus.domain.model.forApi.ConfirmRequestSuccess
+import com.aceplus.domain.model.sale.SaleManDailyReport
 import com.aceplus.domain.vo.SoldProductInfo
 import com.aceplussolutions.rms.constants.AppUtils
 import com.google.gson.Gson
@@ -220,8 +221,7 @@ object Utils {
 //            activity.contentResolver,
 //            Settings.Secure.ANDROID_ID
 //        )
-        val telephonyManager =
-            activity.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+        val telephonyManager = activity.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
         return telephonyManager.imei
 
     }
@@ -786,5 +786,72 @@ object Utils {
         return false
 
     }
+    fun printForEndOfDayReport(activity: Activity, saleManDailyReport: SaleManDailyReport, mBTService: BluetoothService) {
+        try {
+            val printDataByteArray = convertFromListByteArrayTobyteArray(getPrintDataByteArrayListForDailyReport(activity, saleManDailyReport))
+            sendDataByte2BT(activity, mBTService, printDataByteArray)
+        } catch (e: UnsupportedEncodingException) {
+            e.printStackTrace()
+        }
+
+    }
+    private fun getPrintDataByteArrayListForDailyReport(activity:Activity, saleManDailyReport:SaleManDailyReport) :  List<ByteArray>{
+        val printDataByteArrayList = ArrayList<ByteArray>()
+        val decimalFormatterWithComma = DecimalFormat("###,##0")
+        printDataByteArrayList.add(("End of Day Report " + "\n\n").toByteArray())
+        printDataByteArrayList.add(("Sale Man :  " + saleManDailyReport.saleMan + "\n").toByteArray())
+        printDataByteArrayList.add(("Route :  " + saleManDailyReport.routeName + "\n").toByteArray())
+        printDataByteArrayList.add(("Date :  " + saleManDailyReport.date + "\n").toByteArray())
+        printDataByteArrayList.add(("Start Time :  " + saleManDailyReport.startTime + "\n").toByteArray())
+        printDataByteArrayList.add(("End Time :  " + saleManDailyReport.endTime + "\n").toByteArray())
+        printDataByteArrayList.add(("Total Sale :  " + decimalFormatterWithComma.format(saleManDailyReport.saleAmt) + "\n").toByteArray())
+        printDataByteArrayList.add(("Total Order Sales :  " + decimalFormatterWithComma.format(saleManDailyReport.orderAmt) + "\n").toByteArray())
+        printDataByteArrayList.add(("Total Exchange :  (" + decimalFormatterWithComma.format(saleManDailyReport.exchangeAmt) + ")\n").toByteArray())
+        printDataByteArrayList.add(("Total Return :  (" + decimalFormatterWithComma.format(saleManDailyReport.returnAmt) + ")\n").toByteArray())
+        printDataByteArrayList.add(("Total Cash Receipt :  " + decimalFormatterWithComma.format(saleManDailyReport.cashReceive) + "\n").toByteArray())
+        printDataByteArrayList.add(("Net Cash :  " + decimalFormatterWithComma.format(saleManDailyReport.netAmt) + "\n").toByteArray())
+        printDataByteArrayList.add(("Total Customer :  " + saleManDailyReport.customerCount + "\n").toByteArray())
+        printDataByteArrayList.add(("New Customer :  " + saleManDailyReport.newCustomer + "\n").toByteArray())
+        printDataByteArrayList.add(("Plan Customer :  " + saleManDailyReport.planCustomer + "\n").toByteArray())
+        printDataByteArrayList.add(("Total Sale Count :  " + saleManDailyReport.saleCount + "\n").toByteArray())
+        printDataByteArrayList.add(("Total Order Count :  " + saleManDailyReport.orderCount + "\n").toByteArray())
+        printDataByteArrayList.add(("Total Exchange Only :  " + saleManDailyReport.exchangeCount + "\n").toByteArray())
+        printDataByteArrayList.add(("Total Sale Return Only   :  " + saleManDailyReport.returnCount + "\n").toByteArray())
+        printDataByteArrayList.add(("Total Cash Receipt Count :  " + saleManDailyReport.cashReceiveCount + "\n").toByteArray())
+        printDataByteArrayList.add(("Not Visited Count        :  " + saleManDailyReport.notVisitCount + "\n").toByteArray())
+        printDataByteArrayList.add("\nSignature          :\n\n                 Thank You. \n\n".toByteArray())
+        printDataByteArrayList.add(byteArrayOf(0x1b, 0x64, 0x02)) // Cut
+        printDataByteArrayList.add(byteArrayOf(0x07)) // Kick cash drawer
+        return printDataByteArrayList
+    }
+
+    @Throws(UnsupportedEncodingException::class)
+    private fun convertFromListByteArrayTobyteArray(ByteArray: List<ByteArray>): ByteArray {
+        var dataLength = 0
+        for (i in ByteArray.indices) {
+            dataLength += ByteArray[i].size
+        }
+
+        var distPosition = 0
+        val byteArray = ByteArray(dataLength)
+        for (i in ByteArray.indices) {
+            System.arraycopy(ByteArray[i], 0, byteArray, distPosition, ByteArray[i].size)
+            distPosition += ByteArray[i].size
+        }
+
+        return byteArray
+    }
+
+    private fun sendDataByte2BT(mActivity: Activity, mService: BluetoothService, data: ByteArray) {
+        if (mService.state !== BluetoothService.STATE_CONNECTED) {
+            Toast.makeText(mActivity, "Not Connected", Toast.LENGTH_SHORT)
+                .show()
+            return
+        }
+        mService.write(data)
+        commonDialog("Success", mActivity, 0)
+
+    }
+
 
 }

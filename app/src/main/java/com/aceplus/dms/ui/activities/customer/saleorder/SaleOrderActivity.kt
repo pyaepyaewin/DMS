@@ -138,7 +138,6 @@ class SaleOrderActivity : BaseActivity(), KodeinAware {
         headerDiscount.visibility = View.GONE
         tableHeaderQty.visibility = View.GONE
         saleDateTextView.text = Utils.getCurrentDate(false)
-
         if (isDelivery){
             tableHeaderQty.visibility = View.VISIBLE
             searchAndSelectProductsLayout.visibility = View.GONE

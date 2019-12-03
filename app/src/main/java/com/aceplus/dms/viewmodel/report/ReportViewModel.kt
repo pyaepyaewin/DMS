@@ -3,12 +3,16 @@ package com.aceplus.dms.viewmodel.report
 import android.arch.lifecycle.MutableLiveData
 import android.util.Log
 import com.aceplus.domain.entity.customer.Customer
+import com.aceplus.domain.entity.delivery.Delivery
 import com.aceplus.domain.entity.delivery.DeliveryItemUpload
 import com.aceplus.domain.entity.invoice.Invoice
+import com.aceplus.domain.entity.preorder.PreOrder
 import com.aceplus.domain.entity.preorder.PreOrderProduct
 import com.aceplus.domain.entity.product.Product
 import com.aceplus.domain.entity.product.ProductCategory
 import com.aceplus.domain.entity.product.ProductGroup
+import com.aceplus.domain.entity.route.Route
+import com.aceplus.domain.entity.route.RouteScheduleV2
 import com.aceplus.domain.entity.sale.salereturn.SaleReturnDetail
 import com.aceplus.domain.entity.sale.saletarget.SaleTargetCustomer
 import com.aceplus.domain.entity.sale.saletarget.SaleTargetSaleMan
@@ -19,6 +23,7 @@ import com.kkk.githubpaging.network.rx.SchedulerProvider
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.math.abs
 
 class ReportViewModel(
     private val reportRepo: ReportRepo,
@@ -134,7 +139,6 @@ class ReportViewModel(
 
     //sale invoice report and sale exchange tab2
     var saleInvoiceReportList = MutableLiveData<List<SaleInvoiceReport>>()
-    var saleInvoiceReportSuccessState = MutableLiveData<Pair<List<SaleInvoiceReport>, List<Customer>>>()
     var saleInvoiceDetailReportSuccessState = MutableLiveData<List<SaleInvoiceDetailReport>>()
     var saleHistoryForPrintData = MutableLiveData<Invoice>()
     fun loadSaleInvoiceList() {
@@ -241,16 +245,16 @@ class ReportViewModel(
 
     }
     var saleCancelInvoiceReportForDateList = MutableLiveData<List<SalesCancelReport>>()
-//    fun loadSaleCancelInvoiceForDateList(fromDate: String, toDate: String) {
-//        launch {
-//            reportRepo.saleCancelReportForDate(fromDate, toDate)
-//                .subscribeOn(schedulerProvider.io())
-//                .observeOn(schedulerProvider.mainThread())
-//                .subscribe {
-//                    saleCancelInvoiceReportForDateList.postValue(it)
-//                }
-//        }
-//    }
+    fun loadSaleCancelInvoiceForDateList(fromDate: String, toDate: String) {
+        launch {
+            reportRepo.saleCancelReportForDate(fromDate, toDate)
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.mainThread())
+                .subscribe {
+                    saleCancelInvoiceReportForDateList.postValue(it)
+                }
+        }
+    }
 
     //sale order history report
     var salesOrderHistoryReportSuccessState = MutableLiveData<List<SalesOrderHistoryFullDataReport>>()
@@ -265,6 +269,18 @@ class ReportViewModel(
                 }
         }
 
+    }
+
+    var saleOrderHistoryDateFilterList = MutableLiveData<List<SalesOrderHistoryFullDataReport>>()
+    fun loadSaleOrderHistoryDateFilterList(fromDate: String, toDate: String) {
+        launch {
+            reportRepo.saleHistoryDateFilterList(fromDate, toDate)
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.mainThread())
+                .subscribe {
+                    saleOrderHistoryDateFilterList.postValue(it)
+                }
+        }
     }
 
     //sale return report
@@ -332,26 +348,55 @@ class ReportViewModel(
     }
 
     //sale visit history report
-    var salesVisitHistoryReportSuccessState = MutableLiveData<List<SalesVisitHistoryReport>>()
-
-    fun loadSalesVisitHistoryReport() {
+    val customerIdCollection = MutableLiveData<CustomerIdsForSaleVisit>()
+    fun checkFromAndToCustomer(fromCusNo: Int, toCusNo: Int, newDate: String){
+        val invoiceCustomerId = ArrayList<Int>()
+        val preOrderCustomerId = ArrayList<Int>()
+        val deliveryUploadCustomerId = ArrayList<Int>()
+        val saleReturnCustomerId = ArrayList<Int>()
+        val didCustomerFeedBackCustomerId = ArrayList<Int>()
         launch {
-            reportRepo.salesVisitHistoryReport()
+            reportRepo.invoiceCheckFromAndToCustomer(fromCusNo,toCusNo,newDate)
+                .flatMap {
+                    for ( i in it){
+                        invoiceCustomerId.add(i.customer_id!!.toInt())
+                    }
+                    return@flatMap reportRepo.preOrderCheckFromAndToCustomer(fromCusNo,toCusNo,newDate)
+                }
+                .flatMap {
+                    for ( i in it){
+                        preOrderCustomerId.add(i.customer_id!!.toInt())
+                    }
+                    reportRepo.deliveryUploadCheckFromAndToCustomer(fromCusNo,toCusNo,newDate)
+                }
+                .flatMap {
+                    for ( i in it){
+                        deliveryUploadCustomerId.add(i.customer_id)
+                    }
+                    reportRepo.saleReturnCheckFromAndToCustomer(fromCusNo,toCusNo,newDate)
+                }
+                .flatMap {
+                    for ( i in it){
+                        saleReturnCustomerId.add(i.customer_id)
+                    }
+                    reportRepo.didCustomerFeedbackCheckFromAndToCustomer(fromCusNo,toCusNo,newDate)
+                }
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.mainThread())
-                .subscribe({
-                    salesVisitHistoryReportSuccessState.postValue(it)
-                    Log.d("Testing", "$it")
-                }, {
-                    reportErrorState.value = it.localizedMessage
-                })
-        }
+                .subscribe {
+                    for ( i in it){
+                        didCustomerFeedBackCustomerId.add(i.customer_no)
+                    }
+                    val idCollection = CustomerIdsForSaleVisit(invoiceCustomerId,preOrderCustomerId,deliveryUploadCustomerId,saleReturnCustomerId,didCustomerFeedBackCustomerId)
+                    customerIdCollection.postValue(idCollection)
 
+                }
+        }
     }
+
 
     //unSell reason report
     var unSellReasonReportSuccessState = MutableLiveData<List<UnsellReasonReport>>()
-
     fun loadUnSellReasonReport() {
         launch {
             reportRepo.unSellReasonReport()
@@ -604,114 +649,147 @@ class ReportViewModel(
 
     //end of day report
     var endOfDayReportData = MutableLiveData<EndOfDayReport>()
-
-    fun loadEndOFDayReport() {
-        var userName = ""
-        var routeName = ""
-        var startTime = ""
-        var endTime = ""
-        var totalSaleAmount = 0.0
-        var totalSaleOrderAmount = 0.0
-        var totalSaleExchangeAmount = 0.0
-        var totalSaleCashAmount = 0.0
-        var totalSaleNetCashAmount = 0.0
-        var totalSaleReturnAmount = 0.0
-        var totalSales = ""
-        var totalSalesOrder = ""
-        var totalExchange = ""
-        var totalReturn  = ""
-        var totalCashReceive = ""
-        var netCash =""
-        var totalCustomer = ""
-        var newCustomer = ""
-        var planCustomer = ""
-        var totalSalesCount = ""
-        var totalOrderCount = ""
-        var totalSalesExchangeOnly = ""
-        var totalSalesReturnOnly = ""
-        var totalCashReceiptCount = ""
-        var notVisitedCount = ""
+    fun loadEndOFDayReport(now:String) {
+        var totalPayAmt = 0.0
+        var saleReturnCount = 0
+        var saleExchangeCount = 0
+        var totalCashAmount = 0.0
+        var totalCashCount = 0
+        var totalSaleCount = 0
+        var customerCount = 0
+        var newCustomerCount = 0
+        var planCustomerCount = 0
+        var notVisitCount = 0
+        var saleDate = ""
+        var preOrderList = ArrayList<PreOrder>()
+        var amtArr = arrayOf(0.0, 0.0)
+        val customerIdList = ArrayList<Int>()
+        //Time pattern of input time
+        val df = SimpleDateFormat("HH:mm:ss")
+        //Time pattern of desired output time
+        val outputformat = SimpleDateFormat("hh:mm:ss aa")
+        var date: Date? = null
+        var output: String = ""
         launch {
-            reportRepo.getSaleManNameList()
+            reportRepo.getTotalSaleList(now)
                 .flatMap {
-                    for (i in it) {
-                        userName = i.user_name!!
+                    for (i in it!!){
+                        totalPayAmt += i.paid_amount!!.toDouble()
                     }
+                    return@flatMap reportRepo.getInvoiceListForEndOfDay(now)
+                }
+                .flatMap {
+                    for (i in it){
+                        if (i.pay_amount!!.toDouble() > 0.0){
+                            if (i.pay_amount!!.isEmpty()) i.pay_amount = "0.0"
+                            if (i.refund_amount!!.isEmpty()) i.refund_amount = "0.0"
+                            totalPayAmt += (i.pay_amount!!.toDouble() - i.refund_amount!!.toDouble())
+                        }
+                    }
+                    return@flatMap reportRepo.getPreOrderListForEndOfDay(now)
 
-                    return@flatMap reportRepo.getSaleManRouteNameList()
                 }
                 .flatMap {
-                    for (i in it) {
-                        routeName = i.route_name!!
-                    }
-                    return@flatMap reportRepo.getStartTimeAndEndTimeList()
+                    preOrderList = it as ArrayList<PreOrder>
+                    return@flatMap reportRepo.getSaleReturnListForEndOfDay(now)
                 }
                 .flatMap {
-                    for (i in it) {
-                        startTime = i.start_time!!
-                        endTime = i.end_time!!
+                    saleReturnCount = it.size
+                    for (i in it){
+                        amtArr += i.pay_amount
                     }
-                    return@flatMap reportRepo.getAllInvoiceData()
+                    return@flatMap reportRepo.getSaleExchangeListForEndOfDay(now)
                 }
                 .flatMap {
-                    for (i in it) {
-                        totalSaleAmount += i.total_amount!!.toDouble()
-                        totalSales = totalSaleAmount.toString()
-                        totalSaleExchangeAmount += i.pay_amount!!.toDouble()
-                        totalExchange = totalSaleExchangeAmount.toString()
-                        totalSalesCount = it.size.toString()
+                    saleExchangeCount = it.size
+                    for (i in it){
+                        if (i.pay_amount!!.toDouble() > 0.0){
+                            i.pay_amount = abs(i.pay_amount!!.toDouble()).toString()
+                            amtArr[1] += i.pay_amount!!.toDouble()
+                        }
                     }
+                    return@flatMap reportRepo.getCashReceiveListForEndOfDay(now)
+                }
+                .flatMap {
+                    totalCashCount = it.size
+                    for (i in it){
+                        totalCashAmount += i.pay_amount
+                    }
+                    return@flatMap reportRepo.getSaleCountForEndOfDay(now)
+                }
+                .flatMap {
+                    totalSaleCount = it.size
                     return@flatMap reportRepo.getAllCustomerData()
                 }
                 .flatMap {
-                    totalCustomer = it.size.toString()
+                    customerCount = it.size
+                    for (i in it){
+                        customerIdList.add(i.id)
+                    }
+                    return@flatMap reportRepo.getDataNotVisitedCountList()
+                }
+                .flatMap {
+                    for (one in it){
+                        if (one.customer_id != null) {
+                            for (i in customerIdList.indices) {
+                                if (one.customer_id == customerIdList[i]) {
+                                    customerIdList.removeAt(i)
+                                    break
+                                }
+                            }
+
+                        }
+                    }
+                    notVisitCount = customerIdList.size
                     return@flatMap reportRepo.getDataForNewCustomerList()
                 }
+
                 .flatMap {
-                    newCustomer = it.size.toString()
-                    return@flatMap reportRepo.getTotalSaleOrderList()
-                }
-                .flatMap {
-                    for (i in it) {
-                        totalSaleOrderAmount += i.net_amount!!.toDouble()
-                        totalSalesOrder = totalSaleOrderAmount.toString()
-                        totalOrderCount = it.size.toString()
-                    }
-                    return@flatMap reportRepo.getTotalSaleExchangeList()
-                }
-                .flatMap {
-                    totalSalesExchangeOnly = it.size.toString()
-                    return@flatMap reportRepo.getTotalSaleReturnList()
-                }
-                .flatMap {
-                    for (i in it) {
-                        totalSaleReturnAmount += i.pay_amount
-                        totalReturn = totalSaleReturnAmount.toString()
-                        totalSalesReturnOnly = it.size.toString()
-                    }
-                    return@flatMap reportRepo.getTotalCashReceiptList()
-                }
-                .flatMap {
-                    for (i in it) {
-                        totalSaleCashAmount += i.pay_amount
-                        totalCashReceive = totalSaleCashAmount.toString()
-                        totalSaleNetCashAmount += i.pay_amount
-                        netCash = totalSaleNetCashAmount.toString()
-                        totalCashReceiptCount = it.size.toString()
-                    }
+                    newCustomerCount = it.size
                     return@flatMap reportRepo.getPlanCustomerList()
                 }
                 .flatMap {
-                    planCustomer = it.size.toString()
-                    return@flatMap reportRepo.getDataNotVisitedCountList()
+                    planCustomerCount = it.size
+                    return@flatMap reportRepo.getStartTime(now)
                 }
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.mainThread())
-                .subscribe {
-                    notVisitedCount = it.size.toString()
-                    val allData = EndOfDayReport(userName, routeName, startTime, endTime, totalSales, totalSalesOrder, totalExchange, totalReturn, totalCashReceive, netCash, totalCustomer, newCustomer, planCustomer, totalSalesCount, totalOrderCount, totalSalesExchangeOnly, totalSalesReturnOnly, totalCashReceiptCount, notVisitedCount)
+                .subscribe{
+                    for (i in it){
+                        try {
+                            saleDate = df.format(i.sale_date)
+                            date = df.parse(saleDate)
+                            output = outputformat.format(date)
+                        }catch (e:Exception) {
+                            Log.d("error conversion", e.toString())
+                        }
+                    }
+                    val allData = EndOfDayReport(totalPayAmt,preOrderList,amtArr,saleReturnCount,saleExchangeCount,totalCashAmount,totalCashCount,totalSaleCount,customerCount,newCustomerCount,planCustomerCount,notVisitCount,output)
                     endOfDayReportData.postValue(allData)
                 }
+        }
+
+    }
+
+    var routeNameForEndOfDayReport = MutableLiveData<List<Route>>()
+    fun loadRouteNameForEndOfDayReport(saleManId:String){
+        launch {
+            reportRepo.getRouteNameForEndOfDayReport(saleManId)
+                .flatMap {
+                    var routeId = 0
+                    if (it.count() > 0){
+                        for (i in it) {
+                            routeId = i.route_id.toInt()
+                        }
+                    }
+                    return@flatMap reportRepo.getSaleManRouteNameList(routeId)
+                }
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.mainThread())
+                .subscribe{
+                    routeNameForEndOfDayReport.postValue(it)
+                }
+
         }
     }
 
@@ -720,6 +798,13 @@ class ReportViewModel(
         val format = SimpleDateFormat("yyyy-MM-dd")
         return format.format(currentDate)
     }
+
+    fun setEndTime(): String {
+        val currentDate = Calendar.getInstance().time
+        val format = SimpleDateFormat("h:mm a")
+        return format.format(currentDate)
+    }
+
 
     //spinner data
     var customerDataList = MutableLiveData<List<Customer>>()

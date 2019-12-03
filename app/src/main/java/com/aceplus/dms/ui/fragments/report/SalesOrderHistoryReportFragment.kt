@@ -30,8 +30,8 @@ import kotlin.math.roundToInt
 class SalesOrderHistoryReportFragment : BaseFragment(), KodeinAware {
     override val kodein: Kodein by kodein()
     private var myCalendar = Calendar.getInstance()
-    private lateinit var fromDate: Date
-    private lateinit var toDate: Date
+    private var fromDate: String? = null
+    private var toDate: String? = null
     var saleOrderHistoryDataList: List<SalesOrderHistoryReport> = listOf()
     private val salesOrderHistoryReportAdapter: SalesOrderHistoryReportAdapter by lazy { SalesOrderHistoryReportAdapter(this::onClickItem) }
     private val preOrderDetailReportAdapter: PreOrderDetailReportAdapter by lazy { PreOrderDetailReportAdapter() }
@@ -53,7 +53,27 @@ class SalesOrderHistoryReportFragment : BaseFragment(), KodeinAware {
         edit_text_sale_report_to_date.setOnClickListener {
             chooseDob(2)
         }
-        btn_sale_report_search.setOnClickListener { }
+        btn_sale_report_search.setOnClickListener {
+            when {
+                edit_text_sale_report_from_date.text.isEmpty() -> edit_text_sale_report_from_date.error = ""
+                edit_text_sale_report_to_date.text.isEmpty() -> edit_text_sale_report_to_date.error = ""
+                else -> {
+                    salesOrderHistoryReportViewModel.saleOrderHistoryDateFilterList.observe(this, Observer {
+                        val saleOrderHistoryReportList = arrayListOf<SalesOrderHistoryReport>()
+                        for (i in it!!) {
+                            val netAmount = i.netAmount.toDouble() - i.advancePaymentAmount.toDouble() - i.discount.toDouble()
+                            val saleOrderHistoryReport = SalesOrderHistoryReport(i.invoiceId, i.customerName, i.address, i.netAmount, i.discount, i.advancePaymentAmount, netAmount.toString())
+                            saleOrderHistoryReportList.add(saleOrderHistoryReport)
+                        }
+                        salesOrderHistoryReportAdapter.setNewList(saleOrderHistoryReportList)
+                        //Calculate and setText for total,discount and net amounts
+                        calculateAmount(saleOrderHistoryDataList)
+                    })
+                    salesOrderHistoryReportViewModel.loadSaleOrderHistoryDateFilterList(fromDate!!, toDate!!)
+
+                }
+            }
+        }
         btn_sale_report_clear.setOnClickListener {
             edit_text_sale_report_from_date.setText("")
             edit_text_sale_report_from_date.error = null
@@ -67,12 +87,11 @@ class SalesOrderHistoryReportFragment : BaseFragment(), KodeinAware {
         salesOrderHistoryReportViewModel.salesOrderHistoryReportSuccessState.observe(this, Observer {
                 val saleOrderHistoryReportList = arrayListOf<SalesOrderHistoryReport>()
                 for (i in it!!) {
-                    val netAmunt = i.netAmount.toDouble() - i.advancePaymentAmount.toDouble() - i.discount.toDouble()
-                    val saleOrderHistoryReport = SalesOrderHistoryReport(i.invoiceId, i.customerName, i.address, i.netAmount, i.discount, i.advancePaymentAmount, netAmunt.toString())
+                    val netAmount = i.netAmount.toDouble() - i.advancePaymentAmount.toDouble() - i.discount.toDouble()
+                    val saleOrderHistoryReport = SalesOrderHistoryReport(i.invoiceId, i.customerName, i.address, i.netAmount, i.discount, i.advancePaymentAmount, netAmount.toString())
                     saleOrderHistoryReportList.add(saleOrderHistoryReport)
                 }
                 salesOrderHistoryReportAdapter.setNewList(saleOrderHistoryReportList)
-                saleOrderHistoryDataList = saleOrderHistoryReportList
             //Calculate and setText for total,discount and net amounts
                 calculateAmount(saleOrderHistoryReportList)
         })
@@ -168,7 +187,7 @@ class SalesOrderHistoryReportFragment : BaseFragment(), KodeinAware {
     }
 
     private fun chooseDob(choice: Int) {
-        val sdf = SimpleDateFormat("yyyy/MM/dd")
+        val sdf = SimpleDateFormat("yyyy-MM-dd")
         val datePicker =
             DatePickerDialog.OnDateSetListener { _, year, monthOfYear, dayOfMonth ->
                 myCalendar.set(Calendar.YEAR, year)
@@ -177,10 +196,10 @@ class SalesOrderHistoryReportFragment : BaseFragment(), KodeinAware {
 
                 if (choice == 1) {
                     edit_text_sale_report_from_date.setText(sdf.format(myCalendar.time))
-                    fromDate = myCalendar.time
+                    fromDate = sdf.format(myCalendar.time)
                 } else if (choice == 2) {
                     edit_text_sale_report_to_date.setText(sdf.format(myCalendar.time))
-                    toDate = myCalendar.time
+                    toDate = sdf.format(myCalendar.time)
                 }
             }
         val dateDialog = DatePickerDialog(

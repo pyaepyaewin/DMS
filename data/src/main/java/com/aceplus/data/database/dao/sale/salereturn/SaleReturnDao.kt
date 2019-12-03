@@ -53,4 +53,10 @@ interface SaleReturnDao {
     @Query("select sale_return_id,customer_name,address,return_date,pay_amount from  sale_return inner join customer on customer.id = sale_return.customer_id where sale_return.sale_return_id like 'SX%'")
     fun getSalesExchangeTab1(): List<SalesReturnQtyReport>
 
+    @Query("select * from sale_return WHERE  customer_id BETWEEN :fromCusNo AND :toCusNo and date(return_date) = date(:newDate)")
+    fun getSaleVisitForSaleReturn(fromCusNo: Int, toCusNo: Int, newDate: String): List<SaleReturn>
+
+    @Query("select * from sale_return where date(return_date) = date(:now) and sale_return_id like 'SR%'")
+    fun getSaleReturnListForEndOfDay(now: String): List<SaleReturn>?
+
 }
