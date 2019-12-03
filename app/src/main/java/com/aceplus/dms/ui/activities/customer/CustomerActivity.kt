@@ -11,7 +11,6 @@ import android.os.Bundle
 import android.support.v7.widget.GridLayoutManager
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
@@ -170,7 +169,7 @@ class CustomerActivity : BaseActivity(), KodeinAware {
 
         customerViewModel.dialogStatus.observe(this, Observer {
             if (it != null){
-                Utils.commonDialog(it!!, this, 2)
+                Utils.commonDialog(it, this, 2)
                 customerViewModel.dialogStatus.value = null
             }
         })

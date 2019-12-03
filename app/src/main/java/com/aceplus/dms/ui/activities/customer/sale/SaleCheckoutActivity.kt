@@ -1,7 +1,6 @@
 package com.aceplus.dms.ui.activities.customer.sale
 
 import android.app.Activity
-import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.content.Context
 import android.content.Intent
@@ -12,7 +11,6 @@ import android.text.TextWatcher
 import android.util.Log
 import android.view.View
 import android.view.WindowManager
-import android.widget.Toast
 import com.aceplus.data.utils.Constant
 import com.aceplus.dms.R
 import com.aceplus.dms.ui.activities.PrintInvoiceActivity
@@ -39,7 +37,6 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
 
     override val layoutId: Int
         get() = R.layout.activity_sale_checkout
-
 
     companion object{
 
@@ -93,7 +90,7 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
     private var salePersonId: String? = null
     private var invoice: Invoice? = null
     private var totalVolumeDiscount: Double = 0.0
-    private var totalVolumeDiscountPercent:Double = 0.0
+    private var totalVolumeDiscountPercent: Double = 0.0
     private var totalDiscountAmount:Double = 0.0
     private var volDisPercent: Double = 0.0
     private var volDisAmount:Double = 0.0
@@ -111,9 +108,6 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
         setupUI()
         initializeData()
         catchEvents()
-
-        checkoutSoldProductListAdapter.setNewList(soldProductList)
-        setPromotionProductList()
 
     }
 
@@ -135,11 +129,14 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
         tax_layout.visibility = View.VISIBLE
         tableHeaderDiscount.text = "Promotion Price"
 
+        saleExchangeLayout.visibility = if (isSaleExchange) View.VISIBLE else View.GONE
+        payAmount.isEnabled = !isSaleExchange
+
         rvSoldProductList.adapter = checkoutSoldProductListAdapter
         rvSoldProductList.layoutManager = LinearLayoutManager(this)
 
-        saleExchangeLayout.visibility = if (isSaleExchange) View.VISIBLE else View.GONE
-        payAmount.isEnabled = !isSaleExchange
+        checkoutSoldProductListAdapter.setNewList(soldProductList)
+        setPromotionProductList()
 
     }
 
@@ -258,7 +255,7 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
         totalAmount = total
         netAmount = total
         tvTotalAmount.text = Utils.formatAmount(total)
-        tvNetAmount.text = total.toString()
+        tvNetAmount.text = Utils.formatAmount(total)
     }
 
     private fun calculateDiscPercentToAmt(){

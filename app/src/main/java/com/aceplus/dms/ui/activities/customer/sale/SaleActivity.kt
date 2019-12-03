@@ -75,12 +75,13 @@ class SaleActivity : BaseActivity(), KodeinAware {
     private var isSaleExchange: Boolean = false
     private var promotionList: ArrayList<Promotion> = ArrayList()
     private val promotionGiftByClassDis: ArrayList<Int> = ArrayList()
-    private val percentCategoryClassId: HashMap<String, Integer> = HashMap()
-    private val giftCategoryClassId: HashMap<String, Integer> = HashMap()
+    private val percentCategoryClassId: HashMap<String, Int> = HashMap()
+    private val giftCategoryClassId: HashMap<String, Int> = HashMap()
     private val percentAmount: HashMap<String, Double> = HashMap()
     private val giftAmount: HashMap<String, Double> = HashMap()
     private var saleReturnAmount: Double = 0.0
     private var saleReturnInvoiceNo: String? = null
+    private var netAmount: Double = 0.0
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -144,13 +145,6 @@ class SaleActivity : BaseActivity(), KodeinAware {
                 ?: Utils.commonDialog("No issued product", this, 2)
         })
 
-        /*saleViewModel.updatedSoldProduct.observe(this, Observer {
-            if (it != null){
-                mSoldProductListAdapter.updateList(it.first, it.second)
-            }
-        })*/
-        // Remove if it's possible - decide later
-
         saleViewModel.promotionList.observe(this, Observer {
             if (it != null){
                 this.promotionList = it
@@ -162,6 +156,7 @@ class SaleActivity : BaseActivity(), KodeinAware {
             if (it != null){
                 mSoldProductListAdapter.setNewList(it.first)
                 tvNetAmount.text = Utils.formatAmount(it.second)
+                netAmount = it.second
                 saleViewModel.calculatedSoldProductList.value = null
             }
         })
@@ -230,46 +225,43 @@ class SaleActivity : BaseActivity(), KodeinAware {
             .setMessage("Are you sure you want to delete ${soldProduct.product.product_name}?")
             .setPositiveButton("Yes") { arg0, arg1 ->
 
-                for (i in duplicateProductList.indices){
-                    if (duplicateProductList[i].product_id == soldProduct.product.product_id){
-                        duplicateProductList.removeAt(i)
-                        break
-                    }
+                if (duplicateProductList.contains(soldProduct.product)){
+                    duplicateProductList.remove(soldProduct.product)
                 }
 
                 if (soldProduct.quantity != 0){
 
-                if(saleViewModel.totalQtyForGiftWithProduct1.containsKey(soldProduct.product.class_id)){
-                    val tempQty = saleViewModel.totalQtyForGiftWithProduct1[soldProduct.product.class_id]
-                    saleViewModel.totalQtyForGiftWithProduct1[soldProduct.product.class_id!!] = tempQty!! - soldProduct.quantity
-                    val amt = saleViewModel.totalAmtForGiftWithProduct1[soldProduct.product.class_id!!]
-                    saleViewModel.totalAmtForGiftWithProduct1[soldProduct.product.class_id!!] = amt!! - soldProduct.product.selling_price!!.toDouble()
-                    saleViewModel.totalQtyForGiftWithProduct1.remove(soldProduct.product.class_id!!)
-                    saleViewModel.totalAmtForGiftWithProduct1.remove(soldProduct.product.class_id!!)
-                }
-
-                if (saleViewModel.totalQtyForGiftWithProduct.containsKey(soldProduct.product.class_id)){
-                    val tempQty = saleViewModel.totalQtyForGiftWithProduct[soldProduct.product.class_id]
-                    saleViewModel.totalQtyForGiftWithProduct[soldProduct.product.class_id!!] = tempQty!! - soldProduct.quantity
-                }
-
-                if (saleViewModel.productItemForGift.contains(soldProduct.product.product_name)){
-                    saleViewModel.productItemForGift.remove(soldProduct.product.product_name)
-                }
-
-                if (promotionList.size > 0){
-                    try {
-                        for (promotion in promotionList){
-                            // ToDo - remove promotion if same class id is founded
-                            //ToDo - To check promoPlanID and classID not found in Promotion class
-                        }
-                    } catch (exception: ConcurrentModificationException1){
-                        exception.printStackTrace()
+                    if(saleViewModel.totalQtyForGiftWithProduct1.containsKey(soldProduct.product.class_id)){
+                        val tempQty = saleViewModel.totalQtyForGiftWithProduct1[soldProduct.product.class_id]
+                        saleViewModel.totalQtyForGiftWithProduct1[soldProduct.product.class_id!!] = tempQty!! - soldProduct.quantity
+                        val amt = saleViewModel.totalAmtForGiftWithProduct1[soldProduct.product.class_id!!]
+                        saleViewModel.totalAmtForGiftWithProduct1[soldProduct.product.class_id!!] = amt!! - soldProduct.product.selling_price!!.toDouble()
+                        saleViewModel.totalQtyForGiftWithProduct1.remove(soldProduct.product.class_id!!)
+                        saleViewModel.totalAmtForGiftWithProduct1.remove(soldProduct.product.class_id!!)
                     }
-                    updatePromotionProductList()
-                }
 
-            }
+                    if (saleViewModel.totalQtyForGiftWithProduct.containsKey(soldProduct.product.class_id)){
+                        val tempQty = saleViewModel.totalQtyForGiftWithProduct[soldProduct.product.class_id]
+                        saleViewModel.totalQtyForGiftWithProduct[soldProduct.product.class_id!!] = tempQty!! - soldProduct.quantity
+                    }
+
+                    if (saleViewModel.productItemForGift.contains(soldProduct.product.product_name)){
+                        saleViewModel.productItemForGift.remove(soldProduct.product.product_name)
+                    }
+
+                    if (promotionList.size > 0){
+                        try {
+                            for (promotion in promotionList){
+                                // ToDo - remove promotion if same class id is founded
+                                //ToDo - To check promoPlanID and classID not found in Promotion class
+                            }
+                        } catch (exception: ConcurrentModificationException1){
+                            exception.printStackTrace()
+                        }
+                        updatePromotionProductList()
+                    }
+
+                } //For class discount
 
                 val oldList = mSoldProductListAdapter.getDataList() as ArrayList
                 oldList.remove(soldProduct)
@@ -299,7 +291,7 @@ class SaleActivity : BaseActivity(), KodeinAware {
 
     private fun onClickQtyButton(soldProduct: SoldProductInfo, position: Int){
 
-        val layoutInflater = this@SaleActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        val layoutInflater = getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         val view = layoutInflater.inflate(R.layout.dialog_box_sale_quantity, null)
 
         val remainingQtyTextView = view.findViewById(R.id.availableQuantity) as TextView
@@ -309,7 +301,16 @@ class SaleActivity : BaseActivity(), KodeinAware {
         val alertDialog = AlertDialog.Builder(this@SaleActivity)
             .setView(view)
             .setTitle("Sale Quantity")
-            .setPositiveButton("Confirm") { arg0, arg1 ->
+            .setPositiveButton("Confirm", null)
+            .setNegativeButton("Cancel", null)
+            .create()
+
+        alertDialog.setOnShowListener {
+
+            remainingQtyTextView.text = soldProduct.product.remaining_quantity.toString()
+
+            val confirmButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
+            confirmButton.setOnClickListener {
 
                 if (quantityEditText.text.toString().isBlank()) {
                     messageTextView.text = "You must specify quantity."
@@ -330,15 +331,12 @@ class SaleActivity : BaseActivity(), KodeinAware {
                     val newList = mSoldProductListAdapter.getDataList() as ArrayList
                     newList[position] = soldProduct
                     saleViewModel.calculateSoldProductData(newList, this.promotionList)
+                    alertDialog.dismiss()
 
                 }
 
             }
-            .setNegativeButton("Cancel", null)
-            .create()
 
-        alertDialog.setOnShowListener {
-            remainingQtyTextView.text = soldProduct.product.remaining_quantity.toString()
         }
 
         alertDialog.show()
@@ -347,33 +345,18 @@ class SaleActivity : BaseActivity(), KodeinAware {
 
     private fun onClickFocButton(soldProduct: SoldProductInfo, position: Int){
 
-        val layoutInflater = this@SaleActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        val layoutInflater = getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         val view = layoutInflater.inflate(R.layout.dialog_box_sale_foc, null)
 
         val radioFocPercent: RadioButton = view.findViewById(R.id.radioPrecent)
         val radioFocAmount: RadioButton = view.findViewById(R.id.radioAmount)
         val focVolume: EditText = view.findViewById(R.id.focPercent)
+        val messageTextView = view.findViewById(R.id.message) as TextView
 
         val alertDialog = AlertDialog.Builder(this@SaleActivity)
             .setView(view)
             .setTitle("FOC percent or Amount")
-            .setPositiveButton("Confirm") { arg0, arg1 ->
-
-                if (radioFocPercent.isChecked){
-                    soldProduct.focPercent = if (focVolume.text.isNotBlank()) focVolume.text.toString().toDouble() else 0.0
-                    soldProduct.setFocType(true)
-                } else{
-                    soldProduct.focAmount = if (focVolume.text.isNotBlank()) focVolume.text.toString().toDouble() else 0.0
-                    soldProduct.setFocType(false)
-                }
-
-                val newList = mSoldProductListAdapter.getDataList() as ArrayList
-                newList[position] = soldProduct
-                saleViewModel.calculateSoldProductData(newList, this.promotionList)
-
-                //saleViewModel.calculateSoldProductData(false, soldProduct, mSoldProductListAdapter.getDataList() as ArrayList, this.promotionList, position)
-
-            }
+            .setPositiveButton("Confirm",null)
             .setNegativeButton("Cancel", null)
             .create()
 
@@ -388,6 +371,43 @@ class SaleActivity : BaseActivity(), KodeinAware {
                 focVolume.setText(soldProduct.focAmount.toString())
             }
             focVolume.selectAll()
+
+            val confirmButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
+            confirmButton.setOnClickListener {
+
+                var inputCorrect = false
+                val input = if (focVolume.text.isNotBlank()) focVolume.text.toString().toDouble() else 0.0
+
+                if (radioFocPercent.isChecked){
+
+                    if (input <= 100){
+                        soldProduct.focPercent = input
+                        inputCorrect = true
+                        soldProduct.setFocType(true) //true - is Percent
+                    }
+                    else messageTextView.text = "Percentage mustn't greater than 100!"
+
+                } else{
+
+                    if (input <= soldProduct.product.selling_price?.toDouble() ?: 0.0){
+                        soldProduct.focAmount = input
+                        inputCorrect = true
+                        soldProduct.setFocType(false) //false - is not Percent
+                    }
+                    else messageTextView.text = "Discount amount mustn't greater than price!"
+
+                }
+
+                if (inputCorrect){
+                    val newList = mSoldProductListAdapter.getDataList() as ArrayList
+                    newList[position] = soldProduct
+                    saleViewModel.calculateSoldProductData(newList, this.promotionList)
+                    //saleViewModel.calculateSoldProductData(false, soldProduct, mSoldProductListAdapter.getDataList() as ArrayList, this.promotionList, position)
+                    alertDialog.dismiss()
+                }
+                else focVolume.selectAll()
+
+            }
 
         }
 
@@ -406,13 +426,12 @@ class SaleActivity : BaseActivity(), KodeinAware {
             return
         }
 
-        if (tvNetAmount.text == "0" || tvNetAmount.text == "0.0") {
+        if (netAmount <= 0.0) {
             AlertDialog.Builder(this@SaleActivity)
                 .setTitle("Alert")
                 .setMessage("Net amount should be more than zero.")
                 .setPositiveButton("OK", null)
                 .show()
-
             return
         }
 
@@ -442,13 +461,13 @@ class SaleActivity : BaseActivity(), KodeinAware {
 
                 if (soldProduct.quantity == 0){
                     AlertDialog.Builder(this@SaleActivity)
-                        .setTitle("Alert")
+                        .setTitle("Alert!")
                         .setMessage("Quantity must not be zero.")
                         .setPositiveButton("OK", null)
                         .show()
                     return false
                 } else{
-                    val stockId = soldProduct.product.id // Need to check stock id or ID
+                    val stockId = soldProduct.product.id
                     val tempStockId = product.id
                     if (stockId == tempStockId){
                         val isFoc = soldProduct.isFocIsChecked
@@ -462,7 +481,7 @@ class SaleActivity : BaseActivity(), KodeinAware {
             val freq = Collections.frequency(arrList, "T")
             if (freq == 2 || freq == 0){
                 AlertDialog.Builder(this@SaleActivity)
-                    .setTitle("Alert")
+                    .setTitle("Alert!")
                     .setMessage("Need to enable one of FOC in the same product: ${product.product_name}")
                     .setPositiveButton("OK", null)
                     .show()

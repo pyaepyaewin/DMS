@@ -54,9 +54,9 @@ class SaleCheckoutViewModel(
         var amountAndPercentage: MutableMap<String, Double> = mutableMapOf()
         var sameCategoryProducts: ArrayList<SoldProductInfo> = ArrayList()
 
-        var exclude: Int? = 0
-        var volDisFilterId = 0
-        var soldPrice = 0.0
+        var exclude: Int?
+        var volDisFilterId: Int
+        var soldPrice: Double
         var totalBuyAmtInclude = 0.0
         var totalBuyAmtExclude = 0.0
         var discountPercent = 0.0
@@ -76,34 +76,19 @@ class SaleCheckoutViewModel(
                         volDisFilterId = i.id
                         exclude = i.exclude?.toInt()
 
-                        for (soldProduct in soldProductList) {
-
-                            var categoryProduct: String? = null
-                            var category: String? = null
-
-                            customerVisitRepo.getProductByID(soldProduct.product.id)
-                                .subscribeOn(schedulerProvider.io())
-                                .observeOn(schedulerProvider.mainThread())
-                                .subscribe { productList ->
-                                    for (p in productList) {
-                                        categoryProduct = p.category_id
+                        customerVisitRepo.getVolumeDiscountFilterItem(volDisFilterId)
+                            .subscribeOn(schedulerProvider.io())
+                            .observeOn(schedulerProvider.mainThread())
+                            .subscribe { volumeDiscFilterItemList ->
+                                for (v in volumeDiscFilterItemList) {
+                                    for (soldProduct in soldProductList){
+                                        if (v.category_id == soldProduct.product.category_id)
+                                            sameCategoryProducts.add(soldProduct)
                                     }
                                 }
+                            }
 
-                            customerVisitRepo.getVolumeDiscountFilterItem(volDisFilterId)
-                                .subscribeOn(schedulerProvider.io())
-                                .observeOn(schedulerProvider.mainThread())
-                                .subscribe { volumeDiscFilterItemList ->
-                                    for (v in volumeDiscFilterItemList) {
-                                        category = v.category_id
-                                    }
-                                }
-
-                            if (category == categoryProduct)
-                                sameCategoryProducts.add(soldProduct)
-
-                        }
-
+                        //Need to fix
                         for (aSameCategoryProduct in sameCategoryProducts) {
 
                             soldPrice = if (aSameCategoryProduct.promotionPrice == 0.0) {
@@ -188,11 +173,7 @@ class SaleCheckoutViewModel(
 
                     }
 
-                    return@flatMap customerVisitRepo.getVolumeDiscountByDate(
-                        Utils.getCurrentDate(
-                            true
-                        )
-                    )
+                    return@flatMap customerVisitRepo.getVolumeDiscountByDate(Utils.getCurrentDate(true))
                 }
                 .flatMap {
 

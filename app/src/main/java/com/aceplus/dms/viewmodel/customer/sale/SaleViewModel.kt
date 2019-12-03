@@ -18,7 +18,6 @@ class SaleViewModel(
 
     var productDataList = MutableLiveData<Pair<List<Product>, List<String>>>()
     var promotionList = MutableLiveData<ArrayList<Promotion>>()
-    var updatedSoldProduct = MutableLiveData<Pair<SoldProductInfo, Int>>()
     var calculatedSoldProductList = MutableLiveData<Pair<ArrayList<SoldProductInfo>, Double>>()
 
     private var mapGift: HashMap<Int, ArrayList<Int>> = HashMap()
@@ -26,6 +25,7 @@ class SaleViewModel(
     private var tempSoldProductList: ArrayList<SoldProductInfo> = ArrayList()
     private var tempPromotionList: ArrayList<Promotion> = ArrayList()
     private var totalQuantityByCategoryItem = 0
+
     var percentTotalCount: ArrayList<String> = ArrayList()
     var giftTotalCount: ArrayList<String> = ArrayList()
     var productItemForGift = ArrayList<String>()
