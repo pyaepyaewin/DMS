@@ -73,6 +73,10 @@ class SaleCancelCheckOutViewModel(
         saleCancelRepo.deleteInvoiceProductForLongClick(invoiceId, productIdList)
     }
 
+    fun updateProductRemainingQuantity(soldProductInfo: SoldProductInfo) {
+        saleCancelRepo.updateProductRemainingQtyForSaleCancel(soldProductInfo)
+    }
+
     @SuppressLint("CheckResult")
     fun saveCheckoutData(
         id: String,
@@ -103,6 +107,7 @@ class SaleCancelCheckOutViewModel(
         val invoiceList: MutableList<Invoice> = mutableListOf()
 
         for (soldProduct in soldProductList) {
+
             val invoiceDetail = InvoiceDetail()
             invoiceDetail.tsaleId = invoiceId
             invoiceDetail.productId = soldProduct.product.id
@@ -113,14 +118,15 @@ class SaleCancelCheckOutViewModel(
             invoiceDetail.s_price = soldProduct.product.selling_price!!.toDouble()
             invoiceDetail.p_price = soldProduct.product.purchase_price!!.toDouble()
             invoiceDetail.promotionPrice = soldProduct.promotionPrice
-            invoiceDetail.exclude = soldProduct.exclude
             invoiceDetail.itemDiscountPercent = soldProduct.focPercent
             invoiceDetail.itemDiscountAmount = soldProduct.focAmount
 
             if (!soldProduct.promotionPlanId.isNullOrEmpty())
                 invoiceDetail.promotion_plan_id =
                     soldProduct.promotionPlanId.toInt()
-
+            if (soldProduct.exclude != null && !soldProduct.exclude.equals("")) {
+                invoiceDetail.exclude = soldProduct.exclude
+            }
             invoiceDetailList.add(invoiceDetail)
 
 
@@ -133,17 +139,20 @@ class SaleCancelCheckOutViewModel(
             invoiceProduct.discount_percent = soldProduct.discountPercent
             invoiceProduct.s_price = soldProduct.product.selling_price!!.toDouble()
             invoiceProduct.p_price = soldProduct.product.purchase_price!!.toDouble()
-            invoiceProduct.promotion_price =
-                soldProduct.promoPriceByDiscount
+//            invoiceProduct.promotion_price =
+//                soldProduct.promoPriceByDiscount
             invoiceProduct.item_discount_percent = soldProduct.focPercent
             invoiceProduct.item_discount_amount = soldProduct.focAmount
             invoiceProduct.exclude = "${soldProduct.exclude}"
-
+            var promoPrice = soldProduct.promotionPrice
+            if (promoPrice == 0.0) {
+                promoPrice = soldProduct.product.selling_price!!.toDouble()
+            }
             totalQtyForInvoice += soldProduct.quantity
             if (soldProduct.totalAmt != 0.0) {
                 invoiceProductList.add(invoiceProduct)
             }
-
+            saleCancelRepo.updateProductRemainingQtyForSaleCancel(soldProduct)
             saleCancelRepo.updateProductRemainingQty(soldProduct)
         }
 

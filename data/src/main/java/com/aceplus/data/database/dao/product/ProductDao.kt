@@ -44,7 +44,7 @@ interface ProductDao {
     @Query("update product set remaining_quantity = remaining_quantity + :qty, return_quantity = return_quantity + :qty where product.id = :productID")
     fun updateProductRemainingQtyWithSaleReturn(qty: Int, productID: Int)
 
-    @Query("update product set remaining_quantity = remaining_quantity + :qty,  sold_quantity= sold_quantity + :qty where product.id = :productID")
+    @Query("update product set remaining_quantity = remaining_quantity + :qty,  sold_quantity= sold_quantity - :qty where product.id = :productID")
     fun updateProductRemainingQtyWithSaleCancel(qty: Int, productID: Int)
 
     @Query("Delete from product")

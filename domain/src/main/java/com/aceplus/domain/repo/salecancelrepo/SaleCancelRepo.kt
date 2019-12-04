@@ -42,7 +42,7 @@ interface SaleCancelRepo {
 
     fun getInvoiceCancel(invoiceId: String): Observable<Invoice>
 
-    //fun updateProductRemainingQtyForSaleCancel(qty:Int,productId: Int)
+   fun updateProductRemainingQtyForSaleCancel(soldProductInfo: SoldProductInfo)
     fun getPromotionDateList(currentDate:String):Observable<List<PromotionDate>>
     fun getPromotionPriceById(promotionPlanId: String, buy_qty: Int, stockID: String):Observable<List<PromotionPrice>>
 

@@ -21,6 +21,12 @@ import com.aceplussolutions.rms.constants.AppUtils
 import io.reactivex.Observable
 
 class SaleCancelRepoImpl(val database: MyDatabase,val shf:SharedPreferences) : SaleCancelRepo {
+    override fun updateProductRemainingQtyForSaleCancel(soldProductInfo: SoldProductInfo) {
+        database.productDao()
+            .updateProductRemainingQtyWithSaleCancel(soldProductInfo.quantity, soldProductInfo.product.id)
+    }
+
+
 
     override fun getPromotionPriceById(
         promotionPlanId: String,

@@ -26,6 +26,7 @@ import com.aceplus.domain.entity.promotion.Promotion
 import com.aceplus.domain.model.forApi.invoice.InvoiceDetail
 import com.aceplus.domain.vo.SoldProductInfo
 import com.aceplussolutions.rms.ui.activities.BaseActivity
+import kotlinx.android.synthetic.main.activity_sale_cancel.*
 import kotlinx.android.synthetic.main.activity_sale_checkout.*
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
@@ -95,7 +96,11 @@ class SaleCancelCheckoutActivity : BaseActivity(), KodeinAware {
     private val saleCancelCheckOutViewModel: SaleCancelCheckOutViewModel by viewModel()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        title1.text = getString(R.string.sale_cancel_checkout)
+
         advancedPaidAmountLayout.visibility = View.GONE
+        totalInfoForPreOrder.visibility = View.GONE
+        tax_layout.visibility = View.VISIBLE
         volDisForPreOrderLayout.visibility = View.GONE
         volumeDiscountLayout2.visibility = View.GONE
         llSaleStatus.visibility = View.GONE
@@ -103,12 +108,12 @@ class SaleCancelCheckoutActivity : BaseActivity(), KodeinAware {
         soldProductList = intent.getParcelableArrayListExtra("SOLD_PRODUCT_LIST")
         productIdList = intent.getIntegerArrayListExtra("INDEX_LIST")
         saleDateTextView.text = Utils.getCurrentDate(false)
-
-        for (i in soldProductList) {
-
-            val amt = i.quantity.toDouble() * i.product.selling_price!!.toDouble()
-            totalAmt += amt
-        }
+        calculateTotalAmountForProduct()
+//        for (i in soldProductList) {
+//
+//            val amt = i.quantity.toDouble() * i.product.selling_price!!.toDouble()
+//            totalAmt += amt
+//        }
         tvTotalAmount.text = totalAmt.toString()
         tvNetAmount.text = totalAmt.toString()
         tvInvoiceId.text = intent.getStringExtra("INVOICE_ID")
@@ -157,7 +162,7 @@ class SaleCancelCheckoutActivity : BaseActivity(), KodeinAware {
                                 this,
                                 it[0],
                                 soldProductList
-                            ),Utils.RQ_BACK_TO_CUSTOMER
+                            ), Utils.RQ_BACK_TO_CUSTOMER
                         )
 
                         saleCancelCheckOutViewModel.soldInvoiceListSuccessState.value = null
@@ -197,8 +202,14 @@ class SaleCancelCheckoutActivity : BaseActivity(), KodeinAware {
         }
 
         payAmount.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(p0: Editable?) { "Nothing to do" }
-            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) { "Nothing to do" }
+            override fun afterTextChanged(p0: Editable?) {
+                "Nothing to do"
+            }
+
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                "Nothing to do"
+            }
+
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
                 calculateRefundAmount()
             }
@@ -300,10 +311,15 @@ class SaleCancelCheckoutActivity : BaseActivity(), KodeinAware {
         var dueDate = ""
         if (cashOrLoanOrBank == "CR") dueDate = saleDate
         if (edt_dueDate.text.isNotBlank()) dueDate = edt_dueDate.text.toString()
+        soldProductList = intent.getParcelableArrayListExtra("SOLD_PRODUCT_LIST")
 
         saleCancelCheckOutViewModel.deleteInvoiceData(invoiceId)
         saleCancelCheckOutViewModel.deleteInvoiceProductData(invoiceId)
         saleCancelCheckOutViewModel.deleteInvoicePresenttData(invoiceId)
+//        for (soldProduct in soldProductList) {
+//
+//        }
+
         saleCancelCheckOutViewModel.saveCheckoutData(
             customerId,
             saleDate,
@@ -324,14 +340,14 @@ class SaleCancelCheckoutActivity : BaseActivity(), KodeinAware {
             volDisAmount,
             volDisPercent
         )
-       saleCancelCheckOutViewModel.loadSoldInvoiceData(invoiceId)
+        saleCancelCheckOutViewModel.loadSoldInvoiceData(invoiceId)
 
     }
 
 
     private fun validationInput(withBankInfo: Boolean): Boolean {
 
-        var dateAndPayment =false
+        var dateAndPayment = false
         var name = false
         var bank = false
         var acc = false
@@ -339,7 +355,7 @@ class SaleCancelCheckoutActivity : BaseActivity(), KodeinAware {
         edit_txt_branch_name.error = null
         edit_txt_account_name.error = null
 
-            dateAndPayment = true
+        dateAndPayment = true
 
 
 
@@ -371,9 +387,25 @@ class SaleCancelCheckoutActivity : BaseActivity(), KodeinAware {
         return taxAmt
 
     }
+
+    private fun calculateTotalAmountForProduct() {
+        var soldPrice = 0.0
+
+        for (soldProduct in soldProductList) {
+            if (soldProduct.promotionPrice == 0.0) {
+                soldPrice = soldProduct.product.selling_price!!.toDouble()
+            } else {
+                soldPrice = soldProduct.promotionPrice
+            }
+
+            val buy_amt = soldPrice * soldProduct.quantity
+            totalAmt += buy_amt
+        }
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == Utils.RQ_BACK_TO_CUSTOMER)
-            if (resultCode == Activity.RESULT_OK){
+            if (resultCode == Activity.RESULT_OK) {
                 setResult(Activity.RESULT_OK)
                 finish()
             }
