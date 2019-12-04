@@ -88,7 +88,7 @@ class SaleCheckoutViewModel(
                                 }
                             }
 
-                        //Need to fix
+                        //Need to fix - thread
                         for (aSameCategoryProduct in sameCategoryProducts) {
 
                             soldPrice = if (aSameCategoryProduct.promotionPrice == 0.0) {
@@ -109,10 +109,7 @@ class SaleCheckoutViewModel(
 
                         if (exclude == 0) {
 
-                            customerVisitRepo.getDiscountPercentFromVolumeDiscountFilterItem(
-                                volDisFilterId,
-                                totalBuyAmtInclude
-                            )
+                            customerVisitRepo.getDiscountPercentFromVolumeDiscountFilterItem(volDisFilterId, totalBuyAmtInclude)
                                 .subscribeOn(schedulerProvider.io())
                                 .observeOn(schedulerProvider.mainThread())
                                 .subscribe { discList ->
@@ -120,11 +117,10 @@ class SaleCheckoutViewModel(
                                     for (disc in discList) {
                                         discountPercent = disc.discount_percent?.toDouble() ?: 0.0
                                     }
+                                    amountAndPercentage["Percentage"] = discountPercent
+                                    var itemTotalDis = totalBuyAmtInclude * (discountPercent / 100)
+                                    amountAndPercentage["Amount"] = itemTotalDis
                                 }
-
-                            amountAndPercentage["Percentage"] = discountPercent
-                            var itemTotalDis = totalBuyAmtInclude * (discountPercent / 100)
-                            amountAndPercentage["Amount"] = itemTotalDis
 
                             // Check what's this for ... exceed?
                             if (discountPercent > 0) {
@@ -140,10 +136,7 @@ class SaleCheckoutViewModel(
 
                         } else {
 
-                            customerVisitRepo.getDiscountPercentFromVolumeDiscountFilterItem(
-                                volDisFilterId,
-                                totalBuyAmtExclude
-                            )
+                            customerVisitRepo.getDiscountPercentFromVolumeDiscountFilterItem(volDisFilterId, totalBuyAmtExclude)
                                 .subscribeOn(schedulerProvider.io())
                                 .observeOn(schedulerProvider.mainThread())
                                 .subscribe { discList ->
@@ -151,11 +144,10 @@ class SaleCheckoutViewModel(
                                     for (disc in discList) {
                                         discountPercent = disc.discount_percent?.toDouble() ?: 0.0
                                     }
+                                    amountAndPercentage["Percentage"] = discountPercent
+                                    var itemTotalDis = totalBuyAmtInclude * (discountPercent / 100)
+                                    amountAndPercentage["Amount"] = itemTotalDis
                                 }
-
-                            amountAndPercentage["Percentage"] = discountPercent
-                            var itemTotalDis = totalBuyAmtInclude * (discountPercent / 100)
-                            amountAndPercentage["Amount"] = itemTotalDis
 
                             // Check what's this for ... exceed?
                             if (discountPercent > 0) {
@@ -195,16 +187,12 @@ class SaleCheckoutViewModel(
                             buyAmt = noPromoBuyAmt
                         }
 
-                        customerVisitRepo.getDiscountPercentFromVolumeDiscountFilterItem(
-                            volDisId,
-                            buyAmt
-                        )
+                        customerVisitRepo.getDiscountPercentFromVolumeDiscountFilterItem(volDisId, buyAmt)
                             .subscribeOn(schedulerProvider.io())
                             .observeOn(schedulerProvider.mainThread())
                             .subscribe { volDiscFilterItemList ->
                                 for (volDiscFilterItem in volDiscFilterItemList) {
-                                    val discountPercentForVolDis =
-                                        volDiscFilterItem.discount_percent?.toDouble() ?: 0.0
+                                    val discountPercentForVolDis = volDiscFilterItem.discount_percent?.toDouble() ?: 0.0
                                     totalVolumeDiscount = buyAmt * (discountPercentForVolDis / 100)
                                     totalVolumeDiscountPercent = discountPercentForVolDis
                                 }

@@ -183,7 +183,6 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
                 val totalItemDisAmt = it.amountAndPercentage["Amount"] ?: 0.0
                 displayFinalAmount(totalItemDisAmt)
 
-                // ToDo - if it's sale exchange
             }
         })
 
