@@ -23,5 +23,8 @@ interface ProductCategoryDao {
     @Query("Delete from product_category")
     fun deleteAll()
 
+    @Query("select * from product_category where id = :categoryId")
+    fun getCategoryNameFromProductCategory(categoryId: Int): ProductCategory?
+
 
 }

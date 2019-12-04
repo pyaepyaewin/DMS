@@ -1,6 +1,7 @@
 package com.aceplus.domain.repo.report
 
 import com.aceplus.domain.entity.CompanyInformation
+import com.aceplus.domain.entity.GroupCode
 import com.aceplus.domain.entity.credit.Credit
 import com.aceplus.domain.entity.customer.Customer
 import com.aceplus.domain.entity.customer.DidCustomerFeedback
@@ -11,6 +12,7 @@ import com.aceplus.domain.entity.invoice.Invoice
 import com.aceplus.domain.entity.invoice.InvoiceProduct
 import com.aceplus.domain.entity.preorder.PreOrder
 import com.aceplus.domain.entity.preorder.PreOrderProduct
+import com.aceplus.domain.entity.product.Product
 import com.aceplus.domain.entity.product.ProductCategory
 import com.aceplus.domain.entity.product.ProductGroup
 import com.aceplus.domain.entity.route.Route
@@ -60,7 +62,7 @@ interface ReportRepo {
 
     //spinner data
     fun getAllCustomerData(): Observable<List<Customer>>
-    fun getAllGroupData(): Observable<List<ProductGroup>>
+    fun getAllGroupData(): Observable<List<GroupCode>>
     fun getAllCategoryData(): Observable<List<ProductCategory>>
 
     //sale cancel report
@@ -92,20 +94,24 @@ interface ReportRepo {
 
     //sale target sale man
     fun saleTargetSaleManReport(): Observable<List<SaleTargetSaleMan>>
-    fun saleTargetAmountForSaleMan(groupId:Int,categoryId:Int):Observable<List<SaleTargetVO>>
-
-
+    fun getCategoryListFromInvoiceProduct(categoryId:String) : Observable<List<TargetAndSaleForSaleMan>>
+    fun getGroupListFromInvoiceProduct(groupId:String) : Observable<List<TargetAndSaleForSaleMan>>
     fun getAllInvoiceData(): Observable<List<Invoice>>
+    fun getTargetSaleDB(customerId:Int) : Observable<List<SaleTargetSaleMan>>
 
     //sale target and actual sale for customer
-    fun saleTargetCustomerReport(): Observable<List<SaleTargetCustomer>>
-    fun saleTargetAmountForCustomer(iCustomerId:String,groupId:Int,categoryId:Int):Observable<List<SaleTargetVO>>
-    fun saleTargetCustomerIdList(customerId:Int): Observable<List<SaleTargetCustomer>>
+    fun getTargetSaleDBForCustomer(customerIdFromSpinner:Int) : Observable<List<SaleTargetCustomer>>
+    fun getCustomerSaleTargetAndSaleIdList(customerId:String) :Observable<List<TargetAndSaleForSaleMan>>
 
     //target and actual sale for product
-    fun getNameListForSaleTargetProduct(): Observable<List<TargetAndActualSaleForProduct>>
-
-
+    fun getActualSale1ForSaleTargetProduct():Observable<List<Product>>
+    fun getActualSale2ForSaleTargetProduct():Observable<List<Product>>
+    fun getActualSale3ForSaleTargetProduct():Observable<List<Product>>
+    fun getInvoiceProductList(idList: List<String>):Observable<List<InvoiceProduct>>
+    fun getGroupIdFromProduct(productIdList:List<String>) : Observable<List<Product>>
+    fun getProductNameFromProduct(stockId:Int) : Observable<Product>
+    fun getGroupCodeNameFromGroupCode(groupId:Int) : Observable<GroupCode>
+    fun getCategoryNameFromProductCategory(categoryId:Int) : Observable<ProductCategory>
     //......end of day report..........//
     //New..............
     fun getRouteNameForEndOfDayReport(saleManId:String):Observable<List<RouteScheduleV2>>

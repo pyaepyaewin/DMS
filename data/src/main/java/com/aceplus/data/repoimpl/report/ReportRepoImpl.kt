@@ -2,6 +2,7 @@ package com.aceplus.data.repoimpl.report
 
 import com.aceplus.data.database.MyDatabase
 import com.aceplus.domain.entity.CompanyInformation
+import com.aceplus.domain.entity.GroupCode
 import com.aceplus.domain.entity.credit.Credit
 import com.aceplus.domain.entity.customer.Customer
 import com.aceplus.domain.entity.customer.DidCustomerFeedback
@@ -9,6 +10,7 @@ import com.aceplus.domain.entity.delivery.Delivery
 import com.aceplus.domain.entity.delivery.DeliveryItemUpload
 import com.aceplus.domain.entity.delivery.DeliveryUpload
 import com.aceplus.domain.entity.invoice.Invoice
+import com.aceplus.domain.entity.invoice.InvoiceProduct
 import com.aceplus.domain.entity.preorder.PreOrder
 import com.aceplus.domain.entity.preorder.PreOrderProduct
 import com.aceplus.domain.entity.product.Product
@@ -97,8 +99,8 @@ class ReportRepoImpl(private val db: MyDatabase) : ReportRepo {
         return Observable.just(db.customerDao().allData)
     }
 
-    override fun getAllGroupData(): Observable<List<ProductGroup>> {
-        return Observable.just(db.productGroupDao().allData)
+    override fun getAllGroupData(): Observable<List<GroupCode>> {
+        return Observable.just(db.groupCodeDao().allData)
     }
 
     override fun getAllCategoryData(): Observable<List<ProductCategory>> {
@@ -173,50 +175,61 @@ class ReportRepoImpl(private val db: MyDatabase) : ReportRepo {
         return Observable.just(db.saleTargetSaleManDao().allData)
     }
 
-    override fun saleTargetAmountForSaleMan(
-        groupId: Int,
-        categoryId: Int
-    ): Observable<List<SaleTargetVO>> {
-        return Observable.just(
-            db.saleTargetSaleManDao().actualSaleDataForSaleMan(
-                groupId,
-                categoryId
-            )
-        )
+    override fun getCategoryListFromInvoiceProduct(categoryId:String) : Observable<List<TargetAndSaleForSaleMan>>{
+        return Observable.just(db.invoiceProductDao().getCategoryListFromInvoiceProduct(categoryId))
     }
 
+    override fun getGroupListFromInvoiceProduct(groupId:String) : Observable<List<TargetAndSaleForSaleMan>>{
+        return Observable.just(db.invoiceProductDao().getGroupListFromInvoiceProduct(groupId))
+    }
 
     override fun getAllInvoiceData(): Observable<List<Invoice>> {
         return Observable.just(db.invoiceDao().allData)
     }
 
+    override fun getTargetSaleDB(customerId:Int) : Observable<List<SaleTargetSaleMan>>{
+        return Observable.just(db.saleTargetSaleManDao().getTargetSaleDB(customerId))
+    }
+
     //sale target and actual sale for customer
-    override fun saleTargetCustomerReport(): Observable<List<SaleTargetCustomer>> {
-        return Observable.just(db.saleTargetCustomerDao().allData)
+    override fun getTargetSaleDBForCustomer(customerIdFromSpinner:Int) : Observable<List<SaleTargetCustomer>>{
+        return Observable.just(db.saleTargetCustomerDao().getTargetSaleDBForCustomer(customerIdFromSpinner))
     }
 
-    override fun saleTargetCustomerIdList(customerId: Int): Observable<List<SaleTargetCustomer>> {
-        return Observable.just(db.saleTargetCustomerDao().dataById(customerId))
-    }
-
-    override fun saleTargetAmountForCustomer(
-        iCustomerId: String,
-        groupId: Int,
-        categoryId: Int
-    ): Observable<List<SaleTargetVO>> {
-        return Observable.just(
-            db.saleTargetCustomerDao().actualSaleData(
-                iCustomerId,
-                groupId,
-                categoryId
-            )
-        )
+    override fun getCustomerSaleTargetAndSaleIdList(customerId:String) :Observable<List<TargetAndSaleForSaleMan>>{
+        return Observable.just(db.invoiceProductDao().getCustomerSaleTargetAndSaleIdList(customerId))
     }
 
     //sale target and actual sale for product
+    override  fun getActualSale1ForSaleTargetProduct():Observable<List<Product>>{
+        return Observable.just(db.productDao().getActualSale1ForSaleTargetProduct)
+    }
+    override  fun getActualSale2ForSaleTargetProduct():Observable<List<Product>>{
+        return Observable.just(db.productDao().getActualSale2ForSaleTargetProduct)
+    }
 
-    override fun getNameListForSaleTargetProduct(): Observable<List<TargetAndActualSaleForProduct>> {
-        return Observable.just(db.saleTargetSaleManDao().allDataWithName)
+    override  fun getActualSale3ForSaleTargetProduct():Observable<List<Product>>{
+        return Observable.just(db.productDao().getActualSale3ForSaleTargetProduct)
+    }
+
+    override fun getInvoiceProductList(idList: List<String>):Observable<List<InvoiceProduct>> {
+       return Observable.just(db.invoiceProductDao().getInvoiceProductList(idList))
+    }
+
+    override fun getGroupIdFromProduct(productIdList:List<String>) : Observable<List<Product>>{
+      return Observable.fromArray(db.productDao().getGroupIdFromProduct(productIdList))
+    }
+
+    override fun getProductNameFromProduct(stockId:Int) : Observable<Product>{
+        return Observable.just(db.productDao().getProductNameFromProduct(stockId))
+    }
+
+    override  fun getGroupCodeNameFromGroupCode(groupId:Int) : Observable<GroupCode>{
+        return Observable.just(db.groupCodeDao().getGroupCodeNameFromGroupCode(groupId))
+    }
+
+    override fun getCategoryNameFromProductCategory(categoryId:Int) : Observable<ProductCategory>{
+        return Observable.just(db.productCategoryDao().getCategoryNameFromProductCategory(categoryId))
     }
 
     //end of day report

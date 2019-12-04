@@ -1,5 +1,6 @@
 package com.aceplus.dms.ui.fragments.report
 
+import android.app.ActionBar
 import android.arch.lifecycle.Observer
 import android.graphics.Color
 import android.os.Bundle
@@ -9,10 +10,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.ImageView
+import android.widget.LinearLayout
 import com.aceplus.dms.R
 import com.aceplus.dms.viewmodel.report.ReportViewModel
 import com.aceplus.domain.entity.invoice.Invoice
 import com.aceplus.domain.entity.sale.saletarget.SaleTargetSaleMan
+import com.aceplus.domain.model.forApi.sale.saletarget.SaleTargetForCustomer
+import com.aceplus.domain.model.sale.SaleTarget
 import com.aceplus.domain.vo.report.SaleTargetVO
 import com.aceplus.shared.ui.activities.BaseFragment
 import com.github.mikephil.charting.components.Legend
@@ -21,8 +26,12 @@ import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
 import com.github.mikephil.charting.formatter.PercentFormatter
 import com.github.mikephil.charting.formatter.ValueFormatter
-import kotlinx.android.synthetic.main.activity_van_issue.*
 import kotlinx.android.synthetic.main.fragment_sale_comparison_report.*
+import org.achartengine.ChartFactory
+import org.achartengine.GraphicalView
+import org.achartengine.model.CategorySeries
+import org.achartengine.renderer.DefaultRenderer
+import org.achartengine.renderer.SimpleSeriesRenderer
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.support.kodein
@@ -33,22 +42,49 @@ class TargetAndActualSalesForSalesManReportFragment : BaseFragment(), KodeinAwar
     override val kodein: Kodein by kodein()
     private var groupNameList = mutableListOf<String>()
     private var categoryNameList = mutableListOf<String>()
+    private var categoryIdArr = mutableListOf<String>()
+    private var groupIdArr = mutableListOf<String>()
+    private var saleTargetArrayList = ArrayList<SaleTargetForCustomer>()
+    private var actualTargetArrayList = ArrayList<SaleTarget>()
+    private val NAME_LIST = arrayOf("Actual Sale", "Remaining Sale")
+    private val COLORS = intArrayOf(R.color.colorPrimaryDark, R.color.colorPrimary)
+    private var VALUE = ArrayList<Double>()
+    private var mChartView: GraphicalView? = null
+    private val mRenderer = DefaultRenderer()
+    private val mSeries = CategorySeries("")
+    private var allSaleTargetValue = 0.0
+    private var allActualSaleValue = 0.0
+    private var sale = 0.0
+    private var remainingSale = 0.0
+    private var categoryId: String = ""
+    private var groupId: String = ""
     private val targetAndActualSalesForSalesManReportViewModel: ReportViewModel by viewModel()
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(
-            R.layout.fragment_sale_comparison_report,
-            container,
-            false
-        )
+        return inflater.inflate(R.layout.fragment_sale_comparison_report, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        var groupId = 0
-        var categoryId = 0
+        val printImg = activity!!.findViewById(R.id.print_img) as ImageView
+        printImg.visibility = View.VISIBLE
+        getTargetSaleDB(-1)
+        getGroupCodeListFromDbAndCategoryListFromDb()
+        if (categoryIdArr != null && categoryIdArr.size != 0) {
+            categoryId = categoryIdArr[spinner_category.selectedItemPosition]
+        }
+
+        if (groupIdArr != null && groupIdArr.size != 0) {
+            groupId = groupIdArr[spinner_group.selectedItemPosition]
+        }
+        catchEvents()
+        targetAndActualSalesForSalesManReportViewModel.loadProductGroupAndProductCategoryList()
+    }
+
+    private fun getGroupCodeListFromDbAndCategoryListFromDb() {
         spinner_customer.visibility = View.GONE
         targetAndActualSalesForSalesManReportViewModel.productGroupAndCategoryDataList.observe(
             this,
@@ -56,168 +92,220 @@ class TargetAndActualSalesForSalesManReportFragment : BaseFragment(), KodeinAwar
                 //select group list in spinner
                 if (it!!.first != null) {
                     groupNameList.add("All Group")
+                    groupIdArr.add("-1")
                     for (group in it!!.first) {
-                        groupNameList.add(group.group_name.toString())
+                        groupNameList.add(group.name!!)
+                        groupIdArr.add(group.id.toString())
                     }
                 }
                 val groupNameSpinnerAdapter =
                     ArrayAdapter(context, android.R.layout.simple_spinner_item, groupNameList)
                 groupNameSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                 spinner_group.adapter = groupNameSpinnerAdapter
-                spinner_group.onItemSelectedListener =
-                    object : AdapterView.OnItemSelectedListener {
-                        override fun onItemSelected(
-                            p0: AdapterView<*>?,
-                            p1: View?,
-                            p2: Int,
-                            p3: Long
-                        ) {
-                            groupId = p2
-                        }
-
-                        override fun onNothingSelected(p0: AdapterView<*>?) {
-                            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-                        }
-                    }
                 //select category list in spinner
+
                 if (it!!.second != null) {
                     categoryNameList.add("All Category")
-                    for (category in it!!.second) {
-                        categoryNameList.add(category.category_name.toString())
+                    categoryIdArr.add("-1")
+                    for (category in it.second) {
+                        categoryNameList.add(category.category_name!!)
+                        categoryIdArr.add(category.category_id!!)
                     }
                 }
                 val categoryNameSpinnerAdapter =
                     ArrayAdapter(context, android.R.layout.simple_spinner_item, categoryNameList)
                 categoryNameSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                 spinner_category.adapter = categoryNameSpinnerAdapter
-                spinner_category.onItemSelectedListener =
-                    object : AdapterView.OnItemSelectedListener {
-                        override fun onItemSelected(
-                            p0: AdapterView<*>?,
-                            p1: View?,
-                            p2: Int,
-                            p3: Long
-                        ) {
-                            if (categoryId == 0 && groupId == 0) {
-                                targetAndActualSalesForSalesManReportViewModel.saleTargetAndSaleManReportSuccessState.observe(
-                                    this@TargetAndActualSalesForSalesManReportFragment,
-                                    Observer { pair ->
-                                        piChart(pair!!.first, pair!!.second)
-                                    })
-                            } else {
-                                categoryId = p2
-                                targetAndActualSalesForSalesManReportViewModel.saleTargetAndSaleManIdList.observe(
-                                    this@TargetAndActualSalesForSalesManReportFragment,
-                                    Observer { it1 ->
-                                        piChart1(it1!!.first, it1!!.second)
-                                    })
-                            }
-                        }
-
-                        override fun onNothingSelected(p0: AdapterView<*>?) {
-                            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-                        }
-                    }
             })
-        targetAndActualSalesForSalesManReportViewModel.loadProductGroupAndProductCategoryList()
-        targetAndActualSalesForSalesManReportViewModel.loadSaleTargetAndSaleManReport()
-        targetAndActualSalesForSalesManReportViewModel.loadSaleTargetAndSaleIdList(
-            groupId,
-            categoryId
-        )
     }
 
-    private fun piChart(first: List<SaleTargetSaleMan>, second: List<Invoice>) {
-        var targetAmount = 0.0
-        var saleAmount = 0.0
-        val sumAmount :Double
-        val tAmount :Int
-        val sAmount :Int
-        Log.d("First List", "${first.size}")
-        Log.d("Second List", "${second.size}")
-        for (target in first) {
-            targetAmount += target.target_amount!!.toDouble()
-        }
-        sale_target_txt.text = targetAmount.toString()
+    private fun getTargetSaleDB(customerIdFromSpinner: Int) {
+        saleTargetArrayList.clear()
+        if (customerIdFromSpinner != -1) {
+            targetAndActualSalesForSalesManReportViewModel.targetSaleDBList.observe(this, Observer {
+                for (data in it!!) {
+                    val id = data.id.toString()
+                    val fromDate = data.from_date
+                    val toDate = data.to_date
+                    val saleManId = data.sale_man_id
+                    val categoryId = data.category_id
+                    val groupCodeId = data.group_code_id
+                    val stockId = data.stock_id
+                    val targetAmt = data.target_amount
+                    val date = data.date
+                    val invoiceNo = data.invoice_no
+                    val saleTarget = SaleTargetForCustomer()
+                    saleTarget.id = id
+                    saleTarget.fromDate = fromDate
+                    saleTarget.toDate = toDate
+                    saleTarget.saleManId = saleManId
+                    saleTarget.categoryId = categoryId
+                    saleTarget.groupCodeId = groupCodeId
+                    saleTarget.stockId = stockId
+                    saleTarget.targetAmount = targetAmt
+                    saleTarget.date = date
+                    saleTarget.invoiceNo = invoiceNo
+                    saleTargetArrayList.add(saleTarget)
 
-        for (sale in second) {
-            saleAmount += sale.total_amount!!.toDouble()
+                }
+            })
+            targetAndActualSalesForSalesManReportViewModel.loadTargetSaleDB(customerIdFromSpinner)
         }
-        sale_txt.text = saleAmount.toString()
-        if (targetAmount == 0.0 && saleAmount == 0.0) {
-            tAmount = 50
-            sAmount = 50
+    }
+
+    private fun catchEvents() {
+        //Click Group Spinner
+        spinner_group.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
+                updateChartData()
+            }
+
+            override fun onNothingSelected(p0: AdapterView<*>?) {
+                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            }
+        }
+        //Click Category Spinner
+        spinner_category.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
+                updateChartData()
+            }
+
+            override fun onNothingSelected(p0: AdapterView<*>?) {
+                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            }
+        }
+    }
+
+    private fun updateChartData() {
+        if (categoryIdArr != null && categoryIdArr.size != 0) {
+            categoryId = categoryIdArr[spinner_category.selectedItemPosition]
+        }
+
+        if (groupIdArr != null && groupIdArr.size != 0) {
+            groupId = groupIdArr[spinner_group.selectedItemPosition]
+        }
+        if (categoryId != "-1") {
+            targetAndActualSalesForSalesManReportViewModel.categorySaleTargetDataList.observe(
+                this,
+                Observer {
+                    actualTargetArrayList.clear()
+                    for (i in it!!) {
+                        var productId = ""
+                        var saleQty = 0.0
+                        var totalSaleAmount = 0.0
+                        if (i.productId != null) {
+                            productId = i.productId
+                        }
+                        if (i.saleQuantity != null) {
+                            saleQty = i.saleQuantity.toDouble()
+                        }
+                        if (i.totalAmount != null) {
+                            totalSaleAmount = i.totalAmount
+                        }
+                        val sellingPrice = totalSaleAmount / saleQty
+                        val saleTarget = SaleTarget()
+                        saleTarget.productId = productId
+                        saleTarget.quantity = saleQty
+                        saleTarget.sellingPrice = sellingPrice
+                        saleTarget.totalAmount = totalSaleAmount
+                        actualTargetArrayList.add(saleTarget)
+                    }
+                })
+            targetAndActualSalesForSalesManReportViewModel.loadCategorySaleTargetAndSaleIdList(categoryId)
+        }
+        if (groupId != "-1") {
+            targetAndActualSalesForSalesManReportViewModel.groupSaleTargetDataList.observe(this, Observer {
+                for (i in it!!) {
+                    var productId = ""
+                    var saleQty = 0.0
+                    var totalSaleAmount = 0.0
+                    if (i.productId != null) {
+                        productId = i.productId
+                    }
+                    if (i.saleQuantity != null) {
+                        saleQty = i.saleQuantity.toDouble()
+                    }
+                    if (i.totalAmount != null) {
+                        totalSaleAmount = i.totalAmount
+                    }
+                    val sellingPrice = totalSaleAmount / saleQty
+                    val saleTarget = SaleTarget()
+                    saleTarget.productId = productId
+                    saleTarget.quantity = saleQty
+                    saleTarget.sellingPrice = sellingPrice
+                    saleTarget.totalAmount = totalSaleAmount
+                    actualTargetArrayList.add(saleTarget)
+                }
+            })
+            targetAndActualSalesForSalesManReportViewModel.loadGroupSaleTargetAndSaleIdList(groupId)
+        }
+        initialize()
+    }
+
+    private fun initialize(){
+        for (j in saleTargetArrayList.indices) {
+            allSaleTargetValue += Integer.parseInt(saleTargetArrayList[j].targetAmount).toDouble()
+        }
+        for (j in actualTargetArrayList.indices) {
+            allActualSaleValue += actualTargetArrayList[j].totalAmount
+        }
+
+        sale_target_txt.text = allSaleTargetValue.toString()
+        sale_txt.text = allActualSaleValue.toString()
+
+        if (allSaleTargetValue != 0.0) {
+            sale = allActualSaleValue / (allSaleTargetValue / 100)
+        }
+        if (sale < 100) {
+            remainingSale = 100 - sale
+            VALUE.clear()
+            sale = java.lang.Double.parseDouble(String.format("%.2f", sale))
+            remainingSale = java.lang.Double.parseDouble(String.format("%.2f", remainingSale))
+            VALUE.add(sale)
+            VALUE.add(remainingSale)
+
         } else {
-            sumAmount = targetAmount + saleAmount
-            tAmount = (targetAmount.toInt() * 100) / sumAmount.toInt()
-            sAmount = (saleAmount.toInt() * 100) / sumAmount.toInt()
+            sale = 100.0
+            remainingSale = 0.0
+            VALUE.clear()
+            VALUE.add(sale)
+            VALUE.add(remainingSale)
         }
-        piChartShow(tAmount, sAmount, targetAmount, saleAmount)
+        mRenderer.isApplyBackgroundColor = true
+        mRenderer.backgroundColor = Color.WHITE
+        mRenderer.labelsTextSize = 20f
+        mRenderer.labelsColor = Color.BLACK
+        mRenderer.legendTextSize = 20f
+        mRenderer.margins = intArrayOf(100, 0)
+        mRenderer.startAngle = 90f
+        if (mSeries.itemCount != 0) {
+            mSeries.clear()
+            for (simpleSeriesRenderer in mRenderer.seriesRenderers) {
+                mRenderer.removeSeriesRenderer(simpleSeriesRenderer)
+            }
+        }
+        for (i in VALUE.indices) {
+            mSeries.add(NAME_LIST[i] + " " + VALUE[i] + "%", VALUE[i])
+            val renderer = SimpleSeriesRenderer()
+            val res = this.resources
+            renderer.color = res.getColor(COLORS[(mSeries.itemCount - 1) % COLORS.size])
+            mRenderer.addSeriesRenderer(renderer)
+        }
+        if (mChartView != null) {
+            mChartView!!.repaint()
+        }
+
     }
-
-    private fun piChart1(first: List<SaleTargetSaleMan>, second: List<SaleTargetVO>) {
-        var targetAmount = 0.0
-        var saleAmount = 0.0
-        val sumAmount: Double
-        val tAmount: Int
-        val sAmount: Int
-        Log.d("First List", "${first.size}")
-        Log.d("Second List", "${second.size}")
-        for (target in first) {
-            targetAmount += target.target_amount!!.toDouble()
-        }
-        sale_target_txt.text = targetAmount.toString()
-
-        for (sale in second) {
-            saleAmount += sale.totalAmount!!.toDouble()
-        }
-        sale_txt.text = saleAmount.toString()
-        if (targetAmount == 0.0 && saleAmount == 0.0) {
-            tAmount = 50
-            sAmount = 50
+    override fun onResume() {
+        super.onResume()
+        if (mChartView == null) {
+            mChartView = ChartFactory.getPieChartView(activity, mSeries, mRenderer)
+            mRenderer.isClickEnabled = false
+            mRenderer.selectableBuffer = 10
+            pieChart.addView(mChartView, ActionBar.LayoutParams(ActionBar.LayoutParams.FILL_PARENT, ActionBar.LayoutParams.FILL_PARENT))
         } else {
-            sumAmount = targetAmount + saleAmount
-            tAmount = (targetAmount.toInt() * 100) / sumAmount.toInt()
-            sAmount = (saleAmount.toInt() * 100) / sumAmount.toInt()
+            mChartView!!.repaint()
         }
-        piChartShow(tAmount, sAmount, targetAmount, saleAmount)
-    }
-
-    private fun piChartShow(tAmount: Int, sAmount: Int, targetAmount: Double, saleAmount: Double) {
-        //pie chart show
-        var value = mutableListOf<Float>()
-        pieChart?.setUsePercentValues(true)
-        val legend: Legend? = pieChart?.legend
-        legend?.horizontalAlignment = Legend.LegendHorizontalAlignment.LEFT
-        value = mutableListOf(tAmount.toFloat(), sAmount.toFloat())
-        Log.d("All Amount", "${value[0]}")
-        val label = mutableListOf("Sale Target $targetAmount", "Sale $saleAmount")
-
-        val entry = ArrayList<PieEntry>()
-        for (i in value.indices) {
-            entry.add(PieEntry(value[i], label[i]))
-        }
-        val dataSet = PieDataSet(entry, "Result")
-        dataSet.setColors(
-            resources.getColor(R.color.colorPrimary),
-            resources.getColor(R.color.colorPrimaryDark)
-        )
-        dataSet.setDrawValues(true)
-        val pieData = PieData(dataSet)
-        dataSet.yValuePosition = PieDataSet.ValuePosition.INSIDE_SLICE
-        dataSet.valueLinePart1OffsetPercentage = 10f
-        dataSet.valueLinePart1Length = 0.43f
-        dataSet.valueLinePart2Length = .1f
-        dataSet.valueTextColor = Color.BLACK
-        dataSet.xValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
-        pieChart.setEntryLabelColor(Color.BLUE)
-        pieData.setValueFormatter(PercentFormatter() as ValueFormatter?)
-        pieData.setValueTextSize(10f)
-        pieData.setValueTextColor(Color.BLACK)
-        pieChart?.data = pieData
-        chart.canScrollHorizontally(20)
-        pieChart.animateXY(2000, 2000)
-        pieChart.invalidate()
     }
 
 }

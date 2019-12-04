@@ -13,7 +13,6 @@ import com.aceplus.domain.vo.report.ProductBalanceReport
 
 @Dao
 interface ProductDao {
-
     @get:Query("select * from product")
     val allDataLD: LiveData<List<Product>>
 
@@ -60,6 +59,20 @@ interface ProductDao {
     @Query("select * from product where id in (:stockIdList)")
     fun deliveryProductDataList(stockIdList:List<String>): List<Product>
 
+    @get:Query("select * from product,sale_target_sale_man where sale_target_sale_man.group_code_id = product.group_id order by sale_target_sale_man.group_code_id desc")
+    val getActualSale1ForSaleTargetProduct: List<Product>?
+
+    @get:Query("select * from product,sale_target_sale_man where sale_target_sale_man.category_id = product.category_id order by sale_target_sale_man.category_id asc")
+    val getActualSale2ForSaleTargetProduct: List<Product>?
+
+    @get:Query("select * from product,sale_target_sale_man where sale_target_sale_man.stock_id = product.id order by sale_target_sale_man.stock_id desc")
+    val getActualSale3ForSaleTargetProduct: List<Product>?
+
+    @Query("select * from product where id in (:productIdList)")
+    fun getGroupIdFromProduct(productIdList: List<String>): List<Product>?
+
+    @Query("select * from product where id = :stockId")
+    fun getProductNameFromProduct(stockId: Int): Product?
 
 
 }
