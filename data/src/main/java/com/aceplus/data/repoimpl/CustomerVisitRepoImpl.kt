@@ -44,7 +44,7 @@ import kotlin.collections.ArrayList
 
 class CustomerVisitRepoImpl(
     private val db: MyDatabase, private val shf: SharedPreferences, private val upLoadApi: UploadApiService
-) : CustomerVisitRepo {
+): CustomerVisitRepo {
 
     override fun getLocationCode(): Int {
         val locationDataList = db.locationDao().allData
@@ -83,7 +83,7 @@ class CustomerVisitRepoImpl(
         val routeSchedule = db.routeScheduleV2Dao().dataBySaleManId(saleManId ?: "")
         val routeScheduleItems = db.routeScheduleItemV2Dao().allDataByRouteScheduleId(routeSchedule.id.toString())
         return if (routeScheduleItems.count() > 0) routeScheduleItems[0].route_schedule_id else 0
-        // Route Schedule Item id was updated for auto generation by YLA
+        // Route Schedule Item id was updated for auto generation - by YLA
     }
 
     override fun getLastCountForInvoiceNumber(mode: String): Int {

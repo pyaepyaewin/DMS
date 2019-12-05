@@ -39,6 +39,10 @@ class SaleCheckoutViewModel(
         return customerVisitRepo.getRouteScheduleIDV2()
     }
 
+    fun getLocationCode(): Int{
+        return customerVisitRepo.getLocationCode()
+    }
+
     fun getInvoiceNumber(saleManId: String, locationNumber: Int, invoiceMode: String): String {
         return Utils.getInvoiceNo(
             saleManId,
@@ -68,6 +72,7 @@ class SaleCheckoutViewModel(
         var taxPercent = 0
 
         launch {
+            //I think volume discount function is being wrong by logic in old project
             customerVisitRepo.getVolumeDiscountFilterByDate(Utils.getCurrentDate(true))
                 .flatMap {
 
@@ -77,18 +82,48 @@ class SaleCheckoutViewModel(
                         exclude = i.exclude?.toInt()
 
                         customerVisitRepo.getVolumeDiscountFilterItem(volDisFilterId)
-                            .subscribeOn(schedulerProvider.io())
-                            .observeOn(schedulerProvider.mainThread())
-                            .subscribe { volumeDiscFilterItemList ->
+                            .flatMap { volumeDiscFilterItemList ->
                                 for (v in volumeDiscFilterItemList) {
                                     for (soldProduct in soldProductList){
                                         if (v.category_id == soldProduct.product.category_id)
                                             sameCategoryProducts.add(soldProduct)
                                     }
                                 }
+                                for (aSameCategoryProduct in sameCategoryProducts) {
+
+                                    soldPrice = if (aSameCategoryProduct.promotionPrice == 0.0) {
+                                        aSameCategoryProduct.product.selling_price?.toDouble() ?: 0.0
+                                    } else {
+                                        aSameCategoryProduct.promotionPrice
+                                    }
+
+                                    var buyAmt = soldPrice * aSameCategoryProduct.quantity
+                                    aSameCategoryProduct.totalAmt = buyAmt
+
+                                    totalBuyAmtInclude += aSameCategoryProduct.totalAmt
+
+                                    if (aSameCategoryProduct.promotionPrice == 0.0)
+                                        totalBuyAmtExclude += aSameCategoryProduct.totalAmt
+
+                                }
+                                if (exclude == 0)
+                                    return@flatMap customerVisitRepo.getDiscountPercentFromVolumeDiscountFilterItem(volDisFilterId, totalBuyAmtInclude)
+                                else
+                                    return@flatMap customerVisitRepo.getDiscountPercentFromVolumeDiscountFilterItem(volDisFilterId, totalBuyAmtExclude)
+                            }
+                            .subscribeOn(schedulerProvider.io())
+                            .observeOn(schedulerProvider.mainThread())
+                            .subscribe { discList ->
+                                if (discList.isEmpty()) exclude = null
+                                for (disc in discList) {
+                                    discountPercent = disc.discount_percent?.toDouble() ?: 0.0
+                                }
+                                amountAndPercentage["Percentage"] = discountPercent
+                                var itemTotalDis = totalBuyAmtInclude * (discountPercent / 100)
+                                amountAndPercentage["Amount"] = itemTotalDis
                             }
 
-                        //Need to fix - thread
+                        /*Modified function - no more usage
                         for (aSameCategoryProduct in sameCategoryProducts) {
 
                             soldPrice = if (aSameCategoryProduct.promotionPrice == 0.0) {
@@ -161,7 +196,7 @@ class SaleCheckoutViewModel(
                                 }
                             }
 
-                        }
+                        }*/
 
                     }
 
@@ -169,10 +204,13 @@ class SaleCheckoutViewModel(
                 }
                 .flatMap {
 
-                    var volDisId = 0
-                    var buyAmt = 0.0
+                    //Need to fix - wrong logic
+
+                    var volDisId: Int
+                    var buyAmt: Double
 
                     for (i in it) {
+
                         volDisId = i.id
                         exclude = i.exclude?.toInt()
 

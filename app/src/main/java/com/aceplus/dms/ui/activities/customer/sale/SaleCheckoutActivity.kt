@@ -116,7 +116,7 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
         calculateTotalAmount()
         saleCheckoutViewModel.calculateFinalAmount(soldProductList, totalAmount)
         salePersonId = saleCheckoutViewModel.getSaleManID()
-        locationCode = saleCheckoutViewModel.getRouteID() // Check point - route id or location id - main thread
+        locationCode = saleCheckoutViewModel.getLocationCode() // Modified route id to location id - main thread
 
     }
 
@@ -156,7 +156,6 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) { "Nothing to do" }
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
                 calculateRefundAmount()
-                Log.d("Testing", "Text change event")
             }
         })
 
@@ -168,8 +167,8 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
         saleCheckoutViewModel.invoice.observe(this, android.arch.lifecycle.Observer {
             if (it != null){
                 invoice = it
-                saleCheckoutViewModel.invoice.value = null
                 saleOrExchange()
+                saleCheckoutViewModel.invoice.value = null
             }
         })
 
@@ -231,7 +230,7 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
         if (volDisAmount != 0.0) edtVolumeDiscountAmt.setText(volDisAmount.toString())
         else edtVolumeDiscountAmt.setText(totalDiscountAmount.toString())
 
-        tax_txtView.text = df.format(taxAmt)
+        //tax_txtView.text = df.format(taxAmt) moved to function
 
         if (isSaleExchange){
             tvSaleReturnAmount.text = Utils.formatAmount(saleReturnAmount)
@@ -271,6 +270,9 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
             tvNetAmount.text = netAmount.toString()
             this.netAmount = netAmount
             this.volDisAmount = discountAmount
+            this.volDisPercent = totalVolumeDiscountPercent + discountPercent // To check - total percent?
+
+            calculateTax()
 
             if (isSaleExchange)
                 calculateSaleExchangeData()
@@ -294,6 +296,9 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
             tvNetAmount.text = netAmount.toString()
             this.netAmount = netAmount
             this.volDisAmount = discountAmount
+            this.volDisPercent = totalVolumeDiscountPercent + discountPercent // To check - total percent?
+
+            calculateTax()
 
             if (isSaleExchange)
                 calculateSaleExchangeData()
@@ -323,26 +328,6 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
 
     private fun setInvoiceId(){
 
-        /*try {
-            if (!isSaleExchange){
-                val invoiceCount = AppUtils.getIntFromShp(Constant.INVOICE_COUNT, this) ?: 0
-
-                if (invoiceCount >= 0) AppUtils.saveIntToShp(Constant.INVOICE_COUNT, invoiceCount + 1, this)
-
-                try {
-                    val invoiceID = saleCheckoutViewModel.getInvoiceNumber( salePersonId!!, locationCode, Constant.FOR_SALE)
-                    tvInvoiceId.text = invoiceID
-                    this.invoiceId = invoiceID
-                } catch (e: NullPointerException){
-                    e.printStackTrace()
-                    finish() // need to change back to login
-                }
-            }
-        } catch (e: NullPointerException){
-            e.printStackTrace()
-            finish() // need to change back to login
-        }*/
-
         val invoiceCount = AppUtils.getIntFromShp(Constant.INVOICE_COUNT, this) ?: 0
 
         if (invoiceCount >= 0) AppUtils.saveIntToShp(Constant.INVOICE_COUNT, invoiceCount + 1, this)
@@ -363,6 +348,7 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
             taxAmt = netAmount / 21
 
         this.taxAmt = taxAmt
+        tax_txtView.text = df.format(taxAmt)
 
         return taxAmt
 
