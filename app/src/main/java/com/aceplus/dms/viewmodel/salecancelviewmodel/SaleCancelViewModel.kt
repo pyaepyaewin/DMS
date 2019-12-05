@@ -156,7 +156,7 @@ class SaleCancelViewModel(
             invoiceProductList.add(invoiceCancelProduct)
 
             totalQty += soldProduct.quantity
-            saleCancelRepo.updateProductRemainingQtyForSaleCancel(soldProduct)
+            saleCancelRepo.updateProductRemainingQtyForUnsold(soldProduct.quantity,soldProduct.product.id.toString())
         }
 
 //        saleCancelRepo.updateProductRemainingQty(

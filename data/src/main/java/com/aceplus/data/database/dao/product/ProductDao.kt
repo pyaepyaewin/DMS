@@ -60,6 +60,11 @@ interface ProductDao {
     @Query("select * from product where id in (:stockIdList)")
     fun deliveryProductDataList(stockIdList:List<String>): List<Product>
 
+    @Query("update product set remaining_quantity = remaining_quantity- :soldQty,  sold_quantity= sold_quantity + :soldQty where product.id = :productID")
+    fun updateProductRemainingQtyWithSaleCancelForSold(soldQty: Int, productID: String)
+
+    @Query("update product set remaining_quantity = remaining_quantity + :unSoldQty,  sold_quantity= sold_quantity - :unSoldQty where product.id = :productID")
+    fun updateProductRemainingQtyWithSaleCancelForUnSold(unSoldQty: Int, productID: String)
 
 
 }

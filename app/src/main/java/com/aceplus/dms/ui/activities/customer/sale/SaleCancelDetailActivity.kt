@@ -198,6 +198,7 @@ class SaleCancelDetailActivity : BaseActivity(), KodeinAware {
                         soldProductInfo.discountPercent = it.discount_percent
                         soldProductInfo.exclude = it.exclude
                         soldProductInfo.promotionPlanId = it.promotion_plan_id.toString()
+                        soldProductInfo.currentProductQty=it.sale_quantity.toInt()
 
                         soldProductInfoList.add(soldProductInfo)
                         saleCancelViewModel.calculateSoldProductData(soldProductInfoList)
