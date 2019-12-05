@@ -46,6 +46,9 @@ interface SaleCancelRepo {
     fun getPromotionDateList(currentDate:String):Observable<List<PromotionDate>>
     fun getPromotionPriceById(promotionPlanId: String, buy_qty: Int, stockID: String):Observable<List<PromotionPrice>>
 
+    fun updateProductRemainingQtyForSoldProduct(addQty:Int,productId: String)
+    fun updateProductRemainingQtyForUnsoldProduct(unsoldQty:Int,productId: String)
+  //  fun updateProductRemainingQtyForLongClickDelete(unsoldQty: Int,productIdList: List<Int>)
 
 
 }

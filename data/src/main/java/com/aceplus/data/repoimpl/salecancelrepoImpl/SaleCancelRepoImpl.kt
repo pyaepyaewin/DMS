@@ -21,9 +21,26 @@ import com.aceplussolutions.rms.constants.AppUtils
 import io.reactivex.Observable
 
 class SaleCancelRepoImpl(val database: MyDatabase,val shf:SharedPreferences) : SaleCancelRepo {
+//    override fun updateProductRemainingQtyForLongClickDelete(
+//        unsoldQty: Int,
+//        productIdList: List<Int>
+//    ) {
+//        database.productDao().updateProductRemainingQtyForLongClickDelete(unsoldQty,productIdList)
+//    }
+
+    override fun updateProductRemainingQtyForSoldProduct(addQty: Int, productId: String) {
+        database.productDao()
+            .updateProductRemainingQtyForAdd(addQty,productId)
+    }
+
+    override fun updateProductRemainingQtyForUnsoldProduct(unsoldQty: Int, productId: String) {
+        database.productDao()
+            .updateProductRemainingQtyForReduce(unsoldQty,productId)
+    }
+
     override fun updateProductRemainingQtyForSaleCancel(soldProductInfo: SoldProductInfo) {
         database.productDao()
-            .updateProductRemainingQtyWithSaleCancel(soldProductInfo.quantity, soldProductInfo.product.id)
+            .updateProductRemainingQtyWithSaleCancel(soldProductInfo.differentQty, soldProductInfo.product.id)
     }
 
 
@@ -105,7 +122,7 @@ class SaleCancelRepoImpl(val database: MyDatabase,val shf:SharedPreferences) : S
 
     override fun updateProductRemainingQty(soldProductInfo: SoldProductInfo) {
         database.productDao()
-            .updateProductRemainingQty(soldProductInfo.quantity, soldProductInfo.product.id)
+            .updateProductRemainingQty(soldProductInfo.differentQty, soldProductInfo.product.id)
     }
     override fun getAllInvoiceProduct(): Observable<List<InvoiceProduct>> {
         return Observable.just(database.invoiceProductDao().allData)

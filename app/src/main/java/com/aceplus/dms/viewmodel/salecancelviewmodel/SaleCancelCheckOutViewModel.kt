@@ -96,7 +96,8 @@ class SaleCancelCheckOutViewModel(
         bank: String,
         acc: String,
         totalDiscountAmount: Double,
-        totalVolumeDiscountPercent: Double
+        totalVolumeDiscountPercent: Double,
+        productIdList: List<Int>
     ) {
 
         var totalQtyForInvoice = 0
@@ -152,51 +153,65 @@ class SaleCancelCheckOutViewModel(
             if (soldProduct.totalAmt != 0.0) {
                 invoiceProductList.add(invoiceProduct)
             }
-            saleCancelRepo.updateProductRemainingQtyForSaleCancel(soldProduct)
-            saleCancelRepo.updateProductRemainingQty(soldProduct)
+
+            var unsoldQty=soldProduct.currentProductQty-soldProduct.quantity
+          // saleCancelRepo.updateProductRemainingQtyForLongClickDelete(unsoldQty,productIdList)
+            saleCancelRepo.insertInvoiceProduct(invoiceProductList)
+
+            val invoice = Invoice()
+
+            invoice.invoice_id = invoiceId
+            invoice.customer_id = id
+            invoice.sale_date = saleDate
+            invoice.total_amount = totalAmount.toString()
+            invoice.total_discount_amount = totalDiscountAmount
+            invoice.pay_amount = payAmount.toString()
+            invoice.refund_amount = refundAmount.toString()
+            invoice.receipt_person_name = receiptPerson
+            invoice.sale_person_id = salePersonId
+            invoice.due_date = dueDate
+            invoice.cash_or_credit = cashOrLoanOrBank
+            invoice.location_code = ""
+            invoice.device_id = deviceId
+            invoice.invoice_time = invoiceTime
+            invoice.package_invoice_number = 0
+            invoice.package_status = 0
+            invoice.volume_amount = 0.0
+            invoice.package_grade = ""
+            invoice.invoice_product_id = 0
+            invoice.total_quantity =
+                totalQtyForInvoice.toDouble()
+            invoice.invoice_status = cashOrLoanOrBank
+            invoice.total_discount_percent =
+                totalVolumeDiscountPercent.toString()
+            invoice.rate = "1"
+            invoice.tax_amount = taxAmt
+            invoice.bank_name = bank
+            invoice.bank_account_no = acc
+            invoice.sale_flag = 0
+            //invoiceList.add(invoice)
+            saleCancelRepo.insertInvoice(invoice)
         }
 
-        saleCancelRepo.insertInvoiceProduct(invoiceProductList)
 
-        val invoice = Invoice()
-
-        invoice.invoice_id = invoiceId
-        invoice.customer_id = id
-        invoice.sale_date = saleDate
-        invoice.total_amount = totalAmount.toString()
-        invoice.total_discount_amount = totalDiscountAmount
-        invoice.pay_amount = payAmount.toString()
-        invoice.refund_amount = refundAmount.toString()
-        invoice.receipt_person_name = receiptPerson
-        invoice.sale_person_id = salePersonId
-        invoice.due_date = dueDate
-        invoice.cash_or_credit = cashOrLoanOrBank
-        invoice.location_code = ""
-        invoice.device_id = deviceId
-        invoice.invoice_time = invoiceTime
-        invoice.package_invoice_number = 0
-        invoice.package_status = 0
-        invoice.volume_amount = 0.0
-        invoice.package_grade = ""
-        invoice.invoice_product_id = 0
-        invoice.total_quantity =
-            totalQtyForInvoice.toDouble()
-        invoice.invoice_status = cashOrLoanOrBank
-        invoice.total_discount_percent =
-            totalVolumeDiscountPercent.toString()
-        invoice.rate = "1"
-        invoice.tax_amount = taxAmt
-        invoice.bank_name = bank
-        invoice.bank_account_no = acc
-        invoice.sale_flag = 0
-        //invoiceList.add(invoice)
-        saleCancelRepo.insertInvoice(invoice)
     }
-
 }
 
 
 
-
+//if (soldProduct.quantity < soldProduct.currentProductQty) {
+//    var unsoldQty = soldProduct.currentProductQty - soldProduct.quantity
+//    saleCancelRepo.updateProductRemainingQtyForUnsoldProduct(
+//        unsoldQty,
+//        soldProduct.product.id.toString()
+//    )
+//
+//} else {
+//    var soldQty = soldProduct.quantity - soldProduct.currentProductQty
+//    saleCancelRepo.updateProductRemainingQtyForSoldProduct(
+//        soldQty,
+//        soldProduct.product.id.toString()
+//    )
+//}
 
 

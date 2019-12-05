@@ -198,6 +198,16 @@ class SaleCancelDetailActivity : BaseActivity(), KodeinAware {
                         soldProductInfo.discountPercent = it.discount_percent
                         soldProductInfo.exclude = it.exclude
                         soldProductInfo.promotionPlanId = it.promotion_plan_id.toString()
+                        soldProductInfo.currentProductQty=it.sale_quantity.toInt()
+                      //  soldProductInfo.prevQty=it.sale_quantity.toInt()
+                     //   soldProductInfo.currentProductQty=it.sale_quantity.toInt()
+//                        if (soldProductInfo.prevQty>soldProductInfo.quantity)
+//                        {
+//                            soldProductInfo.differentQty=soldProductInfo.prevQty!!.toInt()-it.sale_quantity.toInt()
+//
+//                        }
+//                      else
+//                            soldProductInfo.differentQty=it.sale_quantity.toInt()-soldProductInfo.prevQty!!.toInt()
 
                         soldProductInfoList.add(soldProductInfo)
                         saleCancelViewModel.calculateSoldProductData(soldProductInfoList)
@@ -311,11 +321,13 @@ class SaleCancelDetailActivity : BaseActivity(), KodeinAware {
                     Log.i("qty", "qqqqqqqqqqqqqqqqqqq")
                 } else {
                     val quantity = view.quantity.text.toString().toInt()
-                    if (soldProduct.quantity != 0 && soldProduct.quantity < quantity) {
+                    if (soldProduct.quantity != 0 && soldProduct.quantity < quantity){
+
                         soldProduct.currentProductQty = soldProduct.quantity
                     }
 
                     soldProduct.quantity = quantity
+
                     val newList = saleCancelDetailAdapter.getDataList() as ArrayList
                     newList[position] = soldProduct
                     saleCancelViewModel.calculateSoldProductData(newList)
