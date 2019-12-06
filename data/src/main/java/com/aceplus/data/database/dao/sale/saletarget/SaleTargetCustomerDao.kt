@@ -21,13 +21,13 @@ interface SaleTargetCustomerDao{
     @Query("select * from sale_target_customer where sale_target_customer.customer_id=:customerId")
     fun dataById(customerId: Int): List<SaleTargetCustomer>
 
-    @Query("select invoice_product.total_amount,invoice_product.sale_quantity,product.product_id from invoice_product,product,invoice where product.id = invoice_product.product_id and invoice.customer_id = :iCustomerId and product.group_id = :groupId and product.category_id = :categoryId")
-    fun actualSaleData(iCustomerId:String,groupId:Int,categoryId:Int): List<SaleTargetVO>
-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(list: List<SaleTargetCustomer>)
 
     @Query("Delete from sale_target_customer")
     fun deleteAll()
+
+    @Query("select * from sale_target_customer where customer_id = :customerIdFromSpinner")
+    fun getTargetSaleDBForCustomer(customerIdFromSpinner: Int): List<SaleTargetCustomer>?
 
 }

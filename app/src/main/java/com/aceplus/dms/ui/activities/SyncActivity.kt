@@ -53,11 +53,15 @@ class SyncActivity : BaseActivity(), KodeinAware {
 
                     }
                 }
+                syncViewModel.successState.value = null
             }
         })
         syncViewModel.errorState.observe(this, Observer {
             Utils.cancelDialog()
-            it?.let { errorMessage -> Utils.commonDialog(errorMessage.first, this, 1) }
+            it?.let { errorMessage ->
+                Utils.commonDialog(errorMessage.first, this, 1)
+                syncViewModel.errorState.value = null
+            }
         })
 
         buttonDownload.setOnClickListener {

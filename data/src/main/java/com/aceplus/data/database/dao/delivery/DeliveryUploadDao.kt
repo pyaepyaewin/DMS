@@ -34,4 +34,7 @@ interface DeliveryUploadDao {
     @Query("select delivery_upload.invoice_no,customer_name,address from delivery_upload inner join customer on customer.id = delivery_upload.customer_id")
     fun getIncompleteDeliverReport(): List<IncompleteDeliverReport>
 
+    @Query("select * from delivery_upload WHERE  customer_id BETWEEN :fromCusNo AND :toCusNo and date(invoice_date) = date(:newDate)")
+    fun getSaleVisitForDeliveryUpload(fromCusNo: Int, toCusNo: Int, newDate: String): List<DeliveryUpload>
+
 }

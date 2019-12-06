@@ -25,6 +25,7 @@ import com.aceplus.dms.viewmodel.customer.delivery.DeliveryViewModel
 import com.aceplus.domain.entity.customer.Customer
 import com.aceplus.domain.entity.delivery.Delivery
 import com.aceplus.domain.entity.invoice.Invoice
+import com.aceplus.domain.entity.product.Product
 import com.aceplus.domain.entity.promotion.Promotion
 import com.aceplus.domain.model.credit.CreditInvoice
 import com.aceplus.domain.model.delivery.Deliver
@@ -190,6 +191,8 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
     private var relatedDataForPrint: RelatedDataForPrint? = null
     private var salePersonName: String? = null
     private var customerName: String? = null
+    private var orderPerson :String? = null
+    private var salePerson :String? = null
     private var customerTownShip: String? = null
     private var orderedInvoice: Delivery? = null
     private var orderedDInvoice: Deliver? = null
@@ -207,18 +210,9 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
         }
 
         getIntentData()
+        Log.d("List Error", "${historyReportSoldProductList.size}")
         catchEvents()
         getTaxInfoAndSetData()
-
-        /*when (printMode) {
-            "S" -> print_soldProductList.adapter = soldProductPrintListAdapter
-            "RP" -> print_soldProductList.adapter = historySoldProductPrintListAdapter
-            "D" -> {
-                soldProductPrintListAdapter.setNewList(soldProductList)
-                print_soldProductList.adapter = soldProductPrintListAdapter
-            }
-            print_soldProductList.layoutManager = LinearLayoutManager(this)
-        }*/
 
     }
 
@@ -295,6 +289,7 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
         printDeliveryViewModel.userNameDataList.observe(this, Observer {
             for (i in it!!){
                 deliver_order_person.text = i.user_name!!
+                orderPerson = i.user_name!!
             }
         })
         printDeliveryViewModel.loadOrderPerson(saleManId)
@@ -304,6 +299,7 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
         printDeliveryViewModel.userNameDataList.observe(this, Observer {
             for (i in it!!){
                 deliver_person.text = i.user_name!!
+                salePerson = i.user_name!!
             }
         })
         printDeliveryViewModel.loadOrderPerson(salePersonId.toInt())
@@ -501,9 +497,21 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
             )
 
         } else if (printMode == "RP"){
-
             Utils.saveInvoiceImageIntoGallery(invoice!!.invoice_id, this, myBitmap, "Sale") // Doesn't work
-            val editProductList = printInvoiceViewModel.arrangeProductList(soldProductList, promotionList)
+            val saleInvoiceDetailList = ArrayList<SoldProductInfo>()
+            for (i in historyReportSoldProductList){
+                val soldProduct = SoldProductInfo(Product(), false)
+                soldProduct.product.product_name = i.productName
+                soldProduct.quantity = i.saleQuantity
+                soldProduct.discountAmount = i.discountAmount.toDouble()
+                soldProduct.promotionPrice = i.promotionPrice
+                soldProduct.totalAmt = i.totalAmount
+                soldProduct.itemDiscountAmount = i.itemDiscountAmount
+                soldProduct.discountPercent = i.discountPercent
+                soldProduct.product.selling_price = i.sellingPrice.toString()
+                saleInvoiceDetailList.add(soldProduct)
+            }
+            val editProductList = printInvoiceViewModel.arrangeProductList(saleInvoiceDetailList, promotionList)
             val customerData: Customer = relatedDataForPrint!!.customer
             PrintUtils.printWithHSPOS(
                 this,
@@ -532,16 +540,16 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
                 this,
                 customerData.customer_name,
                 customerData.address,
-                orderedInvoice!!.invoice_no!!,
-                relatedDataForPrint!!.orderSalePersonName,
+                orderedDInvoice!!.invoiceNo!!,
+                orderPerson,
                 invoice!!.invoice_id,
-                salePersonName,
+                salePerson,
                 relatedDataForPrint!!.routeName,
                 relatedDataForPrint!!.customerTownShipName,
                 invoice!!,
                 editProductList,
                 promotionList,
-                orderedInvoice!!.paid_amount?.toDouble() ?: 0.0,
+                orderedDInvoice!!.paidAmount,
                 PrintUtils.PRINT_FOR_NORMAL_SALE,
                 PrintUtils.FOR_OTHERS,
                 mBluetoothService!!,

@@ -35,5 +35,8 @@ interface DidCustomerFeedbackDao {
     @Query("Delete from did_customer_feedback")
     fun deleteAll()
 
+    @Query("select * from did_customer_feedback WHERE  customer_no BETWEEN :fromCusNo AND :toCusNo and date(invoice_date) = date(:newDate)")
+    fun getSaleVisitForDidCustomerFeedback(fromCusNo: Int, toCusNo: Int, newDate: String): List<DidCustomerFeedback>
+
 
 }

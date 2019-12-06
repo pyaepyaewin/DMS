@@ -23,20 +23,7 @@ class DeliveryViewModel(
     private val schedulerProvider: SchedulerProvider
 ) : BaseViewModel() {
     var deliveryDataList = MutableLiveData<List<DeliveryVO>>()
-    var deliveryAllDataList = MutableLiveData<List<Delivery>>()
     var deliveryAllItemDataList = MutableLiveData<Pair<List<SoldProductInfo>, Customer>>()
-
-    //Testing
-    fun loadAllDeliveryList() {
-        launch {
-            deliveryRepo.allData()
-                .subscribeOn(schedulerProvider.io())
-                .observeOn(schedulerProvider.mainThread())
-                .subscribe {
-                    deliveryAllDataList.postValue(it)
-                }
-        }
-    }
 
     fun loadDeliveryList() {
         launch {
@@ -48,17 +35,7 @@ class DeliveryViewModel(
                 }
         }
     }
-    val taxTypeList = MutableLiveData<List<CompanyInformation>>()
-    fun loadTaxTypeList(){
-        launch {
-            deliveryRepo.getTaxTypeList()
-                .subscribeOn(schedulerProvider.io())
-                .observeOn(schedulerProvider.mainThread())
-                .subscribe {
-                    taxTypeList.postValue(it)
-                }
-        }
-    }
+
     fun loadAllDeliveryItemList(deliveryId: String, customerId: Int) {
         var deliveryItemDataList = mutableListOf<DeliveryItem>()
         var deliveryPresentDataList = mutableListOf<DeliveryPresent>()
@@ -206,7 +183,6 @@ class DeliveryViewModel(
     }
 
     val userNameDataList = MutableLiveData<List<SaleMan>>()
-    val invoiceData = MutableLiveData<Invoice>()
      fun loadOrderPerson(saleManId: Int){
          launch {
              deliveryRepo.getSaleManName(saleManId)
@@ -217,16 +193,6 @@ class DeliveryViewModel(
                  }
          }
      }
-    fun loadDeliveryPerson(invoiceId: String){
-        launch {
-            deliveryRepo.getDeliveryName(invoiceId)
-                .subscribeOn(schedulerProvider.io())
-                .observeOn(schedulerProvider.mainThread())
-                .subscribe {
-                    invoiceData.postValue(it)
-                }
-        }
-    }
 
     fun saveDeliveryUpload(cvDeliveryUpload: DeliveryUpload){
         deliveryRepo.saveDeliveryUpload(cvDeliveryUpload)

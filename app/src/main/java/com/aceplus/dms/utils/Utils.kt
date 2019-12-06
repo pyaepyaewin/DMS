@@ -28,6 +28,7 @@ import com.aceplus.domain.entity.promotion.Promotion
 import com.aceplus.domain.model.INVOICECANCEL
 import com.aceplus.domain.model.credit.CreditInvoice
 import com.aceplus.domain.model.forApi.ConfirmRequestSuccess
+import com.aceplus.domain.model.sale.SaleManDailyReport
 import com.aceplus.domain.vo.SoldProductInfo
 import com.aceplussolutions.rms.constants.AppUtils
 import com.google.gson.Gson
@@ -223,13 +224,9 @@ object Utils {
     }
 
     fun getDeviceId(activity: Activity): String {
-//        return Settings.Secure.getString(
-//            activity.contentResolver,
-//            Settings.Secure.ANDROID_ID
-//        )
-        val telephonyManager =
-            activity.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
-        return telephonyManager.imei
+        return Settings.Secure.getString(activity.contentResolver, Settings.Secure.ANDROID_ID)
+//        val telephonyManager = activity.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+//        return telephonyManager.imei
 
     }
 
@@ -792,5 +789,36 @@ object Utils {
         return false
 
     }
+
+
+
+    @Throws(UnsupportedEncodingException::class)
+    private fun convertFromListByteArrayTobyteArray(ByteArray: List<ByteArray>): ByteArray {
+        var dataLength = 0
+        for (i in ByteArray.indices) {
+            dataLength += ByteArray[i].size
+        }
+
+        var distPosition = 0
+        val byteArray = ByteArray(dataLength)
+        for (i in ByteArray.indices) {
+            System.arraycopy(ByteArray[i], 0, byteArray, distPosition, ByteArray[i].size)
+            distPosition += ByteArray[i].size
+        }
+
+        return byteArray
+    }
+
+    private fun sendDataByte2BT(mActivity: Activity, mService: BluetoothService, data: ByteArray) {
+        if (mService.state !== BluetoothService.STATE_CONNECTED) {
+            Toast.makeText(mActivity, "Not Connected", Toast.LENGTH_SHORT)
+                .show()
+            return
+        }
+        mService.write(data)
+        commonDialog("Success", mActivity, 0)
+
+    }
+
 
 }

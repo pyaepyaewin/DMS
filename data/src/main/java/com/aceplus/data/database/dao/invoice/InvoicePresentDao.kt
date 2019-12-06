@@ -24,7 +24,7 @@ interface InvoicePresentDao {
     @Query("Delete from invoice_present")
     fun deleteAll()
 
-    @Query("select invoice.invoice_id,customer_name,address,total_amount,total_discount_amount,invoice.sale_date from invoice inner join customer on customer.id = invoice.customer_id where invoice.sale_flag = 1 and invoice.invoice_id not like 'SX%' and invoice.invoice_id not like 'OS%'")
+    @Query("select invoice.invoice_id,customer_name,address,total_amount,total_discount_amount,invoice.sale_date from invoice inner join customer on customer.id = invoice.customer_id where invoice.sale_flag = 0 and invoice.invoice_id not like 'SX%' and invoice.invoice_id not like 'OS%'")
     fun getSaleInvoiceReport(): List<SaleInvoiceReport>
 
     @Query("Delete from invoice_present where tsale_id=:invoiceID")

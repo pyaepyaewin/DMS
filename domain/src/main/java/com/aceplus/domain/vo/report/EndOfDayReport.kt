@@ -1,23 +1,20 @@
 package com.aceplus.domain.vo.report
 
+import com.aceplus.domain.entity.preorder.PreOrder
+
 class EndOfDayReport(
-    var userName: String,
-    var routeName: String,
-    var startTime: String,
-    var endTime: String,
-    var totalSales: String,
-    var totalSalesOrder: String,
-    var totalExchange: String,
-    var totalReturn: String,
-    var totalCashReceive: String,
-    var netCash: String,
-    var totalCustomer: String,
-    var newCustomer: String,
-    var planCustomer: String,
-    var totalSalesCount: String,
-    var totalOrderCount: String,
-    var totalSalesExchangeOnly: String,
-    var totalSalesReturnOnly: String,
-    var totalCashReceiptCount: String,
-    var notVisitedCount: String
+    var totalPayAmt :Double,
+    var preOrderList : ArrayList<PreOrder>,
+    var amtArr :Array<Double>,
+    var saleReturnCount : Int,
+    var saleExchangeCount :Int,
+    var totalCashAmount :Double,
+    var totalCashCount :Int,
+    var totalSaleCount:Int,
+    var customerCount :Int,
+    var newCustomerCount :Int,
+    var planCustomerCount : Int,
+    var notVisitCount :Int,
+    var startTime : String
+
 )

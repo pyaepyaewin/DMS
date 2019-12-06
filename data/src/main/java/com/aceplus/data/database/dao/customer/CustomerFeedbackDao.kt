@@ -30,7 +30,7 @@ interface CustomerFeedbackDao {
     @Query("Delete from customer_feedback")
     fun deleteAll()
 
-    @Query("select customer_name,description,remark from customer inner join did_customer_feedback on customer.id = did_customer_feedback.customer_no")
+    @Query("select customer_name,description,remark from did_customer_feedback inner join customer on customer.id = did_customer_feedback.customer_no")
     fun getUnSellReasonReport(): List<UnsellReasonReport>
 
 }

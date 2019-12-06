@@ -19,6 +19,7 @@ import android.widget.EditText
 import android.widget.Spinner
 import com.aceplus.data.utils.Constant
 import com.aceplus.dms.R
+import com.aceplus.dms.ui.activities.CustomerVisitActivity
 import com.aceplus.dms.ui.activities.customer.sale.SaleActivity
 import com.aceplus.dms.ui.activities.customer.sale.SaleReturnActivity
 import com.aceplus.dms.ui.activities.customer.saleorder.SaleOrderActivity
@@ -334,7 +335,6 @@ class CustomerActivity : BaseActivity(), KodeinAware {
     }
 
     private fun onClickOkButton(){
-
         if (didCustomerSelected()) {
             customerViewModel.insertDataForTempSaleManRouteAndSaleVisitRecord(selectedCustomer!!, Utils.getCurrentDate(true), gspTracker)
             val intent = SaleReturnActivity.newIntentFromCustomer(applicationContext, true, selectedCustomer!!)

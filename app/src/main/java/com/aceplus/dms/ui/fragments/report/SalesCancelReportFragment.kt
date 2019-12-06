@@ -32,8 +32,8 @@ import kotlin.collections.ArrayList
 
 class SalesCancelReportFragment : BaseFragment(), KodeinAware {
     private var myCalendar = Calendar.getInstance()
-    private lateinit var fromDate: Date
-    private lateinit var toDate: Date
+    private var fromDate: String? = null
+    private var toDate: String? = null
     override val kodein: Kodein by kodein()
     private val salesCancelReportAdapter: SalesCancelReportAdapter by lazy {
         SalesCancelReportAdapter(
@@ -63,11 +63,21 @@ class SalesCancelReportFragment : BaseFragment(), KodeinAware {
             chooseDob(2)
         }
         btn_sale_cancel_report_search.setOnClickListener {
-            //            salesCancelReportViewModel.saleCancelInvoiceReportForDateList.observe(this,android.arch.lifecycle.Observer {
-//                salesCancelReportAdapter.setNewList(it as ArrayList<SalesCancelReport>)
-//                saleCancelDataList = it
-//                calculateAmount(it)
-//            })
+            when {
+                edit_text_sale_cancel_report_from_date.text.isEmpty() -> edit_text_sale_cancel_report_from_date.error = ""
+                edit_text_sale_cancel_report_to_date.text.isEmpty() -> edit_text_sale_cancel_report_to_date.error = ""
+                else -> {
+                    salesCancelReportViewModel.saleCancelInvoiceReportForDateList.observe(
+                        this,
+                        android.arch.lifecycle.Observer {
+                            salesCancelReportAdapter.setNewList(it as ArrayList<SalesCancelReport>)
+                            saleCancelDataList = it
+                            calculateAmount(it)
+                        })
+                    salesCancelReportViewModel.loadSaleCancelInvoiceForDateList(fromDate!!, toDate!!)
+
+                }
+            }
         }
         btn_sale_cancel_report_clear.setOnClickListener {
             edit_text_sale_cancel_report_from_date.setText("")
@@ -130,7 +140,6 @@ class SalesCancelReportFragment : BaseFragment(), KodeinAware {
         }
         salesCancelReportViewModel.loadSalesCancelReport()
         salesCancelReportViewModel.loadCustomer()
-        //salesCancelReportViewModel.loadSaleCancelInvoiceForDateList("$fromDate","$toDate")
 
         //sale cancel report detail list
         salesCancelReportViewModel.saleCancelDetailReportSuccessState.observe(
@@ -179,7 +188,7 @@ class SalesCancelReportFragment : BaseFragment(), KodeinAware {
     }
 
     private fun chooseDob(choice: Int) {
-        val sdf = SimpleDateFormat("yyyy/MM/dd")
+        val sdf = SimpleDateFormat("yyyy-MM-dd")
         val datePicker =
             DatePickerDialog.OnDateSetListener { _, year, monthOfYear, dayOfMonth ->
                 myCalendar.set(Calendar.YEAR, year)
@@ -188,10 +197,10 @@ class SalesCancelReportFragment : BaseFragment(), KodeinAware {
 
                 if (choice == 1) {
                     edit_text_sale_cancel_report_from_date.setText(sdf.format(myCalendar.time))
-                    fromDate = myCalendar.time
+                    fromDate = sdf.format(myCalendar.time)
                 } else if (choice == 2) {
                     edit_text_sale_cancel_report_to_date.setText(sdf.format(myCalendar.time))
-                    toDate = myCalendar.time
+                    toDate = sdf.format(myCalendar.time)
                 }
             }
         val dateDialog = DatePickerDialog(

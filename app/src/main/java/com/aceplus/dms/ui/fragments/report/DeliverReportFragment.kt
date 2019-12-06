@@ -41,7 +41,7 @@ class DeliverReportFragment : BaseFragment(), KodeinAware {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         //delivery report list
         deliverReportViewModel.deliverReportSuccessState.observe(this, Observer {
-           var completeDeliveryItemList = arrayListOf<DeliverReport>()
+           val completeDeliveryItemList = arrayListOf<DeliverReport>()
             for (i in it!!.first){
                 var qty = 0
                 var amount = 0.0
@@ -49,7 +49,9 @@ class DeliverReportFragment : BaseFragment(), KodeinAware {
                     if (i.invoiceId == data.delivery_id){
                         qty += data.quantity!!.toInt()
                     }
-                    for (item in it.third){
+                }
+                for (item in it.third) {
+                    if (i.invoiceId == item.deliveryId) {
                         amount += item.quantity.toDouble() * item.sellingPrice.toDouble()
                     }
                 }

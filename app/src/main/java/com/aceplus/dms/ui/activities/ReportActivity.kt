@@ -63,7 +63,10 @@ class ReportActivity : BaseActivity() {
                     11 -> SalesHistoryReportFragment()
                     12 -> SalesOrderHistoryReportFragment()
                     13 -> SalesVisitHistoryReportFragment()
-                    else -> EndOfDayReportFragment()
+                    else -> {
+                        print_img.visibility = View.VISIBLE
+                        EndOfDayReportFragment()
+                    }
                 }
                 val transaction = supportFragmentManager.beginTransaction()
                 transaction.replace(R.id.fragment_report, fragment)

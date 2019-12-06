@@ -124,16 +124,16 @@ class SaleOrderActivity : BaseActivity(), KodeinAware {
 
     private fun setupUI(){
 
+        headerDiscount.visibility = View.GONE
+        tableHeaderQty.visibility = View.GONE
+        saleDateTextView.text = Utils.getCurrentDate(false)
+
         if (isDelivery){
             tvTitle.text = "DELIVERY"
             tvNetAmount.text = orderedInvoice!!.amount.toString()
             tableHeaderQty.visibility = View.VISIBLE
             searchAndSelectProductsLayout.visibility = View.GONE
         }
-
-        headerDiscount.visibility = View.GONE
-        tableHeaderQty.visibility = View.GONE
-        saleDateTextView.text = Utils.getCurrentDate(false)
 
         rvProductList.adapter = mProductListAdapter
         rvProductList.layoutManager = GridLayoutManager(applicationContext, 1)

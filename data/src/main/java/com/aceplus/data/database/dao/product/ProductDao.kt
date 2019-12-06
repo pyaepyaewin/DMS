@@ -13,7 +13,6 @@ import com.aceplus.domain.vo.report.ProductBalanceReport
 
 @Dao
 interface ProductDao {
-
     @get:Query("select * from product")
     val allDataLD: LiveData<List<Product>>
 
@@ -59,6 +58,21 @@ interface ProductDao {
 
     @Query("update product set remaining_quantity = remaining_quantity- :addQty, sold_quantity = sold_quantity + :addQty where product.id = :productID")
     fun updateProductRemainingQtyForAdd(addQty: Int, productID: String)
+
+    @get:Query("select * from product,sale_target_sale_man where sale_target_sale_man.group_code_id = product.group_id order by sale_target_sale_man.group_code_id desc")
+    val getActualSale1ForSaleTargetProduct: List<Product>?
+
+    @get:Query("select * from product,sale_target_sale_man where sale_target_sale_man.category_id = product.category_id order by sale_target_sale_man.category_id asc")
+    val getActualSale2ForSaleTargetProduct: List<Product>?
+
+    @get:Query("select * from product,sale_target_sale_man where sale_target_sale_man.stock_id = product.id order by sale_target_sale_man.stock_id desc")
+    val getActualSale3ForSaleTargetProduct: List<Product>?
+
+    @Query("select * from product where id = :productId")
+    fun getGroupIdFromProduct(productId:Int): List<Product>?
+
+    @Query("select * from product where id = :stockId")
+    fun getProductNameFromProduct(stockId: Int): Product?
 
     @Query("update product set remaining_quantity = remaining_quantity+ :unSoldQty, sold_quantity = sold_quantity - :unSoldQty where product.id = :productID")
     fun updateProductRemainingQtyForReduce(unSoldQty: Int, productID: String)

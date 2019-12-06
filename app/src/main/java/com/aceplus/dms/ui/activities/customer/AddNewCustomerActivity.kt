@@ -456,10 +456,6 @@ class AddNewCustomerActivity : BaseActivity(), KodeinAware {
         if (tempCusId != null && tempCusId != "") {
             customId = Integer.parseInt(tempCusId)
         }
-        Log.d("ID", "$customId")
-        Log.d("Temp ID", "$tempCusId")
-        Log.d("Customer ID", "$customerId")
-        Log.d(" User ID", "$userId")
         var customer: NewCustomer? = null
         if (type == "save") {
             customer = NewCustomer(
