@@ -1,14 +1,15 @@
 package com.aceplus.dms.ui.activities.customer.sale
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.app.DatePickerDialog
+import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import com.aceplus.data.utils.Constant
@@ -89,14 +90,18 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
     private var locationCode: Int = 0
     private var salePersonId: String? = null
     private var invoice: Invoice? = null
-    private var totalVolumeDiscount: Double = 0.0
-    private var totalVolumeDiscountPercent: Double = 0.0
-    private var totalDiscountAmount:Double = 0.0
-    private var volDisPercent: Double = 0.0
-    private var volDisAmount:Double = 0.0
     private var saleReturnAmount: Double = 0.0
     private var saleReturnInvoiceNo: String? = null
     private var saleExchangeAmount: Double = 0.0
+
+    private var totalVolumeDiscount: Double = 0.0           //Disc by date
+    private var totalVolumeDiscountPercent: Double = 0.0    //Disc by date
+    private var salesmanDisPercent: Double = 0.0            //Disc by salesman
+    private var salesmanDisAmount:Double = 0.0              //Disc by salesman
+    private var totalItemDiscountAmount: Double = 0.0       //Disc by amount
+    private var totalItemDiscountPercent: Double = 0.0      //Disc by amount
+    private var totalDiscountAmount:Double = 0.0            //Total of disc
+    private var totalDiscountPercent:Double = 0.0           //Total of disc
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -179,8 +184,8 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
                 taxType = it.taxType
                 taxPercent = it.taxPercent
 
-                val totalItemDisAmt = it.amountAndPercentage["Amount"] ?: 0.0
-                displayFinalAmount(totalItemDisAmt)
+                totalItemDiscountAmount = it.amountAndPercentage["Amount"] ?: 0.0
+                displayFinalAmount()
 
             }
         })
@@ -201,15 +206,13 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
 
     }
 
-    private fun displayFinalAmount(itemDisAmt: Double){
+    private fun displayFinalAmount(){
+
+        totalDiscountAmount = totalVolumeDiscount + totalItemDiscountAmount + salesmanDisAmount
+        totalDiscountPercent = totalDiscountAmount * 100 / totalAmount  //check after fixing disc
 
         val taxAmt = calculateTax()
         var netAmount: Double
-
-        totalDiscountAmount = totalVolumeDiscount + itemDisAmt
-
-        if (totalAmount != 0.0)
-            totalVolumeDiscountPercent = totalDiscountAmount * 100 / totalAmount
 
         if (taxType.equals("E", true)){
             tax_label_saleCheckout.text = "Tax (Exclude) : "
@@ -219,18 +222,17 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
             netAmount = totalAmount - totalDiscountAmount
         }
 
-        if (volDisAmount != 0.0) netAmount -= volDisAmount
-
         this.netAmount = netAmount
-        tvNetAmount.text = Utils.formatAmount(netAmount)
 
-        if (volDisPercent != 0.0) edtVolumeDiscountPercent.setText(volDisPercent.toString())
+        /*Filling discount in editText - can use again after fixing discount (Don't delete)
+        if (salesmanDisPercent != 0.0) edtVolumeDiscountPercent.setText(salesmanDisPercent.toString())
         else edtVolumeDiscountPercent.setText(totalVolumeDiscountPercent.toString())
 
-        if (volDisAmount != 0.0) edtVolumeDiscountAmt.setText(volDisAmount.toString())
-        else edtVolumeDiscountAmt.setText(totalDiscountAmount.toString())
+        if (salesmanDisAmount != 0.0) edtVolumeDiscountAmt.setText(salesmanDisAmount.toString())
+        else edtVolumeDiscountAmt.setText(totalDiscountAmount.toString())*/
 
-        //tax_txtView.text = df.format(taxAmt) moved to function
+        tvNetAmount.text = Utils.formatAmount(netAmount)
+        tax_txtView.text = df.format(taxAmt)
 
         if (isSaleExchange){
             tvSaleReturnAmount.text = Utils.formatAmount(saleReturnAmount)
@@ -261,23 +263,24 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
         if (edtVolumeDiscountPercent.text.toString().isNotBlank() && edtVolumeDiscountPercent.text.toString() != "."){
             val discountPercent = edtVolumeDiscountPercent.text.toString().toDouble()
             var discountAmount = totalAmount * discountPercent / 100
-            var netAmount = totalAmount - discountAmount
 
             discountAmount = df.format(discountAmount).toDouble()
-            netAmount = df.format(netAmount).toDouble()
-
             edtVolumeDiscountAmt.setText(discountAmount.toString())
-            tvNetAmount.text = netAmount.toString()
-            this.netAmount = netAmount
-            this.volDisAmount = discountAmount
-            this.volDisPercent = totalVolumeDiscountPercent + discountPercent // To check - total percent?
 
-            calculateTax()
+            //var netAmount = netAmount - discountAmount
+            //netAmount = df.format(netAmount).toDouble()
+            //tvNetAmount.text = netAmount.toString()
+            //this.netAmount = netAmount
+
+            this.salesmanDisAmount = discountAmount
+            this.salesmanDisPercent = discountPercent
 
             if (isSaleExchange)
                 calculateSaleExchangeData()
-            else
+            else{
+                displayFinalAmount()
                 calculateRefundAmount()
+            }
         }
 
     }
@@ -287,23 +290,24 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
         if (edtVolumeDiscountAmt.text.toString().isNotBlank() && edtVolumeDiscountAmt.text.toString() != "."){
             val discountAmount = edtVolumeDiscountAmt.text.toString().toDouble()
             var discountPercent = 100 * (discountAmount / totalAmount)
-            var netAmount = totalAmount - discountAmount
 
             discountPercent = df.format(discountPercent).toDouble()
-            netAmount = df.format(netAmount).toDouble()
-
             edtVolumeDiscountPercent.setText(discountPercent.toString())
-            tvNetAmount.text = netAmount.toString()
-            this.netAmount = netAmount
-            this.volDisAmount = discountAmount
-            this.volDisPercent = totalVolumeDiscountPercent + discountPercent // To check - total percent?
 
-            calculateTax()
+            //var netAmount = netAmount - discountAmount
+            //netAmount = df.format(netAmount).toDouble()
+            //tvNetAmount.text = netAmount.toString()
+            //this.netAmount = netAmount
+
+            this.salesmanDisAmount = discountAmount
+            this.salesmanDisPercent = discountPercent
 
             if (isSaleExchange)
                 calculateSaleExchangeData()
-            else
+            else{
+                displayFinalAmount()
                 calculateRefundAmount()
+            }
         }
 
     }
@@ -345,11 +349,9 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
 
         var taxAmt = 0.0
         if (taxPercent != 0)
-            taxAmt = netAmount / 21
+            taxAmt = (totalAmount - totalDiscountAmount) / 21
 
         this.taxAmt = taxAmt
-        tax_txtView.text = df.format(taxAmt)
-
         return taxAmt
 
     }
@@ -407,6 +409,10 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
                 val payAmt = if (payAmount.text.isNotBlank()) payAmount.text.toString().toDouble() else 0.0
 
                 if (payAmt < netAmount){
+                    if (paymentMethod == "B"){
+                        Utils.commonDialog("Insufficient Pay Amount!", this, 1)
+                        return
+                    }
                     setInvoiceId()
                     saveData("CR")
                 } else{
@@ -430,13 +436,13 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
         edit_txt_branch_name.error = null
         edit_txt_account_name.error = null
 
-        if (edt_dueDate.text.isNotBlank() || payAmount.text.isNotBlank()){
-
-            dateAndPayment = true
-
-
-
-        }
+        if (edt_dueDate.text.isNotBlank() || payAmount.text.isNotBlank()) dateAndPayment = true
+        else
+            AlertDialog.Builder(this)
+                .setTitle("Alert!")
+                .setMessage("You must specify due date.")
+                .setPositiveButton("OK", null)
+                .show()
 
         if (receiptPerson.text.isNotBlank()) name = true
         else receiptPerson.error = "Please enter receipt person"
@@ -486,8 +492,8 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
             taxAmt,
             edit_txt_branch_name.text.toString(),
             edit_txt_account_name.text.toString(),
-            volDisAmount,
-            volDisPercent,
+            salesmanDisAmount,
+            salesmanDisPercent,
             saleReturnInvoiceNo
         )
 

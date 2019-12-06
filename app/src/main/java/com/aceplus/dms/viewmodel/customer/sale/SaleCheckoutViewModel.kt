@@ -123,7 +123,7 @@ class SaleCheckoutViewModel(
                                 amountAndPercentage["Amount"] = itemTotalDis
                             }
 
-                        /*Modified function - no more usage
+                        /*Modified function - no more usage (can delete)
                         for (aSameCategoryProduct in sameCategoryProducts) {
 
                             soldPrice = if (aSameCategoryProduct.promotionPrice == 0.0) {
