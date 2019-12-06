@@ -1,5 +1,6 @@
 package com.aceplus.dms.ui.activities.creditcollection
 
+import android.app.Activity
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
@@ -30,7 +31,7 @@ class CreditCollectionActivity : BaseActivity(), KodeinAware {
     private fun onClickNoticeListItem(data: CreditCollectionDataClass) {
         val unpaidAmt=data.amount-data.pay_amount!!
         if (unpaidAmt !== 0.0) {
-            startActivity(CreditCollectionCheckoutActivity.getIntent(this,data.id,data.customer_name))
+            startActivityForResult(CreditCollectionCheckoutActivity.getIntent(this,data.id,data.customer_name),Utils.RQ_BACK_TO_CUSTOMER)
 
         } else {
             Utils.commonDialog("No credit for this customer", this, 2)
@@ -79,5 +80,12 @@ class CreditCollectionActivity : BaseActivity(), KodeinAware {
         creditCollectionViewModel.loadCreditCollection()
 
 
+    }
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == Utils.RQ_BACK_TO_CUSTOMER)
+            if (resultCode == Activity.RESULT_OK){
+                setResult(Activity.RESULT_OK)
+                finish()
+            }
     }
 }

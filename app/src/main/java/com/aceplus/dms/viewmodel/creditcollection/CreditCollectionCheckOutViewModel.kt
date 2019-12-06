@@ -28,8 +28,10 @@ class CreditCollectionCheckOutViewModel(
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
-                    creditCollectionCheckOutSuccessState.postValue(it)
+//                    creditCollectionCheckOutSuccessState.postValue(it)
+                    creditCollectionCheckOutSuccessState.value = it
                     creditList = it
+//                    creditCollectionCheckOutSuccessState.value = null
 
                 }, {
                     creditCollectionCheckOutErrorState.value = it.localizedMessage
@@ -138,7 +140,42 @@ class CreditCollectionCheckOutViewModel(
 
         return remainList
     }
+    fun calculatePayAmountForSelectedInvoice(payAmt: String): List<Credit> {
 
+        var payAmount: Double = payAmt.replace(",", "").toDouble()
+        val remainList = ArrayList<Credit>()
+        val tempCreditList = ArrayList<Credit>()
+        tempCreditList.addAll(creditList)
+
+        for (i in creditList) {
+            val creditAmount = i.amount - i.pay_amount
+
+            if (payAmount != 0.0 && payAmount < creditAmount) {
+                i.pay_amount = payAmount
+                payAmount = 0.0
+                remainList.add(i)
+
+            } else if (payAmount != 0.0 && payAmount > creditAmount) {
+                payAmount -= creditAmount
+                i.pay_amount = creditAmount
+                tempCreditList.remove(i)
+                remainList.add(i)
+
+            } else if (payAmount != 0.0 && payAmount == creditAmount) {
+                payAmount -= creditAmount
+                i.pay_amount = creditAmount
+                tempCreditList.remove(i)
+                remainList.add(i)
+            }
+
+        }
+
+        Log.i("REMAIN -> ", payAmount.toString() + "")
+        Log.i("Remain item -> ", remainList.size.toString() + "")
+        Log.i("item remove -> ", tempCreditList.size.toString() + "")
+
+        return remainList
+    }
 
 }
 

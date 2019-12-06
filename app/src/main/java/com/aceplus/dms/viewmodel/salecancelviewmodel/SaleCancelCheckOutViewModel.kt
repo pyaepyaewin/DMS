@@ -73,6 +73,10 @@ class SaleCancelCheckOutViewModel(
         saleCancelRepo.deleteInvoiceProductForLongClick(invoiceId, productIdList)
     }
 
+    fun updateProductRemainingQuantity(soldProductInfo: SoldProductInfo) {
+        saleCancelRepo.updateProductRemainingQtyForSaleCancel(soldProductInfo)
+    }
+
     @SuppressLint("CheckResult")
     fun saveCheckoutData(
         id: String,
@@ -92,7 +96,8 @@ class SaleCancelCheckOutViewModel(
         bank: String,
         acc: String,
         totalDiscountAmount: Double,
-        totalVolumeDiscountPercent: Double
+        totalVolumeDiscountPercent: Double,
+        productIdList: List<Int>
     ) {
 
         var totalQtyForInvoice = 0
@@ -103,6 +108,7 @@ class SaleCancelCheckOutViewModel(
         val invoiceList: MutableList<Invoice> = mutableListOf()
 
         for (soldProduct in soldProductList) {
+
             val invoiceDetail = InvoiceDetail()
             invoiceDetail.tsaleId = invoiceId
             invoiceDetail.productId = soldProduct.product.id
@@ -113,14 +119,15 @@ class SaleCancelCheckOutViewModel(
             invoiceDetail.s_price = soldProduct.product.selling_price!!.toDouble()
             invoiceDetail.p_price = soldProduct.product.purchase_price!!.toDouble()
             invoiceDetail.promotionPrice = soldProduct.promotionPrice
-            invoiceDetail.exclude = soldProduct.exclude
             invoiceDetail.itemDiscountPercent = soldProduct.focPercent
             invoiceDetail.itemDiscountAmount = soldProduct.focAmount
 
             if (!soldProduct.promotionPlanId.isNullOrEmpty())
                 invoiceDetail.promotion_plan_id =
                     soldProduct.promotionPlanId.toInt()
-
+            if (soldProduct.exclude != null && !soldProduct.exclude.equals("")) {
+                invoiceDetail.exclude = soldProduct.exclude
+            }
             invoiceDetailList.add(invoiceDetail)
 
 
@@ -133,61 +140,78 @@ class SaleCancelCheckOutViewModel(
             invoiceProduct.discount_percent = soldProduct.discountPercent
             invoiceProduct.s_price = soldProduct.product.selling_price!!.toDouble()
             invoiceProduct.p_price = soldProduct.product.purchase_price!!.toDouble()
-            invoiceProduct.promotion_price =
-                soldProduct.promoPriceByDiscount
+//            invoiceProduct.promotion_price =
+//                soldProduct.promoPriceByDiscount
             invoiceProduct.item_discount_percent = soldProduct.focPercent
             invoiceProduct.item_discount_amount = soldProduct.focAmount
             invoiceProduct.exclude = "${soldProduct.exclude}"
-
+            var promoPrice = soldProduct.promotionPrice
+            if (promoPrice == 0.0) {
+                promoPrice = soldProduct.product.selling_price!!.toDouble()
+            }
             totalQtyForInvoice += soldProduct.quantity
             if (soldProduct.totalAmt != 0.0) {
                 invoiceProductList.add(invoiceProduct)
             }
 
-            saleCancelRepo.updateProductRemainingQty(soldProduct)
+            var unsoldQty=soldProduct.currentProductQty-soldProduct.quantity
+          // saleCancelRepo.updateProductRemainingQtyForLongClickDelete(unsoldQty,productIdList)
+            saleCancelRepo.insertInvoiceProduct(invoiceProductList)
+
+            val invoice = Invoice()
+
+            invoice.invoice_id = invoiceId
+            invoice.customer_id = id
+            invoice.sale_date = saleDate
+            invoice.total_amount = totalAmount.toString()
+            invoice.total_discount_amount = totalDiscountAmount
+            invoice.pay_amount = payAmount.toString()
+            invoice.refund_amount = refundAmount.toString()
+            invoice.receipt_person_name = receiptPerson
+            invoice.sale_person_id = salePersonId
+            invoice.due_date = dueDate
+            invoice.cash_or_credit = cashOrLoanOrBank
+            invoice.location_code = ""
+            invoice.device_id = deviceId
+            invoice.invoice_time = invoiceTime
+            invoice.package_invoice_number = 0
+            invoice.package_status = 0
+            invoice.volume_amount = 0.0
+            invoice.package_grade = ""
+            invoice.invoice_product_id = 0
+            invoice.total_quantity =
+                totalQtyForInvoice.toDouble()
+            invoice.invoice_status = cashOrLoanOrBank
+            invoice.total_discount_percent =
+                totalVolumeDiscountPercent.toString()
+            invoice.rate = "1"
+            invoice.tax_amount = taxAmt
+            invoice.bank_name = bank
+            invoice.bank_account_no = acc
+            invoice.sale_flag = 0
+            //invoiceList.add(invoice)
+            saleCancelRepo.insertInvoice(invoice)
         }
 
-        saleCancelRepo.insertInvoiceProduct(invoiceProductList)
 
-        val invoice = Invoice()
-
-        invoice.invoice_id = invoiceId
-        invoice.customer_id = id
-        invoice.sale_date = saleDate
-        invoice.total_amount = totalAmount.toString()
-        invoice.total_discount_amount = totalDiscountAmount
-        invoice.pay_amount = payAmount.toString()
-        invoice.refund_amount = refundAmount.toString()
-        invoice.receipt_person_name = receiptPerson
-        invoice.sale_person_id = salePersonId
-        invoice.due_date = dueDate
-        invoice.cash_or_credit = cashOrLoanOrBank
-        invoice.location_code = ""
-        invoice.device_id = deviceId
-        invoice.invoice_time = invoiceTime
-        invoice.package_invoice_number = 0
-        invoice.package_status = 0
-        invoice.volume_amount = 0.0
-        invoice.package_grade = ""
-        invoice.invoice_product_id = 0
-        invoice.total_quantity =
-            totalQtyForInvoice.toDouble()
-        invoice.invoice_status = cashOrLoanOrBank
-        invoice.total_discount_percent =
-            totalVolumeDiscountPercent.toString()
-        invoice.rate = "1"
-        invoice.tax_amount = taxAmt
-        invoice.bank_name = bank
-        invoice.bank_account_no = acc
-        invoice.sale_flag = 0
-        //invoiceList.add(invoice)
-        saleCancelRepo.insertInvoice(invoice)
     }
-
 }
 
 
 
-
+//if (soldProduct.quantity < soldProduct.currentProductQty) {
+//    var unsoldQty = soldProduct.currentProductQty - soldProduct.quantity
+//    saleCancelRepo.updateProductRemainingQtyForUnsoldProduct(
+//        unsoldQty,
+//        soldProduct.product.id.toString()
+//    )
+//
+//} else {
+//    var soldQty = soldProduct.quantity - soldProduct.currentProductQty
+//    saleCancelRepo.updateProductRemainingQtyForSoldProduct(
+//        soldQty,
+//        soldProduct.product.id.toString()
+//    )
+//}
 
 

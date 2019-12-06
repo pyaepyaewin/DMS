@@ -10,6 +10,8 @@
     <color name="accentColor">#ffab40</color>
     <color name="colorRed">#f50808</color>
     <color name="green">#00aa88</color>
+    <color name="yellow">#D77E0F</color>
+    <color name="black">#898989</color>
 
 
 </resources>

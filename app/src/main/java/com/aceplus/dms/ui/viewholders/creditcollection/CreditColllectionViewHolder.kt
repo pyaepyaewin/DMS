@@ -6,7 +6,7 @@ import com.aceplus.domain.model.creditcollectiondataclass.CreditCollectionDataCl
 import com.aceplussolutions.rms.ui.viewholder.BaseViewHolder
 import kotlinx.android.synthetic.main.customer_credit_list_row.view.*
 
-class CreditColllectionViewHolder(itemView: View,val onClick: (data: CreditCollectionDataClass) -> Unit):BaseViewHolder<CreditCollectionDataClass>(itemView) {
+class CreditCollectionViewHolder(itemView: View,val onClick: (data: CreditCollectionDataClass) -> Unit):BaseViewHolder<CreditCollectionDataClass>(itemView) {
     override fun setData(data: CreditCollectionDataClass) {
         itemView.credit_customer_name.text=data.customer_name
         itemView.credit_totalamt.text= data.amount.toString()
@@ -14,7 +14,8 @@ class CreditColllectionViewHolder(itemView: View,val onClick: (data: CreditColle
         itemView.credit_paidamt.text=data.pay_amount.toString()
         var creditAmt:Double=data.amount
         var unpaidAmt:Double=creditAmt-data.pay_amount!!
-        if(unpaidAmt===0.0)
+        itemView.credit_unpaidamt.text=unpaidAmt.toString()
+        if(unpaidAmt==0.0)
         {
             itemView.credit_customer_name.setTextColor(itemView.resources.getColor(R.color.accentColor))
             itemView.credit_totalamt.setTextColor(itemView.resources.getColor(R.color.accentColor))
@@ -23,7 +24,13 @@ class CreditColllectionViewHolder(itemView: View,val onClick: (data: CreditColle
 
 
         }
-        itemView.credit_unpaidamt.text=unpaidAmt.toString()
+        else
+        {
+            itemView.credit_customer_name.setTextColor(itemView.resources.getColor(R.color.black))
+            itemView.credit_totalamt.setTextColor(itemView.resources.getColor(R.color.black))
+            itemView.credit_paidamt.setTextColor(itemView.resources.getColor(R.color.black))
+            itemView.credit_unpaidamt.setTextColor(itemView.resources.getColor(R.color.black))
+        }
         itemView.setOnClickListener {
             onClick(data)
         }

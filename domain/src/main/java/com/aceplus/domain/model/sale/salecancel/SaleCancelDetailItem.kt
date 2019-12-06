@@ -51,7 +51,8 @@ data class SaleCancelDetailItem(
     var discount_amount: Double = 0.0,
     var discount_percent:Double=0.0,
     var exclude:Int?,
-    var promotion_plan_id:Int?
+    var promotion_plan_id:Int?,
+    var prev_Qty:Int?
 ) {
 
 }

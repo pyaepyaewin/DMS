@@ -56,9 +56,9 @@ class SaleCancelViewModel(
 
     var soldProductListSuccessState = MutableLiveData<List<SaleCancelDetailItem>>()
     var soldProductListErrorState = MutableLiveData<String>()
-    fun loadSoldProductList(productIdList: List<String>,invoiceID: String) {
+    fun loadSoldProductList(productIdList: List<String>, invoiceID: String) {
         launch {
-            saleCancelRepo.getSoldProductList(productIdList,invoiceID)
+            saleCancelRepo.getSoldProductList(productIdList, invoiceID)
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
@@ -87,11 +87,12 @@ class SaleCancelViewModel(
                 })
         }
     }
+
     var promotionPriceSuccessState = MutableLiveData<List<PromotionPrice>>()
     var promotionPriceErrorState = MutableLiveData<String>()
     fun loadPromotionPriceList(promotionPlanId: String, buy_qty: Int, stockID: String) {
         launch {
-            saleCancelRepo.getPromotionPriceById(promotionPlanId,buy_qty,stockID)
+            saleCancelRepo.getPromotionPriceById(promotionPlanId, buy_qty, stockID)
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
@@ -102,6 +103,7 @@ class SaleCancelViewModel(
                 })
         }
     }
+
     var invoiceCancelSuccessState = MutableLiveData<Invoice>()
     var invoiceCancelErrorState = MutableLiveData<String>()
     fun loadInvoiceCancel(invoiceId: String) {
@@ -111,7 +113,7 @@ class SaleCancelViewModel(
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     invoiceCancelSuccessState.value = it
-                    invoiceCancelSuccessState.value=null
+                    invoiceCancelSuccessState.value = null
 
                 }, {
                     invoiceCancelErrorState.value = it.localizedMessage
@@ -124,7 +126,7 @@ class SaleCancelViewModel(
         invoice: Invoice,
         invoiceID: String
     ) {
-        var totalQty=0
+        var totalQty = 0
         val invoiceProductList: ArrayList<InvoiceCancelProduct> = ArrayList()
 
         for (soldProduct in soldProductList) {
@@ -140,6 +142,11 @@ class SaleCancelViewModel(
             invoiceCancelProduct.extra_discount = soldProduct.extraDiscount
             invoiceCancelProduct.p_price = soldProduct.product.purchase_price!!.toDouble()
             invoiceCancelProduct.sale_quantity = soldProduct.quantity.toDouble()
+            var promoPrice = soldProduct.promotionPrice
+            if (promoPrice == 0.0) {
+                promoPrice = soldProduct.product.selling_price!!.toDouble()
+            }
+            invoiceCancelProduct.promotion_price = promoPrice
             invoiceCancelProduct.promotion_plan_id = soldProduct.promotionPlanId.toInt()
             //invoiceCancelProduct.serial_id = soldProduct.serialList[0]
             invoiceCancelProduct.total_amount = soldProduct.totalAmount
@@ -148,8 +155,8 @@ class SaleCancelViewModel(
                 invoiceCancelProduct.promotion_plan_id = soldProduct.promotionPlanId.toInt()
             invoiceProductList.add(invoiceCancelProduct)
 
-            totalQty+=soldProduct.quantity
-           saleCancelRepo.updateProductRemainingQty(soldProduct)
+            totalQty += soldProduct.quantity
+            saleCancelRepo.updateProductRemainingQtyForSaleCancel(soldProduct)
         }
 
 //        saleCancelRepo.updateProductRemainingQty(
@@ -192,7 +199,6 @@ class SaleCancelViewModel(
         saleCancelRepo.deleteInvoiceProduct(invoiceID)
         saleCancelRepo.deleteInvoiceData(invoiceID)
         saleCancelRepo.deleteInvoicePresent(invoiceID)
-
 
 
     }
