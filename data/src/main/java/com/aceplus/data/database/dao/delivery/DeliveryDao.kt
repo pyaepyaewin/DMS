@@ -27,7 +27,7 @@ interface DeliveryDao {
     @Query("Delete from delivery")
     fun deleteAll()
 
-    @Query("select customer.id as CID ,customer.customer_name,customer.address,delivery.id as DID,delivery.invoice_no,delivery.amount,delivery.paid_amount,delivery.discount,delivery.discount_percent,delivery.sale_man_id,delivery.remark from customer inner  join delivery on delivery.customer_id = customer.id")
+    @Query("select customer.id as CID ,customer.customer_name,customer.address,delivery.id as DID,delivery.invoice_no,delivery.amount,delivery.paid_amount,delivery.discount,delivery.discount_percent,delivery.sale_man_id,delivery.remark from delivery inner  join customer on delivery.customer_id = customer.id")
     fun getDeliveryData(): List<DeliveryVO>
 
     @Query("select * from delivery where date(invoice_date) = date(:now) and paid_amount > 0")

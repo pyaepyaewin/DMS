@@ -181,10 +181,7 @@ class SalesHistoryReportFragment : BaseFragment(), KodeinAware {
 
         //Action of dialog button
         dialogBoxView.btn_print.setOnClickListener {
-            val intent = PrintInvoiceActivity.newIntentFromSaleHistoryActivity(
-                context!!,
-                invoice,
-                saleHistoryDetailList)
+            val intent = PrintInvoiceActivity.newIntentFromSaleHistoryActivity(context!!, invoice, saleHistoryDetailList)
             startActivity(intent)
             dialog.dismiss()
 

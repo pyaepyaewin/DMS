@@ -86,6 +86,4 @@ interface InvoiceDao {
 
     @Query("select * from invoice where date(sale_date) = date(:now) order by sale_date asc  limit 1")
     fun getStartTime(now: String): List<Invoice>?
-
-
 }

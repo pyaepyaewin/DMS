@@ -17,6 +17,7 @@ import com.aceplus.data.utils.Constant
 import com.aceplus.dms.R
 import com.aceplus.dms.ui.activities.DeviceListActivity
 import com.aceplus.dms.utils.BluetoothService
+import com.aceplus.dms.utils.PrintUtils
 import com.aceplus.dms.utils.Utils
 import com.aceplus.dms.viewmodel.report.ReportViewModel
 import com.aceplus.domain.model.sale.SaleManDailyReport
@@ -29,6 +30,7 @@ import org.kodein.di.KodeinAware
 import org.kodein.di.android.support.kodein
 import java.sql.Date
 import java.text.SimpleDateFormat
+import kotlin.math.roundToInt
 
 class EndOfDayReportFragment : BaseFragment(), KodeinAware {
     override val kodein: Kodein by kodein()
@@ -44,7 +46,6 @@ class EndOfDayReportFragment : BaseFragment(), KodeinAware {
     private var saleReturnCount = 0
     private var saleExchangeCount = 0
     private var cashReceiptCount = 0
-    private var notVisitedCount = 0
     private var totalNotVisitedCount = 0
     private var totalSaleAmt: Double = 0.0
     private var totalPayAmt:Double = 0.0
@@ -92,7 +93,6 @@ class EndOfDayReportFragment : BaseFragment(), KodeinAware {
             endOfDayReportViewModel.loadRouteNameForEndOfDayReport(saleManId.toString())
         }
         fragment_daily_report_date.text = endOfDayReportViewModel.setCurrentDate()
-        fragment_daily_report_start_time.text = startTime
         fragment_daily_report_end_time.text = endOfDayReportViewModel.setEndTime()
         endTime = endOfDayReportViewModel.setEndTime()
         //......................//
@@ -108,15 +108,16 @@ class EndOfDayReportFragment : BaseFragment(), KodeinAware {
             orderCount = it.preOrderList.size
             totalCashReceive = it.totalCashAmount
             amtArr = it.amtArr
-            notVisitedCount = it.notVisitCount
+            totalNotVisitedCount = it.notVisitCount
             totalSaleAmt = it.totalPayAmt
             getStartTime = it.startTime
             var advancePaymentAmount = 0
             for (i in it!!.preOrderList){
-                advancePaymentAmount += i.advance_payment_amount!!.toInt()
+                advancePaymentAmount += i.advance_payment_amount!!.toDouble().roundToInt()
             }
             totalOrderAmt = advancePaymentAmount.toDouble()
             netAmt = (it.totalPayAmt + advancePaymentAmount + it.totalCashAmount - it.amtArr[0] - it.amtArr[1])
+            fragment_daily_report_start_time.text = getStartTime
             fragment_daily_report_total_order_sale.text = advancePaymentAmount.toString()
             fragment_daily_report_total_order_count.text = (it!!.preOrderList.size).toString()
             fragment_daily_report_total_return.text = Utils.formatAmount(it.amtArr[0])
@@ -177,7 +178,7 @@ class EndOfDayReportFragment : BaseFragment(), KodeinAware {
         saleManDailyReport!!.returnCount = saleReturnCount
         saleManDailyReport!!.cashReceiveCount = cashReceiptCount
         saleManDailyReport!!.notVisitCount = totalNotVisitedCount
-        Utils.printForEndOfDayReport(activity!!, saleManDailyReport!!, mService!!)
+        PrintUtils.printForEndOfDayReport(activity!!, saleManDailyReport!!, mService!!)
     }
 
     private val mHandler = object : Handler() {

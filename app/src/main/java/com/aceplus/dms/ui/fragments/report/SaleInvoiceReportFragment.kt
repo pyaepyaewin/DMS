@@ -18,6 +18,7 @@ import com.aceplus.dms.ui.adapters.report.SaleInvoiceDetailReportAdapter
 import com.aceplus.dms.ui.adapters.report.SaleInvoiceReportAdapter
 import com.aceplus.dms.viewmodel.report.ReportViewModel
 import com.aceplus.domain.entity.invoice.Invoice
+import com.aceplus.domain.vo.SoldProductInfo
 import com.aceplus.domain.vo.report.SaleInvoiceDetailReport
 import com.aceplus.domain.vo.report.SaleInvoiceReport
 import com.aceplus.shared.ui.activities.BaseFragment
@@ -37,7 +38,7 @@ class SaleInvoiceReportFragment : BaseFragment(), KodeinAware {
     override val kodein: Kodein by kodein()
     private var invoice: Invoice? = null
     var saleInvoiceDataList: List<SaleInvoiceReport> = listOf()
-    var saleInvoiceDetailList: List<SaleInvoiceDetailReport> = listOf()
+    private var saleInvoiceDetailList: List<SaleInvoiceDetailReport> = listOf()
     private val saleInvoiceReportAdapter: SaleInvoiceReportAdapter by lazy {
         SaleInvoiceReportAdapter(
             this::onClickItem
@@ -174,11 +175,7 @@ class SaleInvoiceReportFragment : BaseFragment(), KodeinAware {
 
         //Action of dialog button
         dialogBoxView.btn_print.setOnClickListener {
-            val intent = PrintInvoiceActivity.newIntentFromSaleHistoryActivity(
-                context!!,
-                invoice,
-                saleInvoiceDetailList
-            )
+            val intent = PrintInvoiceActivity.newIntentFromSaleHistoryActivity(context!!, invoice, saleInvoiceDetailList)
             startActivity(intent)
             dialog.dismiss()
 

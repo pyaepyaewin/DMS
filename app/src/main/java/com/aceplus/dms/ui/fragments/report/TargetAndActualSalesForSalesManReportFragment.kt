@@ -89,6 +89,8 @@ class TargetAndActualSalesForSalesManReportFragment : BaseFragment(), KodeinAwar
         targetAndActualSalesForSalesManReportViewModel.productGroupAndCategoryDataList.observe(
             this,
             Observer {
+                groupNameList.clear()
+                categoryNameList.clear()
                 //select group list in spinner
                 if (it!!.first != null) {
                     groupNameList.add("All Group")
@@ -98,12 +100,11 @@ class TargetAndActualSalesForSalesManReportFragment : BaseFragment(), KodeinAwar
                         groupIdArr.add(group.id.toString())
                     }
                 }
-                val groupNameSpinnerAdapter =
-                    ArrayAdapter(context, android.R.layout.simple_spinner_item, groupNameList)
+                val groupNameSpinnerAdapter = ArrayAdapter(context, android.R.layout.simple_spinner_item, groupNameList)
                 groupNameSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                 spinner_group.adapter = groupNameSpinnerAdapter
-                //select category list in spinner
 
+                //select category list in spinner
                 if (it!!.second != null) {
                     categoryNameList.add("All Category")
                     categoryIdArr.add("-1")
@@ -209,6 +210,8 @@ class TargetAndActualSalesForSalesManReportFragment : BaseFragment(), KodeinAwar
                         saleTarget.sellingPrice = sellingPrice
                         saleTarget.totalAmount = totalSaleAmount
                         actualTargetArrayList.add(saleTarget)
+                        Log.d("Sale Target List", actualTargetArrayList.size.toString())
+
                     }
                 })
             targetAndActualSalesForSalesManReportViewModel.loadCategorySaleTargetAndSaleIdList(categoryId)

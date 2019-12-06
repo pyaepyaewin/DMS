@@ -54,8 +54,8 @@ interface InvoiceProductDao {
     @Query("Delete from invoice_product where invoice_product_id=:invoiceId and id in (:productIdList)")
     fun deleteInvoiceProductForLongClick(invoiceId:String,productIdList: List<Int>)
 
-    @Query("select * from invoice_product where product_id in (:idList) order by product_id")
-    fun getInvoiceProductList(idList: List<String>): List<InvoiceProduct>?
+    @Query("select * from invoice_product where product_id = :id group by product_id")
+    fun getInvoiceProductList(id: String): List<InvoiceProduct>?
 
     @Query(" select distinct(invoice_product.total_amount),product.product_id,invoice_product.sale_quantity from invoice_product,product where product.id = invoice_product.product_id and  product.category_id = :categoryId")
     fun getCategoryListFromInvoiceProduct(categoryId: String): List<TargetAndSaleForSaleMan>?

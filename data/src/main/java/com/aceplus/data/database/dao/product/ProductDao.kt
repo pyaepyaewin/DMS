@@ -68,8 +68,8 @@ interface ProductDao {
     @get:Query("select * from product,sale_target_sale_man where sale_target_sale_man.stock_id = product.id order by sale_target_sale_man.stock_id desc")
     val getActualSale3ForSaleTargetProduct: List<Product>?
 
-    @Query("select * from product where id in (:productIdList)")
-    fun getGroupIdFromProduct(productIdList: List<String>): List<Product>?
+    @Query("select * from product where id = :productId")
+    fun getGroupIdFromProduct(productId:Int): List<Product>?
 
     @Query("select * from product where id = :stockId")
     fun getProductNameFromProduct(stockId: Int): Product?

@@ -89,6 +89,9 @@ class TargetAndActualSalesForCustomerReportFragment : BaseFragment(), KodeinAwar
         targetAndActualSalesForCustomerReportViewModel.customerAndProductGroupAndProductCategoryList.observe(
             this,
             Observer {
+                customerNameList.clear()
+                groupNameList.clear()
+                categoryNameList.clear()
                 //select customer list in spinner
                 customerNameList.add("All Customer")
                 customerIdArr.add("-1")
@@ -121,8 +124,7 @@ class TargetAndActualSalesForCustomerReportFragment : BaseFragment(), KodeinAwar
                     categoryNameList.add(category.category_name!!)
                     categoryIdArr.add(category.category_id.toString())
                 }
-                val categoryNameSpinnerAdapter =
-                    ArrayAdapter(context, android.R.layout.simple_spinner_item, categoryNameList)
+                val categoryNameSpinnerAdapter = ArrayAdapter(context, android.R.layout.simple_spinner_item, categoryNameList)
                 categoryNameSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                 spinner_category.adapter = categoryNameSpinnerAdapter
 

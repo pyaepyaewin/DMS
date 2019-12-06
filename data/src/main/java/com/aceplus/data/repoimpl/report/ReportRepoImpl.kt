@@ -212,12 +212,12 @@ class ReportRepoImpl(private val db: MyDatabase) : ReportRepo {
         return Observable.just(db.productDao().getActualSale3ForSaleTargetProduct)
     }
 
-    override fun getInvoiceProductList(idList: List<String>):Observable<List<InvoiceProduct>> {
-       return Observable.just(db.invoiceProductDao().getInvoiceProductList(idList))
+    override fun getInvoiceProductList(id: String):Observable<List<InvoiceProduct>> {
+       return Observable.just(db.invoiceProductDao().getInvoiceProductList(id))
     }
 
-    override fun getGroupIdFromProduct(productIdList:List<String>) : Observable<List<Product>>{
-      return Observable.fromArray(db.productDao().getGroupIdFromProduct(productIdList))
+    override fun getGroupIdFromProduct(productId:Int) : Observable<List<Product>>{
+      return Observable.fromArray(db.productDao().getGroupIdFromProduct(productId))
     }
 
     override fun getProductNameFromProduct(stockId:Int) : Observable<Product>{

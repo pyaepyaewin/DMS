@@ -107,8 +107,8 @@ interface ReportRepo {
     fun getActualSale1ForSaleTargetProduct():Observable<List<Product>>
     fun getActualSale2ForSaleTargetProduct():Observable<List<Product>>
     fun getActualSale3ForSaleTargetProduct():Observable<List<Product>>
-    fun getInvoiceProductList(idList: List<String>):Observable<List<InvoiceProduct>>
-    fun getGroupIdFromProduct(productIdList:List<String>) : Observable<List<Product>>
+    fun getInvoiceProductList(id: String):Observable<List<InvoiceProduct>>
+    fun getGroupIdFromProduct(productId:Int) : Observable<List<Product>>
     fun getProductNameFromProduct(stockId:Int) : Observable<Product>
     fun getGroupCodeNameFromGroupCode(groupId:Int) : Observable<GroupCode>
     fun getCategoryNameFromProductCategory(categoryId:Int) : Observable<ProductCategory>
