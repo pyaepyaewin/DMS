@@ -73,6 +73,7 @@ class SaleCheckoutViewModel(
 
         launch {
             //I think volume discount function is being wrong by logic in old project
+            //The whole discount calculation need to be fix
             customerVisitRepo.getVolumeDiscountFilterByDate(Utils.getCurrentDate(true))
                 .flatMap {
 
@@ -121,6 +122,8 @@ class SaleCheckoutViewModel(
                                 amountAndPercentage["Percentage"] = discountPercent
                                 var itemTotalDis = totalBuyAmtInclude * (discountPercent / 100)
                                 amountAndPercentage["Amount"] = itemTotalDis
+
+                                // ToDo - to add exclude and discount
                             }
 
                         /*Modified function - no more usage (can delete)
@@ -282,12 +285,12 @@ class SaleCheckoutViewModel(
         bank: String,
         acc: String,
         totalDiscountAmount: Double,
-        totalVolumeDiscountPercent: Double,
-        saleReturnInvoiceNo: String?
+        totalDiscountPercent: Double,
+        saleReturnInvoiceNo: String?,
+        routeID: Int
     ) {
 
         var totalQtyForInvoice = 0
-        val invoiceDetailList: ArrayList<InvoiceDetail> = ArrayList()
         val invoice = Invoice()
 
         launch {
@@ -302,50 +305,28 @@ class SaleCheckoutViewModel(
 
                         for (soldProduct in soldProductList) {
 
-                            val invoiceDetail = InvoiceDetail()
-                            invoiceDetail.tsaleId = invoiceId
-                            invoiceDetail.productId = soldProduct.product.id
-                            invoiceDetail.qty = soldProduct.quantity
-                            invoiceDetail.discountAmt = soldProduct.discountAmount
-                            invoiceDetail.amt = soldProduct.totalAmt
-                            invoiceDetail.discountPercent = soldProduct.discountPercent
-                            invoiceDetail.s_price = soldProduct.product.selling_price!!.toDouble()
-                            invoiceDetail.p_price = soldProduct.product.purchase_price!!.toDouble()
-                            invoiceDetail.promotionPrice = soldProduct.promotionPrice
-                            invoiceDetail.exclude = soldProduct.exclude
-                            invoiceDetail.itemDiscountPercent = soldProduct.focPercent
-                            invoiceDetail.itemDiscountAmount = soldProduct.focAmount
-
-                            if (!soldProduct.promotionPlanId.isNullOrEmpty())
-                                invoiceDetail.promotion_plan_id =
-                                    soldProduct.promotionPlanId.toInt()
-
-                            invoiceDetailList.add(invoiceDetail) // To Check // For what?
-
-
                             val invoiceProduct = InvoiceProduct()
                             invoiceProduct.invoice_product_id = invoiceId
                             invoiceProduct.product_id = soldProduct.product.id.toString()
                             invoiceProduct.sale_quantity = soldProduct.quantity.toString()
-                            invoiceProduct.discount_amount = soldProduct.discountAmount.toString()
+                            invoiceProduct.discount_amount = soldProduct.discountAmount.toString() //Need to add from disc calculation
                             invoiceProduct.total_amount = soldProduct.totalAmt
-                            invoiceProduct.discount_percent = soldProduct.discountPercent
+                            invoiceProduct.discount_percent = soldProduct.discountPercent //Need to add from disc calculation
                             invoiceProduct.s_price = soldProduct.product.selling_price!!.toDouble()
                             invoiceProduct.p_price = soldProduct.product.purchase_price!!.toDouble()
-                            invoiceProduct.promotion_price = soldProduct.promoPriceByDiscount // Check promo price or promo price by disc
-                            invoiceProduct.item_discount_percent = soldProduct.focPercent
-                            invoiceProduct.item_discount_amount = soldProduct.focAmount
-                            invoiceProduct.exclude = "${soldProduct.exclude}"
+                            invoiceProduct.promotion_price = soldProduct.promoPriceByDiscount //Check promo price or promo price by disc
+                            invoiceProduct.item_discount_percent = soldProduct.focPercent //Inserted only one
+                            invoiceProduct.item_discount_amount = soldProduct.focAmount //Inserted only one
+                            invoiceProduct.exclude = soldProduct.exclude?.toString() ?: "0" //Need to add from disc calculation
 
                             if (!soldProduct.promotionPlanId.isNullOrEmpty())
-                                invoiceProduct.promotion_plan_id =
-                                    soldProduct.promotionPlanId.toInt()
+                                invoiceProduct.promotion_plan_id = soldProduct.promotionPlanId.toInt()
 
                             totalQtyForInvoice += soldProduct.quantity
 
                             if (soldProduct.totalAmt != 0.0) {
                                 invoiceProductList.add(invoiceProduct)
-                                customerVisitRepo.updateProductRemainingQty(soldProduct) // Need to remind !!!
+                                customerVisitRepo.updateProductRemainingQty(soldProduct) //Need to remind kkk!! //Can move to behind saving product
                             }
 
                             if (soldProduct.focQuantity > 0 && soldProduct.totalAmt == 0.0) {
@@ -357,7 +338,7 @@ class SaleCheckoutViewModel(
                         customerVisitRepo.insertAllInvoiceProduct(invoiceProductList)
 
                         for (promotion in promotionList) {
-                            // ToDo - update qty
+                            // ToDo - update present qty, remaining qty
                             // ToDo - insert invoice present
                         }
 
@@ -365,29 +346,29 @@ class SaleCheckoutViewModel(
                         invoice.customer_id = customerId.toString()
                         invoice.sale_date = saleDate
                         invoice.total_amount = totalAmount.toString()
-                        invoice.total_discount_amount = totalDiscountAmount // Need to check
+                        invoice.total_discount_amount = totalDiscountAmount //Check - salesman disc or total disc
                         invoice.pay_amount = payAmount.toString()
                         invoice.refund_amount = refundAmount.toString()
                         invoice.receipt_person_name = receiptPerson
                         invoice.sale_person_id = salePersonId
                         invoice.due_date = dueDate
                         invoice.cash_or_credit = cashOrLoanOrBank
-                        invoice.location_code = "" // Need to add - route id
+                        invoice.location_code = routeID.toString() //Check - route id or location id
                         invoice.device_id = deviceId
                         invoice.invoice_time = invoiceTime
                         invoice.package_invoice_number = 0 // Need to add
-                        invoice.package_status = 0 // Need to check
-                        invoice.volume_amount = 0.0 // Need to check
-                        invoice.package_grade = "" // Need to check
-                        invoice.invoice_product_id = 0 // Need to check
-                        invoice.total_quantity = totalQtyForInvoice.toDouble() // Check int or double
+                        invoice.package_status = 0 //Need to check
+                        invoice.volume_amount = 0.0 //Need to check
+                        invoice.package_grade = "" //Need to check
+                        invoice.invoice_product_id = 0 //Check - should remove - wrong type
+                        invoice.total_quantity = totalQtyForInvoice.toDouble() //Check int or double
                         invoice.invoice_status = cashOrLoanOrBank
-                        invoice.total_discount_percent = totalVolumeDiscountPercent.toString()  // Need to check
+                        invoice.total_discount_percent = totalDiscountPercent.toString() //Check - salesman disc or total disc
                         invoice.rate = "1"
                         invoice.tax_amount = taxAmt
                         invoice.bank_name = bank
                         invoice.bank_account_no = acc
-                        invoice.sale_flag = 0 // Need to check
+                        invoice.sale_flag = 0 //Need to check - 1 or 2
 
                         customerVisitRepo.insertNewInvoice(invoice)
                         this.invoice.postValue(invoice)
@@ -396,7 +377,7 @@ class SaleCheckoutViewModel(
                             customerVisitRepo.updateSaleIdInSaleReturn(saleReturnInvoiceNo!!, invoiceId)
                         }
 
-                        customerVisitRepo.getAllInvoice()
+                        /*customerVisitRepo.getAllInvoice()
                             .flatMap { invoiceList ->
                                 Log.d("Testing", "Invoice count = ${invoiceList.size}")
                                 return@flatMap customerVisitRepo.getAllInvoiceProduct()
@@ -408,7 +389,7 @@ class SaleCheckoutViewModel(
                                     "Testing",
                                     "Invoice product count = ${invoiceProductList.size}"
                                 )
-                            }
+                            }*/
 
                     } else Log.d("Testing", "Found same invoice id")
 
@@ -724,7 +705,7 @@ class SaleCheckoutViewModel(
     private fun uploadPreOrderToServer(preOrderRequest: PreOrderRequest){
 
         val paramData = Utils.getJsonString(preOrderRequest)
-        Log.d("Testing", "Req String = $paramData")
+        //Log.d("Testing", "Req String = $paramData")
 
         launch {
             customerVisitRepo.uploadPreOrderToServer(paramData)
@@ -747,7 +728,7 @@ class SaleCheckoutViewModel(
 
                     } else{
                         uploadResult.postValue(false)
-                        Log.d("Testing", it.aceplusStatusMessage)
+                        //Log.d("Testing", it.aceplusStatusMessage)
                     }
 
                 }

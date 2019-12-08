@@ -88,11 +88,12 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
     private var taxAmt: Double = 0.0
     private var isSaleExchange: Boolean = false
     private var locationCode: Int = 0
+    private var routeID: Int = 0
     private var salePersonId: String? = null
     private var invoice: Invoice? = null
     private var saleReturnAmount: Double = 0.0
     private var saleReturnInvoiceNo: String? = null
-    private var saleExchangeAmount: Double = 0.0
+    private var selectedDueDate: String? = null
 
     private var totalVolumeDiscount: Double = 0.0           //Disc by date
     private var totalVolumeDiscountPercent: Double = 0.0    //Disc by date
@@ -122,6 +123,7 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
         saleCheckoutViewModel.calculateFinalAmount(soldProductList, totalAmount)
         salePersonId = saleCheckoutViewModel.getSaleManID()
         locationCode = saleCheckoutViewModel.getLocationCode() // Modified route id to location id - main thread
+        routeID = saleCheckoutViewModel.getRouteID()
 
     }
 
@@ -142,6 +144,8 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
 
         checkoutSoldProductListAdapter.setNewList(soldProductList)
         setPromotionProductList()
+
+        if (isSaleExchange) tvSaleReturnAmount.text = Utils.formatAmount(saleReturnAmount)
 
     }
 
@@ -185,6 +189,7 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
                 taxPercent = it.taxPercent
 
                 totalItemDiscountAmount = it.amountAndPercentage["Amount"] ?: 0.0
+                totalItemDiscountPercent = it.amountAndPercentage["Percentage"] ?: 0.0
                 displayFinalAmount()
 
             }
@@ -234,10 +239,7 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
         tvNetAmount.text = Utils.formatAmount(netAmount)
         tax_txtView.text = df.format(taxAmt)
 
-        if (isSaleExchange){
-            tvSaleReturnAmount.text = Utils.formatAmount(saleReturnAmount)
-            calculateSaleExchangeData()
-        }
+        if (isSaleExchange) calculateSaleExchangeData()
 
     }
 
@@ -275,12 +277,9 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
             this.salesmanDisAmount = discountAmount
             this.salesmanDisPercent = discountPercent
 
-            if (isSaleExchange)
-                calculateSaleExchangeData()
-            else{
-                displayFinalAmount()
-                calculateRefundAmount()
-            }
+            displayFinalAmount()
+
+            if (!isSaleExchange) calculateRefundAmount()
         }
 
     }
@@ -302,12 +301,9 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
             this.salesmanDisAmount = discountAmount
             this.salesmanDisPercent = discountPercent
 
-            if (isSaleExchange)
-                calculateSaleExchangeData()
-            else{
-                displayFinalAmount()
-                calculateRefundAmount()
-            }
+            displayFinalAmount()
+
+            if (!isSaleExchange) calculateRefundAmount()
         }
 
     }
@@ -325,7 +321,6 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
             else this.refundAmount = 0.0
 
             refund.text = Utils.formatAmount(this.refundAmount)
-
         }
 
     }
@@ -360,10 +355,12 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
 
         val myCalendar = Calendar.getInstance()
         val sdf = SimpleDateFormat("yyyy/MM/dd")
+        val sdf2 = SimpleDateFormat("yyyy-MM-dd")
 
         val dateDialog = DatePickerDialog(this, DatePickerDialog.OnDateSetListener { view, year, month, dayOfMonth ->
             myCalendar.set(year, month, dayOfMonth)
             edt_dueDate.setText(sdf.format(myCalendar.time))
+            selectedDueDate = sdf2.format(myCalendar.time)
         }, myCalendar.get(Calendar.YEAR), myCalendar.get(Calendar.MONTH), myCalendar.get(Calendar.DAY_OF_MONTH))
 
         dateDialog.show()
@@ -372,9 +369,10 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
 
     private fun calculateSaleExchangeData(){
 
+        //var saleExchangeAmount: Double = 0.0
         // To check -> saleExchangeAmount or netAmount
-        val totalItemDiscountAmount = 0.0 // To Check - for what?
-        saleExchangeAmount = totalAmount - totalItemDiscountAmount - totalVolumeDiscount // should be (netAmt-ReturnAmt)
+        //val totalItemDiscountAmount = 0.0 // To Check - for what?
+        //saleExchangeAmount = totalAmount - totalItemDiscountAmount - totalVolumeDiscount // should be (netAmt)
 
         if (netAmount > saleReturnAmount){
 
@@ -409,7 +407,7 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
                 val payAmt = if (payAmount.text.isNotBlank()) payAmount.text.toString().toDouble() else 0.0
 
                 if (payAmt < netAmount){
-                    if (paymentMethod == "B"){
+                    if (paymentMethod == "B" && !isSaleExchange){
                         Utils.commonDialog("Insufficient Pay Amount!", this, 1)
                         return
                     }
@@ -469,10 +467,11 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
         val receiptPerson = receiptPerson.text.toString()
         val invoiceTime = Utils.getCurrentDate(true)
         val deviceId = Utils.getDeviceId(this)
+        val bankBranchName = edit_txt_branch_name.text.toString()
+        val bankAccountName = edit_txt_account_name.text.toString()
+        var dueDate = saleDate
 
-        var dueDate = ""
-        if (cashOrLoanOrBank == "CR") dueDate = saleDate
-        if (edt_dueDate.text.isNotBlank()) dueDate = edt_dueDate.text.toString()
+        if (selectedDueDate != null) dueDate = selectedDueDate!!
 
         saleCheckoutViewModel.saveCheckoutData(
             customerId,
@@ -490,11 +489,12 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
             promotionList,
             totalAmount,
             taxAmt,
-            edit_txt_branch_name.text.toString(),
-            edit_txt_account_name.text.toString(),
-            salesmanDisAmount,
-            salesmanDisPercent,
-            saleReturnInvoiceNo
+            bankBranchName,
+            bankAccountName,
+            totalDiscountAmount,
+            totalDiscountPercent,
+            saleReturnInvoiceNo,
+            routeID
         )
 
     }

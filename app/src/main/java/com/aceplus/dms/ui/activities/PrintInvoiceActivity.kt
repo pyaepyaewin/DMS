@@ -58,9 +58,7 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
         private const val CUSTOMER_NAME = "CUSTOMER_NAME"
         private const val IE_CUSTOMER_DATA = "IE_CUSTOMER_DATA"
         private const val CUSTOMER_TOWNSHIP = "CUSTOMER_TOWNSHIP"
-
         private const val IE_SALE_RETURN_LIST = "IE_SALE_RETURN_LIST"
-        private const val IE_CREDIT_LIST = "IE_CREDIT_LIST"
 
         private const val IR_REQUEST_CONNECT_DEVICE = 1
         private const val IR_REQUEST_ENABLE_BT = 2
@@ -108,7 +106,7 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
             intent.putExtra(IE_INVOICE, invoice)
             intent.putExtra(IE_SOLD_PRODUCT_LIST, returnProductList)
             intent.putExtra(IE_PRINT_MODE, "SR")
-            // To Notice - there's no promotion list
+            //To Notice - there's no promotion list
             return intent
         }
 
@@ -123,8 +121,7 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
             val printIntent = Intent(context, PrintInvoiceActivity::class.java)
             printIntent.putExtra("CREDIT", credit as Serializable)
             printIntent.putExtra("CURSOR_POSITION", position)
-//            printIntent.putExtra("CREDIT_FLG", "CREDIT")
-
+            //printIntent.putExtra("CREDIT_FLG", "CREDIT")
             printIntent.putExtra(IE_PRINT_MODE, "C")
             printIntent.putExtra(CUSTOMER_TOWNSHIP, customerTownShip)
             printIntent.putExtra(SALE_MAN_NAME, salePersonName)
@@ -158,13 +155,11 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
             context: Context,
             invoice: Invoice,
             soldProductList: ArrayList<SoldProductInfo>
-
         ): Intent {
             val intent = Intent(context, PrintInvoiceActivity::class.java)
             intent.putExtra(IE_SOLD_PRODUCT_LIST, soldProductList)
             intent.putExtra(IE_PRINT_MODE, "S")
             intent.putExtra(IE_INVOICE, invoice)
-
             return intent
         }
 
@@ -618,14 +613,14 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
         when (it.what) {
 
             Constant.HM_MESSAGE_STATE_CHANGE -> {
-                if (DEBUG) Log.i(TAG, "MESSAGE_STATE_CHANGE ${it.arg1}")
+                Log.i(TAG, "MESSAGE_STATE_CHANGE ${it.arg1}")
                 when (it.arg1) {
                     BluetoothService.STATE_CONNECTED -> Toast.makeText(this, "Connected with device", Toast.LENGTH_SHORT).show() }
             }
             Constant.HM_MESSAGE_DEVICE_NAME -> {
                 val connectedDeviceName = it.data.getString(DEVICE_NAME)
                 Toast.makeText(this, "Connected to $connectedDeviceName", Toast.LENGTH_SHORT).show()
-                printInvoiceViewModel.getRelatedDataAndPrint(invoice!!.customer_id!!, invoice!!.sale_person_id!!, orderedInvoice?.sale_man_id) //Sale man id to name //Why from sale order
+                printInvoiceViewModel.getRelatedDataAndPrint(invoice!!.customer_id!!, invoice!!.sale_person_id!!, orderedInvoice?.sale_man_id) //Sale man id to name
             }
             Constant.HM_MESSAGE_TOAST -> {
                 Toast.makeText(this, it.data.getString(TOAST), Toast.LENGTH_SHORT).show()
