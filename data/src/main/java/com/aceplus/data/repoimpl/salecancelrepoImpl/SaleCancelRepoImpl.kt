@@ -21,12 +21,16 @@ import com.aceplussolutions.rms.constants.AppUtils
 import io.reactivex.Observable
 
 class SaleCancelRepoImpl(val database: MyDatabase,val shf:SharedPreferences) : SaleCancelRepo {
-//    override fun updateProductRemainingQtyForLongClickDelete(
-//        unsoldQty: Int,
-//        productIdList: List<Int>
-//    ) {
-//        database.productDao().updateProductRemainingQtyForLongClickDelete(unsoldQty,productIdList)
-//    }
+
+    override fun updateProductRemainingQtyForAddProduct(soldQty: Int, productId: String) {
+        database.productDao()
+            .updateProductRemainingQtyWithSaleCancelForSold(soldQty,productId)
+    }
+
+    override fun updateProductRemainingQtyForUnsold(unSoldQty: Int, productId: String) {
+        database.productDao()
+            .updateProductRemainingQtyWithSaleCancelForUnSold(unSoldQty, productId)
+    }
 
     override fun updateProductRemainingQtyForSoldProduct(addQty: Int, productId: String) {
         database.productDao()

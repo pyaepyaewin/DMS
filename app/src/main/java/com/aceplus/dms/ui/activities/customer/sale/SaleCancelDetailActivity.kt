@@ -199,16 +199,6 @@ class SaleCancelDetailActivity : BaseActivity(), KodeinAware {
                         soldProductInfo.exclude = it.exclude
                         soldProductInfo.promotionPlanId = it.promotion_plan_id.toString()
                         soldProductInfo.currentProductQty=it.sale_quantity.toInt()
-                      //  soldProductInfo.prevQty=it.sale_quantity.toInt()
-                     //   soldProductInfo.currentProductQty=it.sale_quantity.toInt()
-//                        if (soldProductInfo.prevQty>soldProductInfo.quantity)
-//                        {
-//                            soldProductInfo.differentQty=soldProductInfo.prevQty!!.toInt()-it.sale_quantity.toInt()
-//
-//                        }
-//                      else
-//                            soldProductInfo.differentQty=it.sale_quantity.toInt()-soldProductInfo.prevQty!!.toInt()
-
                         soldProductInfoList.add(soldProductInfo)
                         saleCancelViewModel.calculateSoldProductData(soldProductInfoList)
 

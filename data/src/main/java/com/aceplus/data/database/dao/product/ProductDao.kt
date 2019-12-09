@@ -50,11 +50,17 @@ interface ProductDao {
     fun getProductBalanceReport(): List<ProductBalanceReport>
 
     @Query("select IP.total_amount,IP.discount_amount,IP.discount_percent,IP.exclude,IP.promotion_plan_id,p.id, p.product_id, p.product_name, p.category_id, p.group_id, p.total_quantity, p.remaining_quantity, p.selling_price, p.purchase_price, p.discount_type, u.name as um, p.sold_quantity, p.order_quantity, p.exchange_quantity, p.return_quantity, p.delivery_quantity, p.present_quantity, p.device_issue_status, p.class_id,IP.promotion_price ,IP.sale_quantity from product as p, um as u,invoice_product as IP where p.um = u.id and p.id in (:productIDList) and p.id=IP.product_id and IP.invoice_product_id=:invoiceId")
-//    @Query("select IP.total_amount,IP.discount_amount,IP.discount_percent,IP.exclude,IP.promotion_plan_id,p.id, p.product_id, p.product_name, p.category_id, p.group_id, p.total_quantity, p.remaining_quantity, p.selling_price, p.purchase_price, p.discount_type, u.name as um, p.sold_quantity, p.order_quantity, p.exchange_quantity, p.return_quantity, p.delivery_quantity, p.present_quantity, p.device_issue_status, p.class_id,IP.promotion_price ,IP.sale_quantity from product as p, um as u,invoice_product as IP where p.id in (:productIDList)")
     fun allProductDataList(productIDList: List<String>,invoiceId:String): List<SaleCancelDetailItem>
+//    @Query("select IP.total_amount,IP.discount_amount,IP.discount_percent,IP.exclude,IP.promotion_plan_id,p.id, p.product_id, p.product_name, p.category_id, p.group_id, p.total_quantity, p.remaining_quantity, p.selling_price, p.purchase_price, p.discount_type, u.name as um, p.sold_quantity, p.order_quantity, p.exchange_quantity, p.return_quantity, p.delivery_quantity, p.present_quantity, p.device_issue_status, p.class_id,IP.promotion_price ,IP.sale_quantity from product as p, um as u,invoice_product as IP where p.id in (:productIDList)")
 
     @Query("select * from product where id in (:stockIdList)")
     fun deliveryProductDataList(stockIdList:List<String>): List<Product>
+
+    @Query("update product set remaining_quantity = remaining_quantity- :soldQty,  sold_quantity= sold_quantity + :soldQty where product.id = :productID")
+    fun updateProductRemainingQtyWithSaleCancelForSold(soldQty: Int, productID: String)
+
+    @Query("update product set remaining_quantity = remaining_quantity + :unSoldQty,  sold_quantity= sold_quantity - :unSoldQty where product.id = :productID")
+    fun updateProductRemainingQtyWithSaleCancelForUnSold(unSoldQty: Int, productID: String)
 
     @Query("update product set remaining_quantity = remaining_quantity- :addQty, sold_quantity = sold_quantity + :addQty where product.id = :productID")
     fun updateProductRemainingQtyForAdd(addQty: Int, productID: String)
