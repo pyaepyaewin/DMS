@@ -48,6 +48,7 @@ class SaleCancelActivity : BaseActivity(), KodeinAware {
                 saleCancelAdapter.setNewList(it as ArrayList<SaleCancelItem>)
 
 
+
             })
 
         saleCancelViewModel.saleCancelErrorState.observe(

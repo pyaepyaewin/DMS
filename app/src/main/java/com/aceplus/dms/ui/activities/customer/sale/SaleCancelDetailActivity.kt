@@ -40,7 +40,7 @@ class SaleCancelDetailActivity : BaseActivity(), KodeinAware {
     var invoiceCancelList = ArrayList<InvoiceCancel>()
     private var invoiceList: ArrayList<InvoiceCancel> = ArrayList()
     var invoice = Invoice()
-    var productIdList = arrayListOf<Int>()
+    var deletedProductList = arrayListOf<SoldProductInfo>()
     var soldInvoiceDataList = mutableListOf<Invoice>()
 
     //    val customerId = intent.getStringExtra("CUSTOMER_ID")
@@ -109,7 +109,7 @@ class SaleCancelDetailActivity : BaseActivity(), KodeinAware {
                     invoicedate,
                     customerId,
                     customerName,
-                    productIdList
+                    deletedProductList
                 ),
                 Utils.RQ_BACK_TO_CUSTOMER
             )
@@ -117,10 +117,12 @@ class SaleCancelDetailActivity : BaseActivity(), KodeinAware {
         saleCancelViewModel.productIdListSuccessState.observe(
             this,
             android.arch.lifecycle.Observer {
+                    soldProductList1 = it as MutableList<String>
+                    //saleCancelViewModel.soldProductListSuccessState.value=null
 
-                soldProductList1 = it as MutableList<String>
+                    saleCancelViewModel.loadSoldProductList(it, invoiceid)
 
-                saleCancelViewModel.loadSoldProductList(it, invoiceid)
+
 
 
             })
@@ -348,7 +350,7 @@ class SaleCancelDetailActivity : BaseActivity(), KodeinAware {
 
                 var oldSoldProductList = saleCancelDetailAdapter.getDataList() as ArrayList
                 oldSoldProductList.removeAt(position)
-                productIdList.add(soldProduct.product.id)
+                deletedProductList.add(soldProduct)
                 saleCancelDetailAdapter.notifyDataSetChanged()
                 saleCancelViewModel.calculateSoldProductData(oldSoldProductList)
                 if (oldSoldProductList.size != 0) {

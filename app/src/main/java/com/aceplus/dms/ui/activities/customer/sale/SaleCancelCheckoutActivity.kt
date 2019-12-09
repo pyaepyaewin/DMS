@@ -55,7 +55,7 @@ class SaleCancelCheckoutActivity : BaseActivity(), KodeinAware {
     private var invoice = arrayListOf<Invoice>()
     var totalQtyForInvoice = 0
     val invoiceProductList: ArrayList<InvoiceProduct> = ArrayList()
-    var productIdList: ArrayList<Int> = ArrayList()
+    var deletedProductList: ArrayList<SoldProductInfo> = ArrayList()
 
 
     private val df = DecimalFormat(".##")
@@ -69,7 +69,7 @@ class SaleCancelCheckoutActivity : BaseActivity(), KodeinAware {
             date: String,
             customerID: String,
             customerName: String,
-            productIdList: ArrayList<Int>
+            deletedProductList:ArrayList<SoldProductInfo>
 
 
         ): Intent {
@@ -79,7 +79,7 @@ class SaleCancelCheckoutActivity : BaseActivity(), KodeinAware {
             saleCancelDetailIntent.putExtra("DATE", date)
             saleCancelDetailIntent.putExtra("CUSTOMER_ID", customerID)
             saleCancelDetailIntent.putExtra("CUSTOMER_NAME", customerName)
-            saleCancelDetailIntent.putIntegerArrayListExtra("INDEX_LIST", productIdList)
+            saleCancelDetailIntent.putExtra("DELETED_PRODUCT_LIST", deletedProductList)
 
 
             return saleCancelDetailIntent
@@ -106,7 +106,7 @@ class SaleCancelCheckoutActivity : BaseActivity(), KodeinAware {
         llSaleStatus.visibility = View.GONE
         tableHeaderDiscount.text = "Promotion Price"
         soldProductList = intent.getParcelableArrayListExtra("SOLD_PRODUCT_LIST")
-        productIdList = intent.getIntegerArrayListExtra("INDEX_LIST")
+        deletedProductList = intent.getParcelableArrayListExtra("DELETED_PRODUCT_LIST")
         saleDateTextView.text = Utils.getCurrentDate(false)
         calculateTotalAmountForProduct()
 //        for (i in soldProductList) {
@@ -316,9 +316,6 @@ class SaleCancelCheckoutActivity : BaseActivity(), KodeinAware {
         saleCancelCheckOutViewModel.deleteInvoiceData(invoiceId)
         saleCancelCheckOutViewModel.deleteInvoiceProductData(invoiceId)
         saleCancelCheckOutViewModel.deleteInvoicePresenttData(invoiceId)
-//        for (soldProduct in soldProductList) {
-//
-//        }
 
         saleCancelCheckOutViewModel.saveCheckoutData(
             customerId,
@@ -339,7 +336,7 @@ class SaleCancelCheckoutActivity : BaseActivity(), KodeinAware {
             edit_txt_account_name.text.toString(),
             volDisAmount,
             volDisPercent,
-            productIdList
+            deletedProductList
         )
         saleCancelCheckOutViewModel.loadSoldInvoiceData(invoiceId)
 
