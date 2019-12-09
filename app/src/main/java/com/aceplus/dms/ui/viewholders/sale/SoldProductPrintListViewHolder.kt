@@ -35,8 +35,11 @@ class SoldProductPrintListViewHolder(itemView: View, private val printMode: Stri
         } else{
             itemView.rl_discountItem.visibility = View.GONE
         }
-        if (printMode == "D") itemView.amt.text = (data.quantity * price).toString()
-        else itemView.amt.text = Utils.formatAmount(data.totalAmt)
+
+        if (printMode == "D")
+            itemView.amt.text = (data.quantity * price).toString()
+        else
+            itemView.amt.text = Utils.formatAmount(data.totalAmt)
 
         if (printMode == "SR")
             itemView.amt.text = Utils.formatAmount(price * data.quantity)

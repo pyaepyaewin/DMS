@@ -105,6 +105,7 @@ class PrintInvoiceViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
 
     }
 
+    //ToDo - Need to check - think it's wrong logic!
     fun arrangeProductList(soldProductList: ArrayList<SoldProductInfo>, promotionList: ArrayList<Promotion>): ArrayList<SoldProductInfo>{
 
         val positionList: ArrayList<Int> = ArrayList()
@@ -118,7 +119,7 @@ class PrintInvoiceViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
             for ((indexForNew, promotion) in newPresentList.withIndex()){
                 var stockId = promotion.promotion_product_id
                 if (stockId != stockId1 && (indexForNew + 1) == newPresentList.size){
-                    val newPromotion = Promotion() // Check currency_id, price, promoPlanId, promotion price, product name // ToDo - Check point !!!
+                    val newPromotion = Promotion() //Check currency_id, price, promoPlanId, promotion price, product name // ToDo - Check point !!!
                     newPromotion.promotion_quantity = 0
                     newPromotion.promotion_product_id = promotionList[i].promotion_product_id
 
@@ -127,7 +128,7 @@ class PrintInvoiceViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
             }
 
             if (newPresentList.size == 0){
-                val newPromotion = Promotion() // Check currency_id, price, promoPlanId, promotion price, product name // ToDo - Check point !!!
+                val newPromotion = Promotion() //Check currency_id, price, promoPlanId, promotion price, product name // ToDo - Check point !!!
                 newPromotion.promotion_quantity = 0
                 newPromotion.promotion_product_id = promotionList[i].promotion_product_id
 
@@ -136,7 +137,10 @@ class PrintInvoiceViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
 
         }
 
-        for (promotion in promotionList){
+        val tempPresentList: ArrayList<Promotion> = ArrayList()
+        tempPresentList.addAll(promotionList)
+
+        for (promotion in tempPresentList){
 
             val stockId = promotion.promotion_product_id
 
@@ -145,6 +149,7 @@ class PrintInvoiceViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
                 if (stockId == stockId1){
                     val promotionQty = promotion.promotion_quantity
                     newPresentList[i].promotion_quantity += promotionQty
+                    promotionList.remove(promotion)
                 }
             }
 

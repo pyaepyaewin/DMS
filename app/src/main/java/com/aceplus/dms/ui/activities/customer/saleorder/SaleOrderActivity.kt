@@ -86,12 +86,14 @@ class SaleOrderActivity : BaseActivity(), KodeinAware {
     private val mProductListAdapter by lazy { ProductListAdapter(this::onClickProductListItem) }
     private val mOrderedProductListAdapter: OrderedProductListAdapter by lazy { OrderedProductListAdapter(this::onLongClickOrderedProductListItem, this::onFocCheckChange, this::onClickQtyButton, this.isDelivery) }
     private val mSearchProductAdapter by lazy { ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, ArrayList<String>()) }
+
     private val duplicateProductList = mutableListOf<Product>()
     private var promotionList: ArrayList<Promotion> = ArrayList()
     private var isDelivery: Boolean = false
     private var customer: Customer? = null
     private var soldProductList = ArrayList<SoldProductInfo>()
     private var orderedInvoice: Deliver? = null
+    private var netAmount: Double = 0.0
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -109,14 +111,11 @@ class SaleOrderActivity : BaseActivity(), KodeinAware {
 
     private fun getIntentData(){
 
-        if (intent.getParcelableExtra<Customer>(IE_CUSTOMER_DATA) != null) customer = intent.getParcelableExtra(IE_CUSTOMER_DATA)
-
+        customer = intent.getParcelableExtra(IE_CUSTOMER_DATA)
         isDelivery = intent.getBooleanExtra(IE_IS_DELIVERY, false)
 
-        if (intent.getSerializableExtra(IE_SOLD_PRODUCT_LIST_KEY) != null) {
+        if (isDelivery){
             soldProductList = intent.getSerializableExtra(IE_SOLD_PRODUCT_LIST_KEY) as ArrayList<SoldProductInfo>
-        }
-         if (intent.getSerializableExtra(IE_ORDERED_INVOICE_KEY) != null) {
             orderedInvoice = intent.getSerializableExtra(IE_ORDERED_INVOICE_KEY) as Deliver
         }
 
@@ -156,11 +155,12 @@ class SaleOrderActivity : BaseActivity(), KodeinAware {
         cancelImg.setOnClickListener { onBackPressed() }
         checkoutImg.setOnClickListener {
             if (isDelivery){
-                val intent = SaleOrderCheckoutActivity.getIntentForDeliveryFromSaleOrder(this, isDelivery, soldProductList,orderedInvoice!!,customer!!)
+                val intent = SaleOrderCheckoutActivity.getIntentForDeliveryFromSaleOrder(this, isDelivery, soldProductList, orderedInvoice!!, customer!!)
                 startActivity(intent)
             }else{
                 checkoutOrder()
-            } }
+            }
+        }
 
         saleViewModel.productDataList.observe(this, Observer {
             it?.let {
@@ -172,14 +172,14 @@ class SaleOrderActivity : BaseActivity(), KodeinAware {
                 ?: Utils.commonDialog("No issued product", this, 2)
         })
 
-
-            saleViewModel.calculatedSoldProductList.observe(this, Observer {
-                if (it != null) {
-                    mOrderedProductListAdapter.setNewList(it.first)
-                    tvNetAmount.text = Utils.formatAmount(it.second)
-                    saleViewModel.calculatedSoldProductList.value = null
-                }
-            })
+        saleViewModel.calculatedSoldProductList.observe(this, Observer {
+            if (it != null) {
+                mOrderedProductListAdapter.setNewList(it.first)
+                tvNetAmount.text = Utils.formatAmount(it.second)
+                netAmount = it.second
+                saleViewModel.calculatedSoldProductList.value = null
+            }
+        })
 
 
     }
@@ -262,11 +262,20 @@ class SaleOrderActivity : BaseActivity(), KodeinAware {
         val alertDialog = AlertDialog.Builder(this)
             .setView(view)
             .setTitle("Sale Order Quantity")
-            .setPositiveButton("Confirm") { arg0, arg1 ->
+            .setPositiveButton("Confirm", null)
+            .setNegativeButton("Cancel", null)
+            .create()
+
+        alertDialog.setOnShowListener {
+
+            availableQuantityLayout.visibility = View.GONE
+
+            val confirmButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
+            confirmButton.setOnClickListener {
 
                 if (quantityEditText.text.toString().isBlank()) {
                     messageTextView.text = "You must specify quantity."
-                    return@setPositiveButton
+                    return@setOnClickListener
                 }
 
                 val quantity = quantityEditText.text.toString().toInt()
@@ -274,7 +283,7 @@ class SaleOrderActivity : BaseActivity(), KodeinAware {
                 if (isDelivery){
                     if (quantity != soldProduct.orderedQuantity){
                         messageTextView.text = "Your quantity must be equal to order quantity."
-                        return@setPositiveButton
+                        return@setOnClickListener
                     }
                 }
 
@@ -285,13 +294,10 @@ class SaleOrderActivity : BaseActivity(), KodeinAware {
                 val newList = mOrderedProductListAdapter.getDataList() as ArrayList
                 newList[position] = soldProduct
                 saleViewModel.calculateSoldProductData(newList, this.promotionList)
+                alertDialog.dismiss()
 
             }
-            .setNegativeButton("Cancel", null)
-            .create()
 
-        alertDialog.setOnShowListener {
-            availableQuantityLayout.visibility = View.GONE
         }
 
         alertDialog.show()
@@ -320,7 +326,7 @@ class SaleOrderActivity : BaseActivity(), KodeinAware {
             return
         }
 
-        if (tvNetAmount.text == "0" || tvNetAmount.text == "0.0") {
+        if (netAmount <= 0.0) {
 
             AlertDialog.Builder(this)
                 .setTitle("Alert")
@@ -340,14 +346,8 @@ class SaleOrderActivity : BaseActivity(), KodeinAware {
                 mOrderedProductListAdapter.getDataList() as ArrayList,
                 this.promotionList
             )
-            startActivityForResult(intent, Utils.RQ_BACK_TO_CUSTOMER)
+            startActivityForResult(intent, Constant.RQC_BACK_TO_CUSTOMER)
         }
-
-
-        /*if (orderedInvoice != null){
-            val intent = SaleOrderCheckoutActivity.getIntent(this, orderedInvoice!!)
-            startActivity(intent)
-        }*/
 
     }
 
@@ -393,7 +393,7 @@ class SaleOrderActivity : BaseActivity(), KodeinAware {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
 
-        if (requestCode == Utils.RQ_BACK_TO_CUSTOMER)
+        if (requestCode == Constant.RQC_BACK_TO_CUSTOMER)
             if (resultCode == Activity.RESULT_OK){
                 setResult(Activity.RESULT_OK)
                 finish()

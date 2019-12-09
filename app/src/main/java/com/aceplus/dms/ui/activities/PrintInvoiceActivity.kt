@@ -41,7 +41,6 @@ import java.io.Serializable
 import java.text.DecimalFormat
 
 class PrintInvoiceActivity : BaseActivity(), KodeinAware {
-
     override val kodein: Kodein by kodein()
 
     override val layoutId: Int
@@ -142,7 +141,13 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
             return intent
         }
 
-        fun newIntent(saleOrderCheckoutActivity: SaleOrderCheckoutActivity,soldProductList: ArrayList<SoldProductInfo>,mode:String,orderInvoice:Deliver,customer: Customer,invoice: Invoice): Intent? {
+        fun newIntent(
+            saleOrderCheckoutActivity: SaleOrderCheckoutActivity,
+            soldProductList: ArrayList<SoldProductInfo>,
+            mode:String,orderInvoice:Deliver,
+            customer: Customer,
+            invoice: Invoice
+        ): Intent? {
             val intent = Intent(saleOrderCheckoutActivity, PrintInvoiceActivity::class.java)
             intent.putExtra(IE_SOLD_PRODUCT_LIST, soldProductList)
             intent.putExtra(IE_PRINT_MODE, mode)
@@ -167,9 +172,9 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
     }
 
     private val printInvoiceViewModel: PrintInvoiceViewModel by viewModel()
-    //private val printDeliveryViewModel: DeliveryViewModel by viewModel() //No usage - can delete
     private val soldProductPrintListAdapter: SoldProductPrintListAdapter by lazy { SoldProductPrintListAdapter(printMode)}
     private val historySoldProductPrintListAdapter: HistorySoldProductPrintListAdapter by lazy { HistorySoldProductPrintListAdapter() }
+    //private val printDeliveryViewModel: DeliveryViewModel by viewModel() //No usage - can delete
 
     private var invoice: Invoice? = null
     private var customer: Customer? = null
@@ -187,13 +192,13 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
     private var relatedDataForPrint: RelatedDataForPrint? = null
     private var salePersonName: String? = null
     private var customerName: String? = null
-    private var orderPerson :String? = null //No usage - can delete
-    private var salePerson :String? = null //No usage - can delete
     private var customerTownShip: String? = null
     private var orderedInvoice: Delivery? = null
     private var orderedDInvoice: Deliver? = null
     private var mBluetoothAdapter: BluetoothAdapter? = null
     private var mBluetoothService: BluetoothService? = null
+    private var orderPerson :String? = null //No usage - can delete
+    private var salePerson :String? = null //No usage - can delete
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -335,7 +340,7 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
                 historySoldProductPrintListAdapter.setNewList(historyReportSoldProductList)
             }
 
-            setPromotionProductListView() //ToDo - no promo list right now
+            setPromotionProductListView()
             print_totalAmount.text = Utils.formatAmount(invoice!!.total_amount!!.toDouble())
 
             if (invoice!!.total_discount_amount != 0.0)
@@ -366,7 +371,6 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
             credit_invoice_no.text = creditList[0].invoiceNo
             credit_sale_man.text = salePersonName
             credit_customer_name.text = customerName
-            //val address =
             credit_township_name.text = customerTownShip
             credit_receive_no.text = creditList[0].invoiceNo
 
