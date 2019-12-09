@@ -96,12 +96,16 @@ class LoginActivity : BaseActivity(), KodeinAware {
                 //null setter is to avoid sucessState liveData  bcoz loginviewmodel use in main activity too
                 loginViewModel.successState.postValue(null)
                 startActivity(MainActivity.newIntent(this))
+                loginViewModel.successState.value = null
                 finish()
             }
         })
         loginViewModel.errorState.observe(this, Observer {
             Utils.cancelDialog()
-            it?.let { it1 -> Utils.commonDialog(it1.first, this, it1.second) }
+            it?.let { it1 ->
+                Utils.commonDialog(it1.first, this, it1.second)
+                loginViewModel.errorState.value = null
+            }
         })
     }
 
