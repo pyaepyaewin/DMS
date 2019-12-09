@@ -15,7 +15,7 @@ import com.kkk.githubpaging.network.rx.SchedulerProvider
 
 class PrintInvoiceViewModel(private val customerVisitRepo: CustomerVisitRepo, private val schedulerProvider: SchedulerProvider): BaseViewModel() {
 
-    var taxInfo = MutableLiveData<Triple<String, Int, Int>>()
+    var taxInfo = MutableLiveData<Triple<String, Int, String>>()
     var salePersonName = MutableLiveData<String>()
     var relatedDataForPrint = MutableLiveData<RelatedDataForPrint>()
     var saleReturnProducts = MutableLiveData<List<SaleExchangeProductInfo>>()
@@ -27,10 +27,7 @@ class PrintInvoiceViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.mainThread())
                 .subscribe{
-                    var salePersonName = ""
-                    for (name in it){
-                        salePersonName = name ?: "----"
-                    }
+                    var salePersonName = it ?: "...."
                     this.salePersonName.postValue(salePersonName)
                 }
         }
@@ -44,11 +41,11 @@ class PrintInvoiceViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
                 .subscribe{
                     var taxType = ""
                     var taxPercent = 0
-                    var branchCode = 0
+                    var branchCode = ""
                     for (companyInfo in it){
                         taxType = companyInfo.tax_type ?: ""
                         taxPercent = companyInfo.tax ?: 0
-                        branchCode = companyInfo.branch_id ?: 0
+                        branchCode = companyInfo.branch_code ?: ""
                     }
                     taxInfo.postValue(Triple(taxType, taxPercent, branchCode))
                 }
@@ -62,6 +59,7 @@ class PrintInvoiceViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
         var routeName: String? = "...."
         var customerTownShipName: String? = null
         var companyInfo: CompanyInformation? = null
+        var salePersonName: String? = null
         var orderSalePersonName: String? = null
 
         launch {
@@ -88,18 +86,20 @@ class PrintInvoiceViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
                     for (i in it){
                         companyInfo = i
                     }
+                    return@flatMap customerVisitRepo.getSaleManName(saleManID)
+                }
+                .flatMap {
+                    salePersonName = it
                     return@flatMap customerVisitRepo.getSaleManName(orderSaleManID)
                 }
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.mainThread())
                 .subscribe{
-                    if (!orderSaleManID.isNullOrBlank()){
-                        for (i in it){
-                            orderSalePersonName = i
-                        }
-                    }
+                    if (!orderSaleManID.isNullOrBlank())
+                        orderSalePersonName = it
+
                     if (customer != null && customerTownShipName != null && companyInfo != null)
-                        relatedDataForPrint.postValue(RelatedDataForPrint(customer!!, routeName, customerTownShipName!!, companyInfo!!, orderSalePersonName))
+                        relatedDataForPrint.postValue(RelatedDataForPrint(customer!!, routeName, customerTownShipName!!, companyInfo!!, orderSalePersonName, salePersonName))
                 }
         }
 

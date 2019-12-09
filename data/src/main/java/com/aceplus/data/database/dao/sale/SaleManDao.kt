@@ -21,7 +21,7 @@ interface SaleManDao {
     fun data(userId: String, password: String): List<SaleMan>
 
     @Query("select user_name from sale_man where id = :saleManID")
-    fun getSaleManNameByID(saleManID: String?): List<String?>
+    fun getSaleManNameByID(saleManID: String?): String?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(list: List<SaleMan>)

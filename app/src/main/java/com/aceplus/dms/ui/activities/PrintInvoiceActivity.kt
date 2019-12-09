@@ -38,6 +38,7 @@ import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.kodein
 import java.io.Serializable
+import java.text.DecimalFormat
 
 class PrintInvoiceActivity : BaseActivity(), KodeinAware {
 
@@ -93,7 +94,7 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
             intent.putExtra(IE_SOLD_PRODUCT_LIST, soldProductList)
             intent.putExtra(IE_PROMOTION_LIST, promotionList)
             intent.putExtra(IE_PRINT_MODE, "S")
-            // ToDo - check for ordered invoice
+            //ToDo - check for ordered invoice
             return intent
         }
 
@@ -166,7 +167,7 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
     }
 
     private val printInvoiceViewModel: PrintInvoiceViewModel by viewModel()
-    private val printDeliveryViewModel: DeliveryViewModel by viewModel()
+    //private val printDeliveryViewModel: DeliveryViewModel by viewModel() //No usage - can delete
     private val soldProductPrintListAdapter: SoldProductPrintListAdapter by lazy { SoldProductPrintListAdapter(printMode)}
     private val historySoldProductPrintListAdapter: HistorySoldProductPrintListAdapter by lazy { HistorySoldProductPrintListAdapter() }
 
@@ -181,13 +182,13 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
     private var printMode: String = ""
     private var taxType: String = ""
     private var taxPercent: Int = 0
-    private var branchCode: Int = 0
+    private var branchCode: String? = null
     private var creditFlg: String? = null
     private var relatedDataForPrint: RelatedDataForPrint? = null
     private var salePersonName: String? = null
     private var customerName: String? = null
-    private var orderPerson :String? = null
-    private var salePerson :String? = null
+    private var orderPerson :String? = null //No usage - can delete
+    private var salePerson :String? = null //No usage - can delete
     private var customerTownShip: String? = null
     private var orderedInvoice: Delivery? = null
     private var orderedDInvoice: Deliver? = null
@@ -280,6 +281,7 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
 
     }
 
+    /*Can delete after testing finish
     private fun getOrderPerson(saleManId:Int){
         printDeliveryViewModel.userNameDataList.observe(this, Observer {
             for (i in it!!){
@@ -298,7 +300,7 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
             }
         })
         printDeliveryViewModel.loadOrderPerson(salePersonId.toInt())
-    }
+    }*/
 
     private fun getTaxInfoAndSetData() {
 
@@ -320,7 +322,7 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
             saleDate.text = Utils.getCurrentDate(false)
             invoiceId.text = invoice!!.invoice_id
             printInvoiceViewModel.getSalePersonName(invoice!!.sale_person_id!!)
-            branch.text = branchCode.toString()
+            branch.text = branchCode
 
             if (printMode == "S") {
                 print_soldProductList.adapter = soldProductPrintListAdapter
@@ -333,7 +335,7 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
                 historySoldProductPrintListAdapter.setNewList(historyReportSoldProductList)
             }
 
-            setPromotionProductListView() // ToDo - no promo list
+            setPromotionProductListView() //ToDo - no promo list right now
             print_totalAmount.text = Utils.formatAmount(invoice!!.total_amount!!.toDouble())
 
             if (invoice!!.total_discount_amount != 0.0)
@@ -348,7 +350,7 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
             }
 
             print_prepaidAmount.text = Utils.formatAmount(invoice!!.pay_amount?.toDouble() ?: 0.0)
-            print_discountAmount.text = "${Utils.formatAmount(invoice!!.total_discount_amount)} (${invoice?.total_discount_percent ?: 0.00}%)"
+            print_discountAmount.text = "${Utils.formatAmount(invoice!!.total_discount_amount)} (${DecimalFormat("#0.00").format(invoice?.total_discount_percent?.toDouble() ?: 0.00)}%)"
 
         }
         else if (printMode == "C") {
@@ -387,8 +389,9 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
             deliver_order_invoice_no.text = orderedDInvoice!!.invoiceNo
             deliver_invoice_no.text = invoice!!.invoice_id
             deliver_date.text = invoice!!.due_date
+            /*Can delete after testing finish
             getOrderPerson(orderedDInvoice!!.saleManId)
-            getSalePerson(invoice!!.sale_person_id!!)
+            getSalePerson(invoice!!.sale_person_id!!)*/
             print_totalAmount.text = orderedDInvoice!!.amount.toString()
             print_totalDiscount.text = orderedDInvoice!!.discount.toString()
             print_net_amount.text = (orderedDInvoice!!.amount - orderedDInvoice!!.paidAmount).toString()
@@ -404,13 +407,13 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
             saleDate.text = Utils.getCurrentDate(false)
             invoiceId.text = invoice!!.invoice_id
             printInvoiceViewModel.getSalePersonName(invoice!!.sale_person_id!!)
-            branch.text = branchCode.toString()
+            branch.text = branchCode
 
             print_soldProductList.adapter = soldProductPrintListAdapter
             print_soldProductList.layoutManager = LinearLayoutManager(this)
             soldProductPrintListAdapter.setNewList(soldProductList)
 
-            //setPromotionProductListView() // Cuz there is no promo list for return
+            //setPromotionProductListView() //Cuz there is no promo list for return
 
             print_totalAmount.text = Utils.formatAmount(invoice!!.total_amount!!.toDouble())
 
@@ -426,9 +429,9 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
             }
 
             print_prepaidAmount.text = Utils.formatAmount(invoice!!.pay_amount?.toDouble() ?: 0.0)
-            print_discountAmount.text = "${Utils.formatAmount(invoice!!.total_discount_amount)} (${invoice?.total_discount_percent ?: 0.00}%)"
+            print_discountAmount.text = "${Utils.formatAmount(invoice!!.total_discount_amount)} (${DecimalFormat("#0.00").format(invoice?.total_discount_percent?.toDouble() ?: 0.00)}%)"
 
-            // To check - everything except promo list is same to S and RP - can combine
+            //To check - everything except promo list is same to S and RP - can combine 3 together
 
         }
     }
@@ -446,11 +449,10 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
         val v1 = window.decorView.rootView
         v1.isDrawingCacheEnabled = true
         val myBitmap = v1.drawingCache
-        val saleManName = if (invoice!!.receipt_person_name.isNullOrBlank()) "To Find" else invoice!!.receipt_person_name
 
         if (printMode == "C" && !creditFlg.isNullOrBlank()){
 
-            Utils.saveInvoiceImageIntoGallery(creditList[pos].invoiceNo, this, myBitmap, "Credit Collect") // Doesn't work
+            Utils.saveInvoiceImageIntoGallery(creditList[pos].invoiceNo, this, myBitmap, "Credit Collect") //To Check
             if (creditList.isNotEmpty()){
                 val customerData: Customer = relatedDataForPrint!!.customer
                 PrintUtils.printCreditWithHSPOS(
@@ -464,12 +466,12 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
                     creditList[pos],
                     mBluetoothService!!,
                     relatedDataForPrint!!.companyInfo
-                ) //To check sale person name
+                ) //To check - sale person name
             }
 
         } else if (printMode == "S"){
 
-            Utils.saveInvoiceImageIntoGallery(invoice!!.invoice_id, this, myBitmap, "Sale") // Doesn't work
+            Utils.saveInvoiceImageIntoGallery(invoice!!.invoice_id, this, myBitmap, "Sale")
             val editProductList = printInvoiceViewModel.arrangeProductList(soldProductList, promotionList)
             val customerData: Customer = relatedDataForPrint!!.customer
             //invoice!!.printMode = "sale" // Doesn't exist in invoice, in all condition ?? add or param pass?
@@ -478,7 +480,7 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
                 customerData.customer_name,
                 customerData.address,
                 invoice!!.invoice_id,
-                saleManName,
+                invoice!!.receipt_person_name,
                 relatedDataForPrint!!.routeName,
                 relatedDataForPrint!!.customerTownShipName,
                 invoice!!,
@@ -492,7 +494,7 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
             )
 
         } else if (printMode == "RP"){
-            Utils.saveInvoiceImageIntoGallery(invoice!!.invoice_id, this, myBitmap, "Sale") // Doesn't work
+            Utils.saveInvoiceImageIntoGallery(invoice!!.invoice_id, this, myBitmap, "Sale")
             val saleInvoiceDetailList = ArrayList<SoldProductInfo>()
             for (i in historyReportSoldProductList){
                 val soldProduct = SoldProductInfo(Product(), false)
@@ -513,7 +515,7 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
                 customerData.customer_name,
                 customerData.address,
                 invoice!!.invoice_id,
-                salePersonName,
+                invoice!!.receipt_person_name,
                 relatedDataForPrint!!.routeName,
                 relatedDataForPrint!!.customerTownShipName,
                 invoice!!,
@@ -524,11 +526,11 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
                 mBluetoothService!!,
                 relatedDataForPrint!!.companyInfo,
                 "report"
-            ) //To check sale person name
+            )
 
         } else if (printMode == "D"){
 
-            Utils.saveInvoiceImageIntoGallery(invoice!!.invoice_id, this, myBitmap, "Deliver") // Doesn't work
+            Utils.saveInvoiceImageIntoGallery(invoice!!.invoice_id, this, myBitmap, "Deliver") //To Check
             val editProductList = printInvoiceViewModel.arrangeProductList(soldProductList, promotionList)
             val customerData: Customer = relatedDataForPrint!!.customer
             PrintUtils.printDeliverWithHSPOS(
@@ -536,9 +538,9 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
                 customerData.customer_name,
                 customerData.address,
                 orderedDInvoice!!.invoiceNo!!,
-                orderPerson,
+                relatedDataForPrint!!.orderSalePersonName,
                 invoice!!.invoice_id,
-                salePerson,
+                relatedDataForPrint!!.salePersonName,
                 relatedDataForPrint!!.routeName,
                 relatedDataForPrint!!.customerTownShipName,
                 invoice!!,
@@ -549,11 +551,11 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
                 PrintUtils.FOR_OTHERS,
                 mBluetoothService!!,
                 relatedDataForPrint!!.companyInfo
-            ) //To check sale person name
+            ) //Changed orderPerson/salePerson to relatedDataForPrint.orderPerson/salePerson by YLA
 
         } else if (printMode == "SR"){
 
-            Utils.saveInvoiceImageIntoGallery(invoice!!.invoice_id, this, myBitmap, "Sale") // Doesn't work
+            Utils.saveInvoiceImageIntoGallery(invoice!!.invoice_id, this, myBitmap, "Sale")
             val editProductList = printInvoiceViewModel.arrangeProductList(soldProductList, promotionList)
             val customerData: Customer = relatedDataForPrint!!.customer
             PrintUtils.printWithHSPOS(
@@ -561,7 +563,7 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
                 customerData.customer_name,
                 customerData.address,
                 invoice!!.invoice_id,
-                salePersonName,
+                relatedDataForPrint!!.salePersonName,
                 relatedDataForPrint!!.routeName,
                 relatedDataForPrint!!.customerTownShipName,
                 invoice!!,
@@ -572,7 +574,7 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
                 mBluetoothService!!,
                 relatedDataForPrint!!.companyInfo,
                 null
-            ) //To check sale person name
+            )
 
         }
 
@@ -591,7 +593,7 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
                         data?.getStringExtra(DeviceListActivity.IR_EXTRA_DEVICE_ADDRESS)
                     if (BluetoothAdapter.checkBluetoothAddress(address)) {
                         val device = mBluetoothAdapter!!.getRemoteDevice(address)
-                        mBluetoothService?.connect(device)
+                        if (mBluetoothAdapter!!.isEnabled) mBluetoothService?.connect(device)
                     }
                 }
             }
@@ -620,7 +622,7 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
             Constant.HM_MESSAGE_DEVICE_NAME -> {
                 val connectedDeviceName = it.data.getString(DEVICE_NAME)
                 Toast.makeText(this, "Connected to $connectedDeviceName", Toast.LENGTH_SHORT).show()
-                printInvoiceViewModel.getRelatedDataAndPrint(invoice!!.customer_id!!, invoice!!.sale_person_id!!, orderedInvoice?.sale_man_id) //Sale man id to name
+                printInvoiceViewModel.getRelatedDataAndPrint(invoice!!.customer_id!!, invoice!!.sale_person_id!!, orderedInvoice?.sale_man_id)
             }
             Constant.HM_MESSAGE_TOAST -> {
                 Toast.makeText(this, it.data.getString(TOAST), Toast.LENGTH_SHORT).show()

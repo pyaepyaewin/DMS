@@ -34,7 +34,7 @@ interface CustomerVisitRepo {
 
     fun getLocationCode(): Int
     fun getSaleManData(): SaleMan
-    fun getSaleManName(saleManId: String?): Observable<List<String?>>
+    fun getSaleManName(saleManId: String?): Observable<String?>
     fun getRouteID(saleManId: String): Observable<List<String>>
     fun getRouteScheduleByID(saleManId: String): Observable<RouteScheduleV2>
     fun getRouteNameByID(routeID: Int): Observable<String?>

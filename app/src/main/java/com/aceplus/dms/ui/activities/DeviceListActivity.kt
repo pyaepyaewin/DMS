@@ -19,7 +19,6 @@ import org.kodein.di.KodeinAware
 import org.kodein.di.android.kodein
 
 class DeviceListActivity: BaseActivity(), KodeinAware {
-
     override val kodein: Kodein by kodein()
 
     override val layoutId: Int
@@ -41,8 +40,6 @@ class DeviceListActivity: BaseActivity(), KodeinAware {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        //setResult(Activity.RESULT_CANCELED)
 
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
 
@@ -90,10 +87,10 @@ class DeviceListActivity: BaseActivity(), KodeinAware {
 
     private fun doDiscovery(){
 
-        // ToDo - show loading
         title_new_devices.visibility = View.VISIBLE
         if (mBluetoothAdapter != null){
-            if (mBluetoothAdapter!!.isDiscovering) mBluetoothAdapter!!.cancelDiscovery()
+            if (mBluetoothAdapter!!.isDiscovering)
+                mBluetoothAdapter!!.cancelDiscovery()
             mBluetoothAdapter!!.startDiscovery()
         }
 
@@ -128,15 +125,17 @@ class DeviceListActivity: BaseActivity(), KodeinAware {
                 if (device.bondState != BluetoothDevice.BOND_BONDED)
                     mNewDevicesArrayAdapter.add("${device.name}\n${device.address}")
             } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED == action){
-                // ToDo - hide loading
-                //title = "Select Device"
                 if (mNewDevicesArrayAdapter.count == 0)
                     mNewDevicesArrayAdapter.add("No New Device")
-
                 button_scan.isEnabled = true
             }
 
         }
+    }
+
+    override fun onDestroy() {
+        unregisterReceiver(mReceiver)
+        super.onDestroy()
     }
 
 }

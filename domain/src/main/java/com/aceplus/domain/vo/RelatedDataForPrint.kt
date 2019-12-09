@@ -8,5 +8,6 @@ data class RelatedDataForPrint(
     var routeName: String?,
     var customerTownShipName: String,
     var companyInfo: CompanyInformation,
-    var orderSalePersonName: String?
+    var orderSalePersonName: String?,
+    var salePersonName: String?
 )

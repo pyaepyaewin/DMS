@@ -370,9 +370,9 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
     private fun calculateSaleExchangeData(){
 
         //var saleExchangeAmount: Double = 0.0
-        // To check -> saleExchangeAmount or netAmount
-        //val totalItemDiscountAmount = 0.0 // To Check - for what?
-        //saleExchangeAmount = totalAmount - totalItemDiscountAmount - totalVolumeDiscount // should be (netAmt)
+        //To check -> saleExchangeAmount or netAmount
+        //val totalItemDiscountAmount = 0.0 //To Check - for what?
+        //saleExchangeAmount = totalAmount - totalItemDiscountAmount - totalVolumeDiscount //should be (netAmt)
 
         if (netAmount > saleReturnAmount){
 
