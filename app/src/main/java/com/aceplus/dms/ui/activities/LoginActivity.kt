@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.view.WindowManager
 import android.widget.Toast
 import com.aceplus.data.database.MyDatabase
 import com.aceplus.data.repoimpl.LoginRepoImpl
@@ -68,6 +69,9 @@ class LoginActivity : BaseActivity(), KodeinAware {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
+        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
 
         if (AppUtils.getStringFromShp(Constant.KEY_CHANGE_URL, this) != "") {
             AppUtils.getStringFromShp(Constant.KEY_CHANGE_URL, this)?.let {

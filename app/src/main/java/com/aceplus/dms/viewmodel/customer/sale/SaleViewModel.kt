@@ -18,7 +18,6 @@ class SaleViewModel(
 
     var productDataList = MutableLiveData<Pair<List<Product>, List<String>>>()
     var promotionList = MutableLiveData<ArrayList<Promotion>>()
-    var updatedSoldProduct = MutableLiveData<Pair<SoldProductInfo, Int>>()
     var calculatedSoldProductList = MutableLiveData<Pair<ArrayList<SoldProductInfo>, Double>>()
 
     private var mapGift: HashMap<Int, ArrayList<Int>> = HashMap()
@@ -26,6 +25,7 @@ class SaleViewModel(
     private var tempSoldProductList: ArrayList<SoldProductInfo> = ArrayList()
     private var tempPromotionList: ArrayList<Promotion> = ArrayList()
     private var totalQuantityByCategoryItem = 0
+
     var percentTotalCount: ArrayList<String> = ArrayList()
     var giftTotalCount: ArrayList<String> = ArrayList()
     var productItemForGift = ArrayList<String>()
@@ -46,7 +46,7 @@ class SaleViewModel(
                 .subscribe {
                     val productNameList = mutableListOf<String>()
                     for (product in it) {
-                        productNameList.add(product.product_name!!)
+                        productNameList.add(product.product_name.toString())
                     }
                     productDataList.postValue(Pair(it, productNameList))
                 }
@@ -354,7 +354,7 @@ class SaleViewModel(
 
         for (soldProductInfo in soldProductList){
 
-            var promoPrice = soldProductInfo.product.selling_price!!.toDouble()
+            var promoPrice = soldProductInfo.product.selling_price?.toDouble() ?: 0.0
             if (soldProductInfo.promotionPrice != 0.0) promoPrice = soldProductInfo.promotionPrice
 
             if (soldProductInfo.focPercent != 0.0 || soldProductInfo.focAmount != 0.0){

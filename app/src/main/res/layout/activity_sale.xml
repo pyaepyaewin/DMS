@@ -34,7 +34,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
                 android:layout_centerVertical="true"
-                android:text="@string/sale"
+                android:text="@string/sale_order"
                 android:textColor="#ffffff"
                 android:textSize="23sp" />
     </RelativeLayout>

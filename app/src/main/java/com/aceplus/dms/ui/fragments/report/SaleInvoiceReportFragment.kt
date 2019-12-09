@@ -18,6 +18,7 @@ import com.aceplus.dms.ui.adapters.report.SaleInvoiceDetailReportAdapter
 import com.aceplus.dms.ui.adapters.report.SaleInvoiceReportAdapter
 import com.aceplus.dms.viewmodel.report.ReportViewModel
 import com.aceplus.domain.entity.invoice.Invoice
+import com.aceplus.domain.vo.SoldProductInfo
 import com.aceplus.domain.vo.report.SaleInvoiceDetailReport
 import com.aceplus.domain.vo.report.SaleInvoiceReport
 import com.aceplus.shared.ui.activities.BaseFragment
@@ -37,7 +38,7 @@ class SaleInvoiceReportFragment : BaseFragment(), KodeinAware {
     override val kodein: Kodein by kodein()
     private var invoice: Invoice? = null
     var saleInvoiceDataList: List<SaleInvoiceReport> = listOf()
-    var saleInvoiceDetailList: List<SaleInvoiceDetailReport> = listOf()
+    private var saleInvoiceDetailList: List<SaleInvoiceDetailReport> = listOf()
     private val saleInvoiceReportAdapter: SaleInvoiceReportAdapter by lazy {
         SaleInvoiceReportAdapter(
             this::onClickItem
@@ -62,12 +63,20 @@ class SaleInvoiceReportFragment : BaseFragment(), KodeinAware {
             chooseDob(2)
         }
         btn_sale_report_search.setOnClickListener {
-            saleInvoiceReportViewModel.saleInvoiceReportForDateList.observe(this, Observer {
-                saleInvoiceReportAdapter.setNewList(it as ArrayList<SaleInvoiceReport>)
-                saleInvoiceDataList = it!!
-                //Calculate and setText for total,discount and net amounts
-                calculateAmount(it)
-            })
+            when {
+                edit_text_sale_report_from_date.text.isEmpty() -> edit_text_sale_report_from_date.error = ""
+                edit_text_sale_report_to_date.text.isEmpty() -> edit_text_sale_report_to_date.error = ""
+                else -> {
+                    saleInvoiceReportViewModel.saleInvoiceReportForDateList.observe(this, Observer {
+                        saleInvoiceReportAdapter.setNewList(it as ArrayList<SaleInvoiceReport>)
+                        saleInvoiceDataList = it!!
+                        //Calculate and setText for total,discount and net amounts
+                        calculateAmount(it)
+                    })
+                    saleInvoiceReportViewModel.loadHistoryInvoiceForDateList("$fromDate", "$toDate")
+
+                }
+            }
         }
         btn_sale_report_clear.setOnClickListener {
             edit_text_sale_report_from_date.setText("")
@@ -133,7 +142,6 @@ class SaleInvoiceReportFragment : BaseFragment(), KodeinAware {
             adapter = saleInvoiceReportAdapter
         }
         saleInvoiceReportViewModel.loadSaleInvoiceList()
-        saleInvoiceReportViewModel.loadHistoryInvoiceForDateList("$fromDate", "$toDate")
         saleInvoiceReportViewModel.loadCustomer()
 
 
@@ -167,11 +175,7 @@ class SaleInvoiceReportFragment : BaseFragment(), KodeinAware {
 
         //Action of dialog button
         dialogBoxView.btn_print.setOnClickListener {
-            val intent = PrintInvoiceActivity.newIntentFromSaleHistoryActivity(
-                context!!,
-                invoice,
-                saleInvoiceDetailList
-            )
+            val intent = PrintInvoiceActivity.newIntentFromSaleHistoryActivity(context!!, invoice, saleInvoiceDetailList)
             startActivity(intent)
             dialog.dismiss()
 
@@ -213,13 +217,7 @@ class SaleInvoiceReportFragment : BaseFragment(), KodeinAware {
                     toDate = sdf.format(myCalendar.time)
                 }
             }
-        val dateDialog = DatePickerDialog(
-            this.context!!,
-            datePicker,
-            myCalendar.get(Calendar.YEAR),
-            myCalendar.get(Calendar.MONTH),
-            myCalendar.get(Calendar.DAY_OF_MONTH)
-        )
+        val dateDialog = DatePickerDialog(this.context!!, datePicker, myCalendar.get(Calendar.YEAR), myCalendar.get(Calendar.MONTH), myCalendar.get(Calendar.DAY_OF_MONTH))
         dateDialog.show()
     }
 

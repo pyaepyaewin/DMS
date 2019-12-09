@@ -9,6 +9,7 @@ import com.aceplus.domain.entity.CompanyInformation
 import com.aceplus.domain.entity.invoice.Invoice
 import com.aceplus.domain.entity.promotion.Promotion
 import com.aceplus.domain.model.credit.CreditInvoice
+import com.aceplus.domain.model.sale.SaleManDailyReport
 import com.aceplus.domain.vo.SaleExchangeProductInfo
 import com.aceplus.domain.vo.SoldProductInfo
 import gems.com.command.sdk.PrintPicture
@@ -160,6 +161,16 @@ object PrintUtils{
         } catch (e: UnsupportedEncodingException) {
             e.printStackTrace()
         }
+    }
+
+    fun printForEndOfDayReport(activity: Activity, saleManDailyReport: SaleManDailyReport, mBTService: BluetoothService) {
+        try {
+            val printDataByteArray = convertFromListByteArrayToByteArray(getPrintDataByteArrayListForDailyReport(activity, saleManDailyReport))
+            sendDataByte2BT(activity, mBTService, printDataByteArray)
+        } catch (e: UnsupportedEncodingException) {
+            e.printStackTrace()
+        }
+
     }
 
     fun printSaleExchangeWithHSPOS(
@@ -561,7 +572,7 @@ object PrintUtils{
                 }
                 var refundAmt = 0.0
                 if (invoice.refund_amount != null)
-                    refundAmt = invoice.refund_amount!!.toDouble()
+                    refundAmt = invoice.refund_amount?.toDouble() ?: 0.0
 
                 printDataByteArrayList.add(
                     formatter!!.format(
@@ -980,14 +991,13 @@ object PrintUtils{
                 pricePerUnit = soldProduct.product.selling_price!!.toDouble()
                 promoPrice = soldProduct.promotionPrice
 
-                val amount = soldProduct.totalAmount
+                val amount = soldProduct.quantity * soldProduct.product.selling_price!!.toDouble()
                 val pricePerUnitWithDiscount: Double = soldProduct.discountAmount
                 val netAmount: Double
 
-
-                netAmount = soldProduct.totalAmount - pricePerUnitWithDiscount
-
                 totalAmount += amount
+
+                netAmount = totalAmount - pricePerUnitWithDiscount
                 totalNetAmount += netAmount
 
                 // Shorthand the name.
@@ -1123,13 +1133,13 @@ object PrintUtils{
                 val quantity = soldProduct.quantity
                 var pricePerUnit = soldProduct.product.selling_price!!.toDouble()
 
-                val amount = soldProduct.totalAmount
+                val amount = soldProduct.quantity * soldProduct.product.selling_price!!.toDouble()
                 val pricePerUnitWithDiscount: Double = soldProduct.discountAmount
                 val netAmount: Double
 
-                netAmount = soldProduct.totalAmount - pricePerUnitWithDiscount
-
                 totalAmount += amount
+
+                netAmount = totalAmount - pricePerUnitWithDiscount
                 totalNetAmount += netAmount
 
                 val nameFragments = soldProduct.product.product_name!!.split(" ")
@@ -1279,7 +1289,7 @@ object PrintUtils{
                     taxText,
                     ""/*decimalFormatterWithComma.format(invoice.getTaxAmount()) + " (" + taxPercent + "%)"*/,
                     "Discount        :",
-                    Utils.decimalFormatterWithComma.format(invoice.total_discount_amount) + " (" + DecimalFormat("#0.00").format(invoice.total_discount_percent) + "%)",
+                    Utils.decimalFormatterWithComma.format(invoice.total_discount_amount) + " (" + DecimalFormat("#0.00").format(invoice.total_discount_percent?.toDouble() ?: 0.0) + "%)",
                     "Net Amount      :",
                     Utils.decimalFormatterWithComma.format(totalNetAmount),
                     "Pay Amount      :",
@@ -1301,13 +1311,13 @@ object PrintUtils{
                         taxText,
                         "" /*decimalFormatterWithComma.format(invoice.getTaxAmount()) + " (" + new DecimalFormat("#0.00").format(taxPercent) + "%)"*/,
                         "Discount        :        ",
-                        Utils.decimalFormatterWithComma.format(invoice.total_discount_amount) + " (" + DecimalFormat("#0.00").format(invoice.total_discount_percent) + "%)",
+                        Utils.decimalFormatterWithComma.format(invoice.total_discount_amount) + " (" + DecimalFormat("#0.00").format(invoice.total_discount_percent?.toDouble() ?: 0.0) + "%)",
                         "Prepaid Amount  :        ",
                         Utils.decimalFormatterWithComma.format(prepaidAmount),
                         "Net Amount      :        ",
                         Utils.decimalFormatterWithComma.format(totalNetAmount),
                         "Pay Amount      :        ",
-                        Utils.decimalFormatterWithComma.format(invoice.pay_amount),
+                        Utils.decimalFormatterWithComma.format(invoice.pay_amount?.toDouble() ?: 0.0),
                         "Credit Balance  :        ",
                         Utils.decimalFormatterWithComma.format(abs(creditBalance!!))
                     ).toString().toByteArray()
@@ -1334,6 +1344,69 @@ object PrintUtils{
         mService.write(data)
         Utils.commonDialog("Success", mActivity, 0)
 
+    }
+
+    private fun getPrintDataByteArrayListForDailyReport(activity:Activity, saleManDailyReport:SaleManDailyReport) :  List<ByteArray>{
+        val printDataByteArrayList = ArrayList<ByteArray>()
+        val decimalFormatterWithComma = DecimalFormat("###,##0")
+        printDataByteArrayList.add(("End of Day Report " + "\n\n").toByteArray())
+        printDataByteArrayList.add(("Sale Man :  " + saleManDailyReport.saleMan + "\n").toByteArray())
+        printDataByteArrayList.add(("Route :  " + saleManDailyReport.routeName + "\n").toByteArray())
+        printDataByteArrayList.add(("Date :  " + saleManDailyReport.date + "\n").toByteArray())
+        printDataByteArrayList.add(("Start Time               :  " + saleManDailyReport.startTime + "\n").toByteArray())
+        printDataByteArrayList.add(("End Time                 :  " + saleManDailyReport.endTime + "\n").toByteArray())
+
+        printDataByteArrayList.add(
+            ("Total Sale               :  " + decimalFormatterWithComma.format(
+                saleManDailyReport.saleAmt
+            ) + "\n").toByteArray()
+        )
+        printDataByteArrayList.add(
+            ("Total Order Sales        :  " + decimalFormatterWithComma.format(
+                saleManDailyReport.orderAmt
+            ) + "\n").toByteArray()
+        )
+        printDataByteArrayList.add(
+            ("Total Exchange           :  (" + decimalFormatterWithComma.format(
+                saleManDailyReport.exchangeAmt
+            ) + ")\n").toByteArray()
+        )
+        printDataByteArrayList.add(
+            ("Total Return             :  (" + decimalFormatterWithComma.format(
+                saleManDailyReport.returnAmt
+            ) + ")\n").toByteArray()
+        )
+        printDataByteArrayList.add(
+            ("Total Cash Receipt       :  " + decimalFormatterWithComma.format(
+                saleManDailyReport.cashReceive
+            ) + "\n").toByteArray()
+        )
+
+        printDataByteArrayList.add(
+            ("Net Cash                 :  " + decimalFormatterWithComma.format(
+                saleManDailyReport.netAmt
+            ) + "\n").toByteArray()
+        )
+        printDataByteArrayList.add(("Total Customer           :  " + saleManDailyReport.customerCount + "\n").toByteArray())
+        printDataByteArrayList.add(("New Customer             :  " + saleManDailyReport.newCustomer + "\n").toByteArray())
+        printDataByteArrayList.add(("Plan Customer            :  " + saleManDailyReport.planCustomer + "\n").toByteArray())
+
+        printDataByteArrayList.add(("Total Sale Count         :  " + saleManDailyReport.saleCount + "\n").toByteArray())
+
+        printDataByteArrayList.add(("Total Order Count        :  " + saleManDailyReport.orderCount + "\n").toByteArray())
+
+        printDataByteArrayList.add(("Total Exchange Only      :  " + saleManDailyReport.exchangeCount + "\n").toByteArray())
+
+        printDataByteArrayList.add(("Total Sale Return Only   :  " + saleManDailyReport.returnCount + "\n").toByteArray())
+
+        printDataByteArrayList.add(("Total Cash Receipt Count :  " + saleManDailyReport.cashReceiveCount + "\n").toByteArray())
+
+        printDataByteArrayList.add(("Not Visited Count        :  " + saleManDailyReport.notVisitCount + "\n").toByteArray())
+
+        printDataByteArrayList.add("\nSignature          :\n\n                 Thank You. \n\n".toByteArray())
+        printDataByteArrayList.add(byteArrayOf(0x1b, 0x64, 0x02)) // Cut
+        printDataByteArrayList.add(byteArrayOf(0x07)) // Kick cash drawer
+        return printDataByteArrayList
     }
 
     @Throws(UnsupportedEncodingException::class)

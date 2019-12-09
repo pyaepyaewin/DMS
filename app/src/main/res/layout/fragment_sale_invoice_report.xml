@@ -29,7 +29,7 @@
 
             <EditText
                     android:id="@+id/edit_text_sale_report_from_date"
-                    android:layout_width="120dp"
+                    android:layout_width="125dp"
                     android:layout_height="wrap_content"
                     android:focusable="false" />
 
@@ -41,7 +41,7 @@
 
             <EditText
                     android:id="@+id/edit_text_sale_report_to_date"
-                    android:layout_width="120dp"
+                    android:layout_width="125dp"
                     android:layout_height="wrap_content"
                     android:focusable="false" />
 

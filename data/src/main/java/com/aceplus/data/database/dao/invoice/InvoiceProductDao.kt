@@ -11,6 +11,8 @@ import com.aceplus.domain.model.sale.salecancel.SaleCancelDetailItem
 import com.aceplus.domain.model.sale.salecancel.SoldProductDataClass
 import com.aceplus.domain.vo.SoldProductInfo
 import com.aceplus.domain.vo.report.SaleInvoiceDetailReport
+import com.aceplus.domain.vo.report.TargetAndActualSaleForProduct
+import com.aceplus.domain.vo.report.TargetAndSaleForSaleMan
 
 
 @Dao
@@ -51,6 +53,18 @@ interface InvoiceProductDao {
 
     @Query("Delete from invoice_product where invoice_product_id=:invoiceId and id in (:productIdList)")
     fun deleteInvoiceProductForLongClick(invoiceId:String,productIdList: List<Int>)
+
+    @Query("select * from invoice_product where product_id = :id group by product_id")
+    fun getInvoiceProductList(id: String): List<InvoiceProduct>?
+
+    @Query(" select distinct(invoice_product.total_amount),product.product_id,invoice_product.sale_quantity from invoice_product,product where product.id = invoice_product.product_id and  product.category_id = :categoryId")
+    fun getCategoryListFromInvoiceProduct(categoryId: String): List<TargetAndSaleForSaleMan>?
+
+    @Query(" select distinct(invoice_product.total_amount),product.product_id,invoice_product.sale_quantity from invoice_product,product where product.id = invoice_product.product_id and  product.group_id = :groupId")
+    fun getGroupListFromInvoiceProduct(groupId: String): List<TargetAndSaleForSaleMan>?
+
+    @Query(" select distinct(invoice_product.total_amount),product.product_id,invoice_product.sale_quantity from invoice_product,product,invoice where product.id = invoice_product.product_id and  invoice.customer_id = :customerId")
+    fun getCustomerSaleTargetAndSaleIdList(customerId: String): List<TargetAndSaleForSaleMan>?
 
 //    @Query("select P.product_name,P.um,IP.sale_quantity,IP.s_price,IP.promotion_price from invoice_product as IP LEFT JOIN product as P ON P.id=IP.product_id where IP.invoice_product_id=:invoiceId")
 //    fun getSaleCancelDetailList(invoiceId:String):List<SoldProductInfo>

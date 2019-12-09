@@ -338,7 +338,8 @@ class SaleCancelCheckoutActivity : BaseActivity(), KodeinAware {
             edit_txt_branch_name.text.toString(),
             edit_txt_account_name.text.toString(),
             volDisAmount,
-            volDisPercent
+            volDisPercent,
+            productIdList
         )
         saleCancelCheckOutViewModel.loadSoldInvoiceData(invoiceId)
 

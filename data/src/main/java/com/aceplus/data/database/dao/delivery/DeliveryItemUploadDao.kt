@@ -37,6 +37,6 @@ interface DeliveryItemUploadDao {
     @Query("select * from delivery_item_upload where delivery_id in (:invoiceNo)")
     fun getDeliveryItemList(invoiceNo: List<String>): List<DeliveryItemUpload>
 
-    @Query("select quantity,selling_price from delivery_item_upload left join product on product.id = delivery_item_upload.stock_id where delivery_id in (:list)")
+    @Query("select delivery_id,quantity,selling_price from delivery_item_upload left join product on product.id = delivery_item_upload.stock_id where delivery_id in (:list)")
     fun getQtyAndAmount(list: List<String>): List<TotalAmountForDeliveryReport>
 }

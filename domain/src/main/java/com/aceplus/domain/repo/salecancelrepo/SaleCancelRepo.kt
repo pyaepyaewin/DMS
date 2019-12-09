@@ -48,6 +48,9 @@ interface SaleCancelRepo {
     fun updateProductRemainingQtyForAddProduct(soldQty:Int,productId: String)
     fun updateProductRemainingQtyForUnsold(unSoldQty:Int,productId:String)
 
+    fun updateProductRemainingQtyForSoldProduct(addQty:Int,productId: String)
+    fun updateProductRemainingQtyForUnsoldProduct(unsoldQty:Int,productId: String)
+  //  fun updateProductRemainingQtyForLongClickDelete(unsoldQty: Int,productIdList: List<Int>)
 
 
 }

@@ -11,7 +11,6 @@ import android.os.Bundle
 import android.support.v7.widget.GridLayoutManager
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
@@ -20,6 +19,7 @@ import android.widget.EditText
 import android.widget.Spinner
 import com.aceplus.data.utils.Constant
 import com.aceplus.dms.R
+import com.aceplus.dms.ui.activities.CustomerVisitActivity
 import com.aceplus.dms.ui.activities.customer.sale.SaleActivity
 import com.aceplus.dms.ui.activities.customer.sale.SaleReturnActivity
 import com.aceplus.dms.ui.activities.customer.saleorder.SaleOrderActivity
@@ -117,21 +117,14 @@ class CustomerActivity : BaseActivity(), KodeinAware {
     private fun onClickCustomerListItem(customer: Customer) {
 
         this.selectedCustomer = customer
+
         tvCustomerNameCA.text = customer.customer_name
-        tvPhone.apply {
-            paintFlags = Paint.UNDERLINE_TEXT_FLAG
-            text = customer.phone?.trim()
-        }
-        tvAddress.apply {
-            paintFlags = Paint.UNDERLINE_TEXT_FLAG
-            text = customer.address
-        }
         tvTownship.text = customer.township_number
         tvCreditTerms.text = customer.credit_term
         tvCreditLimit.text = customer.credit_limit
-        tvCreditAmount.text = customer.credit_amount
-        tvDueAmount.text = customer.due_amount
-        tvPrepaidAmount.text = customer.prepaid_amount
+        tvCreditAmount.text = if (customer.credit_amount.isNullOrBlank()) "0.0" else customer.credit_amount
+        tvDueAmount.text = if (customer.due_amount.isNullOrBlank()) "0.0" else customer.credit_amount
+        tvPrepaidAmount.text = if (customer.prepaid_amount.isNullOrBlank()) "0.0" else customer.credit_amount
         tvPaymentType.text = customer.payment_type
         val latitude = Utils.onDecimalFormat(customer.latitude?.toDouble() ?: 0.0)
         val longitude = Utils.onDecimalFormat(customer.longitude?.toDouble() ?: 0.0)
@@ -140,6 +133,15 @@ class CustomerActivity : BaseActivity(), KodeinAware {
         tvLongitude.text = nf.format(longitude)
         tvCustomerRemark.text = customer.fax
         btnLocation.isEnabled = customer.flag?.toInt() ?: 0 != 1
+
+        tvPhone.apply {
+            paintFlags = Paint.UNDERLINE_TEXT_FLAG
+            text = customer.phone?.trim()
+        }
+        tvAddress.apply {
+            paintFlags = Paint.UNDERLINE_TEXT_FLAG
+            text = customer.address
+        }
 
     }
 
@@ -168,20 +170,21 @@ class CustomerActivity : BaseActivity(), KodeinAware {
 
         customerViewModel.dialogStatus.observe(this, Observer {
             if (it != null){
-                Utils.commonDialog(it!!, this@CustomerActivity, 2)
+                Utils.commonDialog(it, this, 2)
                 customerViewModel.dialogStatus.value = null
             }
         })
 
+        ivCancel.setOnClickListener { onBackPressed() }
         tvAddress.setOnClickListener { onClickAddress() }
         tvPhone.setOnClickListener { onClickPhoneNo() }
-        ivCancel.setOnClickListener { onBackPressed() }
-        btnOk.setOnClickListener { onClickOkButton() }
         btnSale.setOnClickListener { onClickSaleButton() }
         btnSaleOrder.setOnClickListener { onClickSaleOrderButton() }
         btnUnsellReason.setOnClickListener { onClickUnSellReasonButton() }
         btnSaleReturn.setOnClickListener { onClickSaleReturnButton() }
         btnLocation.setOnClickListener { onClickBtnLocation() }
+        btnOk.setOnClickListener { onClickOkButton() }
+
     }
 
     private fun onClickSaleButton() {
@@ -208,8 +211,6 @@ class CustomerActivity : BaseActivity(), KodeinAware {
 
         if (didCustomerSelected()) {
 
-            customerViewModel.insertDataForTempSaleManRouteAndSaleVisitRecord(selectedCustomer!!, Utils.getCurrentDate(true), gspTracker)
-
             if (selectedCustomer!!.flag == "1"){
                 AlertDialog.Builder(this)
                     .setTitle("No Authority")
@@ -217,7 +218,9 @@ class CustomerActivity : BaseActivity(), KodeinAware {
                     .setPositiveButton("OK", null)
                     .show()
                 return
-            }
+            } //Do it first for old customer check
+
+            customerViewModel.insertDataForTempSaleManRouteAndSaleVisitRecord(selectedCustomer!!, Utils.getCurrentDate(true), gspTracker)
 
             customerViewModel.loadDidCustomerFeedback(selectedCustomer!!,
                 {
@@ -316,14 +319,6 @@ class CustomerActivity : BaseActivity(), KodeinAware {
     private fun onClickAddress(){
 
         if (didCustomerSelected()) {
-            /*val intent = CustomerLocationActivity.newIntent(
-                    applicationContext,
-                    latitude = tvLatitude.text.toString(),
-                    longitude = tvLongitude.text.toString(),
-                    customerName = tvCustomerNameCA.text.toString(),
-                    address = tvAddress.text.toString(),
-                    visitRecord = this.selectedCustomer!!.visit_record.toString()
-                )*/
             val intent = CustomerLocationActivity.newIntentFromCustomer(this, selectedCustomer!!)
             startActivity(intent)
         }
@@ -340,7 +335,6 @@ class CustomerActivity : BaseActivity(), KodeinAware {
     }
 
     private fun onClickOkButton(){
-
         if (didCustomerSelected()) {
             customerViewModel.insertDataForTempSaleManRouteAndSaleVisitRecord(selectedCustomer!!, Utils.getCurrentDate(true), gspTracker)
             val intent = SaleReturnActivity.newIntentFromCustomer(applicationContext, true, selectedCustomer!!)
@@ -359,7 +353,6 @@ class CustomerActivity : BaseActivity(), KodeinAware {
                     selectedCustomer = customer
                     onClickCustomerListItem(customer)
                     customerViewModel.saveOrUpdateSaleManRoute(customer, gspTracker)
-                    Log.d("Testing", "Data Updated")
                 }
             }
         }

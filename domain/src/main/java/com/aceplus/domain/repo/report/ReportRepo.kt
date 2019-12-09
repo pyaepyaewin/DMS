@@ -1,17 +1,23 @@
 package com.aceplus.domain.repo.report
 
 import com.aceplus.domain.entity.CompanyInformation
+import com.aceplus.domain.entity.GroupCode
 import com.aceplus.domain.entity.credit.Credit
 import com.aceplus.domain.entity.customer.Customer
+import com.aceplus.domain.entity.customer.DidCustomerFeedback
+import com.aceplus.domain.entity.delivery.Delivery
 import com.aceplus.domain.entity.delivery.DeliveryItemUpload
+import com.aceplus.domain.entity.delivery.DeliveryUpload
 import com.aceplus.domain.entity.invoice.Invoice
 import com.aceplus.domain.entity.invoice.InvoiceProduct
 import com.aceplus.domain.entity.preorder.PreOrder
 import com.aceplus.domain.entity.preorder.PreOrderProduct
+import com.aceplus.domain.entity.product.Product
 import com.aceplus.domain.entity.product.ProductCategory
 import com.aceplus.domain.entity.product.ProductGroup
 import com.aceplus.domain.entity.route.Route
 import com.aceplus.domain.entity.route.RouteScheduleItemV2
+import com.aceplus.domain.entity.route.RouteScheduleV2
 import com.aceplus.domain.entity.sale.SaleMan
 import com.aceplus.domain.entity.sale.saleexchange.SaleExchange
 import com.aceplus.domain.entity.sale.salereturn.SaleReturn
@@ -19,6 +25,8 @@ import com.aceplus.domain.entity.sale.salereturn.SaleReturnDetail
 import com.aceplus.domain.entity.sale.saletarget.SaleTargetCustomer
 import com.aceplus.domain.entity.sale.saletarget.SaleTargetSaleMan
 import com.aceplus.domain.entity.sale.salevisit.SaleVisitRecordUpload
+import com.aceplus.domain.model.routeSchedule_v2.RouteScheduleItem_v2
+import com.aceplus.domain.model.routeSchedule_v2.RouteSchedule_v2
 import com.aceplus.domain.vo.report.*
 import io.reactivex.Observable
 import java.sql.Date
@@ -54,17 +62,18 @@ interface ReportRepo {
 
     //spinner data
     fun getAllCustomerData(): Observable<List<Customer>>
-    fun getAllGroupData(): Observable<List<ProductGroup>>
+    fun getAllGroupData(): Observable<List<GroupCode>>
     fun getAllCategoryData(): Observable<List<ProductCategory>>
 
     //sale cancel report
     fun salesCancelReport(): Observable<List<SalesCancelReport>>
-    //fun saleCancelReportForDate(fromDate: String, toDate: String):  Observable<List<SalesCancelReport>>
+    fun saleCancelReportForDate(fromDate: String, toDate: String):  Observable<List<SalesCancelReport>>
 
     fun salesCancelDetailReport(invoiceId: String): Observable<List<SaleCancelInvoiceDetailReport>>
 
     //sale order history report
     fun salesOrderHistoryReport(): Observable<List<SalesOrderHistoryFullDataReport>>
+    fun saleHistoryDateFilterList(fromDate: String, toDate: String): Observable<List<SalesOrderHistoryFullDataReport>>
 
     //sale return report and exchange tab1
     fun salesReturnQtyReport(): Observable<List<SalesReturnQtyReport>>
@@ -73,38 +82,50 @@ interface ReportRepo {
     fun salesReturnDetailReport(invoiceId: String): Observable<List<SalesReturnDetailReport>>
 
     //sale visit history report
-    fun salesVisitHistoryReport(): Observable<List<SalesVisitHistoryReport>>
+    fun invoiceCheckFromAndToCustomer(fromCusNo: Int, toCusNo: Int, newDate: String):Observable<List<Invoice>>
+    fun preOrderCheckFromAndToCustomer(fromCusNo: Int, toCusNo: Int, newDate: String):Observable<List<PreOrder>>
+    fun deliveryUploadCheckFromAndToCustomer(fromCusNo: Int, toCusNo: Int, newDate: String):Observable<List<DeliveryUpload>>
+    fun saleReturnCheckFromAndToCustomer(fromCusNo: Int, toCusNo: Int, newDate: String):Observable<List<SaleReturn>>
+    fun didCustomerFeedbackCheckFromAndToCustomer(fromCusNo: Int, toCusNo: Int, newDate: String):Observable<List<DidCustomerFeedback>>
+
 
     //unSell reason report
     fun unSellReasonReport(): Observable<List<UnsellReasonReport>>
 
     //sale target sale man
     fun saleTargetSaleManReport(): Observable<List<SaleTargetSaleMan>>
-    fun saleTargetAmountForSaleMan(groupId:Int,categoryId:Int):Observable<List<SaleTargetVO>>
-
-
+    fun getCategoryListFromInvoiceProduct(categoryId:String) : Observable<List<TargetAndSaleForSaleMan>>
+    fun getGroupListFromInvoiceProduct(groupId:String) : Observable<List<TargetAndSaleForSaleMan>>
     fun getAllInvoiceData(): Observable<List<Invoice>>
+    fun getTargetSaleDB(customerId:Int) : Observable<List<SaleTargetSaleMan>>
 
     //sale target and actual sale for customer
-    fun saleTargetCustomerReport(): Observable<List<SaleTargetCustomer>>
-    fun saleTargetAmountForCustomer(iCustomerId:String,groupId:Int,categoryId:Int):Observable<List<SaleTargetVO>>
-    fun saleTargetCustomerIdList(customerId:Int): Observable<List<SaleTargetCustomer>>
+    fun getTargetSaleDBForCustomer(customerIdFromSpinner:Int) : Observable<List<SaleTargetCustomer>>
+    fun getCustomerSaleTargetAndSaleIdList(customerId:String) :Observable<List<TargetAndSaleForSaleMan>>
 
     //target and actual sale for product
-    fun getNameListForSaleTargetProduct(): Observable<List<TargetAndActualSaleForProduct>>
-
-
-    //end of day report
-    fun getSaleManNameList(): Observable<List<SaleMan>>
-
-    fun getSaleManRouteNameList(): Observable<List<Route>>
-    fun getStartTimeAndEndTimeList(): Observable<List<CompanyInformation>>
-    fun getTotalSaleOrderList(): Observable<List<PreOrder>>
-    fun getTotalSaleExchangeList(): Observable<List<SaleExchange>>
-    fun getTotalSaleReturnList(): Observable<List<SaleReturn>>
-    fun getTotalCashReceiptList(): Observable<List<Credit>>
-    fun getPlanCustomerList(): Observable<List<RouteScheduleItemV2>>
+    fun getActualSale1ForSaleTargetProduct():Observable<List<Product>>
+    fun getActualSale2ForSaleTargetProduct():Observable<List<Product>>
+    fun getActualSale3ForSaleTargetProduct():Observable<List<Product>>
+    fun getInvoiceProductList(id: String):Observable<List<InvoiceProduct>>
+    fun getGroupIdFromProduct(productId:Int) : Observable<List<Product>>
+    fun getProductNameFromProduct(stockId:Int) : Observable<Product>
+    fun getGroupCodeNameFromGroupCode(groupId:Int) : Observable<GroupCode>
+    fun getCategoryNameFromProductCategory(categoryId:Int) : Observable<ProductCategory>
+    //......end of day report..........//
+    //New..............
+    fun getRouteNameForEndOfDayReport(saleManId:String):Observable<List<RouteScheduleV2>>
+    fun getSaleManRouteNameList(routeId:Int): Observable<List<Route>>
+    fun getTotalSaleList(now:String):Observable<List<Delivery>>
+    fun getInvoiceListForEndOfDay(now: String): Observable<List<Invoice>>
+    fun getPreOrderListForEndOfDay(now: String): Observable<List<PreOrder>>
+    fun getSaleReturnListForEndOfDay(now: String): Observable<List<SaleReturn>>
+    fun getSaleExchangeListForEndOfDay(now: String): Observable<List<Invoice>>
+    fun getCashReceiveListForEndOfDay(now: String):Observable<List<Credit>>
+    fun getSaleCountForEndOfDay(now: String): Observable<List<Invoice>>
     fun getDataForNewCustomerList():Observable<List<Customer>>
+    fun getPlanCustomerList(): Observable<List<RouteScheduleItemV2>>
     fun getDataNotVisitedCountList():Observable<List<SaleVisitRecordUpload>>
-
+    fun getStartTime(now:String):Observable<List<Invoice>>
+    //Up To...............
 }

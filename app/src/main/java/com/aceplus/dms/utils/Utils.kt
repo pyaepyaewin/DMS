@@ -28,6 +28,7 @@ import com.aceplus.domain.entity.promotion.Promotion
 import com.aceplus.domain.model.INVOICECANCEL
 import com.aceplus.domain.model.credit.CreditInvoice
 import com.aceplus.domain.model.forApi.ConfirmRequestSuccess
+import com.aceplus.domain.model.sale.SaleManDailyReport
 import com.aceplus.domain.vo.SoldProductInfo
 import com.aceplussolutions.rms.constants.AppUtils
 import com.google.gson.Gson
@@ -156,6 +157,7 @@ object Utils {
     }
 
     fun commonDialog(message: String, activity: Activity?, flag: Int) {
+
         val handler = Handler()
         handler.post(Runnable {
             if (activity!!.isFinishing) {
@@ -163,15 +165,20 @@ object Utils {
             } else {
                 var statusImage = 0
                 var title = ""
-                if (flag == 0) {
-                    statusImage = R.drawable.success
-                    title = "Success"
-                } else if (flag == 1) {
-                    statusImage = R.drawable.fail
-                    title = "Error"
-                } else if (flag == 2) {
-                    statusImage = R.drawable.info
-                    title = "Info"
+
+                when (flag) {
+                    0 -> {
+                        statusImage = R.drawable.success
+                        title = "Success"
+                    }
+                    1 -> {
+                        statusImage = R.drawable.fail
+                        title = "Error"
+                    }
+                    2 -> {
+                        statusImage = R.drawable.info
+                        title = "Info"
+                    }
                 }
 
                 AlertDialog.Builder(activity)
@@ -183,6 +190,7 @@ object Utils {
                     .show()
             }
         })
+
     }
 
     fun encodePassword(str: String): String {
@@ -216,13 +224,9 @@ object Utils {
     }
 
     fun getDeviceId(activity: Activity): String {
-//        return Settings.Secure.getString(
-//            activity.contentResolver,
-//            Settings.Secure.ANDROID_ID
-//        )
-        val telephonyManager =
-            activity.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
-        return telephonyManager.imei
+        return Settings.Secure.getString(activity.contentResolver, Settings.Secure.ANDROID_ID)
+//        val telephonyManager = activity.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+//        return telephonyManager.imei
 
     }
 
@@ -780,11 +784,41 @@ object Utils {
         val cm: ConnectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val activeNetwork = cm.activeNetworkInfo
 
-        if (activeNetwork != null)
-            return activeNetwork.isConnected
+        if (activeNetwork != null) return activeNetwork.isConnected
 
         return false
 
     }
+
+
+
+    @Throws(UnsupportedEncodingException::class)
+    private fun convertFromListByteArrayTobyteArray(ByteArray: List<ByteArray>): ByteArray {
+        var dataLength = 0
+        for (i in ByteArray.indices) {
+            dataLength += ByteArray[i].size
+        }
+
+        var distPosition = 0
+        val byteArray = ByteArray(dataLength)
+        for (i in ByteArray.indices) {
+            System.arraycopy(ByteArray[i], 0, byteArray, distPosition, ByteArray[i].size)
+            distPosition += ByteArray[i].size
+        }
+
+        return byteArray
+    }
+
+    private fun sendDataByte2BT(mActivity: Activity, mService: BluetoothService, data: ByteArray) {
+        if (mService.state !== BluetoothService.STATE_CONNECTED) {
+            Toast.makeText(mActivity, "Not Connected", Toast.LENGTH_SHORT)
+                .show()
+            return
+        }
+        mService.write(data)
+        commonDialog("Success", mActivity, 0)
+
+    }
+
 
 }

@@ -13,6 +13,7 @@ import android.support.v7.app.AlertDialog
 import android.util.Log
 import android.widget.Toast
 import com.aceplus.dms.R
+import com.aceplus.dms.utils.Utils
 import com.aceplus.domain.entity.customer.Customer
 import com.aceplus.shared.utils.GPSTracker
 import com.aceplussolutions.rms.ui.activities.BaseActivity
@@ -59,7 +60,11 @@ class CustomerLocationActivity : BaseActivity(), KodeinAware {
 
         customer = intent.getParcelableExtra(IE_CUSTOMER_DATA)
 
-        setupUI()
+        if (Utils.isInternetAccess(this))
+            setupUI()
+        else
+            Utils.commonDialog("No Internet Connection", this, 1)
+
         catchEvent()
 
     }
@@ -83,28 +88,30 @@ class CustomerLocationActivity : BaseActivity(), KodeinAware {
                 this.map?.uiSettings?.isMyLocationButtonEnabled = true
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
 
+                    if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
                         map?.isMyLocationEnabled = true
+                    else
+                        checkLocationPermission() //Check and request Location Permission
 
-                        /*val gpsTracker = GPSTracker(this)
-                        var lat = 0.0
-                        var lon = 0.0
+                } else{
+                    map?.isMyLocationEnabled = true
+                }
 
-                        if (gpsTracker.canGetLocation()) {
-                            lat = gpsTracker.getLatitude()
-                            lon = gpsTracker.getLongitude()
-                        }
-                        map?.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(lat, lon), 15f))*/
+                if (customer!!.latitude != null && customer!!.latitude?.length ?: 0 > 3) {
 
-                    } else {
-                        checkLocationPermission() //To Request Location Permission
-                    }
+                    val point = LatLng(customer!!.latitude!!.toDouble(), customer!!.longitude!!.toDouble())
+
+                    if (customer?.visit_record == "1")
+                        drawMarkerGreen(point, customer!!.customer_name.toString(), customer!!.address.toString())
+                    else
+                        drawMarkerRed(point, customer!!.customer_name.toString(), customer!!.address.toString())
+
+                    //Check - visit record null - if 1 show green for visited and show red for non-visited when it's 0
+
                 } else{
 
-                    map?.isMyLocationEnabled = true
-
-                    /*val gpsTracker = GPSTracker(this)
+                    val gpsTracker = GPSTracker(this)
                     var lat = 0.0
                     var lon = 0.0
 
@@ -112,20 +119,7 @@ class CustomerLocationActivity : BaseActivity(), KodeinAware {
                         lat = gpsTracker.getLatitude()
                         lon = gpsTracker.getLongitude()
                     }
-                    map?.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(lat, lon), 15f))*/
-
-                }
-
-                if (customer?.latitude != null) {
-
-                    val point = LatLng(customer!!.latitude!!.toDouble(), customer!!.longitude!!.toDouble())
-
-                    if (customer?.visit_record == "1")
-                        drawMarker2(point, customer!!.customer_name.toString(), customer!!.address.toString())
-                    else
-                        drawMarker(point, customer!!.customer_name.toString(), customer!!.address.toString())
-
-                    //To check - visit record null
+                    map?.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(lat, lon), 15f))
 
                 }
 
@@ -188,7 +182,7 @@ class CustomerLocationActivity : BaseActivity(), KodeinAware {
 
     }
 
-    private fun drawMarker(point: LatLng, title: String, snippet: String) {
+    private fun drawMarkerRed(point: LatLng, title: String, snippet: String) {
         val markerOptions = MarkerOptions()
         markerOptions
             .position(point)
@@ -198,7 +192,7 @@ class CustomerLocationActivity : BaseActivity(), KodeinAware {
         this.map?.moveCamera(CameraUpdateFactory.newLatLngZoom(point, 15f))
     }
 
-    private fun drawMarker2(point: LatLng, title: String, snippet: String) {
+    private fun drawMarkerGreen(point: LatLng, title: String, snippet: String) {
         val markerOptions = MarkerOptions()
         markerOptions
             .position(point)

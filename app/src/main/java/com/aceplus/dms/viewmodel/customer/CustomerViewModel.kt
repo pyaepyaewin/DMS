@@ -28,7 +28,7 @@ class CustomerViewModel(
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.mainThread())
                 .subscribe {
-                    customerDataList.postValue(it)
+                    this.customerDataList.postValue(it)
                 }
         }
     }
@@ -56,9 +56,9 @@ class CustomerViewModel(
                                     val customerFeedbackList = it
 
                                     val invoiceDate = SimpleDateFormat("yyyy-MM-dd hh:mm:ss.sss").format(Date())
-                                    val customerNumber = selectedCustomer.id
-                                    val locationNumber = customerVisitRepo.getLocationCode() // To Check
-                                    val feedbackNumber = customerFeedbackList[descriptionPosition].id //To Check..Invoice_No or ID // Modified
+                                    val customerID = selectedCustomer.id
+                                    val locationID = customerVisitRepo.getLocationCode()
+                                    val feedbackID = customerFeedbackList[descriptionPosition].id //To Check..Invoice_No or ID // Modified
                                     val feedbackDate = customerFeedbackList[descriptionPosition].invoice_date
                                     val serialNumber = ""
                                     val description = customerFeedbackList[descriptionPosition].remark
@@ -66,7 +66,7 @@ class CustomerViewModel(
 
                                     val invoiceNumber = Utils.getInvoiceNo(
                                         saleManId,
-                                        locationNumber.toString(),
+                                        locationID.toString(),
                                         Constant.FOR_OTHERS,
                                         customerVisitRepo.getLastCountForInvoiceNumber(Constant.FOR_OTHERS)
                                     )
@@ -76,9 +76,9 @@ class CustomerViewModel(
                                     didCustomerFeedbackEntity.dev_id = deviceId
                                     didCustomerFeedbackEntity.invoice_no = invoiceNumber
                                     didCustomerFeedbackEntity.invoice_date = invoiceDate
-                                    didCustomerFeedbackEntity.customer_no = customerNumber
-                                    didCustomerFeedbackEntity.location_no = locationNumber
-                                    didCustomerFeedbackEntity.feedback_no = feedbackNumber
+                                    didCustomerFeedbackEntity.customer_no = customerID
+                                    didCustomerFeedbackEntity.location_no = locationID
+                                    didCustomerFeedbackEntity.feedback_no = feedbackID
                                     didCustomerFeedbackEntity.feedback_date = feedbackDate
                                     didCustomerFeedbackEntity.serial_no = serialNumber
                                     didCustomerFeedbackEntity.description = description
@@ -109,7 +109,6 @@ class CustomerViewModel(
         customerVisitRepo.saveSaleVisitRecord(selectedCustomer, arrivalStatus)
     }
 
-    // Can it move to utils?
     private fun isSameCustomer(customer: Customer, gpsTracker: GPSTracker): Boolean {
         var arrivalStatus = false
         if (gpsTracker.canGetLocation()) {
@@ -144,7 +143,6 @@ class CustomerViewModel(
         }
         return arrivalStatus
     }
-
 
     fun updateCustomerLocation(customer: Customer){
         customerVisitRepo.updateCustomerData(customer)

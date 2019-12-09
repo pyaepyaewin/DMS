@@ -43,7 +43,7 @@ interface InvoiceDao {
     @Query("Delete from invoice")
     fun deleteAll()
 
-    @Query("select invoice.invoice_id,customer_name,address,total_amount,total_discount_amount,invoice.sale_date from invoice inner join customer on customer.id = invoice.customer_id where invoice.sale_flag = 0 and invoice.invoice_id not like 'SX%' and invoice.invoice_id not like 'OS%'")
+    @Query("select invoice.invoice_id,customer_name,address,total_amount,total_discount_amount,invoice.sale_date from invoice inner join customer on customer.id = invoice.customer_id where invoice.sale_flag = 1 and invoice.invoice_id not like 'SX%' and invoice.invoice_id not like 'OS%'")
     fun getSaleHistoryReport(): List<SaleInvoiceReport>
 
     @Query("select invoice.invoice_id,customer_name,address,total_amount,total_discount_amount,invoice.sale_date from invoice inner join customer on customer.id = invoice.customer_id where date(invoice.sale_date) between date(:fromDate) and date(:toDate)")
@@ -61,8 +61,8 @@ interface InvoiceDao {
     @Query("Delete from  invoice where invoice_id=:invoiceId")
     fun deleteAll(invoiceId:String)
 
-    @Query("UPDATE invoice SET total_quantity=:totalqty WHERE  invoice_product_id=:invoiceId")
-    fun updateTotalQtyForInvoice(invoiceId: String,totalqty:Int)
+    @Query("UPDATE invoice SET total_quantity = :totalQty WHERE  invoice_product_id=:invoiceId")
+    fun updateTotalQtyForInvoice(invoiceId: String,totalQty:Int)
 
     @Query("select * from invoice WHERE  invoice_id=:invoiceId")
     fun getSoldInvoice(invoiceId: String):List<Invoice>
@@ -72,5 +72,18 @@ interface InvoiceDao {
     @Query("select * from invoice WHERE  invoice_id=:invoiceId")
     fun getInvoiceCancel(invoiceId: String):Invoice
 
+    @Query("select * from invoice WHERE  customer_id BETWEEN :fromCusNo AND :toCusNo and date(sale_date) = date(:newDate)")
+    fun getSaleVisitFromAndToCustomer(fromCusNo: Int, toCusNo: Int, newDate: String): List<Invoice>
 
+    @Query("select * from invoice where date(sale_date) = date(:now) and pay_amount > 0")
+    fun getInvoiceListForEndOfDay(now: String): List<Invoice>
+
+    @Query("select * from invoice where date(sale_date) = date(:now) and invoice_id like 'SX%'")
+    fun getSaleExchangeListForEndOfDay(now: String): List<Invoice>?
+
+    @Query("select * from invoice where date(sale_date) = date(:now)")
+    fun getSaleCountForEndOfDay(now: String): List<Invoice>?
+
+    @Query("select * from invoice where date(sale_date) = date(:now) order by sale_date asc  limit 1")
+    fun getStartTime(now: String): List<Invoice>?
 }

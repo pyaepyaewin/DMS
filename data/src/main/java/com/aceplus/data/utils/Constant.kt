@@ -3,7 +3,9 @@ package com.aceplus.data.utils
 class Constant {
 
     companion object {
+
         var REAL_TIME_URL = "http://acedms-001-site1.atempurl.com/api/v1/upload.svc/"
+
         var REAL_TIME_AP_URL = "http://128.199.102.103:8080/api/v1/"
 
         var BASE_URL = "http://192.168.0.81:9000/api/v1/"//test ip for bi2
@@ -71,6 +73,7 @@ class Constant {
         const val HM_MESSAGE_UNABLE_CONNECT = 7
 
         const val RQC_GET_LOCATION = 100
+        const val RQC_BACK_TO_CUSTOMER = 101
 
     }
 

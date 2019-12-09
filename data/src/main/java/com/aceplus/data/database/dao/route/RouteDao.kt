@@ -35,6 +35,9 @@ interface RouteDao {
     @Query("select route_name from route where id = :routeID")
     fun getRouteNameByID(routeID: Int): String?
 
+    @Query("select * from route where id = :routeId")
+    fun getRouteList(routeId: Int): List<Route>
+
 
 //    @Query("select C.customer_name,T.township_name,C.phone,C.address from customer as C,township as T where C.township_number=T.id and C.township_number=:id")
 //    fun getCustomerFilterDetail(id:String): List<ViewByListDataClass>

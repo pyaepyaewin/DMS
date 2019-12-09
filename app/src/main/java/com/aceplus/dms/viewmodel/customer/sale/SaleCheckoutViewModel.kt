@@ -39,6 +39,10 @@ class SaleCheckoutViewModel(
         return customerVisitRepo.getRouteScheduleIDV2()
     }
 
+    fun getLocationCode(): Int{
+        return customerVisitRepo.getLocationCode()
+    }
+
     fun getInvoiceNumber(saleManId: String, locationNumber: Int, invoiceMode: String): String {
         return Utils.getInvoiceNo(
             saleManId,
@@ -54,9 +58,9 @@ class SaleCheckoutViewModel(
         var amountAndPercentage: MutableMap<String, Double> = mutableMapOf()
         var sameCategoryProducts: ArrayList<SoldProductInfo> = ArrayList()
 
-        var exclude: Int? = 0
-        var volDisFilterId = 0
-        var soldPrice = 0.0
+        var exclude: Int?
+        var volDisFilterId: Int
+        var soldPrice: Double
         var totalBuyAmtInclude = 0.0
         var totalBuyAmtExclude = 0.0
         var discountPercent = 0.0
@@ -68,6 +72,7 @@ class SaleCheckoutViewModel(
         var taxPercent = 0
 
         launch {
+            //I think volume discount function is being wrong by logic in old project
             customerVisitRepo.getVolumeDiscountFilterByDate(Utils.getCurrentDate(true))
                 .flatMap {
 
@@ -76,34 +81,49 @@ class SaleCheckoutViewModel(
                         volDisFilterId = i.id
                         exclude = i.exclude?.toInt()
 
-                        for (soldProduct in soldProductList) {
-
-                            var categoryProduct: String? = null
-                            var category: String? = null
-
-                            customerVisitRepo.getProductByID(soldProduct.product.id)
-                                .subscribeOn(schedulerProvider.io())
-                                .observeOn(schedulerProvider.mainThread())
-                                .subscribe { productList ->
-                                    for (p in productList) {
-                                        categoryProduct = p.category_id
+                        customerVisitRepo.getVolumeDiscountFilterItem(volDisFilterId)
+                            .flatMap { volumeDiscFilterItemList ->
+                                for (v in volumeDiscFilterItemList) {
+                                    for (soldProduct in soldProductList){
+                                        if (v.category_id == soldProduct.product.category_id)
+                                            sameCategoryProducts.add(soldProduct)
                                     }
                                 }
+                                for (aSameCategoryProduct in sameCategoryProducts) {
 
-                            customerVisitRepo.getVolumeDiscountFilterItem(volDisFilterId)
-                                .subscribeOn(schedulerProvider.io())
-                                .observeOn(schedulerProvider.mainThread())
-                                .subscribe { volumeDiscFilterItemList ->
-                                    for (v in volumeDiscFilterItemList) {
-                                        category = v.category_id
+                                    soldPrice = if (aSameCategoryProduct.promotionPrice == 0.0) {
+                                        aSameCategoryProduct.product.selling_price?.toDouble() ?: 0.0
+                                    } else {
+                                        aSameCategoryProduct.promotionPrice
                                     }
+
+                                    var buyAmt = soldPrice * aSameCategoryProduct.quantity
+                                    aSameCategoryProduct.totalAmt = buyAmt
+
+                                    totalBuyAmtInclude += aSameCategoryProduct.totalAmt
+
+                                    if (aSameCategoryProduct.promotionPrice == 0.0)
+                                        totalBuyAmtExclude += aSameCategoryProduct.totalAmt
+
                                 }
+                                if (exclude == 0)
+                                    return@flatMap customerVisitRepo.getDiscountPercentFromVolumeDiscountFilterItem(volDisFilterId, totalBuyAmtInclude)
+                                else
+                                    return@flatMap customerVisitRepo.getDiscountPercentFromVolumeDiscountFilterItem(volDisFilterId, totalBuyAmtExclude)
+                            }
+                            .subscribeOn(schedulerProvider.io())
+                            .observeOn(schedulerProvider.mainThread())
+                            .subscribe { discList ->
+                                if (discList.isEmpty()) exclude = null
+                                for (disc in discList) {
+                                    discountPercent = disc.discount_percent?.toDouble() ?: 0.0
+                                }
+                                amountAndPercentage["Percentage"] = discountPercent
+                                var itemTotalDis = totalBuyAmtInclude * (discountPercent / 100)
+                                amountAndPercentage["Amount"] = itemTotalDis
+                            }
 
-                            if (category == categoryProduct)
-                                sameCategoryProducts.add(soldProduct)
-
-                        }
-
+                        /*Modified function - no more usage (can delete)
                         for (aSameCategoryProduct in sameCategoryProducts) {
 
                             soldPrice = if (aSameCategoryProduct.promotionPrice == 0.0) {
@@ -124,10 +144,7 @@ class SaleCheckoutViewModel(
 
                         if (exclude == 0) {
 
-                            customerVisitRepo.getDiscountPercentFromVolumeDiscountFilterItem(
-                                volDisFilterId,
-                                totalBuyAmtInclude
-                            )
+                            customerVisitRepo.getDiscountPercentFromVolumeDiscountFilterItem(volDisFilterId, totalBuyAmtInclude)
                                 .subscribeOn(schedulerProvider.io())
                                 .observeOn(schedulerProvider.mainThread())
                                 .subscribe { discList ->
@@ -135,11 +152,10 @@ class SaleCheckoutViewModel(
                                     for (disc in discList) {
                                         discountPercent = disc.discount_percent?.toDouble() ?: 0.0
                                     }
+                                    amountAndPercentage["Percentage"] = discountPercent
+                                    var itemTotalDis = totalBuyAmtInclude * (discountPercent / 100)
+                                    amountAndPercentage["Amount"] = itemTotalDis
                                 }
-
-                            amountAndPercentage["Percentage"] = discountPercent
-                            var itemTotalDis = totalBuyAmtInclude * (discountPercent / 100)
-                            amountAndPercentage["Amount"] = itemTotalDis
 
                             // Check what's this for ... exceed?
                             if (discountPercent > 0) {
@@ -155,10 +171,7 @@ class SaleCheckoutViewModel(
 
                         } else {
 
-                            customerVisitRepo.getDiscountPercentFromVolumeDiscountFilterItem(
-                                volDisFilterId,
-                                totalBuyAmtExclude
-                            )
+                            customerVisitRepo.getDiscountPercentFromVolumeDiscountFilterItem(volDisFilterId, totalBuyAmtExclude)
                                 .subscribeOn(schedulerProvider.io())
                                 .observeOn(schedulerProvider.mainThread())
                                 .subscribe { discList ->
@@ -166,11 +179,10 @@ class SaleCheckoutViewModel(
                                     for (disc in discList) {
                                         discountPercent = disc.discount_percent?.toDouble() ?: 0.0
                                     }
+                                    amountAndPercentage["Percentage"] = discountPercent
+                                    var itemTotalDis = totalBuyAmtInclude * (discountPercent / 100)
+                                    amountAndPercentage["Amount"] = itemTotalDis
                                 }
-
-                            amountAndPercentage["Percentage"] = discountPercent
-                            var itemTotalDis = totalBuyAmtInclude * (discountPercent / 100)
-                            amountAndPercentage["Amount"] = itemTotalDis
 
                             // Check what's this for ... exceed?
                             if (discountPercent > 0) {
@@ -184,22 +196,21 @@ class SaleCheckoutViewModel(
                                 }
                             }
 
-                        }
+                        }*/
 
                     }
 
-                    return@flatMap customerVisitRepo.getVolumeDiscountByDate(
-                        Utils.getCurrentDate(
-                            true
-                        )
-                    )
+                    return@flatMap customerVisitRepo.getVolumeDiscountByDate(Utils.getCurrentDate(true))
                 }
                 .flatMap {
 
-                    var volDisId = 0
-                    var buyAmt = 0.0
+                    //Need to fix - wrong logic
+
+                    var volDisId: Int
+                    var buyAmt: Double
 
                     for (i in it) {
+
                         volDisId = i.id
                         exclude = i.exclude?.toInt()
 
@@ -214,16 +225,12 @@ class SaleCheckoutViewModel(
                             buyAmt = noPromoBuyAmt
                         }
 
-                        customerVisitRepo.getDiscountPercentFromVolumeDiscountFilterItem(
-                            volDisId,
-                            buyAmt
-                        )
+                        customerVisitRepo.getDiscountPercentFromVolumeDiscountFilterItem(volDisId, buyAmt)
                             .subscribeOn(schedulerProvider.io())
                             .observeOn(schedulerProvider.mainThread())
                             .subscribe { volDiscFilterItemList ->
                                 for (volDiscFilterItem in volDiscFilterItemList) {
-                                    val discountPercentForVolDis =
-                                        volDiscFilterItem.discount_percent?.toDouble() ?: 0.0
+                                    val discountPercentForVolDis = volDiscFilterItem.discount_percent?.toDouble() ?: 0.0
                                     totalVolumeDiscount = buyAmt * (discountPercentForVolDis / 100)
                                     totalVolumeDiscountPercent = discountPercentForVolDis
                                 }

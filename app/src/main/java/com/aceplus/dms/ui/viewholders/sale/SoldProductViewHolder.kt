@@ -1,6 +1,5 @@
 package com.aceplus.dms.ui.viewholders.sale
 
-import android.util.Log
 import android.view.View
 import com.aceplus.dms.utils.Utils
 import com.aceplus.domain.vo.SoldProductInfo
@@ -15,9 +14,7 @@ class SoldProductViewHolder(
     val onClickFocButton: (soldProduct: SoldProductInfo, position: Int) -> Unit
 ) : BaseViewHolder<SoldProductInfo>(itemView) {
 
-    override fun setData(data: SoldProductInfo) {
-
-    }
+    override fun setData(data: SoldProductInfo) { "Do Nothing" }
 
     fun setData(data: SoldProductInfo, position: Int){
 

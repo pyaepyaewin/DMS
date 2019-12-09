@@ -23,4 +23,7 @@ interface GroupCodeDao{
     @Query("Delete from group_code")
     fun deleteAll()
 
+    @Query("select * from group_code where id = :groupId")
+    fun getGroupCodeNameFromGroupCode(groupId: Int): GroupCode?
+
 }
