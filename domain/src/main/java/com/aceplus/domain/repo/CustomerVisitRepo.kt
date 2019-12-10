@@ -52,6 +52,7 @@ interface CustomerVisitRepo {
     fun getProductByID(productID: Int): Observable<List<Product>>
     fun updateProductRemainingQty(soldProductInfo: SoldProductInfo)
     fun updateRemainingQtyWithExchangeOrReturn(isSaleExchange: Boolean, qty: Int, productID: Int)
+    fun updateOrderQty(soldProductInfo: SoldProductInfo)
 
     fun saveCustomerFeedback(didCustomerFeedbackEntity: DidCustomerFeedback)
 

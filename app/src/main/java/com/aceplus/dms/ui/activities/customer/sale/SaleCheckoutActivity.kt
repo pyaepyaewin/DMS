@@ -122,7 +122,7 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
         calculateTotalAmount()
         saleCheckoutViewModel.calculateFinalAmount(soldProductList, totalAmount)
         salePersonId = saleCheckoutViewModel.getSaleManID()
-        locationCode = saleCheckoutViewModel.getLocationCode() // Modified route id to location id - main thread
+        locationCode = saleCheckoutViewModel.getLocationCode() //Modified route id to location id - main thread
         routeID = saleCheckoutViewModel.getRouteID()
 
     }
@@ -255,9 +255,10 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
             total += soldProduct.totalAmt
         }
         totalAmount = total
-        netAmount = total
         tvTotalAmount.text = Utils.formatAmount(total)
-        tvNetAmount.text = Utils.formatAmount(total)
+
+        /*netAmount = total
+        tvNetAmount.text = Utils.formatAmount(total)*/
     }
 
     private fun calculateDiscPercentToAmt(){

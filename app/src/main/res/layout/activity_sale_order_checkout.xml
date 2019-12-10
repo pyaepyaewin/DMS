@@ -33,7 +33,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
                 android:layout_centerVertical="true"
-                android:text="@string/sale_checkout"
+                android:text="@string/sale_order_checkout"
                 android:textColor="#ffffff"
                 android:textSize="@dimen/appbar_title_size" />
     </RelativeLayout>
@@ -884,6 +884,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="10dp"
+                            android:visibility="gone"
                             android:weightSum="4">
 
                         <TextView

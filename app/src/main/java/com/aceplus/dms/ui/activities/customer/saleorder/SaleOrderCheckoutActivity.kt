@@ -99,12 +99,10 @@ import kotlinx.android.synthetic.main.activity_sale_order_checkout.tableHeaderUM
 import kotlinx.android.synthetic.main.activity_sale_order_checkout.volDisForPreOrderLayout as volDisForPreOrderLayout1
 
 class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
-
     override val kodein: Kodein by kodein()
 
     override val layoutId: Int
         get() = R.layout.activity_sale_order_checkout
-
 
     companion object{
 
@@ -112,27 +110,20 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
         private const val IE_SOLD_PRODUCT_LIST = "IE_SOLD_PRODUCT_LIST"
         private const val IE_PROMOTION_LIST = "IE_PROMOTION_LIST"
         private const val IE_IS_DELIVERY = "IE_IS_DELIVERY"
-        // For pre order
-        private const val IS_PRE_ORDER = "is-pre-order"
-        //For delivery
         private const val ORDERED_INVOICE_KEY = "ordered_invoice_key"
-
-
         private const val RC_REQUEST_SEND_SMS = 101
 
-        fun getIntentFromSaleOrder(context: Context, customerData: Customer, soldProductList: ArrayList<SoldProductInfo>, promotionList: ArrayList<Promotion>): Intent{
-
+        fun getIntentFromSaleOrder(
+            context: Context,
+            customerData: Customer,
+            soldProductList:
+            ArrayList<SoldProductInfo>,
+            promotionList: ArrayList<Promotion>
+        ): Intent{
             val intent = Intent(context, SaleOrderCheckoutActivity::class.java)
             intent.putExtra(IE_CUSTOMER_DATA, customerData)
             intent.putExtra(IE_SOLD_PRODUCT_LIST, soldProductList)
             intent.putExtra(IE_PROMOTION_LIST, promotionList)
-            return intent
-
-        }
-
-        fun getIntent(saleOrderActivity: SaleOrderActivity, orderedInvoice: Deliver): Intent? {
-            val intent = Intent(saleOrderActivity, SaleOrderCheckoutActivity::class.java)
-            intent.putExtra(ORDERED_INVOICE_KEY,orderedInvoice)
             return intent
         }
 
@@ -152,24 +143,19 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
         }
 
     }
+
     private val saleCheckoutViewModel: SaleCheckoutViewModel by viewModel()
     private val deliveryCheckoutViewModel: DeliveryViewModel by viewModel()
     private val orderCheckoutListAdapter: OrderCheckoutListAdapter by lazy { OrderCheckoutListAdapter() }
 
     private val df = DecimalFormat(".##")
     private var orderedInvoice: Deliver? = null
-    private var isPreOrder: Boolean = false
     private var customer: Customer? = null
     private var isDelivery: Boolean = false
     private var soldProductList: ArrayList<SoldProductInfo> = ArrayList()
     private var promotionList: ArrayList<Promotion> = ArrayList()
     private var totalAmount: Double = 0.0
     private var netAmount: Double = 0.0
-    private var totalVolumeDiscount: Double = 0.0
-    private var totalVolumeDiscountPercent:Double = 0.0
-    private var totalDiscountAmount:Double = 0.0
-    private var volDisPercent: Double = 0.0
-    private var volDisAmount:Double = 0.0
     private var taxType: String = ""
     private var taxPercent: Int = 0
     private var taxAmt: Double = 0.0
@@ -177,26 +163,38 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
     private var locationCode: Int = 0
     private var invoiceId: String = ""
     private var invoice: Invoice? = null
-    private var sale_man_id = ""
-    private var saleManId = ""
-    private var saleManNo = ""
+    private var selectedDeliveryDate: String? = null
+    private var routeID: Int = 0
+
+    private var sale_man_id = ""                            //Should be the same
+    private var saleManId = ""                              //Should be the same
+    private var saleManNo = ""                              //Should be the same
+
+    private var totalVolumeDiscount: Double = 0.0           //Disc by date
+    private var totalVolumeDiscountPercent:Double = 0.0     //Disc by date
+    private var salesmanDisAmount: Double = 0.0             //Disc by salesman
+    private var salesmanDisPercent:Double = 0.0             //Disc by salesman
+    private var totalItemDiscountAmount: Double = 0.0       //Disc by amount
+    private var totalItemDiscountPercent: Double = 0.0      //Disc by amount
+    private var totalDiscountAmount:Double = 0.0            //Total of disc
+    private var totalDiscountPercent:Double = 0.0           //Total of disc
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         saleManId = AppUtils.getStringFromShp(Constant.SALEMAN_ID, this)!!
         saleManNo = AppUtils.getStringFromShp(Constant.SALEMAN_NO, this)!!
-
 
         getIntentData()
         initializeData()
         setupUI()
         catchEvents()
-        orderCheckoutListAdapter.setNewList(soldProductList)
 
     }
 
     private fun setupUI(){
+
         if (isDelivery){
             deliveryHeaderLayout.tvTitle.text = "DELIVERY CHECKOUT"
             tvInvoiceId.text = orderedInvoice!!.invoiceNo
@@ -216,7 +214,6 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
             tableHeaderUM.visibility = View.GONE
             advancedPaidAmountLayout.visibility = View.GONE
             volDisForPreOrderLayout.visibility = View.GONE
-
         }
         else{
             saleDateTextView.text = Utils.getDate(false)
@@ -237,14 +234,20 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
         rvSoldProductList.adapter = orderCheckoutListAdapter
         rvSoldProductList.layoutManager = LinearLayoutManager(this)
 
+        orderCheckoutListAdapter.setNewList(soldProductList)
+
     }
 
     private fun initializeData(){
+
         calculateTotalAmount()
-        saleCheckoutViewModel.calculateFinalAmount(soldProductList, totalAmount) // Check - should do only for pre-order
-        deliveryCheckoutViewModel.loadRouteId(saleManId)
+        saleCheckoutViewModel.calculateFinalAmount(soldProductList, totalAmount) //Check - should do only for pre-order
         salePersonId = saleCheckoutViewModel.getSaleManID()
-        locationCode = saleCheckoutViewModel.getRouteID() // Check point - route id or location id - main thread
+        locationCode = saleCheckoutViewModel.getLocationCode()
+        routeID = saleCheckoutViewModel.getRouteID()
+
+        if (isDelivery) deliveryCheckoutViewModel.loadRouteId(saleManId) //exceeding
+
     }
 
     private fun catchEvents(){
@@ -253,7 +256,9 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
         btn_disOk.setOnClickListener { calculateDiscPercentToAmt() }
         btn_amtOk.setOnClickListener { calculateDiscAmtToPercent() }
 
-        confirmAndPrint_img.setOnClickListener { Utils.askConfirmationDialog("Save", "Do you want to confirm?", "save", this, this::onClickSaveButton) }
+        confirmAndPrint_img.setOnClickListener {
+            Utils.askConfirmationDialog("Save", "Do you want to confirm?", "save", this, this::onClickSaveButton)
+        }
 
         if (!isDelivery) checkout_delivery_date_chooser_text.setOnClickListener { chooseDeliveryDate() }
 
@@ -269,10 +274,11 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
                 taxType = it.taxType
                 taxPercent = it.taxPercent
 
-                val totalItemDisAmt = it.amountAndPercentage["Amount"] ?: 0.0
+                totalItemDiscountAmount = it.amountAndPercentage["Amount"] ?: 0.0
+                totalItemDiscountPercent = it.amountAndPercentage["Percentage"] ?: 0.0
 
                 if (!isDelivery)
-                    displayFinalAmount(totalItemDisAmt)
+                    displayFinalAmount()
                 else
                     displayFinalDataForDelivery() // ToDo - need to update for delivery
             }
@@ -314,6 +320,7 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
                 saleCheckoutViewModel.uploadResult.value = null
             }
         })
+
         deliveryCheckoutViewModel.routeDataList.observe(this,android.arch.lifecycle.Observer {
             sale_man_id = it!!.sale_man_id
         })
@@ -321,12 +328,17 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
     }
 
     private fun getIntentData(){
-        isPreOrder = intent.getBooleanExtra(IS_PRE_ORDER, false)
+
         isDelivery = intent.getBooleanExtra(IE_IS_DELIVERY, false)
-        if (intent.getParcelableExtra<Customer>(IE_CUSTOMER_DATA) != null) customer = intent.getParcelableExtra(IE_CUSTOMER_DATA)
-        if (intent.getParcelableArrayListExtra<SoldProductInfo>(IE_SOLD_PRODUCT_LIST) != null) soldProductList = intent.getParcelableArrayListExtra(IE_SOLD_PRODUCT_LIST)
-        if (intent.getParcelableArrayListExtra<Promotion>(IE_PROMOTION_LIST) != null) promotionList = intent.getParcelableArrayListExtra(IE_PROMOTION_LIST)
-        if (intent.getSerializableExtra(ORDERED_INVOICE_KEY) != null) orderedInvoice = intent.getSerializableExtra(ORDERED_INVOICE_KEY) as Deliver
+        customer = intent.getParcelableExtra(IE_CUSTOMER_DATA)
+        soldProductList = intent.getParcelableArrayListExtra(IE_SOLD_PRODUCT_LIST)
+
+        if (intent.getParcelableArrayListExtra<Promotion>(IE_PROMOTION_LIST) != null)
+            promotionList = intent.getParcelableArrayListExtra(IE_PROMOTION_LIST)
+
+        if (intent.getSerializableExtra(ORDERED_INVOICE_KEY) != null)
+            orderedInvoice = intent.getSerializableExtra(ORDERED_INVOICE_KEY) as Deliver
+
     }
 
     private fun onClickSaveButton(type: String){
@@ -346,7 +358,6 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
                 if (validationInput(paymentMethod == "B", paidAmount)){
 
                     if (paidAmount < netAmount){
-                        // ToDo - check insufficient amount
                         setInvoiceId()
                         savePreOrderInformation("CR")
                     } else{
@@ -379,10 +390,12 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
 
         val myCalendar = Calendar.getInstance()
         val sdf = SimpleDateFormat("yyyy/MM/dd")
+        val sdf2 = SimpleDateFormat("yyyy-MM-dd")
 
         val dateDialog = DatePickerDialog(this, DatePickerDialog.OnDateSetListener { view, year, month, dayOfMonth ->
             myCalendar.set(year, month, dayOfMonth)
             checkout_delivery_date_chooser_text.setText(sdf.format(myCalendar.time))
+            selectedDeliveryDate = sdf2.format(myCalendar.time)
         }, myCalendar.get(Calendar.YEAR), myCalendar.get(Calendar.MONTH), myCalendar.get(Calendar.DAY_OF_MONTH))
 
         dateDialog.show()
@@ -394,15 +407,14 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
         if (edtVolumeDiscountPercent.text.toString().isNotBlank() && edtVolumeDiscountPercent.text.toString() != "."){
             val discountPercent = edtVolumeDiscountPercent.text.toString().toDouble()
             var discountAmount = totalAmount * discountPercent / 100
-            var netAmount = totalAmount - discountAmount
 
             discountAmount = df.format(discountAmount).toDouble()
-            netAmount = df.format(netAmount).toDouble()
-
             edtVolumeDiscountAmt.setText(discountAmount.toString())
-            tvNetAmount.text = netAmount.toString()
-            this.netAmount = netAmount
-            this.volDisAmount = discountAmount
+
+            this.salesmanDisAmount = discountAmount
+            this.salesmanDisPercent = discountPercent
+
+            displayFinalAmount()
         }
 
     }
@@ -412,15 +424,14 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
         if (edtVolumeDiscountAmt.text.toString().isNotBlank() && edtVolumeDiscountAmt.text.toString() != "."){
             val discountAmount = edtVolumeDiscountAmt.text.toString().toDouble()
             var discountPercent = 100 * (discountAmount / totalAmount)
-            var netAmount = totalAmount - discountAmount
 
             discountPercent = df.format(discountPercent).toDouble()
-            netAmount = df.format(netAmount).toDouble()
-
             edtVolumeDiscountPercent.setText(discountPercent.toString())
-            tvNetAmount.text = netAmount.toString()
-            this.netAmount = netAmount
-            this.volDisAmount = discountAmount
+
+            this.salesmanDisAmount = discountAmount
+            this.salesmanDisPercent = discountPercent
+
+            displayFinalAmount()
         }
 
     }
@@ -431,20 +442,19 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
             total += soldProduct.totalAmt
         }
         totalAmount = total
-        netAmount = total
         tvTotalAmount.text = Utils.formatAmount(total)
-        tvNetAmount.text = total.toString()
+
+        /*netAmount = total
+        tvNetAmount.text = total.toString()*/
     }
 
-    private fun displayFinalAmount(itemDisAmt: Double){
+    private fun displayFinalAmount(){
+
+        totalDiscountAmount = totalVolumeDiscount + totalItemDiscountAmount + salesmanDisAmount
+        totalDiscountPercent = totalDiscountAmount * 100 / totalAmount  //check after fixing disc
 
         val taxAmt = calculateTax()
-        var netAmount = 0.0
-
-        totalDiscountAmount = totalVolumeDiscount + itemDisAmt
-
-        if (totalAmount != 0.0)
-            totalVolumeDiscountPercent = totalDiscountAmount * 100 / totalAmount
+        var netAmount: Double
 
         if (taxType.equals("E", true)){
             tax_label_saleCheckout.text = "Tax (Exclude) : "
@@ -454,17 +464,8 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
             netAmount = totalAmount - totalDiscountAmount
         }
 
-        if (volDisAmount != 0.0) netAmount -= volDisAmount
-
         this.netAmount = netAmount
         tvNetAmount.text = Utils.formatAmount(netAmount)
-
-        if (volDisPercent != 0.0) edtVolumeDiscountPercent.setText(volDisPercent.toString())
-        else edtVolumeDiscountPercent.setText(totalVolumeDiscountPercent.toString())
-
-        if (volDisAmount != 0.0) edtVolumeDiscountAmt.setText(volDisAmount.toString())
-        else edtVolumeDiscountAmt.setText(totalDiscountAmount.toString())
-
         tax_txtView.text = df.format(taxAmt)
 
     }
@@ -493,20 +494,22 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
     }
 
     private fun calculateTax(): Double{
+
         var taxAmt = 0.0
         if (taxPercent != 0)
-            taxAmt = netAmount / 21
+            taxAmt = (totalAmount - totalDiscountAmount) / 21
 
         this.taxAmt = taxAmt
-
         return taxAmt
 
     }
 
     private fun validationInput(withBankInfo: Boolean, paidAmount: Double): Boolean{
+
         var deliDate = false
         var bank = false
         var acc = false
+
         if (paidAmount > netAmount){
             AlertDialog.Builder(this)
                 .setTitle("Delivery")
@@ -518,6 +521,12 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
                 .show()
 
             return false
+        }
+        else{
+            if (withBankInfo && paidAmount < netAmount){
+                Utils.commonDialog("Insufficient Pay Amount!", this, 1)
+                return false
+            }
         }
 
         if (!isDelivery){
@@ -563,7 +572,7 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
 
         val invoiceCount = AppUtils.getIntFromShp(Constant.INVOICE_COUNT, this) ?: 0
         if (invoiceCount >= 0) AppUtils.saveIntToShp(Constant.INVOICE_COUNT, invoiceCount + 1, this)
-        val invoiceID = saleCheckoutViewModel.getInvoiceNumber( salePersonId!!, locationCode, Constant.FOR_SALE)
+        val invoiceID = saleCheckoutViewModel.getInvoiceNumber( salePersonId!!, locationCode, Constant.FOR_PRE_ORDER_SALE)
         tvInvoiceId.text = invoiceID
         this.invoiceId = invoiceID
 
@@ -575,8 +584,8 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
         saleCheckoutViewModel.updateSaleVisitRecord(customer!!.id)
 
         val customerId = customer!!.id
-        val preOrderDate = Utils.getCurrentDate(true) // To check format
-        val deliveryDate = checkout_delivery_date_chooser_text.text.toString() // To check format
+        val preOrderDate = Utils.getCurrentDate(true)
+        val deliveryDate = selectedDeliveryDate.toString()
         val advancedPaymentAmount = if (tvPrepaidAmount.text.isNotBlank()) tvPrepaidAmount.text.toString().toDouble() else 0.0
 
         saleCheckoutViewModel.saveOrderData(
@@ -588,9 +597,9 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
             deliveryDate,
             advancedPaymentAmount,
             totalAmount,
-            locationCode,
-            volDisAmount,
-            volDisPercent,
+            routeID,
+            salesmanDisAmount,
+            salesmanDisPercent,
             taxAmt,
             checkout_remark_edit_text.text.toString(),
             edit_txt_branch_name.text.toString(),
@@ -709,7 +718,7 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
     private fun toPrintActivity(mode:String){
         if (mode == "S") {
             val intent = PrintInvoiceActivity.newIntentFromSaleOrderCheckout(this, invoice!!, soldProductList, promotionList)
-            startActivityForResult(intent, Utils.RQ_BACK_TO_CUSTOMER)
+            startActivityForResult(intent, Constant.RQC_BACK_TO_CUSTOMER)
         }else{
             insertDeliveryDataToDatabase()
             val intent = PrintInvoiceActivity.newIntent(this,soldProductList,"D",orderedInvoice!!,customer!!,invoice!!)
@@ -775,7 +784,7 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == Utils.RQ_BACK_TO_CUSTOMER)
+        if (requestCode == Constant.RQC_BACK_TO_CUSTOMER)
             if (resultCode == Activity.RESULT_OK) {
                 setResult(Activity.RESULT_OK)
                 finish()
@@ -787,7 +796,8 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
             val intent = Intent(this@SaleOrderCheckoutActivity, DeliveryActivity::class.java)
             startActivity(intent)
             finish()
-        } else super.onBackPressed()
+        } else
+            super.onBackPressed()
     }
 
 }

@@ -167,6 +167,10 @@ class CustomerVisitRepoImpl(
             db.productDao().updateProductRemainingQtyWithSaleReturn(qty, productID)
     }
 
+    override fun updateOrderQty(soldProductInfo: SoldProductInfo) {
+        db.productDao().updateOrderQty(soldProductInfo.quantity, soldProductInfo.product.id)
+    }
+
     override fun saveDataForTempSaleManRoute(selectedCustomer: Customer, currentDate: String, arrivalStatus: Int) {
 
         val saleManId = AppUtils.getStringFromShp(Constant.SALEMAN_ID, shf)

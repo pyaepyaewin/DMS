@@ -29,6 +29,7 @@ class SaleCheckoutViewModel(
     var finalData = MutableLiveData<CalculatedFinalData>()
     var messageInfo = MutableLiveData<Pair<String, String>>()
     var uploadResult = MutableLiveData<Boolean>()
+    var invoiceAndRelatedData = MutableLiveData<Triple<Invoice, ArrayList<SoldProductInfo>, ArrayList<Promotion>>>()
 
     fun getSaleManID(): String {
         val saleManData = customerVisitRepo.getSaleManData()
@@ -419,9 +420,9 @@ class SaleCheckoutViewModel(
         deliveryDate: String,
         advancedPaymentAmount: Double,
         totalAmount: Double,
-        locationID: Int,
+        routeID: Int,
         totalDiscountAmount: Double,
-        totalVolumeDiscountPercent: Double,
+        totalDiscountPercent: Double,
         taxAmt: Double,
         remark: String,
         bank: String,
@@ -430,7 +431,6 @@ class SaleCheckoutViewModel(
         soldProductList: ArrayList<SoldProductInfo>,
         promotionList: ArrayList<Promotion>
     ) {
-
         launch {
             customerVisitRepo.getOrderInvoiceCountByID(invoiceId)
                 .subscribeOn(schedulerProvider.io())
@@ -442,6 +442,7 @@ class SaleCheckoutViewModel(
                         val invoice = Invoice()
                         val preOrder = PreOrder()
                         val preOrderProductList: ArrayList<PreOrderProduct> = ArrayList()
+                        val tempSoldProduct: ArrayList<SoldProductInfo> = ArrayList()
 
                         for (soldProduct in soldProductList) {
 
@@ -451,24 +452,29 @@ class SaleCheckoutViewModel(
                             preOrderProduct.order_quantity = soldProduct.quantity.toString()
                             preOrderProduct.price = soldProduct.product.selling_price
                             preOrderProduct.total_amount = soldProduct.totalAmt
-                            preOrderProduct.promotion_price =
-                                soldProduct.promoPriceByDiscount.toString() // Check promo price or promo price by disc
+                            preOrderProduct.promotion_price = soldProduct.promoPriceByDiscount.toString() //Check promo-price or promo-price-by-disc
                             preOrderProduct.promotion_plan_id = soldProduct.promotionPlanId
                             preOrderProduct.volume_discount = soldProduct.discountAmount.toString()
-                            preOrderProduct.volume_discount_percent =
-                                soldProduct.discountPercent.toString()
-                            //preOrderProduct.item_discount_percent = soldProduct.itemDiscountAmount.toString() // ToDo -  Check
-                            //preOrderProduct.item_discount_amount // ToDo -  Check
+                            preOrderProduct.volume_discount_percent = soldProduct.discountPercent.toString()
+                            preOrderProduct.item_discount_percent = soldProduct.itemDiscountAmount.toString() // ToDo -  not set in old project
+                            //preOrderProduct.item_discount_amount // ToDo -  not exist in sold product
                             preOrderProduct.exclude = soldProduct.exclude?.toString()
 
-                            preOrderProductList.add(preOrderProduct)
+                            if (soldProduct.totalAmt != 0.0){
+                                preOrderProductList.add(preOrderProduct)
+                                customerVisitRepo.updateOrderQty(soldProduct) //Need to remind kkk!!
+                            }
 
-                            // ToDo - something
+                            if (soldProduct.focQuantity > 0 && soldProduct.totalAmt == 0.0){
+                                // ToDo - add promotion list
+                                tempSoldProduct.add(soldProduct)
+                            }
 
                         }
 
                         customerVisitRepo.insertAllPreOrderProduct(preOrderProductList)
 
+                        soldProductList.removeAll(tempSoldProduct)
 
                         for (promotion in promotionList) {
                             // ToDo - something for promotion
@@ -478,14 +484,14 @@ class SaleCheckoutViewModel(
                         invoice.customer_id = customerId.toString()
                         invoice.sale_date = preOrderDate
                         invoice.total_amount = totalAmount.toString()
-                        invoice.total_discount_amount = totalDiscountAmount // Need to check
+                        invoice.total_discount_amount = totalDiscountAmount
                         invoice.pay_amount = advancedPaymentAmount.toString()
                         invoice.refund_amount = "0.0"
                         invoice.sale_person_id = salePersonId
-                        invoice.location_code = locationID.toString()
+                        invoice.location_code = routeID.toString()
                         invoice.device_id = deviceId
                         invoice.invoice_status = cashOrLoanOrBank
-                        invoice.total_discount_percent = totalVolumeDiscountPercent.toString()
+                        invoice.total_discount_percent = totalDiscountPercent.toString()
                         invoice.rate = "1"
                         invoice.tax_amount = taxAmt
                         invoice.due_date = deliveryDate
@@ -498,11 +504,10 @@ class SaleCheckoutViewModel(
                         preOrder.pre_order_date = preOrderDate
                         preOrder.expected_delivery_date = deliveryDate
                         preOrder.advance_payment_amount = advancedPaymentAmount.toString()
-                        preOrder.net_amount = totalAmount.toString() // To Check
-                        preOrder.location_id = locationID.toString()
-                        preOrder.discount = totalDiscountAmount.toString() // To Check
-                        preOrder.discount_percent =
-                            totalVolumeDiscountPercent.toString() // To Check
+                        preOrder.net_amount = totalAmount.toString()
+                        preOrder.location_id = routeID.toString()
+                        preOrder.discount = totalDiscountAmount.toString()
+                        preOrder.discount_percent = totalDiscountPercent.toString()
                         preOrder.tax_amount = taxAmt.toString()
                         preOrder.bank_name = bank
                         preOrder.bank_account_no = acc
@@ -512,9 +517,9 @@ class SaleCheckoutViewModel(
 
                         customerVisitRepo.insertPreOrder(preOrder)
                         this.invoice.postValue(invoice)
+                        this.invoiceAndRelatedData.postValue(Triple(invoice, soldProductList, promotionList))
 
-
-                        customerVisitRepo.getAllPreOrder()
+                        /*customerVisitRepo.getAllPreOrder()
                             .flatMap { preOrderList ->
                                 Log.d("Testing", "Pre Order count = ${preOrderList.size}")
                                 return@flatMap customerVisitRepo.getAllPreOrderProduct()
@@ -522,17 +527,13 @@ class SaleCheckoutViewModel(
                             .subscribeOn(schedulerProvider.io())
                             .observeOn(schedulerProvider.mainThread())
                             .subscribe { preOrderProductList ->
-                                Log.d(
-                                    "Testing",
-                                    "Pre Order Product count = ${preOrderProductList.size}"
-                                )
-                            }
+                                Log.d("Testing", "Pre Order Product count = ${preOrderProductList.size}")
+                            }*/
 
                     } else Log.d("Testing", "Found same invoice id")
 
                 }
         }
-
     }
 
     @SuppressLint("CheckResult")

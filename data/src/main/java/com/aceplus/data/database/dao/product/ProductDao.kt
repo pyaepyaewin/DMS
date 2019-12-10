@@ -86,4 +86,7 @@ interface ProductDao {
 //    @Query("update product set remaining_quantity = remaining_quantity+ :unSoldQty, sold_quantity = sold_quantity - :unSoldQty where id in (:productIDList)")
 //    fun updateProductRemainingQtyForLongClickDelete(unSoldQty: Int, productIDList: List<Int>)
 
+    @Query("update product set order_quantity = order_quantity + :soldQty where id = :productID")
+    fun updateOrderQty(soldQty: Int, productID: Int)
+
 }
