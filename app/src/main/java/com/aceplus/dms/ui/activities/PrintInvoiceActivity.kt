@@ -93,7 +93,6 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
             intent.putExtra(IE_SOLD_PRODUCT_LIST, soldProductList)
             intent.putExtra(IE_PROMOTION_LIST, promotionList)
             intent.putExtra(IE_PRINT_MODE, "S")
-            //ToDo - check for ordered invoice
             return intent
         }
 

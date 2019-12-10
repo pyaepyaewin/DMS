@@ -29,7 +29,6 @@ class SaleCheckoutViewModel(
     var finalData = MutableLiveData<CalculatedFinalData>()
     var messageInfo = MutableLiveData<Pair<String, String>>()
     var uploadResult = MutableLiveData<Boolean>()
-    var invoiceAndRelatedData = MutableLiveData<Triple<Invoice, ArrayList<SoldProductInfo>, ArrayList<Promotion>>>()
 
     fun getSaleManID(): String {
         val saleManData = customerVisitRepo.getSaleManData()
@@ -303,6 +302,7 @@ class SaleCheckoutViewModel(
                     if (it == 0) {
 
                         val invoiceProductList: ArrayList<InvoiceProduct> = ArrayList()
+                        val tempSoldProduct: ArrayList<SoldProductInfo> = ArrayList()
 
                         for (soldProduct in soldProductList) {
 
@@ -332,11 +332,14 @@ class SaleCheckoutViewModel(
 
                             if (soldProduct.focQuantity > 0 && soldProduct.totalAmt == 0.0) {
                                 // ToDo - add promotion list
+                                tempSoldProduct.add(soldProduct)
                             }
 
                         }
 
                         customerVisitRepo.insertAllInvoiceProduct(invoiceProductList)
+
+                        soldProductList.removeAll(tempSoldProduct)
 
                         for (promotion in promotionList) {
                             // ToDo - update present qty, remaining qty
@@ -517,7 +520,6 @@ class SaleCheckoutViewModel(
 
                         customerVisitRepo.insertPreOrder(preOrder)
                         this.invoice.postValue(invoice)
-                        this.invoiceAndRelatedData.postValue(Triple(invoice, soldProductList, promotionList))
 
                         /*customerVisitRepo.getAllPreOrder()
                             .flatMap { preOrderList ->

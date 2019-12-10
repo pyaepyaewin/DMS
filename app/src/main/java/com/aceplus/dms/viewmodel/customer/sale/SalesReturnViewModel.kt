@@ -36,6 +36,10 @@ class SalesReturnViewModel(
         return customerVisitRepo.getRouteScheduleIDV2()
     }
 
+    fun getLocationCode(): Int{
+        return customerVisitRepo.getLocationCode()
+    }
+
     fun getLastCountForInvoiceNumber(mode: String) = customerVisitRepo.getLastCountForInvoiceNumber(mode)
 
     fun loadProductList() {

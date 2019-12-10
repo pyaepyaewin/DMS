@@ -31,7 +31,6 @@ import org.kodein.di.KodeinAware
 import org.kodein.di.android.kodein
 
 class SaleReturnActivity : BaseActivity(), KodeinAware {
-
     override val kodein: Kodein by kodein()
 
     override val layoutId: Int
@@ -68,7 +67,7 @@ class SaleReturnActivity : BaseActivity(), KodeinAware {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN) // Hide keyboard
+        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
 
         getIntentData()
         initializeData()
@@ -87,7 +86,7 @@ class SaleReturnActivity : BaseActivity(), KodeinAware {
     private fun initializeData(){
 
         salePersonID = salesReturnViewModel.getSaleManID()
-        locationCode = salesReturnViewModel.getRouteID() // Check point - route id or location id - main thread
+        locationCode = salesReturnViewModel.getLocationCode()
 
         saleReturnID = if (isSaleExchange)
             Utils.getInvoiceNo(salePersonID!!, locationCode.toString(), Constant.FOR_SALE_RETURN_EXCHANGE, salesReturnViewModel.getLastCountForInvoiceNumber(Constant.FOR_SALE_RETURN_EXCHANGE))
@@ -204,11 +203,17 @@ class SaleReturnActivity : BaseActivity(), KodeinAware {
         val alertDialog = AlertDialog.Builder(this)
             .setView(view)
             .setTitle("Quantity")
-            .setPositiveButton("Confirm") { arg0, arg1 ->
+            .setPositiveButton("Confirm", null)
+            .setNegativeButton("Cancel", null)
+            .create()
 
+        alertDialog.setOnShowListener {
+            availableQuantityLayout.visibility = View.GONE
+            val confirmButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
+            confirmButton.setOnClickListener {
                 if (quantityEditText.text.toString().isBlank()) {
                     messageTextView.text = "You must specify quantity."
-                    return@setPositiveButton
+                    return@setOnClickListener
                 } else{
                     val quantity = quantityEditText.text.toString().toInt()
 
@@ -221,13 +226,10 @@ class SaleReturnActivity : BaseActivity(), KodeinAware {
                     val newList = mReturnProductListAdapter.getDataList() as ArrayList
                     newList[position] = soldProduct
                     salesReturnViewModel.calculateSelectedProductData(newList)
+                    alertDialog.dismiss()
                 }
-
             }
-            .setNegativeButton("Cancel", null)
-            .create()
-
-        alertDialog.setOnShowListener { availableQuantityLayout.visibility = View.GONE }
+        }
         alertDialog.show()
 
     }

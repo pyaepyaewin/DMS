@@ -40,7 +40,6 @@ import org.kodein.di.KodeinAware
 import org.kodein.di.android.kodein
 
 class SaleExchangeInfoActivity: BaseActivity(), KodeinAware {
-
     override val kodein: Kodein by kodein()
 
     override val layoutId: Int

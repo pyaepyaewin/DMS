@@ -280,7 +280,7 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
                 if (!isDelivery)
                     displayFinalAmount()
                 else
-                    displayFinalDataForDelivery() // ToDo - need to update for delivery
+                    displayFinalDataForDelivery()
             }
         })
 
@@ -301,7 +301,7 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
             if (it != null){
                 sendSMS(it.first, it.second)
                 insertSMSRecord(it.first, it.second)
-                // To check - found no update commend for delete flag
+                //To check - found no update commend for delete flag
             }
         })
 
@@ -437,6 +437,7 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
     }
 
     private fun calculateTotalAmount(){
+
         var total = 0.0
         for (soldProduct in soldProductList){
             total += soldProduct.totalAmt
@@ -444,8 +445,6 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
         totalAmount = total
         tvTotalAmount.text = Utils.formatAmount(total)
 
-        /*netAmount = total
-        tvNetAmount.text = total.toString()*/
     }
 
     private fun displayFinalAmount(){
@@ -479,7 +478,7 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
             tax_label_saleCheckout.text = "Tax (Include) : "
             netAmount = totalAmount
         }
-        // for delivery
+
         val volDiscount = java.lang.Double.parseDouble(String.format("%.3f", totalAmount * orderedInvoice!!.discountPercent / 100))
         orderedInvoice!!.discount = volDiscount
         netAmount = java.lang.Double.parseDouble(String.format("%.3f", netAmount - orderedInvoice!!.discount - orderedInvoice!!.paidAmount))
