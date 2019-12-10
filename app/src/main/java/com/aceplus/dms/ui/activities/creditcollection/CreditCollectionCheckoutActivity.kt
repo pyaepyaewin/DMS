@@ -11,6 +11,7 @@ import android.support.v7.widget.LinearLayoutManager
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
+import android.widget.AdapterView
 import android.widget.Toast
 import com.aceplus.data.utils.Constant
 import com.aceplus.dms.R
@@ -24,6 +25,7 @@ import com.aceplus.domain.model.credit.CreditInvoice
 import com.aceplussolutions.rms.constants.AppUtils
 import com.aceplussolutions.rms.ui.activities.BaseActivity
 import kotlinx.android.synthetic.main.activity_credit_collection.*
+import kotlinx.android.synthetic.main.activity_credit_collection.view.*
 import kotlinx.android.synthetic.main.activity_sale_checkout.*
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
@@ -33,11 +35,11 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 
-class CreditCollectionCheckoutActivity : BaseActivity(), KodeinAware {
+ class CreditCollectionCheckoutActivity : BaseActivity(), KodeinAware {
     override val kodein: Kodein by kodein()
     override val layoutId: Int
         get() = R.layout.activity_credit_collection
-    private var listViewPosition = 0
+    private var selectedItemPosition= 0
     var calculateList = mutableListOf<Credit>()
     var total = 0.0
     private val df = DecimalFormat(".##")
@@ -70,14 +72,20 @@ class CreditCollectionCheckoutActivity : BaseActivity(), KodeinAware {
     }
 
 
-    private fun onClickNoticeListItem(data: Credit) {
+    private fun onClickNoticeListItem(data: Credit,position:Int,id:String) {
+        total_pay_layout.visibility = View.GONE
+        item_pay_layout.visibility = View.VISIBLE
          data1 = data
-//        total_pay_layout.visibility = View.GONE
-//        item_pay_layout.visibility = View.VISIBLE
         date_txt.text = data.invoice_date
         invno_txt.text = data.invoice_no
         item_pay_edit.setText("")
         invoiceAmount=data.amount
+        val creditList = creditCollectionCheckOutAdapter.getDataList() as ArrayList
+        selectedItemPosition=position
+      creditList[position] = data
+        customer_name_txt.text= intent.getSerializableExtra("CustomerName") as String
+        item_pay_edit.setText("")
+
         item_pay_edit.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(p0: Editable?) {
                 var tempPayAmount = 0.0
@@ -130,6 +138,8 @@ class CreditCollectionCheckoutActivity : BaseActivity(), KodeinAware {
         var customerName = intent.getSerializableExtra("CustomerName") as String
         var townShipName = creditCollectionCheckOutViewModel.getTownShipName(customerId.toInt())
 
+        payment_amount_edit.text = null
+        item_pay_edit.text = null
 
         payment_amount_edit.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(p0: Editable?) {
@@ -163,9 +173,7 @@ class CreditCollectionCheckoutActivity : BaseActivity(), KodeinAware {
             }
 
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-//                if (p0!!.isNotEmpty()){
-//                    calculateRefundAmount()
-//                }
+
                 if (p0.toString().isNotEmpty() && !p0.toString().endsWith(".")) {
                     val convertedString = p0.toString()
                     //                    convertedString = Utils.formatAmount(Double.parseDouble(charSequence.toString().replace(",", "")));
@@ -175,19 +183,9 @@ class CreditCollectionCheckoutActivity : BaseActivity(), KodeinAware {
                     }
                 }
 
-
-
-
-//                val convertedString = p0.toString()
-//                if (payment_amount_edit.text.toString() != convertedString && convertedString.isNotEmpty()) {
-//                    payment_amount_edit.setText(convertedString)
-//                    payment_amount_edit.setSelection(payment_amount_edit.text.length)
-//                }
             }
 
         })
-
-        //val customerName=creditCollectionCheckOutViewModel.getCustomerName(customerId)
 
         cancel_img.setOnClickListener {
             onBackPressed()
@@ -213,7 +211,9 @@ class CreditCollectionCheckoutActivity : BaseActivity(), KodeinAware {
                     } else {
                         calculateList =
                             creditCollectionCheckOutViewModel.calculatePayAmount(payment_amount_edit.text.toString()) as MutableList<Credit>
-                        creditCollectionCheckOutViewModel.insertCashReceiveData(calculateList)
+                        creditCollectionCheckOutViewModel.getCashReceiveCount()
+
+
                         val creditInvoiceList = mutableListOf<CreditInvoice>()
                         calculateList.map {
                             val creditInvoice = CreditInvoice()
@@ -235,16 +235,51 @@ class CreditCollectionCheckoutActivity : BaseActivity(), KodeinAware {
                             PrintInvoiceActivity.getIntentFromCredit(
                                 this,
                                 creditInvoiceList,
-                                listViewPosition,
+                                selectedItemPosition,
                                 townShipName,
                                 salePersonName.toString(),
                                 customerName
-                            ),Utils.RQ_BACK_TO_CUSTOMER
+                            ), Utils.RQ_BACK_TO_CUSTOMER
                         )
                     }
                 }
+                    else  {
+                        if (item_pay_edit.text.toString() == "") {
+                            item_pay_edit.error = "Please enter pay amount"
+                        } else
+                        {
+                            creditCollectionCheckOutViewModel.getCashReceiveCount()
+ calculateList = creditCollectionCheckOutViewModel.calculatePayAmountForSelectedInvoice(item_pay_edit.text.toString(),selectedItemPosition) as MutableList<Credit>
+                            val creditInvoiceList = mutableListOf<CreditInvoice>()
+                            calculateList.map {
+                                val creditInvoice = CreditInvoice()
+                                creditInvoice.id = it.id
+                                creditInvoice.amt = it.amount
+                                creditInvoice.customerId = it.customer_id
+                                creditInvoice.creditAmt = it.amount - it.pay_amount
+                                creditInvoice.invoiceDate = it.invoice_date
+                                creditInvoice.invoiceNo = it.invoice_no
+                                creditInvoice.invoiceStatus = it.invoice_status
+                                creditInvoice.payAmt = it.pay_amount
+                                creditInvoice.refund = it.refund
+                                creditInvoice.saleManId = it.sale_man_id!!.toInt()
+                                creditInvoice.saleStatus = it.sale_status
+                                creditInvoiceList.add(creditInvoice)
+                            }
+                            startActivityForResult(
+                                PrintInvoiceActivity.getIntentFromCredit(
+                                    this,
+                                    creditInvoiceList,
+                                    selectedItemPosition,
+                                    townShipName,
+                                    salePersonName.toString(),
+                                    customerName
+                                ), Utils.RQ_BACK_TO_CUSTOMER
+                            )                        }
+                    }
+                }
             }
-        }
+
         creditCollectionCheckOutViewModel.creditCollectionCheckOutSuccessState.observe(
             this,
             android.arch.lifecycle.Observer {
@@ -260,7 +295,6 @@ class CreditCollectionCheckoutActivity : BaseActivity(), KodeinAware {
                     total += amt
                     totalPaid += paid
                     totalUnpaid += unpaid
-                //    creditCollectionCheckOutViewModel.updatePayAmount(payment_amount_edit.text.toString().toDouble(),i.invoice_no!!)
 
 
                 }
@@ -284,9 +318,19 @@ class CreditCollectionCheckoutActivity : BaseActivity(), KodeinAware {
             adapter = creditCollectionCheckOutAdapter
         }
         creditCollectionCheckOutViewModel.loadCreditCollectionCheckOut(customerId)
+        creditCollectionCheckOutViewModel.cashReceiveCountSuccessState.observe(
+            this,
+            android.arch.lifecycle.Observer {
+                var count=it
+                creditCollectionCheckOutViewModel.insertCashReceiveData(calculateList,count!!)
+            }
+        )
+        creditCollectionCheckOutViewModel.cashReceiveCountErrorState.observe(
+            this,
+            android.arch.lifecycle.Observer {
+            })
 
-
-    }
+            }
 
 
 

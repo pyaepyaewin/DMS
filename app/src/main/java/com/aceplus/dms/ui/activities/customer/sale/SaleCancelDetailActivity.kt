@@ -320,9 +320,9 @@ class SaleCancelDetailActivity : BaseActivity(), KodeinAware {
 
                     soldProduct.quantity = quantity
 
-                    val newList = saleCancelDetailAdapter.getDataList() as ArrayList
-                    newList[position] = soldProduct
-                    saleCancelViewModel.calculateSoldProductData(newList)
+                    val soldProductList = saleCancelDetailAdapter.getDataList() as ArrayList
+                    soldProductList[position] = soldProduct
+                    saleCancelViewModel.calculateSoldProductData(soldProductList)
                     saleCancelDetailAdapter.notifyItemChanged(position)
 
                 }

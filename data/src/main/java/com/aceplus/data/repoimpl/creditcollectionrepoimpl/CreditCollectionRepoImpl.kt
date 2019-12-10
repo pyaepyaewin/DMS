@@ -11,6 +11,11 @@ import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
 
 class CreditCollectionRepoImpl(val database: MyDatabase):CreditCollectionRepo {
+    override fun getCashReceiveCount(): Observable<Int> {
+        return Observable.just(database.cashReceiveDao().getCashReceiveCount())
+
+    }
+
     override fun getCreditCollectionList(): Observable<List<CreditCollectionDataClass>> {
         return Observable.just(database.creditDao().getCreditCollection())
 

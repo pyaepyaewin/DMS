@@ -4,6 +4,7 @@ import android.arch.lifecycle.MutableLiveData
 import android.content.SharedPreferences
 import android.util.Log
 import com.aceplus.data.utils.Constant
+import com.aceplus.dms.di.provideDownloadApi
 import com.aceplus.domain.entity.Location
 import com.aceplus.domain.entity.cash.CashReceive
 import com.aceplus.domain.entity.cash.CashReceiveItem
@@ -53,18 +54,30 @@ class CreditCollectionCheckOutViewModel(
                 })
         }
     }
+    var cashReceiveCountSuccessState = MutableLiveData<Int>()
+    var cashReceiveCountErrorState = MutableLiveData<String>()
+    fun getCashReceiveCount() {
+        launch {
+            creditCollectionCheckOutRepo.getCashReceiveCount()
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    cashReceiveCountSuccessState.postValue(it)
+                }, {
+                    cashReceiveCountErrorState.value = it.localizedMessage
+                })
+        }
+    }
 
-
-    fun insertCashReceiveData(creditDataList: List<Credit>) {
+    fun insertCashReceiveData(creditDataList: List<Credit>,count:Int) {
         var cashList: MutableList<CashReceive> = mutableListOf()
         var cashItemList: MutableList<CashReceiveItem> = mutableListOf()
-
+       creditCollectionCheckOutRepo.getCashReceiveCount()
         for (credit in creditDataList) {
             val cashReceive = CashReceive()
             val cashReceiveItem = CashReceiveItem()
-
-            cashReceive.id = credit.id
-            cashReceive.receive_no = credit.invoice_no
+          cashReceive.id =count+1
+            cashReceive.receive_no = credit.invoice_no?.replace("W", "CR")
             cashReceive.receive_date = credit.invoice_date
             cashReceive.customer_id = credit.customer_id.toString()
             cashReceive.amount = credit.pay_amount.toString()
@@ -140,35 +153,35 @@ class CreditCollectionCheckOutViewModel(
 
         return remainList
     }
-    fun calculatePayAmountForSelectedInvoice(payAmt: String): List<Credit> {
+    fun calculatePayAmountForSelectedInvoice(payAmt: String,position:Int): List<Credit> {
 
         var payAmount: Double = payAmt.replace(",", "").toDouble()
         val remainList = ArrayList<Credit>()
         val tempCreditList = ArrayList<Credit>()
         tempCreditList.addAll(creditList)
 
-        for (i in creditList) {
-            val creditAmount = i.amount - i.pay_amount
+
+            val creditAmount =  creditList[position].amount -   creditList[position].pay_amount
 
             if (payAmount != 0.0 && payAmount < creditAmount) {
-                i.pay_amount = payAmount
+                creditList[position].pay_amount = payAmount
                 payAmount = 0.0
-                remainList.add(i)
+                remainList.add(creditList[position])
 
             } else if (payAmount != 0.0 && payAmount > creditAmount) {
                 payAmount -= creditAmount
-                i.pay_amount = creditAmount
-                tempCreditList.remove(i)
-                remainList.add(i)
+                creditList[position].pay_amount = creditAmount
+                tempCreditList.remove(creditList[position])
+                remainList.add(creditList[position])
 
             } else if (payAmount != 0.0 && payAmount == creditAmount) {
                 payAmount -= creditAmount
-                i.pay_amount = creditAmount
-                tempCreditList.remove(i)
-                remainList.add(i)
+                creditList[position].pay_amount = creditAmount
+                tempCreditList.remove(creditList[position])
+                remainList.add(creditList[position])
             }
 
-        }
+
 
         Log.i("REMAIN -> ", payAmount.toString() + "")
         Log.i("Remain item -> ", remainList.size.toString() + "")

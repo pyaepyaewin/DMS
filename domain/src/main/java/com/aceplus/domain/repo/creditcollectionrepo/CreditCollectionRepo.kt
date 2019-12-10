@@ -14,4 +14,5 @@ interface CreditCollectionRepo {
     fun updatePayAmount(payAmt:Double,invoiceNo:String)
     fun getLocation():Observable<List<Location>>
     fun getTownShipName(customerID:Int):String
+    fun getCashReceiveCount():Observable<Int>
 }
