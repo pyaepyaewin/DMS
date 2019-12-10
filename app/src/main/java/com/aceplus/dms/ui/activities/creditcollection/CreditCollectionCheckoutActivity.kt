@@ -206,9 +206,9 @@ import kotlin.collections.ArrayList
 
                 }
                 if (total_pay_layout.visibility == View.VISIBLE) {
-                    selectedItemPosition=
+
                     if (payment_amount_edit.text.toString() == "") {
-                        payment_amount_edit.error = "Please enter pay amount"
+                       payment_amount_edit.error = "Please enter pay amount"
                     } else {
                         calculateList =
                             creditCollectionCheckOutViewModel.calculatePayAmount(payment_amount_edit.text.toString()) as MutableList<Credit>
