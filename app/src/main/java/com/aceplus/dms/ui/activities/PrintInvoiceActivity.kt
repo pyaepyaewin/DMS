@@ -117,6 +117,7 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
             customerTownShip: String,
             salePersonName: String,
             customerName: String
+
         ): Intent {
             val printIntent = Intent(context, PrintInvoiceActivity::class.java)
             printIntent.putExtra("CREDIT", credit as Serializable)
@@ -125,7 +126,6 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
             printIntent.putExtra(IE_PRINT_MODE, "C")
             printIntent.putExtra(CUSTOMER_TOWNSHIP, customerTownShip)
             printIntent.putExtra(SALE_MAN_NAME, salePersonName)
-            printIntent.putExtra(CUSTOMER_NAME, customerName)
             return printIntent
         }
 
@@ -373,9 +373,9 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
             credit_net_amount.textSize = 30f
             credit_receive_amt.textSize = 30f
 
-            credit_total_amt.text = Utils.formatAmount(creditList[0].amt)
-            credit_net_amount.text = Utils.formatAmount(creditList[0].amt)
-            credit_receive_amt.text = Utils.formatAmount(creditList[0].payAmt)
+            credit_total_amt.text = Utils.formatAmount(creditList[pos].amt)
+            credit_net_amount.text = Utils.formatAmount(creditList[pos].amt)
+            credit_receive_amt.text = Utils.formatAmount(creditList[pos].payAmt)
             credit_discount.text = "0.0 (0%)"
 
         } else if (printMode == "D") {

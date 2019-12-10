@@ -206,6 +206,7 @@ import kotlin.collections.ArrayList
 
                 }
                 if (total_pay_layout.visibility == View.VISIBLE) {
+                    selectedItemPosition=
                     if (payment_amount_edit.text.toString() == "") {
                         payment_amount_edit.error = "Please enter pay amount"
                     } else {
@@ -238,8 +239,7 @@ import kotlin.collections.ArrayList
                                 selectedItemPosition,
                                 townShipName,
                                 salePersonName.toString(),
-                                customerName
-                            ), Utils.RQ_BACK_TO_CUSTOMER
+                                customerName), Utils.RQ_BACK_TO_CUSTOMER
                         )
                     }
                 }
@@ -248,8 +248,10 @@ import kotlin.collections.ArrayList
                             item_pay_edit.error = "Please enter pay amount"
                         } else
                         {
-                            creditCollectionCheckOutViewModel.getCashReceiveCount()
+
  calculateList = creditCollectionCheckOutViewModel.calculatePayAmountForSelectedInvoice(item_pay_edit.text.toString(),selectedItemPosition) as MutableList<Credit>
+
+                            creditCollectionCheckOutViewModel.getCashReceiveCount()
                             val creditInvoiceList = mutableListOf<CreditInvoice>()
                             calculateList.map {
                                 val creditInvoice = CreditInvoice()

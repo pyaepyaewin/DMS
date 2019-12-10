@@ -20,6 +20,9 @@ class CreditCollectionCheckOutViewModel(
     private val schedulerProvider: SchedulerProvider,
     private val shf: SharedPreferences
 ) : BaseViewModel() {
+    var invoiceId=""
+
+
     var creditList = listOf<Credit>()
     var creditCollectionCheckOutSuccessState = MutableLiveData<List<Credit>>()
     var creditCollectionCheckOutErrorState = MutableLiveData<String>()
@@ -121,6 +124,7 @@ class CreditCollectionCheckOutViewModel(
 
         var payAmount: Double = payAmt.replace(",", "").toDouble()
         val remainList = ArrayList<Credit>()
+
         val tempCreditList = ArrayList<Credit>()
         tempCreditList.addAll(creditList)
 
@@ -132,17 +136,24 @@ class CreditCollectionCheckOutViewModel(
                 payAmount = 0.0
                 remainList.add(i)
 
+
+
+
             } else if (payAmount != 0.0 && payAmount > creditAmount) {
                 payAmount -= creditAmount
                 i.pay_amount = creditAmount
                 tempCreditList.remove(i)
                 remainList.add(i)
+//                invoiceId=i.invoice_no!!
+
 
             } else if (payAmount != 0.0 && payAmount == creditAmount) {
                 payAmount -= creditAmount
                 i.pay_amount = creditAmount
                 tempCreditList.remove(i)
                 remainList.add(i)
+//                invoiceId=i.invoice_no!!
+
             }
 
         }
