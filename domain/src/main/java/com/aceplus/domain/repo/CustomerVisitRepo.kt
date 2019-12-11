@@ -9,6 +9,7 @@ import com.aceplus.domain.entity.classdiscount.ClassDiscountByPriceItem
 import com.aceplus.domain.entity.customer.Customer
 import com.aceplus.domain.entity.customer.CustomerFeedback
 import com.aceplus.domain.entity.customer.DidCustomerFeedback
+import com.aceplus.domain.entity.deviceissue.DeviceIssueRequest
 import com.aceplus.domain.entity.invoice.Invoice
 import com.aceplus.domain.entity.invoice.InvoiceProduct
 import com.aceplus.domain.entity.preorder.PreOrder
@@ -119,5 +120,7 @@ interface CustomerVisitRepo {
     fun insertAllSaleReturnDetail(list: List<SaleReturnDetail>)
     fun getSaleReturnProductInfo(saleReturnInvoiceNo: String): Observable<List<SaleExchangeProductInfo>>
     fun getSaleReturnInfo(saleReturnInvoiceNo: String?): Observable<SaleReturn?>
+
+    fun getDeviceIssueRequestByID(invoiceNo: String): Observable<List<DeviceIssueRequest>>
 
 }

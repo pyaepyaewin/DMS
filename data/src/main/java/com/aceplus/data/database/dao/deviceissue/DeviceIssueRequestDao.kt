@@ -25,4 +25,7 @@ interface DeviceIssueRequestDao {
     @Query("Delete from device_issue_request")
     fun deleteAll()
 
+    @Query("select * from device_issue_request where invoice_no = :invoiceNo")
+    fun getDataByID(invoiceNo: String): List<DeviceIssueRequest>
+
 }

@@ -13,6 +13,7 @@ import com.aceplus.domain.entity.classdiscount.ClassDiscountByPriceItem
 import com.aceplus.domain.entity.customer.Customer
 import com.aceplus.domain.entity.customer.CustomerFeedback
 import com.aceplus.domain.entity.customer.DidCustomerFeedback
+import com.aceplus.domain.entity.deviceissue.DeviceIssueRequest
 import com.aceplus.domain.entity.invoice.Invoice
 import com.aceplus.domain.entity.invoice.InvoiceProduct
 import com.aceplus.domain.entity.preorder.PreOrder
@@ -496,6 +497,10 @@ class CustomerVisitRepoImpl(
 
     override fun getSaleReturnInfo(saleReturnInvoiceNo: String?): Observable<SaleReturn?> {
         return Observable.just(db.saleReturnDao().getDataByID(saleReturnInvoiceNo))
+    }
+
+    override fun getDeviceIssueRequestByID(invoiceNo: String): Observable<List<DeviceIssueRequest>> {
+        return Observable.just(db.deviceIssueRequestDao().allData)
     }
 
 }

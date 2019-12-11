@@ -8,7 +8,8 @@ import kotlinx.android.synthetic.main.van_issue_product_list.view.*
 
 class VanIssueSelectedProductViewHolder(
     itemView: View,
-    private val onClickBtnQty: (soldProduct: SoldProductInfo, position: Int) -> Unit
+    private val onClickBtnQty: (soldProduct: SoldProductInfo, position: Int) -> Unit,
+    private val onLongClickSoldProductListItem: (soldProduct: SoldProductInfo, position: Int) -> Unit
 ): BaseViewHolder<SoldProductInfo>(itemView) {
 
     override fun setData(data: SoldProductInfo) { "Notion" }
@@ -23,6 +24,11 @@ class VanIssueSelectedProductViewHolder(
         itemView.amount.text = Utils.formatAmount(data.totalAmt)
 
         itemView.qty.setOnClickListener { onClickBtnQty(data, position) }
+
+        itemView.setOnLongClickListener {
+            onLongClickSoldProductListItem(data, position)
+            true
+        }
 
     }
 

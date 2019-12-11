@@ -1,6 +1,7 @@
 package com.aceplus.dms.viewmodel
 
 import android.arch.lifecycle.MutableLiveData
+import com.aceplus.dms.utils.Utils
 import com.aceplus.domain.entity.product.Product
 import com.aceplus.domain.repo.CustomerVisitRepo
 import com.aceplus.shared.viewmodel.BaseViewModel
@@ -13,6 +14,24 @@ class VanIssueViewModel(
 
     var productDataList = MutableLiveData<Pair<List<Product>, List<String>>>()
 
+
+    fun getLocationCode(): Int{
+        return customerVisitRepo.getLocationCode()
+    }
+
+    fun getSaleManID(): String {
+        val saleManData = customerVisitRepo.getSaleManData()
+        return saleManData.id
+    }
+
+    fun getInvoiceNumber(saleManId: String, locationNumber: Int, invoiceMode: String): String {
+        return Utils.getInvoiceNo(
+            saleManId,
+            locationNumber.toString(),
+            invoiceMode,
+            customerVisitRepo.getLastCountForInvoiceNumber(invoiceMode)
+        )
+    }
 
     fun loadProductList() {
         launch {
@@ -27,6 +46,14 @@ class VanIssueViewModel(
                     productDataList.postValue(Pair(it, productNameList))
                 }
         }
+    }
+
+    fun saveData(
+        invoiceNo: String
+    ){
+
+
+
     }
 
 }

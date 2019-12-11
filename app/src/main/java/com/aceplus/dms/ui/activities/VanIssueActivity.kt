@@ -10,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
 import android.widget.*
+import com.aceplus.data.utils.Constant
 import com.aceplus.dms.R
 import com.aceplus.dms.ui.adapters.VanIssueProductListAdapter
 import com.aceplus.dms.ui.adapters.sale.ProductListAdapter
@@ -17,6 +18,7 @@ import com.aceplus.dms.utils.Utils
 import com.aceplus.dms.viewmodel.VanIssueViewModel
 import com.aceplus.domain.entity.product.Product
 import com.aceplus.domain.vo.SoldProductInfo
+import com.aceplussolutions.rms.constants.AppUtils
 import com.aceplussolutions.rms.ui.activities.BaseActivity
 import kotlinx.android.synthetic.main.activity_sale1.*
 import kotlinx.android.synthetic.main.activity_van_issue.*
@@ -42,7 +44,12 @@ class VanIssueActivity: BaseActivity(), KodeinAware {
     private val vanIssueViewModel: VanIssueViewModel by viewModel()
     private val mProductListAdapter by lazy { ProductListAdapter(::onClickProductListItem) }
     private val mSearchProductAdapter by lazy { ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, ArrayList<String>()) }
-    private val mVanIssueProductAdapter by lazy { VanIssueProductListAdapter(this::onClickBtnQty) }
+    private val mVanIssueProductAdapter by lazy { VanIssueProductListAdapter(this::onClickBtnQty, this::onLongClickSoldProductListItem) }
+
+    private var locationCode: Int = 0
+    private var invoiceNo: String? = null
+    private var saleManID: String? = null
+    private var totalIssueQuantity = 0
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -50,10 +57,18 @@ class VanIssueActivity: BaseActivity(), KodeinAware {
 
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
 
+        initializeData()
         setupUI()
         catchEvent()
 
+    }
+
+    private fun initializeData(){
+
         vanIssueViewModel.loadProductList()
+        locationCode = vanIssueViewModel.getLocationCode()
+        saleManID = vanIssueViewModel.getSaleManID()
+        setInvoiceNo()
 
     }
 
@@ -88,6 +103,9 @@ class VanIssueActivity: BaseActivity(), KodeinAware {
             checkDuplicateProductAndAdd(mProductListAdapter.getDataList()[position])
             searchAutoCompleteTextView.setText("")
         }
+
+        cancel_img.setOnClickListener { onBackPressed() }
+        checkout_img.setOnClickListener { Utils.askConfirmationDialog("Save", "Do you want to confirm?", "save", this, this::onClickSaveButton) }
 
     }
 
@@ -128,16 +146,38 @@ class VanIssueActivity: BaseActivity(), KodeinAware {
                     }
 
                     soldProduct.quantity = quantity
+                    soldProduct.totalAmt = quantity * (soldProduct.product.selling_price?.toDouble() ?: 0.0)
 
-                    val newList = mVanIssueProductAdapter.getDataList() as ArrayList
-                    newList[position] = soldProduct
-                    //vanIssueViewModel.calculateSelectedProductData(newList)
-                    Utils.showToast(this, position.toString())
+                    mVanIssueProductAdapter.notifyDataSetChanged()
+                    calculateQuantity()
                     alertDialog.dismiss()
                 }
             }
         }
         alertDialog.show()
+
+    }
+
+    private fun setInvoiceNo(){
+
+        val invoiceCount = AppUtils.getIntFromShp(Constant.INVOICE_COUNT, this) ?: 0
+        if (invoiceCount >= 0) AppUtils.saveIntToShp(Constant.INVOICE_COUNT, invoiceCount + 1, this)
+
+        invoiceNo = vanIssueViewModel.getInvoiceNumber(saleManID!!, locationCode, Constant.FOR_VAN_ISSUE)
+        tvInvoiceNo.text = invoiceNo
+
+    }
+
+    private fun calculateQuantity(){
+
+        var totalIssueQuantity = 0
+
+        for(soldProduct in mVanIssueProductAdapter.getDataList()){
+            totalIssueQuantity += soldProduct.quantity
+        }
+
+        this.totalIssueQuantity = totalIssueQuantity
+        mIssueQuantity.text = totalIssueQuantity.toString()
 
     }
 
@@ -156,6 +196,35 @@ class VanIssueActivity: BaseActivity(), KodeinAware {
             Utils.commonDialog("Already have this product", this, 2)
         else
             mVanIssueProductAdapter.addNewItem(SoldProductInfo(tempProduct, false))
+
+    }
+
+    private fun onLongClickSoldProductListItem(soldProduct: SoldProductInfo, position: Int){
+
+        AlertDialog.Builder(this)
+            .setTitle("Delete sold product")
+            .setMessage("Are you sure you want to delete ${soldProduct.product.product_name}?")
+            .setPositiveButton("Yes"){ arg0, arg1 ->
+
+                val newList = mVanIssueProductAdapter.getDataList() as ArrayList
+                newList.removeAt(position)
+                mVanIssueProductAdapter.setNewList(newList)
+                calculateQuantity()
+
+            }
+            .setNegativeButton("No", null)
+            .show()
+
+    }
+
+    private fun onClickSaveButton(type: String){
+
+        if (type == "save"){
+
+            vanIssueViewModel.saveData(invoiceNo!!)
+            Utils.showToast(this, "Clicked")
+
+        }
 
     }
 
