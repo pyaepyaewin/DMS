@@ -75,11 +75,13 @@ class CreditCollectionCheckOutViewModel(
     fun insertCashReceiveData(creditDataList: List<Credit>, count: Int) {
         var cashList: MutableList<CashReceive> = mutableListOf()
         var cashItemList: MutableList<CashReceiveItem> = mutableListOf()
-        creditCollectionCheckOutRepo.getCashReceiveCount()
+        var newCount=count
+       // creditCollectionCheckOutRepo.getCashReceiveCount()
         for (credit in creditDataList) {
             val cashReceive = CashReceive()
             val cashReceiveItem = CashReceiveItem()
-            cashReceive.id = count + 1
+            newCount += 1
+            cashReceive.id = newCount
             cashReceive.receive_no = credit.invoice_no?.replace("W", "CR")
             cashReceive.receive_date = credit.invoice_date
             cashReceive.customer_id = credit.customer_id.toString()
@@ -92,7 +94,7 @@ class CreditCollectionCheckOutViewModel(
                 cashReceive.payment_type = "CR"
             }
             val saleManId = AppUtils.getStringFromShp(Constant.SALEMAN_ID, shf)
-            var locationId = getLocationID()
+            var locationId =getLocationID()
             cashReceive.location_id = locationId.toString()
             cashReceive.status = ""
             cashReceive.cash_receive_type = ""

@@ -47,7 +47,7 @@ import kotlin.collections.ArrayList
     private var creditDate: String=""
     private var invoiceId:String=""
     private var invoiceAmount: Double = 0.0
-
+     private var locationId=""
     var data1 : Credit = Credit()
 
     private val creditCollectionCheckOutAdapter: CreditCollectionCheckOutAdapter by lazy {
@@ -325,6 +325,7 @@ import kotlin.collections.ArrayList
             android.arch.lifecycle.Observer {
                 var count=it
                 creditCollectionCheckOutViewModel.insertCashReceiveData(calculateList,count!!)
+
             }
         )
         creditCollectionCheckOutViewModel.cashReceiveCountErrorState.observe(
@@ -367,17 +368,7 @@ import kotlin.collections.ArrayList
           // Toast.makeText(this,(payAmount - total).toString(),Toast.LENGTH_SHORT).show()
       }
 
-//        if (payment_amount_edit.text.isNotBlank()) {
-//            val payAmount = payment_amount_edit.text.toString().toDouble()
-//            var refundAmount = payAmount - total
-//
-//            if (refundAmount >= 0) {
-//                refundAmount = df.format(refundAmount).toDouble()
-//                refund_txt.text = Utils.formatAmount(refundAmount)
-//            } else refund_txt.text = "0"
-//
-//            this.refundAmount = refundAmount
-//        }
+
 
     }
 

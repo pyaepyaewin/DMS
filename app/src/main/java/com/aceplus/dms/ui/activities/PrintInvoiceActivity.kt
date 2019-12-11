@@ -374,9 +374,9 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
             credit_net_amount.textSize = 30f
             credit_receive_amt.textSize = 30f
 
-            credit_total_amt.text = Utils.formatAmount(creditList[pos].amt)
-            credit_net_amount.text = Utils.formatAmount(creditList[pos].amt)
-            credit_receive_amt.text = Utils.formatAmount(creditList[pos].payAmt)
+            credit_total_amt.text = Utils.formatAmount(creditList[0].amt)
+            credit_net_amount.text = Utils.formatAmount(creditList[0].amt)
+            credit_receive_amt.text = Utils.formatAmount(creditList[0].payAmt)
             credit_discount.text = "0.0 (0%)"
 
         } else if (printMode == "D") {
@@ -451,18 +451,18 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
 
         if (printMode == "C" && !creditFlg.isNullOrBlank()){
 
-            Utils.saveInvoiceImageIntoGallery(creditList[pos].invoiceNo, this, myBitmap, "Credit Collect") // Doesn't work
+            Utils.saveInvoiceImageIntoGallery(creditList[0].invoiceNo, this, myBitmap, "Credit Collect") // Doesn't work
             if (creditList.isNotEmpty()){
                 val customerData: Customer = relatedDataForPrint!!.customer
                 PrintUtils.printCreditWithHSPOS(
                     this,
                     customerData.customer_name,
                     customerData.address,
-                    creditList[pos].invoiceNo,
+                    creditList[0].invoiceNo,
                     salePersonName,
                     relatedDataForPrint!!.routeName,
                     relatedDataForPrint!!.customerTownShipName,
-                    creditList[pos],
+                    creditList[0],
                     mBluetoothService!!,
                     relatedDataForPrint!!.companyInfo
                 ) //To check sale person name
