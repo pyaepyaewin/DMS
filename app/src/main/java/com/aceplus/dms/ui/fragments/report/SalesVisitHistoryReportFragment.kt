@@ -50,6 +50,8 @@ class SalesVisitHistoryReportFragment : BaseFragment(), KodeinAware {
         //select customer name list in db
         salesVisitHistoryReportViewModel.customerDataList.observe(this, Observer {
             if (it != null) {
+                customerNameList.clear()
+                customerIdList.clear()
                 for (customer in it) {
                     customerIdList.add(customer.id)
                     customerNextIdList.add(customer.customer_id.toString())

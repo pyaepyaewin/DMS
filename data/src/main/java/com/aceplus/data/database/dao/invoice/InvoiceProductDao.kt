@@ -36,7 +36,7 @@ interface InvoiceProductDao {
     @Query("select * from invoice_product WHERE invoice_product_id = :invoice_id")
     fun allDataById(invoice_id: String): List<InvoiceProduct>
 
-    @Query("select product.product_name,invoice_product.sale_quantity,invoice_product.discount_amount,invoice_product.total_amount,invoice_product.s_price,invoice_product.discount_percent,invoice_product.promotion_price,invoice_product.item_discount_amount from invoice_product inner join product on product.id = invoice_product.product_id where invoice_product.invoice_product_id == :invoiceId")
+    @Query("select product.id,product.product_id,product.selling_price,product.purchase_price,product.discount_type,product.remaining_quantity,product.category_id,product.group_id,product.class_id,product.um,product.product_name,invoice_product.sale_quantity,invoice_product.discount_amount,invoice_product.total_amount,invoice_product.s_price,invoice_product.discount_percent,invoice_product.promotion_price,invoice_product.item_discount_amount,invoice_product.item_discount_percent from product inner join invoice_product on product.id = invoice_product.product_id where invoice_product.invoice_product_id == :invoiceId")
     fun getSaleInvoiceDetailReport(invoiceId: String): List<SaleInvoiceDetailReport>
 
     @Query("select IP.product_id from invoice_product as IP,invoice as I WHERE IP.invoice_product_id=I.invoice_id and I.invoice_id = :invoiceID")

@@ -654,6 +654,29 @@
                         android:gravity="right"
                         android:text="0" />
             </LinearLayout>
+            <LinearLayout
+                    android:id="@+id/llPrepaid"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:visibility="gone">
+
+                <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="7"
+                        android:gravity="right"
+                        android:text="Prepaid Amount:" />
+
+                <TextView
+                        android:id="@+id/print_prepaidAmountShow"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="10dp"
+                        android:layout_weight="2"
+                        android:gravity="right"
+                        android:text="0" />
+            </LinearLayout>
 
             <LinearLayout
                     android:layout_width="match_parent"

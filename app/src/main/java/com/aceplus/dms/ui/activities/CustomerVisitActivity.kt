@@ -3,6 +3,7 @@ package com.aceplus.dms.ui.activities
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import com.aceplus.data.utils.Constant
 import com.aceplus.dms.R
 import com.aceplus.dms.ui.activities.customer.AddNewCustomerActivity
 import com.aceplus.dms.ui.activities.creditcollection.CreditCollectionActivity
@@ -43,6 +44,13 @@ class CustomerVisitActivity : BaseActivity(), KodeinAware {
         buttonInvoiceCancel.setOnClickListener { startActivity(SaleCancelActivity.newIntentFromCustomer(applicationContext)) }
 
         cancel_img.setOnClickListener { onBackPressed() }
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        val intent = Intent(this,MainActivity::class.java)
+        startActivityForResult(intent, Constant.RQC_BACK_TO_HOME)
+        finish()
     }
 
 }

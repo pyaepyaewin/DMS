@@ -17,8 +17,8 @@ class HistorySoldProductPrintListViewHolder(private val view: View) :
 
             var sPrice = data.sellingPrice
             if (data.promotionPrice != 0.0)
-                sPrice = data.promotionPrice
-            price.text = Utils.formatAmount(sPrice)
+                sPrice = data.promotionPrice.toString()
+            price.text = Utils.formatAmount(sPrice!!.toDouble())
 
             if (data.discountAmount.toDouble() > 0.0 || data.discountPercent > 0.0) {
 

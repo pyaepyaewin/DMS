@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import com.aceplus.data.utils.Constant
 import com.aceplus.dms.R
 import com.aceplus.dms.ui.activities.CustomerVisitActivity
 import com.aceplus.dms.ui.fragments.customer.FragmentDeliveryReport
@@ -43,6 +44,8 @@ class DeliveryActivity : BaseActivity(), KodeinAware {
     }
 
     override fun onBackPressed() {
+        val intent = Intent(this, CustomerVisitActivity::class.java)
+        startActivityForResult(intent, Constant.RQC_BACK_TO_CUSTOMER_VISIT)
         finish()
     }
 }

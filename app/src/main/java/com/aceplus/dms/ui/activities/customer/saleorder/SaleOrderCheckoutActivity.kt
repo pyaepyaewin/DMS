@@ -6,6 +6,7 @@ import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.app.PendingIntent
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -44,7 +45,6 @@ import com.aceplus.domain.repo.deliveryrepo.DeliveryRepo
 import com.aceplus.domain.vo.SoldProductInfo
 import com.aceplussolutions.rms.constants.AppUtils
 import com.aceplussolutions.rms.ui.activities.BaseActivity
-import kotlinx.android.synthetic.main.activity_sale_checkout.*
 import kotlinx.android.synthetic.main.activity_sale_order_checkout.*
 import kotlinx.android.synthetic.main.activity_sale_order_checkout.back_img
 import kotlinx.android.synthetic.main.activity_sale_order_checkout.confirmAndPrint_img
@@ -95,8 +95,12 @@ import kotlinx.android.synthetic.main.activity_sale_order_checkout.edtVolumeDisc
 import kotlinx.android.synthetic.main.activity_sale_order_checkout.layout_receipt_person as layout_receipt_person1
 import kotlinx.android.synthetic.main.activity_sale_order_checkout.refundLayout as refundLayout1
 import kotlinx.android.synthetic.main.activity_sale_order_checkout.rvSoldProductList as rvSoldProductList1
+import kotlinx.android.synthetic.main.activity_sale_order_checkout.saleDateLayout as saleDateLayout1
 import kotlinx.android.synthetic.main.activity_sale_order_checkout.tableHeaderUM as tableHeaderUM1
+import kotlinx.android.synthetic.main.activity_sale_order_checkout.totalvolumeDiscountLayout as totalvolumeDiscountLayout1
 import kotlinx.android.synthetic.main.activity_sale_order_checkout.volDisForPreOrderLayout as volDisForPreOrderLayout1
+import kotlinx.android.synthetic.main.activity_sale_order_checkout.volumeDiscountLayout as volumeDiscountLayout1
+import kotlinx.android.synthetic.main.activity_sale_order_checkout.volumeDiscountLayout2 as volumeDiscountLayout21
 
 class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
 
@@ -202,20 +206,23 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
             tvInvoiceId.text = orderedInvoice!!.invoiceNo
             tvNetAmount.text = (orderedInvoice!!.amount - orderedInvoice!!.paidAmount).toString()
             tvTotalAmount.text = orderedInvoice!!.amount.toString()
+
             btn_disOk.visibility = View.GONE
             btn_amtOk.visibility = View.GONE
             paymentMethodLayout.visibility = View.GONE
-            refundLayout.visibility = View.GONE
+            refundLayout1.visibility = View.GONE
             llSaleStatus.visibility = View.GONE
-            duedateLayout.visibility = View.GONE
+            duedateLayout1.visibility = View.GONE
             payAmountLayout.visibility = View.VISIBLE
             checkout_delivery_date_layout.visibility = View.GONE
             checkout_remark_layout.visibility = View.GONE
-            layout_receipt_person.visibility = View.VISIBLE
+            layout_receipt_person1.visibility = View.VISIBLE
             payAmountLayout.visibility = View.VISIBLE
-            tableHeaderUM.visibility = View.GONE
-            advancedPaidAmountLayout.visibility = View.GONE
-            volDisForPreOrderLayout.visibility = View.GONE
+            tableHeaderUM1.visibility = View.GONE
+            tableHeaderQty.text = getString(R.string.ordered_qty)
+            tableHeaderDiscount.text = "Promotion Price"
+            advancedPaidAmountLayout1.visibility = View.GONE
+            volDisForPreOrderLayout1.visibility = View.GONE
 
         }
         else{
@@ -224,18 +231,18 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
             tax_layout.visibility = View.VISIBLE
             checkout_remark_layout.visibility = View.VISIBLE
             tableHeaderQty.text = getString(R.string.ordered_qty)
-            tableHeaderUM.visibility = View.GONE
-            advancedPaidAmountLayout.visibility = View.GONE
+            tableHeaderUM1.visibility = View.GONE
+            advancedPaidAmountLayout1.visibility = View.GONE
             payAmountLayout.visibility = View.GONE
-            refundLayout.visibility = View.GONE
-            layout_receipt_person.visibility = View.GONE
-            volDisForPreOrderLayout.visibility = View.GONE
+            refundLayout1.visibility = View.GONE
+            layout_receipt_person1.visibility = View.GONE
+            volDisForPreOrderLayout1.visibility = View.GONE
             checkout_delivery_date_layout.visibility = View.VISIBLE
-            duedateLayout.visibility = View.GONE
+            duedateLayout1.visibility = View.GONE
         }
 
-        rvSoldProductList.adapter = orderCheckoutListAdapter
-        rvSoldProductList.layoutManager = LinearLayoutManager(this)
+        rvSoldProductList1.adapter = orderCheckoutListAdapter
+        rvSoldProductList1.layoutManager = LinearLayoutManager(this)
 
     }
 
@@ -258,7 +265,7 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
         if (!isDelivery) checkout_delivery_date_chooser_text.setOnClickListener { chooseDeliveryDate() }
 
         activity_sale_checkout_radio_bank.setOnCheckedChangeListener { button, isChecked ->
-            bank_branch_layout.visibility = if (isChecked) View.VISIBLE else View.GONE
+            bank_branch_layout1.visibility = if (isChecked) View.VISIBLE else View.GONE
             bank_account_layout.visibility = if (isChecked) View.VISIBLE else View.GONE
         }
 
@@ -303,7 +310,7 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
             if (uploaded != null){
                 if (uploaded){
                     Utils.cancelDialog()
-                    Snackbar.make(rvSoldProductList, resources.getString(R.string.upload_succes_msg), Snackbar.LENGTH_INDEFINITE)
+                    Snackbar.make(rvSoldProductList1, resources.getString(R.string.upload_succes_msg), Snackbar.LENGTH_INDEFINITE)
                         .setAction("Done"){
                             toPrintActivity("S")
                         }
@@ -332,21 +339,15 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
     private fun onClickSaveButton(type: String){
 
         if (type == "save"){
-
             var paymentMethod = when(activity_sale_checkout_radio_group.checkedRadioButtonId){
                 R.id.activity_sale_checkout_radio_bank -> "B"
                 R.id.activity_sale_checkout_radio_cash -> "CA"
                 else -> ""
             }
-
             val paidAmount = if (tvPrepaidAmount.text.isNotBlank()) tvPrepaidAmount.text.toString().toDouble() else 0.0
-
-
             if (!isDelivery){
                 if (validationInput(paymentMethod == "B", paidAmount)){
-
                     if (paidAmount < netAmount){
-                        // ToDo - check insufficient amount
                         setInvoiceId()
                         savePreOrderInformation("CR")
                     } else{
@@ -356,19 +357,35 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
                 }
             }
             else{
-                if (this@SaleOrderCheckoutActivity.receiptPerson.text.isEmpty()) {
-                    AlertDialog.Builder(this@SaleOrderCheckoutActivity)
-                        .setTitle("Delivery")
-                        .setMessage("You must provide 'Receipt Person'.")
-                        .setPositiveButton(
-                            "OK"
-                        ) { arg0, arg1 -> receiptPerson.requestFocus() }
-                        .show()
+                val varPayAmount = if (payAmount.text.isNotBlank()) payAmount.text.toString().toDouble() else 0.0
+                val nAmount = orderedInvoice!!.amount - orderedInvoice!!.paidAmount
+                when {
+                    varPayAmount > nAmount -> {
+                        AlertDialog.Builder(this@SaleOrderCheckoutActivity)
+                            .setTitle("Delivery")
+                            .setMessage("Your pay amount must be less than Net Amount.")
+                            .setPositiveButton("OK") { arg0, arg1 ->
+                                payAmount.setText("0")
+                                payAmount.requestFocus()
+                            }
+                            .show()
 
-                    return
-                }else {
-                    toPrintActivity("D")
+                        return
+                    }
+                    this@SaleOrderCheckoutActivity.receiptPerson.text.isEmpty() -> {
+                        AlertDialog.Builder(this@SaleOrderCheckoutActivity)
+                            .setTitle("Delivery")
+                            .setMessage("You must provide 'Receipt Person'.")
+                            .setPositiveButton(
+                                "OK"
+                            ) { arg0, arg1 -> receiptPerson.requestFocus() }
+                            .show()
+                        return
+                    }
+                    else -> toPrintActivity("D")
                 }
+
+
             }
 
         }
@@ -399,7 +416,7 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
             discountAmount = df.format(discountAmount).toDouble()
             netAmount = df.format(netAmount).toDouble()
 
-            edtVolumeDiscountAmt.setText(discountAmount.toString())
+            edtVolumeDiscountAmt1.setText(discountAmount.toString())
             tvNetAmount.text = netAmount.toString()
             this.netAmount = netAmount
             this.volDisAmount = discountAmount
@@ -409,8 +426,8 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
 
     private fun calculateDiscAmtToPercent(){
 
-        if (edtVolumeDiscountAmt.text.toString().isNotBlank() && edtVolumeDiscountAmt.text.toString() != "."){
-            val discountAmount = edtVolumeDiscountAmt.text.toString().toDouble()
+        if (edtVolumeDiscountAmt1.text.toString().isNotBlank() && edtVolumeDiscountAmt1.text.toString() != "."){
+            val discountAmount = edtVolumeDiscountAmt1.text.toString().toDouble()
             var discountPercent = 100 * (discountAmount / totalAmount)
             var netAmount = totalAmount - discountAmount
 
@@ -462,8 +479,8 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
         if (volDisPercent != 0.0) edtVolumeDiscountPercent.setText(volDisPercent.toString())
         else edtVolumeDiscountPercent.setText(totalVolumeDiscountPercent.toString())
 
-        if (volDisAmount != 0.0) edtVolumeDiscountAmt.setText(volDisAmount.toString())
-        else edtVolumeDiscountAmt.setText(totalDiscountAmount.toString())
+        if (volDisAmount != 0.0) edtVolumeDiscountAmt1.setText(volDisAmount.toString())
+        else edtVolumeDiscountAmt1.setText(totalDiscountAmount.toString())
 
         tax_txtView.text = df.format(taxAmt)
 
@@ -482,10 +499,10 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
         val volDiscount = java.lang.Double.parseDouble(String.format("%.3f", totalAmount * orderedInvoice!!.discountPercent / 100))
         orderedInvoice!!.discount = volDiscount
         netAmount = java.lang.Double.parseDouble(String.format("%.3f", netAmount - orderedInvoice!!.discount - orderedInvoice!!.paidAmount))
-        edtVolumeDiscountAmt.setText("${orderedInvoice!!.discount}")
+        edtVolumeDiscountAmt1.setText("${orderedInvoice!!.discount}")
         edtVolumeDiscountPercent.setText("${orderedInvoice!!.discountPercent}")
         tvPrepaidAmount.setText("${orderedInvoice!!.paidAmount}")
-        edtVolumeDiscountAmt.isEnabled = false
+        edtVolumeDiscountAmt1.isEnabled = false
         edtVolumeDiscountPercent.isEnabled = false
         tvPrepaidAmount.isEnabled = false
         tax_txtView.text = Utils.formatAmount((orderedInvoice!!.amount - orderedInvoice!!.discount)/21)
@@ -542,7 +559,6 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
         } else{
 
             if (receiptPerson.text.isBlank()){
-
                 AlertDialog.Builder(this)
                     .setTitle("Delivery")
                     .setMessage("You must provide 'Receipt Person'.")
@@ -712,6 +728,7 @@ class SaleOrderCheckoutActivity: BaseActivity(), KodeinAware {
             startActivityForResult(intent, Utils.RQ_BACK_TO_CUSTOMER)
         }else{
             insertDeliveryDataToDatabase()
+            invoice!!.pay_amount = payAmount.text.toString()
             val intent = PrintInvoiceActivity.newIntent(this,soldProductList,"D",orderedInvoice!!,customer!!,invoice!!)
             startActivity(intent)
         }

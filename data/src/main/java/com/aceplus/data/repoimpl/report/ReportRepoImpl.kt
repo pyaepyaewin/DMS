@@ -89,6 +89,10 @@ class ReportRepoImpl(private val db: MyDatabase) : ReportRepo {
         return Observable.just(db.invoiceProductDao().getSaleInvoiceDetailReport(invoiceId))
     }
 
+    override fun getInvoicePresentList(invoiceId: String): Observable<List<PromotionData>> {
+        return Observable.just(db.invoicePresentDao().getInvoicePresentList(invoiceId))
+    }
+
     override fun saleInvoiceDetlailPrint(invoiceId: String): Observable<Invoice> {
         return Observable.just(db.invoiceDao().getSaleHistoryReportForPrint(invoiceId))
     }

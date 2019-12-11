@@ -6,6 +6,8 @@ import android.arch.persistence.room.Insert
 import android.arch.persistence.room.OnConflictStrategy
 import android.arch.persistence.room.Query
 import com.aceplus.domain.entity.invoice.InvoicePresent
+import com.aceplus.domain.vo.report.PromotionData
+import com.aceplus.domain.vo.report.SaleInvoiceDetailReport
 import com.aceplus.domain.vo.report.SaleInvoiceReport
 
 
@@ -32,7 +34,8 @@ interface InvoicePresentDao {
 
     @Query("select invoice.invoice_id,customer_name,address,total_amount,total_discount_amount,invoice.sale_date from invoice inner join customer on customer.id = invoice.customer_id where invoice.invoice_id like 'SX%'")
     fun getSaleExchangeTab2Report(): List<SaleInvoiceReport>
-
+    @Query("select invoice_present.stock_id,invoice_present.quantity,invoice_present.currency_id,product.product_name,product.id,product.selling_price from product inner join invoice_present on invoice_present.stock_id = product.id and invoice_present.tsale_id = :invoiceId")
+    fun getInvoicePresentList(invoiceId: String): List<PromotionData>?
 
 
 }

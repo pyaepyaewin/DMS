@@ -19,6 +19,9 @@ import com.aceplus.dms.ui.adapters.report.SaleInvoiceDetailReportAdapter
 import com.aceplus.dms.ui.adapters.report.SaleInvoiceReportAdapter
 import com.aceplus.dms.viewmodel.report.ReportViewModel
 import com.aceplus.domain.entity.invoice.Invoice
+import com.aceplus.domain.entity.product.Product
+import com.aceplus.domain.entity.promotion.Promotion
+import com.aceplus.domain.vo.SoldProductInfo
 import com.aceplus.domain.vo.report.SaleInvoiceDetailReport
 import com.aceplus.domain.vo.report.SaleInvoiceReport
 import com.aceplus.shared.ui.activities.BaseFragment
@@ -29,6 +32,7 @@ import org.kodein.di.KodeinAware
 import org.kodein.di.android.support.kodein
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 
 
 class SalesHistoryReportFragment : BaseFragment(), KodeinAware {
@@ -38,7 +42,9 @@ class SalesHistoryReportFragment : BaseFragment(), KodeinAware {
     private var toDate: String? = null
     private var invoice: Invoice? = null
     var saleHistoryDataList: List<SaleInvoiceReport> = listOf()
-    private var saleHistoryDetailList: List<SaleInvoiceDetailReport> = listOf()
+    private var saleHistoryDetailList: ArrayList<SaleInvoiceDetailReport> = arrayListOf()
+    private val soldProductList = ArrayList<SoldProductInfo>()
+    private var promotionArrayList = ArrayList<Promotion>()
 
     private val saleHistoryReportAdapter: SaleInvoiceReportAdapter by lazy {
         SaleInvoiceReportAdapter(
@@ -46,7 +52,6 @@ class SalesHistoryReportFragment : BaseFragment(), KodeinAware {
         )
     }
     private val saleHistoryDetailReportAdapter: SaleInvoiceDetailReportAdapter by lazy { SaleInvoiceDetailReportAdapter() }
-
     private val saleHistoryReportViewModel: ReportViewModel by viewModel()
 
     override fun onCreateView(
@@ -101,6 +106,7 @@ class SalesHistoryReportFragment : BaseFragment(), KodeinAware {
         saleHistoryReportViewModel.customerDataList.observe(this, Observer {
             //select customer name list in db
             if (it != null) {
+                customerNameList.clear()
                 customerNameList.add("All")
                 for (customer in it) {
                     customerNameList.add(customer.customer_name.toString())
@@ -149,13 +155,46 @@ class SalesHistoryReportFragment : BaseFragment(), KodeinAware {
         saleHistoryReportViewModel.loadHistoryInvoiceList()
 
         //sale history detail list
-        saleHistoryReportViewModel.saleInvoiceDetailReportSuccessState.observe(this, Observer {
-            saleHistoryDetailReportAdapter.setNewList(it as ArrayList<SaleInvoiceDetailReport>)
-            saleHistoryDetailList = it
-        })
+        saleHistoryReportViewModel.saleInvoiceDetailReportSuccessState.observe(this, Observer {detailList->
+            saleHistoryDetailList = detailList!!.first as ArrayList<SaleInvoiceDetailReport>
+            soldProductList.clear()
+            promotionArrayList.clear()
+            for (i in saleHistoryDetailList){
+                val tempProduct = Product()
+                tempProduct.id = i.id
+                tempProduct.product_id = i.productId
+                tempProduct.product_name = i.productName
+                tempProduct.selling_price = i.sellingPrice
+                tempProduct.purchase_price = i.purchasePrice
+                tempProduct.discount_type = i.discountType
+                tempProduct.remaining_quantity = i.remainingQuantity
+                tempProduct.category_id = i.categoryId
+                tempProduct.group_id = i.groupId
+                tempProduct.class_id = i.classId
+                tempProduct.um = i.um
 
-        saleHistoryReportViewModel.saleHistoryForPrintData.observe(this, Observer {
-            invoice = it
+                val soldProduct = SoldProductInfo(tempProduct, false)
+                val qty = i.saleQuantity
+                soldProduct.quantity = qty
+                soldProduct.discountAmount = i.discountAmount.toDouble()
+                soldProduct.discountPercent = i.discountPercent
+                soldProduct.focPercent = i.itemDiscountPercent
+                soldProduct.focAmount = i.itemDiscountAmount
+                soldProduct.itemDiscountAmount = i.sPrice - i.itemDiscountAmount
+                soldProduct.totalAmt = i.totalAmount
+                soldProductList.add(soldProduct)
+            }
+            for (i in detailList.second){
+                val promotion = Promotion()
+                promotion.promotion_product_id = i.productId
+                promotion.name = i.productName
+                promotion.promotion_quantity = i.quantity.toInt()
+                promotionArrayList.add(promotion)
+                val saleInvoiceDetailReport = SaleInvoiceDetailReport(0,"","","","","","","",0,"",i.productName!!,i.quantity.toInt(),"0.0",0.0,0.0,0.0,0.0,0.0,0.0)
+                saleHistoryDetailList.add(saleInvoiceDetailReport)
+            }
+            saleHistoryDetailReportAdapter.setNewList(saleHistoryDetailList)
+            invoice = detailList.third
         })
 
     }
@@ -177,11 +216,9 @@ class SalesHistoryReportFragment : BaseFragment(), KodeinAware {
             adapter = saleHistoryDetailReportAdapter
         }
         saleHistoryReportViewModel.loadSaleInvoiceDetailReport(invoiceId = invoiceId)
-        saleHistoryReportViewModel.loadSaleInvoiceDetailPrint(invoiceId = invoiceId)
-
         //Action of dialog button
         dialogBoxView.btn_print.setOnClickListener {
-            val intent = PrintInvoiceActivity.newIntentFromSaleHistoryActivity(context!!, invoice, saleHistoryDetailList)
+            val intent = PrintInvoiceActivity.newIntentFromSaleHistoryActivity(context!!, invoice, soldProductList,promotionArrayList)
             startActivity(intent)
             dialog.dismiss()
 

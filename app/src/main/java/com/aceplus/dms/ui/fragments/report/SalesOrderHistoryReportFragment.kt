@@ -98,6 +98,7 @@ class SalesOrderHistoryReportFragment : BaseFragment(), KodeinAware {
         salesOrderHistoryReportViewModel.customerDataList.observe(this, Observer {
             //select customer name list in db
             if (it!! != null) {
+                customerNameList.clear()
                 customerNameList.add("All")
                 for (customer in it!!) {
                     customerNameList.add(customer.customer_name.toString())

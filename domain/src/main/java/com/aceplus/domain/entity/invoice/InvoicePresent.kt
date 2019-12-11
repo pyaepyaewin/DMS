@@ -18,7 +18,7 @@ class InvoicePresent {
     @ColumnInfo(name = "tsale_id")
     @SerializedName("tsale_id")
     @Expose
-    var tsale_id: Int = 0
+    var tsale_id: String? = null
 
     @ColumnInfo(name = "stock_id")
     @SerializedName("stock_id")

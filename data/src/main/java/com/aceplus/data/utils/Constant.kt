@@ -74,6 +74,9 @@ class Constant {
 
         const val RQC_GET_LOCATION = 100
         const val RQC_BACK_TO_CUSTOMER = 101
+        const val RQC_BACK_TO_REPORT = 102
+        const val RQC_BACK_TO_CUSTOMER_VISIT = 103
+        const val RQC_BACK_TO_HOME = 103
 
     }
 

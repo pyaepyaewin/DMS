@@ -41,8 +41,7 @@ class SalesCancelReportFragment : BaseFragment(), KodeinAware {
         )
     }
     var saleCancelDataList: List<SalesCancelReport> = listOf()
-    var saleCancelInvoiceDetailList: List<SaleCancelInvoiceDetailReport> = listOf()
-    private var invoice: Invoice? = null
+    private var saleCancelInvoiceDetailList: List<SaleCancelInvoiceDetailReport> = listOf()
     private val salesCancelReportViewModel: ReportViewModel by viewModel()
     private val saleCancelDetailReportAdapter: SaleCancelDetailReportAdapter by lazy { SaleCancelDetailReportAdapter() }
 
@@ -96,6 +95,7 @@ class SalesCancelReportFragment : BaseFragment(), KodeinAware {
         salesCancelReportViewModel.customerDataList.observe(this, android.arch.lifecycle.Observer {
             //select customer name list in db
             if (it != null) {
+                customerNameList.clear()
                 customerNameList.add("All")
                 for (customer in it) {
                     customerNameList.add(customer.customer_name.toString())

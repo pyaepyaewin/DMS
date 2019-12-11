@@ -47,7 +47,7 @@ interface ReportRepo {
     fun preOrderDetailReport(invoiceId: String): Observable<List<PreOrderDetailReport>>
 
     //product balance report
-    fun productBalanceReport(): Observable<List<com.aceplus.domain.entity.product.Product>>
+    fun productBalanceReport(): Observable<List<Product>>
 
     //sale invoice report and sale exchange tab2
     fun saleInvoiceReport(): Observable<List<SaleInvoiceReport>>
@@ -58,6 +58,7 @@ interface ReportRepo {
     fun saleHistoryReportForDate(fromDate: String,toDate:String ): Observable<List<SaleInvoiceReport>>
 
     fun saleInvoiceDetailReport(invoiceId: String): Observable<List<SaleInvoiceDetailReport>>
+    fun getInvoicePresentList(invoiceId: String): Observable<List<PromotionData>>
     fun saleInvoiceDetlailPrint(invoiceId:String):Observable<Invoice>
 
     //spinner data
