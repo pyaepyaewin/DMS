@@ -98,11 +98,11 @@
                         android:textSize="30sp" />
             </RelativeLayout>
 
-            <ListView
+            <android.support.v7.widget.RecyclerView
                     android:id="@+id/productsListView"
                     android:layout_width="match_parent"
                     android:layout_height="fill_parent"
-                    android:divider="#000000"></ListView>
+                    android:scrollbars="vertical"></android.support.v7.widget.RecyclerView>
 
         </LinearLayout>
 
@@ -116,6 +116,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="right"
+                    android:paddingRight="10dp"
                     android:orientation="horizontal">
 
                 <LinearLayout
@@ -156,7 +157,8 @@
                     android:layout_below="@id/saleDateLayout"
                     android:layout_margin="10dp"
                     android:background="#898989"
-                    android:padding="10dp">
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp">
 
                 <TextView
                         android:layout_width="0dp"
@@ -232,15 +234,15 @@
                     android:layout_alignParentBottom="true">-->
 
 
-            <ListView
+            <android.support.v7.widget.RecyclerView
                     android:id="@+id/vanIssueProductList"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_above="@+id/netAmountLayout"
                     android:layout_below="@id/headerLayout"
-                    android:layout_margin="10dp"
-                    android:descendantFocusability="blocksDescendants"
-                    android:padding="10dp" />
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:descendantFocusability="blocksDescendants"/>
 
 
             <LinearLayout

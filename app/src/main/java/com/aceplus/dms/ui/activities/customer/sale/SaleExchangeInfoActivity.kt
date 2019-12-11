@@ -192,15 +192,25 @@ class SaleExchangeInfoActivity: BaseActivity(), KodeinAware {
 
         tvDate.text = Utils.getCurrentDate(false)
         tvCustomerName.text = customer!!.customer_name
-        //tvSaleReturnAmount
-        //tvSaleReturnDiscAmount
-        tvSaleExchangeAmount.text = Utils.formatAmount(invoice!!.total_amount?.toDouble() ?: 0.0) + " MMK"
-        //tvPayAmountFromCustomer
-        //tvRefundToCustomer
-        // ToDo - not confirmed yet!!
 
-        printInvoiceViewModel.getSaleReturnProductInfo(saleReturnInvoiceNo!!)
-        printInvoiceViewModel.getExchangeProductInfo(soldProductList)
+        printInvoiceViewModel.saleReturn.observe(this, Observer {
+            if (it != null){
+                tvSaleReturnAmount.text = Utils.formatAmount(it.amount) + " MMK"
+                tvSaleReturnDiscAmount.text = Utils.formatAmount(it.discount) + " MMK"
+
+                val saleSaleReturnAmtWithDisc = it.amount - it.discount
+                val saleExchangeAmount = invoice!!.total_amount?.toDouble() ?: 0.0
+
+                tvSaleExchangeAmount.text = Utils.formatAmount(saleExchangeAmount) + " MMK"
+
+                if (saleSaleReturnAmtWithDisc > saleExchangeAmount)
+                    tvRefundToCustomer.text = Utils.formatAmount(saleSaleReturnAmtWithDisc - saleExchangeAmount) + " MMK"
+                else
+                    tvPayAmountFromCustomer.text = Utils.formatAmount(saleExchangeAmount - saleSaleReturnAmtWithDisc) + " MMK"
+
+                printInvoiceViewModel.saleReturn.value = null
+            }
+        })
 
         printInvoiceViewModel.saleReturnProducts.observe(this, Observer {
             if (it != null) saleExchangeInfoAdapterForReturn.setNewList(it as ArrayList<SaleExchangeProductInfo>)
@@ -209,6 +219,10 @@ class SaleExchangeInfoActivity: BaseActivity(), KodeinAware {
         printInvoiceViewModel.exchangeProducts.observe(this, Observer {
             if (it != null) saleExchangeInfoAdapterForExchange.setNewList(it as ArrayList<SaleExchangeProductInfo>)
         })
+
+        printInvoiceViewModel.getSaleReturnInfo(saleReturnInvoiceNo!!)
+        printInvoiceViewModel.getSaleReturnProductInfo(saleReturnInvoiceNo!!)
+        printInvoiceViewModel.getExchangeProductInfo(soldProductList)
 
     }
 
@@ -230,7 +244,7 @@ class SaleExchangeInfoActivity: BaseActivity(), KodeinAware {
             Constant.HM_MESSAGE_DEVICE_NAME -> {
                 val connectedDeviceName = it.data.getString(PrintInvoiceActivity.DEVICE_NAME)
                 Toast.makeText(this, "Connected to $connectedDeviceName", Toast.LENGTH_SHORT).show()
-                printInvoiceViewModel.getRelatedDataAndPrint(invoice!!.customer_id!!, invoice!!.sale_person_id!!, null)
+                printInvoiceViewModel.getRelatedDataAndPrint(invoice!!.customer_id!!, invoice!!.sale_person_id!!, null, saleReturnInvoiceNo)
             }
             Constant.HM_MESSAGE_TOAST -> {
                 Toast.makeText(this, it.data.getString(PrintInvoiceActivity.TOAST), Toast.LENGTH_SHORT).show()
@@ -255,7 +269,7 @@ class SaleExchangeInfoActivity: BaseActivity(), KodeinAware {
                         data?.getStringExtra(DeviceListActivity.IR_EXTRA_DEVICE_ADDRESS)
                     if (BluetoothAdapter.checkBluetoothAddress(address)) {
                         val device = mBluetoothAdapter!!.getRemoteDevice(address)
-                        mBluetoothService?.connect(device)
+                        if (mBluetoothAdapter!!.isEnabled) mBluetoothService?.connect(device)
                     }
                 }
             }
@@ -276,7 +290,7 @@ class SaleExchangeInfoActivity: BaseActivity(), KodeinAware {
         val v1 = window.decorView.rootView
         v1.isDrawingCacheEnabled = true
         val myBitmap = v1.drawingCache
-        Utils.saveInvoiceImageIntoGallery(invoice!!.invoice_id, this, myBitmap, "Sale") // Doesn't work
+        Utils.saveInvoiceImageIntoGallery(invoice!!.invoice_id, this, myBitmap, "Sale")
 
         val editProductList = printInvoiceViewModel.arrangeProductList(soldProductList, promotionList)
         PrintUtils.printSaleExchangeWithHSPOS(
@@ -287,12 +301,12 @@ class SaleExchangeInfoActivity: BaseActivity(), KodeinAware {
             relatedDataForPrint!!.customer.address,
             relatedDataForPrint!!.customerTownShipName,
             invoice!!.invoice_id,
-            "To Find",
+            relatedDataForPrint!!.salePersonName,
             relatedDataForPrint!!.routeName,
             editProductList,
             invoice!!,
             saleExchangeInfoAdapterForReturn.getDataList() as ArrayList<SaleExchangeProductInfo>,
-            9999.9
+            relatedDataForPrint!!.saleReturnInvoice?.amount ?: 0.0
         )
 
     }

@@ -357,14 +357,14 @@ class SaleCheckoutViewModel(
                         invoice.sale_person_id = salePersonId
                         invoice.due_date = dueDate
                         invoice.cash_or_credit = cashOrLoanOrBank
-                        invoice.location_code = routeID.toString() //Check - route id or location id
+                        invoice.location_code = routeID.toString()
                         invoice.device_id = deviceId
                         invoice.invoice_time = invoiceTime
                         invoice.package_invoice_number = 0 // Need to add
                         invoice.package_status = 0 //Need to check
                         invoice.volume_amount = 0.0 //Need to check
                         invoice.package_grade = "" //Need to check
-                        invoice.invoice_product_id = 0 //Check - should remove - wrong type
+                        invoice.invoice_product_id = 0 //should remove - wrong type
                         invoice.total_quantity = totalQtyForInvoice.toDouble() //Check int or double
                         invoice.invoice_status = cashOrLoanOrBank
                         invoice.total_discount_percent = totalDiscountPercent.toString() //Check - salesman disc or total disc

@@ -118,5 +118,6 @@ interface CustomerVisitRepo {
 
     fun insertAllSaleReturnDetail(list: List<SaleReturnDetail>)
     fun getSaleReturnProductInfo(saleReturnInvoiceNo: String): Observable<List<SaleExchangeProductInfo>>
+    fun getSaleReturnInfo(saleReturnInvoiceNo: String?): Observable<SaleReturn?>
 
 }

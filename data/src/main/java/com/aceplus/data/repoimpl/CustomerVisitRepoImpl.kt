@@ -494,4 +494,8 @@ class CustomerVisitRepoImpl(
         return Observable.just(db.saleReturnDetailDao().getSaleReturnProductInfo(saleReturnInvoiceNo))
     }
 
+    override fun getSaleReturnInfo(saleReturnInvoiceNo: String?): Observable<SaleReturn?> {
+        return Observable.just(db.saleReturnDao().getDataByID(saleReturnInvoiceNo))
+    }
+
 }

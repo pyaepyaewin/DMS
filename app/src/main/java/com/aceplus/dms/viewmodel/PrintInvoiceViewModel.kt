@@ -6,6 +6,7 @@ import com.aceplus.domain.entity.CompanyInformation
 import com.aceplus.domain.entity.customer.Customer
 import com.aceplus.domain.entity.product.Product
 import com.aceplus.domain.entity.promotion.Promotion
+import com.aceplus.domain.entity.sale.salereturn.SaleReturn
 import com.aceplus.domain.repo.CustomerVisitRepo
 import com.aceplus.domain.vo.RelatedDataForPrint
 import com.aceplus.domain.vo.SaleExchangeProductInfo
@@ -18,6 +19,7 @@ class PrintInvoiceViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
     var taxInfo = MutableLiveData<Triple<String, Int, String>>()
     var salePersonName = MutableLiveData<String>()
     var relatedDataForPrint = MutableLiveData<RelatedDataForPrint>()
+    var saleReturn = MutableLiveData<SaleReturn>()
     var saleReturnProducts = MutableLiveData<List<SaleExchangeProductInfo>>()
     var exchangeProducts = MutableLiveData<List<SaleExchangeProductInfo>>()
 
@@ -52,7 +54,7 @@ class PrintInvoiceViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
         }
     }
 
-    fun getRelatedDataAndPrint(customerID: String, saleManID: String, orderSaleManID: String?){
+    fun getRelatedDataAndPrint(customerID: String, saleManID: String, orderSaleManID: String?, returnInvoiceNo: String?){
 
         var customer: Customer? = null
         var routeID = 0
@@ -61,6 +63,7 @@ class PrintInvoiceViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
         var companyInfo: CompanyInformation? = null
         var salePersonName: String? = null
         var orderSalePersonName: String? = null
+        var saleReturnInvoice: SaleReturn? = null
 
         launch {
             customerVisitRepo.getCustomerByID(customerID.toInt())
@@ -92,14 +95,19 @@ class PrintInvoiceViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
                     salePersonName = it
                     return@flatMap customerVisitRepo.getSaleManName(orderSaleManID)
                 }
+                .flatMap {
+                    if (!orderSaleManID.isNullOrBlank())
+                        orderSalePersonName = it
+                    return@flatMap customerVisitRepo.getSaleReturnInfo(returnInvoiceNo)
+                }
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.mainThread())
                 .subscribe{
-                    if (!orderSaleManID.isNullOrBlank())
-                        orderSalePersonName = it
+
+                    saleReturnInvoice = it
 
                     if (customer != null && customerTownShipName != null && companyInfo != null)
-                        relatedDataForPrint.postValue(RelatedDataForPrint(customer!!, routeName, customerTownShipName!!, companyInfo!!, orderSalePersonName, salePersonName))
+                        relatedDataForPrint.postValue(RelatedDataForPrint(customer!!, routeName, customerTownShipName!!, companyInfo!!, orderSalePersonName, salePersonName, saleReturnInvoice))
                 }
         }
 
@@ -191,6 +199,17 @@ class PrintInvoiceViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
 
         return newSoldProductList
 
+    }
+
+    fun getSaleReturnInfo(saleReturnInvoiceNo: String){
+        launch {
+            customerVisitRepo.getSaleReturnInfo(saleReturnInvoiceNo)
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.mainThread())
+                .subscribe{
+                    this.saleReturn.postValue(it)
+                }
+        }
     }
 
     fun getSaleReturnProductInfo(saleReturnInvoiceNo: String){

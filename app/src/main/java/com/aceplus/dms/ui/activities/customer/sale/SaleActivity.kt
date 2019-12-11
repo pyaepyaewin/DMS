@@ -33,6 +33,7 @@ import kotlin.collections.HashMap
 import java.util.ConcurrentModificationException as ConcurrentModificationException1
 
 class SaleActivity : BaseActivity(), KodeinAware {
+
     override val kodein: Kodein by kodein()
 
     override val layoutId: Int

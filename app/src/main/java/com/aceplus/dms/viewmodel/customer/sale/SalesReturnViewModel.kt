@@ -13,6 +13,7 @@ import com.aceplus.domain.repo.CustomerVisitRepo
 import com.aceplus.domain.vo.SoldProductInfo
 import com.aceplus.shared.viewmodel.BaseViewModel
 import com.kkk.githubpaging.network.rx.SchedulerProvider
+import java.text.DecimalFormat
 
 class SalesReturnViewModel(
     private val customerVisitRepo: CustomerVisitRepo,
@@ -188,6 +189,7 @@ class SalesReturnViewModel(
                         invoice.total_amount = netAmount.toString()
                         invoice.pay_amount = payAmount.toString()
                         invoice.total_discount_amount = discAmount
+                        invoice.total_discount_percent = DecimalFormat("#0.00").format(discAmount*100/netAmount)
                         invoice.device_id = deviceID
                         invoice.invoice_status = saleReturn.invoice_status
                         invoice.sale_person_id = salePersonID.toString()

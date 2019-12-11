@@ -204,10 +204,10 @@
             <TextView
                     android:id="@+id/tvPayAmountFromCustomer"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Pay Amount From Customer"
-                    android:textColor="@color/black"
-                    android:layout_marginLeft="20dp" />
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="20dp"
+                    android:text="0 MMK"
+                    android:textColor="@color/black" />
 
         </LinearLayout>
 
@@ -232,9 +232,9 @@
                     android:id="@+id/tvRefundToCustomer"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Refund To Customer"
-                    android:textColor="@color/black"
-                    android:layout_marginLeft="20dp" />
+                    android:layout_marginLeft="20dp"
+                    android:text="0 MMK"
+                    android:textColor="@color/black" />
 
         </LinearLayout>
 

@@ -43,6 +43,9 @@ interface SaleReturnDao {
     @Query("update sale_return set delete_flag = 1 WHERE delete_flag = 0")
     fun updateAllInactiveData()
 
+    @Query("select * from sale_return where sale_return_id = :id")
+    fun getDataByID(id: String?): SaleReturn?
+
 
     @Query("update sale_return set sale_id = :saleID where sale_return_id = :saleReturnInvoiceNo")
     fun updateSaleIdInSaleReturn(saleReturnInvoiceNo: String, saleID: String)

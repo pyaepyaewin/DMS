@@ -120,7 +120,6 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
             val printIntent = Intent(context, PrintInvoiceActivity::class.java)
             printIntent.putExtra("CREDIT", credit as Serializable)
             printIntent.putExtra("CURSOR_POSITION", position)
-            //printIntent.putExtra("CREDIT_FLG", "CREDIT")
             printIntent.putExtra(IE_PRINT_MODE, "C")
             printIntent.putExtra(CUSTOMER_TOWNSHIP, customerTownShip)
             printIntent.putExtra(SALE_MAN_NAME, salePersonName)
@@ -625,7 +624,7 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
             Constant.HM_MESSAGE_DEVICE_NAME -> {
                 val connectedDeviceName = it.data.getString(DEVICE_NAME)
                 Toast.makeText(this, "Connected to $connectedDeviceName", Toast.LENGTH_SHORT).show()
-                printInvoiceViewModel.getRelatedDataAndPrint(invoice!!.customer_id!!, invoice!!.sale_person_id!!, orderedInvoice?.sale_man_id)
+                printInvoiceViewModel.getRelatedDataAndPrint(invoice!!.customer_id!!, invoice!!.sale_person_id!!, orderedInvoice?.sale_man_id, null)
             }
             Constant.HM_MESSAGE_TOAST -> {
                 Toast.makeText(this, it.data.getString(TOAST), Toast.LENGTH_SHORT).show()

@@ -250,6 +250,7 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
     }
 
     private fun calculateTotalAmount(){
+
         var total = 0.0
         for (soldProduct in soldProductList){
             total += soldProduct.totalAmt
@@ -257,8 +258,6 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
         totalAmount = total
         tvTotalAmount.text = Utils.formatAmount(total)
 
-        /*netAmount = total
-        tvNetAmount.text = Utils.formatAmount(total)*/
     }
 
     private fun calculateDiscPercentToAmt(){

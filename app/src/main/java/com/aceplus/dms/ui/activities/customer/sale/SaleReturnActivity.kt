@@ -60,6 +60,7 @@ class SaleReturnActivity : BaseActivity(), KodeinAware {
     private var salePersonID: String? = null
     private var saleReturnID: String? = null
     private var locationCode: Int = 0
+    private var routeID: Int = 0
     private var netAmount: Double = 0.0
     private var taxAmount: Double = 0.0
 
@@ -87,6 +88,7 @@ class SaleReturnActivity : BaseActivity(), KodeinAware {
 
         salePersonID = salesReturnViewModel.getSaleManID()
         locationCode = salesReturnViewModel.getLocationCode()
+        routeID = salesReturnViewModel.getRouteID()
 
         saleReturnID = if (isSaleExchange)
             Utils.getInvoiceNo(salePersonID!!, locationCode.toString(), Constant.FOR_SALE_RETURN_EXCHANGE, salesReturnViewModel.getLastCountForInvoiceNumber(Constant.FOR_SALE_RETURN_EXCHANGE))
@@ -282,7 +284,7 @@ class SaleReturnActivity : BaseActivity(), KodeinAware {
                 saleReturnID!!,
                 salePersonID!!.toInt(),
                 customer!!.id,
-                locationCode,
+                routeID,
                 netAmount,
                 if (returnCashAmtEditText.text.isNotBlank()) returnCashAmtEditText.text.toString().toDouble() else 0.0,
                 Utils.getDeviceId(this),

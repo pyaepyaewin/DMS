@@ -39,6 +39,7 @@ import java.text.DecimalFormat
 import kotlin.collections.ArrayList
 
 class CustomerActivity : BaseActivity(), KodeinAware {
+
     override val kodein: Kodein by kodein()
 
     override val layoutId: Int
@@ -74,7 +75,7 @@ class CustomerActivity : BaseActivity(), KodeinAware {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN) // Hide keyboard on startup.
+        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
 
         setupUI()
         catchEvents()
