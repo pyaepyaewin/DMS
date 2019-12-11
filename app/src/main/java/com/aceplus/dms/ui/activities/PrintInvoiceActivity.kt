@@ -13,9 +13,7 @@ import android.view.View
 import android.widget.Toast
 import com.aceplus.data.utils.Constant
 //import com.aceplus.dms.R
-import com.aceplus.dms.ui.activities.customer.CustomerActivity
 import com.aceplus.dms.ui.activities.customer.saleorder.SaleOrderCheckoutActivity
-import com.aceplus.dms.ui.adapters.report.HistorySoldProductPrintListAdapter
 import com.aceplus.dms.ui.adapters.sale.SoldProductPrintListAdapter
 import com.aceplus.dms.utils.BluetoothService
 import com.aceplus.dms.utils.PrintUtils
@@ -25,24 +23,18 @@ import com.aceplus.dms.viewmodel.customer.delivery.DeliveryViewModel
 import com.aceplus.domain.entity.customer.Customer
 import com.aceplus.domain.entity.delivery.Delivery
 import com.aceplus.domain.entity.invoice.Invoice
-import com.aceplus.domain.entity.product.Product
 import com.aceplus.domain.entity.promotion.Promotion
 import com.aceplus.domain.model.credit.CreditInvoice
 import com.aceplus.domain.model.delivery.Deliver
 import com.aceplus.domain.vo.RelatedDataForPrint
 import com.aceplus.domain.vo.SoldProductInfo
-import com.aceplus.domain.vo.report.SaleInvoiceDetailReport
 import com.aceplussolutions.rms.ui.activities.BaseActivity
-import kotlinx.android.synthetic.main.activity_sale_order_checkout.*
 import kotlinx.android.synthetic.main.activity_sale_print.*
 import kotlinx.android.synthetic.main.activity_sale_print.headerLayout
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.kodein
 import java.io.Serializable
-import android.R
-import android.view.ViewGroup
-import android.widget.LinearLayout
 
 
 class PrintInvoiceActivity : BaseActivity(), KodeinAware {
@@ -175,12 +167,9 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
     private val printInvoiceViewModel: PrintInvoiceViewModel by viewModel()
     private val printDeliveryViewModel: DeliveryViewModel by viewModel()
     private val soldProductPrintListAdapter: SoldProductPrintListAdapter by lazy { SoldProductPrintListAdapter(printMode)}
-    private val historySoldProductPrintListAdapter: HistorySoldProductPrintListAdapter by lazy { HistorySoldProductPrintListAdapter() }
-
     private var invoice: Invoice? = null
     private var customer: Customer? = null
     private var soldProductList: ArrayList<SoldProductInfo> = ArrayList()
-    private var historyReportSoldProductList: ArrayList<SaleInvoiceDetailReport> = ArrayList()
     private var promotionList: ArrayList<Promotion> = ArrayList()
     private var saleReturnList: ArrayList<SoldProductInfo> = ArrayList()
     private var creditList: ArrayList<CreditInvoice> = ArrayList()
