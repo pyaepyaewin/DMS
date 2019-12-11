@@ -65,7 +65,7 @@ import kotlin.collections.ArrayList
         ): Intent {
             val creditCheckOutIntent = Intent(context, CreditCollectionCheckoutActivity::class.java)
             creditCheckOutIntent.putExtra("CustomerID", customerId)
-            creditCheckOutIntent.putExtra("CustomerName", customerName)
+            creditCheckOutIntent.putExtra("CUSTOMER_NAME", customerName)
 
             return creditCheckOutIntent
         }
@@ -83,7 +83,7 @@ import kotlin.collections.ArrayList
         val creditList = creditCollectionCheckOutAdapter.getDataList() as ArrayList
         selectedItemPosition=position
       creditList[position] = data
-        customer_name_txt.text= intent.getSerializableExtra("CustomerName") as String
+        customer_name_txt.text= intent.getSerializableExtra("CUSTOMER_NAME") as String
         item_pay_edit.setText("")
 
         item_pay_edit.addTextChangedListener(object : TextWatcher {
@@ -135,7 +135,7 @@ import kotlin.collections.ArrayList
         creditDate = SimpleDateFormat("yyyy/MM/dd").format(Date())
 
         var customerId = intent.getSerializableExtra("CustomerID") as String
-        var customerName = intent.getSerializableExtra("CustomerName") as String
+        var customerName = intent.getSerializableExtra("CUSTOMER_NAME") as String
         var townShipName = creditCollectionCheckOutViewModel.getTownShipName(customerId.toInt())
 
         payment_amount_edit.text = null

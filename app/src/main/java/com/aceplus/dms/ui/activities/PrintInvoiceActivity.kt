@@ -126,6 +126,7 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
             printIntent.putExtra(IE_PRINT_MODE, "C")
             printIntent.putExtra(CUSTOMER_TOWNSHIP, customerTownShip)
             printIntent.putExtra(SALE_MAN_NAME, salePersonName)
+            printIntent.putExtra(CUSTOMER_NAME,customerName)
             return printIntent
         }
 
