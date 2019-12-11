@@ -95,14 +95,14 @@ class SaleCancelCheckOutViewModel(
         taxAmt: Double,
         bank: String,
         acc: String,
+        volDisAmount:Double,
+        volDisPercent:Double,
         totalDiscountAmount: Double,
-        totalVolumeDiscountPercent: Double,
         deletedProductList: ArrayList<SoldProductInfo>
     ) {
 
         var totalQtyForInvoice = 0
         var totalAmountForInvoice = 0.0
-        var totalDiscountAmount = 0.0
         val invoiceProductList: ArrayList<InvoiceProduct> = ArrayList()
         val invoiceDetailList: ArrayList<InvoiceDetail> = ArrayList()
         val invoice = Invoice()
@@ -164,13 +164,14 @@ class SaleCancelCheckOutViewModel(
             invoice.total_quantity =
                 totalQtyForInvoice.toDouble()
             invoice.invoice_status = cashOrLoanOrBank
-            invoice.total_discount_percent =
-                totalVolumeDiscountPercent.toString()
+            invoice.total_discount_percent =""
             invoice.rate = "1"
             invoice.tax_amount = taxAmt
             invoice.bank_name = bank
             invoice.bank_account_no = acc
             invoice.sale_flag = 0
+            invoice.total_discount_amount=totalDiscountAmount
+
             if (soldProduct.quantity < soldProduct.currentProductQty) {
                 var unsoldQty = soldProduct.currentProductQty - soldProduct.quantity
                 saleCancelRepo.updateProductRemainingQtyForUnsoldProduct(
