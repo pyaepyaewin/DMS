@@ -172,38 +172,36 @@ class CreditCollectionCheckOutViewModel(
             remainList.add(creditList[position])
 
         }
-//        payAmount -= creditAmount
-//        i.pay_amount = creditAmount
-//        tempCreditList.remove(i)
-//        remainList.add(i)
-//
+
         else if (payAmount != 0.0 && payAmount > creditAmount) {
             var refund = payAmount - creditAmount
             creditList[position].pay_amount = creditAmount
             tempCreditList.remove(creditList[position])
             remainList.add(creditList[position])
             for (i in tempCreditList) {
-                if (refund != 0.0 && refund < i.amount) {
-                    i.pay_amount = refund
-                    refund = 0.0
-                    remainList.add(i)
+                var newAmt=i.amount-i.pay_amount
+                if (newAmt!=0.0)
+                {
+                    if (refund != 0.0 && refund < i.amount) {
+                        i.pay_amount = refund
+                        refund = 0.0
+                        remainList.add(i)
 
 
-                } else if (refund != 0.0 && refund > i.amount) {
-                    refund -= i.amount
-                    i.pay_amount = i.amount
-//                    tempCreditList.remove(i)
-                    remainList.add(i)
+                    } else if (refund != 0.0 && refund > i.amount) {
+                        refund -= i.amount
+                        i.pay_amount = i.amount
+                        remainList.add(i)
 
 
-                } else if (refund != 0.0 && refund == i.amount) {
-                    refund -= i.amount
-                    i.pay_amount = i.amount
-//                    tempCreditList.remove(i)
-                    remainList.add(i)
-//                invoiceId=i.invoice_no!!
+                    } else if (refund != 0.0 && refund == i.amount) {
+                        refund -= i.amount
+                        i.pay_amount = i.amount
+                        remainList.add(i)
 
+                    }
                 }
+
 
             }
 
