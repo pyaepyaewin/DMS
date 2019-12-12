@@ -14,7 +14,7 @@ class ClassDiscountByPriceItem {
     @ColumnInfo(name = "id")
     @SerializedName("id")
     @Expose
-    var id: Int = 0
+    var id: Int=0
 
     @ColumnInfo(name = "class_discount_id")
     @SerializedName("class_discount_id")
