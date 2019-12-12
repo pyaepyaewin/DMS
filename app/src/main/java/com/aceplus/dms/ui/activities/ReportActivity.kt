@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import com.aceplus.data.utils.Constant
 import com.aceplus.dms.R
 import com.aceplus.dms.ui.fragments.report.*
 import com.aceplussolutions.rms.ui.activities.BaseActivity
@@ -85,7 +86,9 @@ class ReportActivity : BaseActivity() {
     }
 
     override fun onBackPressed() {
+
         finish()
+
     }
 
 }

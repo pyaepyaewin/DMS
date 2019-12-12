@@ -11,7 +11,7 @@ import android.widget.ArrayAdapter
 import com.aceplus.dms.R
 import com.aceplus.dms.ui.adapters.report.SalesVisitHistoryReportAdapter
 import com.aceplus.dms.utils.Utils
-import com.aceplus.dms.viewmodel.report.ReportViewModel
+import com.aceplus.dms.viewmodel.report.ReportViewiModel
 import com.aceplus.domain.model.sale.SaleVisitForUI
 import com.aceplus.domain.vo.report.SalesVisitHistoryReport
 import com.aceplus.shared.ui.activities.BaseFragment
@@ -50,6 +50,8 @@ class SalesVisitHistoryReportFragment : BaseFragment(), KodeinAware {
         //select customer name list in db
         salesVisitHistoryReportViewModel.customerDataList.observe(this, Observer {
             if (it != null) {
+                customerNameList.clear()
+                customerIdList.clear()
                 for (customer in it) {
                     customerIdList.add(customer.id)
                     customerNextIdList.add(customer.customer_id.toString())

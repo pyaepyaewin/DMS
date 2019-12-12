@@ -1,14 +1,18 @@
 package com.aceplus.dms.ui.fragments.customer
 
+import android.app.Activity
 import android.app.AlertDialog
 import android.arch.lifecycle.Observer
+import android.content.Intent
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.aceplus.data.utils.Constant
 import com.aceplus.dms.R
+import com.aceplus.dms.ui.activities.CustomerVisitActivity
 import com.aceplus.dms.ui.activities.customer.saleorder.SaleOrderActivity
 import com.aceplus.dms.ui.adapters.customer.DeliveryActivityAdapter
 import com.aceplus.dms.viewmodel.customer.delivery.DeliveryViewModel
@@ -71,13 +75,16 @@ class FragmentDeliveryReport : BaseFragment(), KodeinAware {
         //Delivery Item List...........
         fragmentDeliveryViewModel.deliveryAllItemDataList.observe(this, Observer { list ->
             if (list != null) {
+                soldProductList.clear()
                 soldProductList = list.first as ArrayList<SoldProductInfo>
+                val copySoldProductList = arrayListOf<SoldProductInfo>()
                 customer = list.second
-//                for (product in soldProductList) {
-//                    if (product.orderedQuantity == 0) {
-//                        soldProductList.remove(product)
-//                    }
-//                }
+                for (item in soldProductList) {
+                    if (item.orderedQuantity == 0) {
+                        copySoldProductList.add(item)
+                    }
+                }
+                soldProductList.removeAll(copySoldProductList)
                 if (soldProductList.isEmpty()) {
                     AlertDialog.Builder(activity)
                         .setTitle("Delivery")
@@ -92,8 +99,7 @@ class FragmentDeliveryReport : BaseFragment(), KodeinAware {
                         soldProductList,
                         delivery!!
                     )
-                    startActivity(intent)
-                    activity!!.finish()
+                    startActivityForResult(intent, Constant.RQC_BACK_TO_DELIVERY)
                 }
                 fragmentDeliveryViewModel.deliveryAllItemDataList.value = null
             }
@@ -104,4 +110,5 @@ class FragmentDeliveryReport : BaseFragment(), KodeinAware {
         delivery = deliver
         fragmentDeliveryViewModel.loadAllDeliveryItemList(deliver.deliverId.toString(), deliver.customerId.toInt())
     }
+
 }

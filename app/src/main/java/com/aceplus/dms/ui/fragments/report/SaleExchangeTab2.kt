@@ -15,6 +15,7 @@ import com.aceplus.dms.viewmodel.report.ReportViewModel
 import com.aceplus.domain.vo.report.SaleInvoiceDetailReport
 import com.aceplus.domain.vo.report.SaleInvoiceReport
 import com.aceplus.shared.ui.activities.BaseFragment
+import kotlinx.android.synthetic.main.dialog_box_sale_invoice_report.*
 import kotlinx.android.synthetic.main.dialog_box_sale_invoice_report.view.*
 import kotlinx.android.synthetic.main.fragment_sale_invoice_report.*
 import org.kodein.di.Kodein
@@ -65,13 +66,14 @@ class SaleExchangeTab2 : BaseFragment(), KodeinAware {
 
         //sale exchange tab2 report detail list
         saleInvoiceReportViewModel.saleInvoiceDetailReportSuccessState.observe(this, Observer {
-            saleInvoiceDetailReportAdapter.setNewList(it as java.util.ArrayList<SaleInvoiceDetailReport>)
+            saleInvoiceDetailReportAdapter.setNewList(it as ArrayList<SaleInvoiceDetailReport>)
         })
     }
 
     private fun onClickItem(invoiceId: String) {
         //layout inflate for sale exchange tab2 report detail
         val dialogBoxView = activity!!.layoutInflater.inflate(R.layout.dialog_box_sale_invoice_report, null)
+        dialogBoxView.rl_reprint.visibility = View.GONE
         val builder = AlertDialog.Builder(activity)
         builder.setView(dialogBoxView)
         builder.setTitle("Sales Product")

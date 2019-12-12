@@ -18,6 +18,7 @@ class PrintInvoiceViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
 
     var taxInfo = MutableLiveData<Triple<String, Int, String>>()
     var salePersonName = MutableLiveData<String>()
+    var orderSalePersonName = MutableLiveData<String>()
     var relatedDataForPrint = MutableLiveData<RelatedDataForPrint>()
     var saleReturn = MutableLiveData<SaleReturn>()
     var saleReturnProducts = MutableLiveData<List<SaleExchangeProductInfo>>()
@@ -31,6 +32,18 @@ class PrintInvoiceViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
                 .subscribe{
                     var salePersonName = it ?: "...."
                     this.salePersonName.postValue(salePersonName)
+                }
+        }
+    }
+
+    fun getOrderSalePersonName(orderSalePersonID: String?){
+        launch {
+            customerVisitRepo.getSaleManName(orderSalePersonID)
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.mainThread())
+                .subscribe{
+                    var orderSalePersonName = it ?: "...."
+                    this.orderSalePersonName.postValue(orderSalePersonName)
                 }
         }
     }
@@ -63,7 +76,7 @@ class PrintInvoiceViewModel(private val customerVisitRepo: CustomerVisitRepo, pr
         var companyInfo: CompanyInformation? = null
         var salePersonName: String? = null
         var orderSalePersonName: String? = null
-        var saleReturnInvoice: SaleReturn? = null
+        var saleReturnInvoice: SaleReturn?
 
         launch {
             customerVisitRepo.getCustomerByID(customerID.toInt())

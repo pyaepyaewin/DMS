@@ -4,28 +4,17 @@ import android.app.ActionBar
 import android.arch.lifecycle.Observer
 import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.ImageView
-import android.widget.LinearLayout
 import com.aceplus.dms.R
 import com.aceplus.dms.viewmodel.report.ReportViewModel
-import com.aceplus.domain.entity.invoice.Invoice
-import com.aceplus.domain.entity.sale.saletarget.SaleTargetSaleMan
 import com.aceplus.domain.model.forApi.sale.saletarget.SaleTargetForCustomer
 import com.aceplus.domain.model.sale.SaleTarget
-import com.aceplus.domain.vo.report.SaleTargetVO
 import com.aceplus.shared.ui.activities.BaseFragment
-import com.github.mikephil.charting.components.Legend
-import com.github.mikephil.charting.data.PieData
-import com.github.mikephil.charting.data.PieDataSet
-import com.github.mikephil.charting.data.PieEntry
-import com.github.mikephil.charting.formatter.PercentFormatter
-import com.github.mikephil.charting.formatter.ValueFormatter
 import kotlinx.android.synthetic.main.fragment_sale_comparison_report.*
 import org.achartengine.ChartFactory
 import org.achartengine.GraphicalView
@@ -73,13 +62,6 @@ class TargetAndActualSalesForSalesManReportFragment : BaseFragment(), KodeinAwar
         printImg.visibility = View.VISIBLE
         getTargetSaleDB(-1)
         getGroupCodeListFromDbAndCategoryListFromDb()
-        if (categoryIdArr != null && categoryIdArr.size != 0) {
-            categoryId = categoryIdArr[spinner_category.selectedItemPosition]
-        }
-
-        if (groupIdArr != null && groupIdArr.size != 0) {
-            groupId = groupIdArr[spinner_group.selectedItemPosition]
-        }
         catchEvents()
         targetAndActualSalesForSalesManReportViewModel.loadProductGroupAndProductCategoryList()
     }
@@ -100,7 +82,8 @@ class TargetAndActualSalesForSalesManReportFragment : BaseFragment(), KodeinAwar
                         groupIdArr.add(group.id.toString())
                     }
                 }
-                val groupNameSpinnerAdapter = ArrayAdapter(context, android.R.layout.simple_spinner_item, groupNameList)
+                val groupNameSpinnerAdapter =
+                    ArrayAdapter(context, android.R.layout.simple_spinner_item, groupNameList)
                 groupNameSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                 spinner_group.adapter = groupNameSpinnerAdapter
 
@@ -185,67 +168,53 @@ class TargetAndActualSalesForSalesManReportFragment : BaseFragment(), KodeinAwar
         if (groupIdArr != null && groupIdArr.size != 0) {
             groupId = groupIdArr[spinner_group.selectedItemPosition]
         }
-        if (categoryId != "-1") {
-            targetAndActualSalesForSalesManReportViewModel.categorySaleTargetDataList.observe(
-                this,
-                Observer {
-                    actualTargetArrayList.clear()
-                    for (i in it!!) {
-                        var productId = ""
-                        var saleQty = 0.0
-                        var totalSaleAmount = 0.0
-                        if (i.productId != null) {
-                            productId = i.productId
-                        }
-                        if (i.saleQuantity != null) {
-                            saleQty = i.saleQuantity.toDouble()
-                        }
-                        if (i.totalAmount != null) {
-                            totalSaleAmount = i.totalAmount
-                        }
-                        val sellingPrice = totalSaleAmount / saleQty
-                        val saleTarget = SaleTarget()
-                        saleTarget.productId = productId
-                        saleTarget.quantity = saleQty
-                        saleTarget.sellingPrice = sellingPrice
-                        saleTarget.totalAmount = totalSaleAmount
-                        actualTargetArrayList.add(saleTarget)
-                        Log.d("Sale Target List", actualTargetArrayList.size.toString())
 
+        if (groupId == "-1" && categoryId == "-1"){
+            targetAndActualSalesForSalesManReportViewModel.allSaleTargetDataList.observe(this, Observer {
+                allActualSaleValue = 0.0
+                if (it!!.isEmpty()) {
+                    sale_txt.text = "0.0"
+                } else {
+                    for (i in it!!) {
+                        allActualSaleValue += i.totalAmount
+                        sale_txt.text = allActualSaleValue.toString()
                     }
-                })
-            targetAndActualSalesForSalesManReportViewModel.loadCategorySaleTargetAndSaleIdList(categoryId)
+                }
+            })
+            targetAndActualSalesForSalesManReportViewModel.loadAllSaleTargetAndSaleIdList()
         }
+
         if (groupId != "-1") {
             targetAndActualSalesForSalesManReportViewModel.groupSaleTargetDataList.observe(this, Observer {
-                for (i in it!!) {
-                    var productId = ""
-                    var saleQty = 0.0
-                    var totalSaleAmount = 0.0
-                    if (i.productId != null) {
-                        productId = i.productId
+                allActualSaleValue = 0.0
+                if (it!!.isEmpty()) {
+                        sale_txt.text = "0.0"
+                } else {
+                    for (i in it!!) {
+                        allActualSaleValue += i.totalAmount
+                            sale_txt.text = allActualSaleValue.toString()
                     }
-                    if (i.saleQuantity != null) {
-                        saleQty = i.saleQuantity.toDouble()
-                    }
-                    if (i.totalAmount != null) {
-                        totalSaleAmount = i.totalAmount
-                    }
-                    val sellingPrice = totalSaleAmount / saleQty
-                    val saleTarget = SaleTarget()
-                    saleTarget.productId = productId
-                    saleTarget.quantity = saleQty
-                    saleTarget.sellingPrice = sellingPrice
-                    saleTarget.totalAmount = totalSaleAmount
-                    actualTargetArrayList.add(saleTarget)
                 }
             })
             targetAndActualSalesForSalesManReportViewModel.loadGroupSaleTargetAndSaleIdList(groupId)
         }
+        if (categoryId != "-1") {
+            targetAndActualSalesForSalesManReportViewModel.categorySaleTargetDataList.observe(this, Observer {
+                if (it!!.isEmpty()) {
+                    sale_txt.text = "0.0"
+                } else {
+                    for (i in it!!) {
+                        allActualSaleValue += i.totalAmount
+                        sale_txt.text = allActualSaleValue.toString()
+                    }
+                }
+            })
+            targetAndActualSalesForSalesManReportViewModel.loadCategorySaleTargetAndSaleIdList(categoryId)
+        }
         initialize()
     }
 
-    private fun initialize(){
+    private fun initialize() {
         for (j in saleTargetArrayList.indices) {
             allSaleTargetValue += Integer.parseInt(saleTargetArrayList[j].targetAmount).toDouble()
         }
@@ -254,7 +223,6 @@ class TargetAndActualSalesForSalesManReportFragment : BaseFragment(), KodeinAwar
         }
 
         sale_target_txt.text = allSaleTargetValue.toString()
-        sale_txt.text = allActualSaleValue.toString()
 
         if (allSaleTargetValue != 0.0) {
             sale = allActualSaleValue / (allSaleTargetValue / 100)
@@ -299,13 +267,20 @@ class TargetAndActualSalesForSalesManReportFragment : BaseFragment(), KodeinAwar
         }
 
     }
+
     override fun onResume() {
         super.onResume()
         if (mChartView == null) {
             mChartView = ChartFactory.getPieChartView(activity, mSeries, mRenderer)
             mRenderer.isClickEnabled = false
             mRenderer.selectableBuffer = 10
-            pieChart.addView(mChartView, ActionBar.LayoutParams(ActionBar.LayoutParams.FILL_PARENT, ActionBar.LayoutParams.FILL_PARENT))
+            pieChart.addView(
+                mChartView,
+                ActionBar.LayoutParams(
+                    ActionBar.LayoutParams.FILL_PARENT,
+                    ActionBar.LayoutParams.FILL_PARENT
+                )
+            )
         } else {
             mChartView!!.repaint()
         }

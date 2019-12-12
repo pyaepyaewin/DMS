@@ -12,10 +12,8 @@ import android.util.Log
 import android.view.View
 import android.widget.Toast
 import com.aceplus.data.utils.Constant
-import com.aceplus.dms.R
-import com.aceplus.dms.ui.activities.customer.CustomerActivity
+//import com.aceplus.dms.R
 import com.aceplus.dms.ui.activities.customer.saleorder.SaleOrderCheckoutActivity
-import com.aceplus.dms.ui.adapters.report.HistorySoldProductPrintListAdapter
 import com.aceplus.dms.ui.adapters.sale.SoldProductPrintListAdapter
 import com.aceplus.dms.utils.BluetoothService
 import com.aceplus.dms.utils.PrintUtils
@@ -25,33 +23,32 @@ import com.aceplus.dms.viewmodel.customer.delivery.DeliveryViewModel
 import com.aceplus.domain.entity.customer.Customer
 import com.aceplus.domain.entity.delivery.Delivery
 import com.aceplus.domain.entity.invoice.Invoice
-import com.aceplus.domain.entity.product.Product
 import com.aceplus.domain.entity.promotion.Promotion
 import com.aceplus.domain.model.credit.CreditInvoice
 import com.aceplus.domain.model.delivery.Deliver
 import com.aceplus.domain.vo.RelatedDataForPrint
 import com.aceplus.domain.vo.SoldProductInfo
-import com.aceplus.domain.vo.report.SaleInvoiceDetailReport
 import com.aceplussolutions.rms.ui.activities.BaseActivity
 import kotlinx.android.synthetic.main.activity_sale_print.*
+import kotlinx.android.synthetic.main.activity_sale_print.headerLayout
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.kodein
 import java.io.Serializable
 import java.text.DecimalFormat
 
+
 class PrintInvoiceActivity : BaseActivity(), KodeinAware {
     override val kodein: Kodein by kodein()
 
     override val layoutId: Int
-        get() = R.layout.activity_sale_print
+        get() = com.aceplus.dms.R.layout.activity_sale_print
 
     companion object {
 
         private const val IE_SOLD_PRODUCT_LIST = "IE_SOLD_PRODUCT_LIST"
         private const val IE_INVOICE = "IE_INVOICE"
         private const val ORDERED_INVOICE_KEY = "ordered_invoice_key"
-        private const val HISTORY_REPORT_SOLD_PRODUCT_LIST = "HISTORY_REPORT_SOLD_PRODUCT_LIST"
         private const val IE_PROMOTION_LIST = "IE_PROMOTION_LIST"
         private const val IE_PRINT_MODE = "IE_PRINT_MODE"
         private const val SALE_MAN_NAME = "SALE_MAN_NAME"
@@ -130,11 +127,13 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
         fun newIntentFromSaleHistoryActivity(
             context: Context,
             invoice: Invoice?,
-            saleHistoryDetailList: List<SaleInvoiceDetailReport>
+            soldProductList: List<SoldProductInfo>,
+            promotionList: ArrayList<Promotion>
         ): Intent? {
             val intent = Intent(context, PrintInvoiceActivity::class.java)
             intent.putExtra(IE_INVOICE, invoice)
-            intent.putExtra(HISTORY_REPORT_SOLD_PRODUCT_LIST, saleHistoryDetailList as ArrayList<SaleInvoiceDetailReport>)
+            intent.putExtra(IE_SOLD_PRODUCT_LIST, soldProductList as ArrayList<SoldProductInfo>)
+            intent.putExtra(IE_PROMOTION_LIST,promotionList)
             intent.putExtra(IE_PRINT_MODE, "RP")
             return intent
         }
@@ -171,13 +170,10 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
 
     private val printInvoiceViewModel: PrintInvoiceViewModel by viewModel()
     private val soldProductPrintListAdapter: SoldProductPrintListAdapter by lazy { SoldProductPrintListAdapter(printMode)}
-    private val historySoldProductPrintListAdapter: HistorySoldProductPrintListAdapter by lazy { HistorySoldProductPrintListAdapter() }
-    //private val printDeliveryViewModel: DeliveryViewModel by viewModel() //No usage - can delete
 
     private var invoice: Invoice? = null
     private var customer: Customer? = null
     private var soldProductList: ArrayList<SoldProductInfo> = ArrayList()
-    private var historyReportSoldProductList: ArrayList<SaleInvoiceDetailReport> = ArrayList()
     private var promotionList: ArrayList<Promotion> = ArrayList()
     private var saleReturnList: ArrayList<SoldProductInfo> = ArrayList()
     private var creditList: ArrayList<CreditInvoice> = ArrayList()
@@ -189,14 +185,13 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
     private var creditFlg: String? = null
     private var relatedDataForPrint: RelatedDataForPrint? = null
     private var salePersonName: String? = null
+    private var orderSalePersonName: String? = null
     private var customerName: String? = null
     private var customerTownShip: String? = null
     private var orderedInvoice: Delivery? = null
     private var orderedDInvoice: Deliver? = null
     private var mBluetoothAdapter: BluetoothAdapter? = null
     private var mBluetoothService: BluetoothService? = null
-    private var orderPerson :String? = null //No usage - can delete
-    private var salePerson :String? = null //No usage - can delete
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -209,7 +204,6 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
         }
 
         getIntentData()
-        Log.d("List Error", "${historyReportSoldProductList.size}")
         catchEvents()
         getTaxInfoAndSetData()
 
@@ -248,11 +242,17 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
 
     private fun catchEvents() {
 
-        cancel_img.setOnClickListener { onBackPressed() }
+        cancel_img.setOnClickListener {onBackPressed()}
 
         printInvoiceViewModel.salePersonName.observe(this, Observer {
             saleMan.text = it
+            deliver_person.text = it
             salePersonName = it
+        })
+
+        printInvoiceViewModel.orderSalePersonName.observe(this, Observer {
+            deliver_order_person.text = it
+            orderSalePersonName = it
         })
 
         print_img.setOnClickListener { onConnecting() }
@@ -278,32 +278,10 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
         if (intent.getStringExtra(CUSTOMER_TOWNSHIP) != null) customerTownShip = intent.getStringExtra(CUSTOMER_TOWNSHIP)
         if (intent.getParcelableArrayListExtra<SoldProductInfo>(IE_SALE_RETURN_LIST) != null) saleReturnList = intent.getParcelableArrayListExtra(IE_SALE_RETURN_LIST)
         if (intent.getStringExtra(IE_PRINT_MODE) != null) printMode = intent.getStringExtra(IE_PRINT_MODE)
-        if (intent.getParcelableArrayListExtra<SaleInvoiceDetailReport>(HISTORY_REPORT_SOLD_PRODUCT_LIST) != null) historyReportSoldProductList = intent.getParcelableArrayListExtra(HISTORY_REPORT_SOLD_PRODUCT_LIST)
         if (intent.getSerializableExtra(ORDERED_INVOICE_KEY) != null) orderedDInvoice = intent.getSerializableExtra(ORDERED_INVOICE_KEY) as Deliver
         if (intent.getSerializableExtra(IE_CUSTOMER_DATA) != null) customer = intent.getParcelableExtra(IE_CUSTOMER_DATA)
 
     }
-
-    /*Can delete after testing finish
-    private fun getOrderPerson(saleManId:Int){
-        printDeliveryViewModel.userNameDataList.observe(this, Observer {
-            for (i in it!!){
-                deliver_order_person.text = i.user_name!!
-                orderPerson = i.user_name!!
-            }
-        })
-        printDeliveryViewModel.loadOrderPerson(saleManId)
-    }
-
-    private fun getSalePerson(salePersonId:String){
-        printDeliveryViewModel.userNameDataList.observe(this, Observer {
-            for (i in it!!){
-                deliver_person.text = i.user_name!!
-                salePerson = i.user_name!!
-            }
-        })
-        printDeliveryViewModel.loadOrderPerson(salePersonId.toInt())
-    }*/
 
     private fun getTaxInfoAndSetData() {
 
@@ -327,15 +305,10 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
             printInvoiceViewModel.getSalePersonName(invoice!!.sale_person_id!!)
             branch.text = branchCode
 
-            if (printMode == "S") {
+            if (printMode == "S" || printMode == "RP") {
                 print_soldProductList.adapter = soldProductPrintListAdapter
                 print_soldProductList.layoutManager = LinearLayoutManager(this)
                 soldProductPrintListAdapter.setNewList(soldProductList)
-            }
-            else {
-                print_soldProductList.adapter = historySoldProductPrintListAdapter
-                print_soldProductList.layoutManager = LinearLayoutManager(this)
-                historySoldProductPrintListAdapter.setNewList(historyReportSoldProductList)
             }
 
             setPromotionProductListView()
@@ -383,21 +356,24 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
             credit_discount.text = "0.0 (0%)"
 
         } else if (printMode == "D") {
+            printInvoiceViewModel.getSalePersonName(invoice!!.sale_person_id!!)
+            printInvoiceViewModel.getOrderSalePersonName(orderedDInvoice!!.saleManId.toString())
             deliverPrintHeaderLayout1.visibility = View.VISIBLE
             salePrintHeaderLayout1.visibility = View.GONE
             salePrintHeaderLayout2.visibility = View.GONE
+            llPrepaid.visibility = View.VISIBLE
             deliver_customer_name.text = orderedDInvoice!!.customerName
             deliver_township_name.text = orderedDInvoice!!.customerAddres
             deliver_order_invoice_no.text = orderedDInvoice!!.invoiceNo
             deliver_invoice_no.text = invoice!!.invoice_id
             deliver_date.text = invoice!!.due_date
-            /*Can delete after testing finish
-            getOrderPerson(orderedDInvoice!!.saleManId)
-            getSalePerson(invoice!!.sale_person_id!!)*/
+
             print_totalAmount.text = orderedDInvoice!!.amount.toString()
             print_totalDiscount.text = orderedDInvoice!!.discount.toString()
             print_net_amount.text = (orderedDInvoice!!.amount - orderedDInvoice!!.paidAmount).toString()
-            print_prepaidAmount.text = orderedDInvoice!!.paidAmount.toString()
+            if (invoice!!.pay_amount.isNullOrEmpty())  print_prepaidAmount.text = "0.0"
+            else print_prepaidAmount.text = (invoice!!.pay_amount!!.toDouble()).toString()
+            print_prepaidAmountShow.text = Utils.formatAmount(orderedDInvoice!!.paidAmount)
             print_discountAmount.text = orderedDInvoice!!.discountPercent.toString()
 
             soldProductPrintListAdapter.setNewList(soldProductList)
@@ -497,20 +473,7 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
 
         } else if (printMode == "RP"){
             Utils.saveInvoiceImageIntoGallery(invoice!!.invoice_id, this, myBitmap, "Sale")
-            val saleInvoiceDetailList = ArrayList<SoldProductInfo>()
-            for (i in historyReportSoldProductList){
-                val soldProduct = SoldProductInfo(Product(), false)
-                soldProduct.product.product_name = i.productName
-                soldProduct.quantity = i.saleQuantity
-                soldProduct.discountAmount = i.discountAmount.toDouble()
-                soldProduct.promotionPrice = i.promotionPrice
-                soldProduct.totalAmt = i.totalAmount
-                soldProduct.itemDiscountAmount = i.itemDiscountAmount
-                soldProduct.discountPercent = i.discountPercent
-                soldProduct.product.selling_price = i.sellingPrice.toString()
-                saleInvoiceDetailList.add(soldProduct)
-            }
-            val editProductList = printInvoiceViewModel.arrangeProductList(saleInvoiceDetailList, promotionList)
+            val editProductList = printInvoiceViewModel.arrangeProductList(soldProductList, promotionList)
             val customerData: Customer = relatedDataForPrint!!.customer
             PrintUtils.printWithHSPOS(
                 this,
@@ -641,10 +604,6 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
     }
 
     override fun onBackPressed() {
-        if (printMode == "D"){
-            val intent = Intent(this,CustomerActivity::class.java)
-            startActivity(intent)
-        }
         setResult(Activity.RESULT_OK)
         finish()
     }

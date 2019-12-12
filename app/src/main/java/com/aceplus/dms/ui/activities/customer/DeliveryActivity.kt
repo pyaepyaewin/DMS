@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import com.aceplus.data.utils.Constant
 import com.aceplus.dms.R
 import com.aceplus.dms.ui.activities.CustomerVisitActivity
 import com.aceplus.dms.ui.fragments.customer.FragmentDeliveryReport
@@ -35,9 +36,7 @@ class DeliveryActivity : BaseActivity(), KodeinAware {
 
 
         cancel_img.setOnClickListener {
-            val intent = Intent(this@DeliveryActivity, CustomerVisitActivity::class.java)
-            startActivity(intent)
-            finish()
+            onBackPressed()
         }
 
     }

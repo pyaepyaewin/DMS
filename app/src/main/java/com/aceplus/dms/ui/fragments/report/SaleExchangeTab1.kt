@@ -45,7 +45,6 @@ class SaleExchangeTab1 : BaseFragment(),KodeinAware {
         //sale exchange tab1 report list
         salesReturnReportViewModel.salesReturnReportSuccessState.observe(this, Observer {
             if (it!!.first != null) {
-                Log.d("List is Sizee", "${it.first.size}")
                 val qtySaleReturnList = arrayListOf<SalesReturnReport>()
                 for (i in it.first) {
                     var qty = 0

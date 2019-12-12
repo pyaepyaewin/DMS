@@ -93,6 +93,7 @@ class DeliveryViewModel(
                                 soldProduct.product.um = um
                                 soldProduct.quantity = data.quantity!!.toDouble().roundToInt()
                                 soldProduct.orderedQuantity = data.quantity!!.toDouble().roundToInt()
+                                Log.d("Mya Mya","${data.quantity}")
                                 soldProduct.product.product_id = data.stock_id!!
                                 soldProduct.isFocIsChecked = true
                                 innerSoldProductList.add(soldProduct)

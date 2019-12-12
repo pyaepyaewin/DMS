@@ -147,8 +147,7 @@ class ReportViewModel(
 
     //sale invoice report and sale exchange tab2
     var saleInvoiceReportList = MutableLiveData<List<SaleInvoiceReport>>()
-    var saleInvoiceDetailReportSuccessState = MutableLiveData<List<SaleInvoiceDetailReport>>()
-    var saleHistoryForPrintData = MutableLiveData<Invoice>()
+    var saleInvoiceDetailReportSuccessState = MutableLiveData<Triple<List<SaleInvoiceDetailReport>,List<PromotionData>,Invoice>>()
     fun loadSaleInvoiceList() {
         launch {
             reportRepo.saleInvoiceReport()
@@ -196,30 +195,25 @@ class ReportViewModel(
     }
 
     fun loadSaleInvoiceDetailReport(invoiceId: String) {
+        var saleInvoiceDetailReport = listOf<SaleInvoiceDetailReport>()
+        var promotionList = listOf<PromotionData>()
+        var saleHistoryForPrintData = Invoice()
         launch {
             reportRepo.saleInvoiceDetailReport(invoiceId)
+                .flatMap {
+                    saleInvoiceDetailReport = it
+                    return@flatMap reportRepo.getInvoicePresentList(invoiceId)
+                }
+                .flatMap {
+                    promotionList = it
+                    return@flatMap  reportRepo.saleInvoiceDetlailPrint(invoiceId)
+                }
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.mainThread())
-                .subscribe({
-                    saleInvoiceDetailReportSuccessState.postValue(it)
-                    Log.d("Invoice List", "${it.size}")
-                }, {
-                    reportErrorState.value = it.localizedMessage
-                })
-        }
-
-    }
-
-    fun loadSaleInvoiceDetailPrint(invoiceId: String) {
-        launch {
-            reportRepo.saleInvoiceDetlailPrint(invoiceId)
-                .subscribeOn(schedulerProvider.io())
-                .observeOn(schedulerProvider.mainThread())
-                .subscribe({
-                    saleHistoryForPrintData.postValue(it)
-                }, {
-                    reportErrorState.value = it.localizedMessage
-                })
+                .subscribe{
+                    saleHistoryForPrintData = it
+                    saleInvoiceDetailReportSuccessState.postValue(Triple(saleInvoiceDetailReport,promotionList,saleHistoryForPrintData))
+                }
         }
 
     }
@@ -296,8 +290,7 @@ class ReportViewModel(
     }
 
     //sale return report
-    var salesReturnReportSuccessState =
-        MutableLiveData<Pair<List<SalesReturnQtyReport>, List<SaleReturnDetail>>>()
+    var salesReturnReportSuccessState = MutableLiveData<Pair<List<SalesReturnQtyReport>, List<SaleReturnDetail>>>()
     var salesReturnDetailReportSuccessState = MutableLiveData<List<SalesReturnDetailReport>>()
     fun loadSalesReturnReport() {
         var salesReturnReportList: List<SalesReturnQtyReport> = listOf()
@@ -451,6 +444,7 @@ class ReportViewModel(
     //"sale target and sale man" and "customer"
     var categorySaleTargetDataList = MutableLiveData<List<TargetAndSaleForSaleMan>>()
     var groupSaleTargetDataList = MutableLiveData<List<TargetAndSaleForSaleMan>>()
+    var allSaleTargetDataList = MutableLiveData<List<TargetAndSaleForSaleMan>>()
     var customerSaleTargetDataList = MutableLiveData<List<TargetAndSaleForSaleMan>>()
     var productGroupAndCategoryDataList =
         MutableLiveData<Pair<List<GroupCode>, List<ProductCategory>>>()
@@ -499,6 +493,18 @@ class ReportViewModel(
                 .observeOn(schedulerProvider.mainThread())
                 .subscribe {
                     groupSaleTargetDataList.postValue(it)
+                }
+        }
+
+    }
+
+    fun loadAllSaleTargetAndSaleIdList() {
+        launch {
+            reportRepo.getAllListFromInvoiceProduct()
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.mainThread())
+                .subscribe {
+                    allSaleTargetDataList.postValue(it)
                 }
         }
 
@@ -730,8 +736,12 @@ class ReportViewModel(
                 .flatMap {
                     for (i in it) {
                         if (i.pay_amount!!.toDouble() > 0.0) {
-                            if (i.pay_amount!!.isEmpty()) i.pay_amount = "0.0"
-                            if (i.refund_amount!!.isEmpty()) i.refund_amount = "0.0"
+                            if (i.pay_amount!!.isEmpty()) {
+                                i.pay_amount = "0.0"
+                            }
+                            if (i.refund_amount.isNullOrEmpty()){
+                                i.refund_amount = "0.0"
+                            }
                             totalPayAmt += (i.pay_amount!!.toDouble() - i.refund_amount!!.toDouble())
                         }
                     }

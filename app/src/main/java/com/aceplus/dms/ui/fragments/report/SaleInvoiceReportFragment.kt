@@ -12,12 +12,15 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
+import com.aceplus.data.utils.Constant
 import com.aceplus.dms.R
 import com.aceplus.dms.ui.activities.PrintInvoiceActivity
 import com.aceplus.dms.ui.adapters.report.SaleInvoiceDetailReportAdapter
 import com.aceplus.dms.ui.adapters.report.SaleInvoiceReportAdapter
 import com.aceplus.dms.viewmodel.report.ReportViewModel
 import com.aceplus.domain.entity.invoice.Invoice
+import com.aceplus.domain.entity.product.Product
+import com.aceplus.domain.entity.promotion.Promotion
 import com.aceplus.domain.vo.SoldProductInfo
 import com.aceplus.domain.vo.report.SaleInvoiceDetailReport
 import com.aceplus.domain.vo.report.SaleInvoiceReport
@@ -37,8 +40,10 @@ class SaleInvoiceReportFragment : BaseFragment(), KodeinAware {
     private var toDate: String? = null
     override val kodein: Kodein by kodein()
     private var invoice: Invoice? = null
+    private val soldProductList = ArrayList<SoldProductInfo>()
+    private var promotionArrayList = ArrayList<Promotion>()
     var saleInvoiceDataList: List<SaleInvoiceReport> = listOf()
-    private var saleInvoiceDetailList: List<SaleInvoiceDetailReport> = listOf()
+    private var saleInvoiceDetailList: ArrayList<SaleInvoiceDetailReport> = arrayListOf()
     private val saleInvoiceReportAdapter: SaleInvoiceReportAdapter by lazy {
         SaleInvoiceReportAdapter(
             this::onClickItem
@@ -64,8 +69,8 @@ class SaleInvoiceReportFragment : BaseFragment(), KodeinAware {
         }
         btn_sale_report_search.setOnClickListener {
             when {
-                edit_text_sale_report_from_date.text.isEmpty() -> edit_text_sale_report_from_date.error = ""
-                edit_text_sale_report_to_date.text.isEmpty() -> edit_text_sale_report_to_date.error = ""
+                edit_text_sale_report_from_date.text.isEmpty() -> edit_text_sale_report_from_date.error = "Please enter START DATE"
+                edit_text_sale_report_to_date.text.isEmpty() -> edit_text_sale_report_to_date.error = "Please enter END DATE"
                 else -> {
                     saleInvoiceReportViewModel.saleInvoiceReportForDateList.observe(this, Observer {
                         saleInvoiceReportAdapter.setNewList(it as ArrayList<SaleInvoiceReport>)
@@ -93,6 +98,7 @@ class SaleInvoiceReportFragment : BaseFragment(), KodeinAware {
         saleInvoiceReportViewModel.customerDataList.observe(this, Observer {
             //select customer name list in db
             if (it != null) {
+                customerNameList.clear()
                 customerNameList.add("All")
                 for (customer in it) {
                     customerNameList.add(customer.customer_name.toString())
@@ -148,14 +154,47 @@ class SaleInvoiceReportFragment : BaseFragment(), KodeinAware {
         //Dialog sale history report of invoice detail recycler view
         saleInvoiceReportViewModel.saleInvoiceDetailReportSuccessState.observe(this, Observer {
             it?.let { detailList ->
-                saleInvoiceDetailReportAdapter.setNewList(detailList as ArrayList<SaleInvoiceDetailReport>)
-                saleInvoiceDetailList = it
+                saleInvoiceDetailList = detailList.first as ArrayList<SaleInvoiceDetailReport>
+                soldProductList.clear()
+                promotionArrayList.clear()
+                for (i in saleInvoiceDetailList){
+                    val tempProduct = Product()
+                    tempProduct.id = i.id
+                    tempProduct.product_id = i.productId
+                    tempProduct.product_name = i.productName
+                    tempProduct.selling_price = i.sellingPrice
+                    tempProduct.purchase_price = i.purchasePrice
+                    tempProduct.discount_type = i.discountType
+                    tempProduct.remaining_quantity = i.remainingQuantity
+                    tempProduct.category_id = i.categoryId
+                    tempProduct.group_id = i.groupId
+                    tempProduct.class_id = i.classId
+                    tempProduct.um = i.um
+
+                    val soldProduct = SoldProductInfo(tempProduct, false)
+                    val qty = i.saleQuantity
+                    soldProduct.quantity = qty
+                    soldProduct.discountAmount = i.discountAmount.toDouble()
+                    soldProduct.discountPercent = i.discountPercent
+                    soldProduct.focPercent = i.itemDiscountPercent
+                    soldProduct.focAmount = i.itemDiscountAmount
+                    soldProduct.itemDiscountAmount = i.sPrice - i.itemDiscountAmount
+                    soldProduct.totalAmt = i.totalAmount
+                    soldProductList.add(soldProduct)
+                }
+                for (i in detailList.second){
+                    val promotion = Promotion()
+                    promotion.promotion_product_id = i.productId
+                    promotion.name = i.productName
+                    promotion.promotion_quantity = i.quantity.toInt()
+                    promotionArrayList.add(promotion)
+                    val saleInvoiceDetailReport = SaleInvoiceDetailReport(0,"","","","","","","",0,"",i.productName!!,i.quantity.toInt(),"0.0",0.0,0.0,0.0,0.0,0.0,0.0)
+                    saleInvoiceDetailList.add(saleInvoiceDetailReport)
+                }
+                saleInvoiceDetailReportAdapter.setNewList(saleInvoiceDetailList)
+                invoice = detailList.third
             }
         })
-        saleInvoiceReportViewModel.saleHistoryForPrintData.observe(this, Observer {
-            invoice = it
-        })
-
     }
 
     private fun onClickItem(invoiceId: String) {
@@ -170,12 +209,10 @@ class SaleInvoiceReportFragment : BaseFragment(), KodeinAware {
             adapter = saleInvoiceDetailReportAdapter
         }
         saleInvoiceReportViewModel.loadSaleInvoiceDetailReport(invoiceId = invoiceId)
-        saleInvoiceReportViewModel.loadSaleInvoiceDetailPrint(invoiceId = invoiceId)
-
 
         //Action of dialog button
         dialogBoxView.btn_print.setOnClickListener {
-            val intent = PrintInvoiceActivity.newIntentFromSaleHistoryActivity(context!!, invoice, saleInvoiceDetailList)
+            val intent = PrintInvoiceActivity.newIntentFromSaleHistoryActivity(context!!, invoice, soldProductList,promotionArrayList)
             startActivity(intent)
             dialog.dismiss()
 
@@ -186,6 +223,7 @@ class SaleInvoiceReportFragment : BaseFragment(), KodeinAware {
         dialog.show()
 
     }
+
 
     private fun calculateAmount(allItems: List<SaleInvoiceReport>) {
         var totalAmount = 0.0

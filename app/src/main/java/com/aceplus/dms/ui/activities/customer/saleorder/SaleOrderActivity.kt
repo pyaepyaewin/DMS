@@ -155,8 +155,12 @@ class SaleOrderActivity : BaseActivity(), KodeinAware {
         cancelImg.setOnClickListener { onBackPressed() }
         checkoutImg.setOnClickListener {
             if (isDelivery){
-                val intent = SaleOrderCheckoutActivity.getIntentForDeliveryFromSaleOrder(this, isDelivery, soldProductList, orderedInvoice!!, customer!!)
-                startActivity(intent)
+                for (i in soldProductList){
+                    i.totalAmt = i.quantity * i.product.selling_price!!.toDouble()
+                    i.promoPriceByDiscount =  (i.product.selling_price?.toDouble() ?: 0.0).toDouble()
+                }
+                val intent = SaleOrderCheckoutActivity.getIntentForDeliveryFromSaleOrder(this, isDelivery, soldProductList,orderedInvoice!!,customer!!)
+                startActivityForResult(intent, Constant.RQC_BACK_TO_CUSTOMER)
             }else{
                 checkoutOrder()
             }

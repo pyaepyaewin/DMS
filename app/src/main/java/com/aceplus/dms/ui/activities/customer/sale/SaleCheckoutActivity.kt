@@ -39,6 +39,7 @@ class SaleCheckoutActivity : BaseActivity(), KodeinAware {
     override val layoutId: Int
         get() = R.layout.activity_sale_checkout
 
+
     companion object{
 
         private const val IE_CUSTOMER_DATA = "IE_CUSTOMER_DATA"

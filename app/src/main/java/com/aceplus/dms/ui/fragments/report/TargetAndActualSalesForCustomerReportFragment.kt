@@ -69,18 +69,6 @@ class TargetAndActualSalesForCustomerReportFragment : BaseFragment(), KodeinAwar
         printImg.visibility = View.VISIBLE
         getTargetSaleDB(-1)
         getCustomerListAndGroupCodeListFromDbAndCategoryListFromDb()
-        if (categoryIdArr != null && categoryIdArr.size != 0) {
-            categoryId = categoryIdArr[spinner_category.selectedItemPosition]
-        }
-
-        if (groupIdArr != null && groupIdArr.size != 0) {
-            groupId = groupIdArr[spinner_group.selectedItemPosition]
-        }
-
-        if (customerIdArr != null && customerIdArr.size != 0) {
-            customerId = customerIdArr[spinner_customer.selectedItemPosition]
-        }
-
         catchEvents()
         targetAndActualSalesForCustomerReportViewModel.loadCustomerAndProductGroupAndProductCategoryList()
     }
@@ -228,85 +216,63 @@ class TargetAndActualSalesForCustomerReportFragment : BaseFragment(), KodeinAwar
             groupId = groupIdArr[spinner_group.selectedItemPosition]
         }
 
-        if (customerIdArr != null){
-            targetAndActualSalesForCustomerReportViewModel.customerSaleTargetDataList.observe(this, Observer {
-                actualTargetArrayList.clear()
-                for (i in it!!){
-                    var productId = ""
-                    var saleQty = 0.0
-                    var totalSaleAmount = 0.0
-                    if (i.productId != null) {
-                        productId = i.productId
+        if (customerId == "-1" && groupId == "-1" && categoryId == "-1"){
+            targetAndActualSalesForCustomerReportViewModel.allSaleTargetDataList.observe(this, Observer {
+                allActualSaleValue = 0.0
+                if (it!!.isEmpty()) {
+                    sale_txt.text = "0.0"
+                } else {
+                    for (i in it!!) {
+                        allActualSaleValue += i.totalAmount
+                        sale_txt.text = allActualSaleValue.toString()
                     }
-                    if (i.saleQuantity != null) {
-                        saleQty = i.saleQuantity.toDouble()
-                    }
-                    if (i.totalAmount != null) {
-                        totalSaleAmount = i.totalAmount
-                    }
-                    val sellingPrice = totalSaleAmount / saleQty
-                    val saleTarget = SaleTarget()
-                    saleTarget.productId = productId
-                    saleTarget.quantity = saleQty
-                    saleTarget.sellingPrice = sellingPrice
-                    saleTarget.totalAmount = totalSaleAmount
-                    actualTargetArrayList.add(saleTarget)
                 }
             })
-            targetAndActualSalesForCustomerReportViewModel.loadCustomerSaleTargetAndSaleIdList(customerId)
+            targetAndActualSalesForCustomerReportViewModel.loadAllSaleTargetAndSaleIdList()
+        }
+
+        if (groupId != "-1") {
+            targetAndActualSalesForCustomerReportViewModel.groupSaleTargetDataList.observe(this, Observer {
+                allActualSaleValue = 0.0
+                if (it!!.isEmpty()) {
+                    sale_txt.text = "0.0"
+                } else {
+                    for (i in it!!) {
+                        allActualSaleValue += i.totalAmount
+                        sale_txt.text = allActualSaleValue.toString()
+                    }
+                }
+            })
+            targetAndActualSalesForCustomerReportViewModel.loadGroupSaleTargetAndSaleIdList(groupId)
         }
 
         if (categoryId != "-1") {
             targetAndActualSalesForCustomerReportViewModel.categorySaleTargetDataList.observe(this, Observer {
+                if (it!!.isEmpty()) {
+                    sale_txt.text = "0.0"
+                } else {
                     for (i in it!!) {
-                        var productId = ""
-                        var saleQty = 0.0
-                        var totalSaleAmount = 0.0
-                        if (i.productId != null) {
-                            productId = i.productId
-                        }
-                        if (i.saleQuantity != null) {
-                            saleQty = i.saleQuantity.toDouble()
-                        }
-                        if (i.totalAmount != null) {
-                            totalSaleAmount = i.totalAmount
-                        }
-                        val sellingPrice = totalSaleAmount / saleQty
-                        val saleTarget = SaleTarget()
-                        saleTarget.productId = productId
-                        saleTarget.quantity = saleQty
-                        saleTarget.sellingPrice = sellingPrice
-                        saleTarget.totalAmount = totalSaleAmount
-                        actualTargetArrayList.add(saleTarget)
+                        allActualSaleValue += i.totalAmount
+                        sale_txt.text = allActualSaleValue.toString()
                     }
-                })
-            targetAndActualSalesForCustomerReportViewModel.loadCategorySaleTargetAndSaleIdList(categoryId)
-        }
-        if (groupId != "-1") {
-            targetAndActualSalesForCustomerReportViewModel.groupSaleTargetDataList.observe(this, Observer {
-                for (i in it!!) {
-                    var productId = ""
-                    var saleQty = 0.0
-                    var totalSaleAmount = 0.0
-                    if (i.productId != null) {
-                        productId = i.productId
-                    }
-                    if (i.saleQuantity != null) {
-                        saleQty = i.saleQuantity.toDouble()
-                    }
-                    if (i.totalAmount != null) {
-                        totalSaleAmount = i.totalAmount
-                    }
-                    val sellingPrice = totalSaleAmount / saleQty
-                    val saleTarget = SaleTarget()
-                    saleTarget.productId = productId
-                    saleTarget.quantity = saleQty
-                    saleTarget.sellingPrice = sellingPrice
-                    saleTarget.totalAmount = totalSaleAmount
-                    actualTargetArrayList.add(saleTarget)
                 }
             })
-            targetAndActualSalesForCustomerReportViewModel.loadGroupSaleTargetAndSaleIdList(groupId)
+            targetAndActualSalesForCustomerReportViewModel.loadCategorySaleTargetAndSaleIdList(categoryId)
+        }
+
+        if (customerId != "-1"){
+            targetAndActualSalesForCustomerReportViewModel.customerSaleTargetDataList.observe(this, Observer {
+                allActualSaleValue = 0.0
+                if (it!!.isEmpty()) {
+                    sale_txt.text = "0.0"
+                } else {
+                    for (i in it!!) {
+                        allActualSaleValue += i.totalAmount
+                        sale_txt.text = allActualSaleValue.toString()
+                    }
+                }
+            })
+            targetAndActualSalesForCustomerReportViewModel.loadCustomerSaleTargetAndSaleIdList(customerId)
         }
 
         initialize()
@@ -316,12 +282,8 @@ class TargetAndActualSalesForCustomerReportFragment : BaseFragment(), KodeinAwar
         for (j in saleTargetArrayList.indices) {
             allSaleTargetValue += Integer.parseInt(saleTargetArrayList[j].targetAmount).toDouble()
         }
-        for (j in actualTargetArrayList.indices) {
-            allActualSaleValue += actualTargetArrayList[j].totalAmount
-        }
 
         sale_target_txt.text = allSaleTargetValue.toString()
-        sale_txt.text = allActualSaleValue.toString()
 
         if (allSaleTargetValue != 0.0) {
             sale = allActualSaleValue / (allSaleTargetValue / 100)
