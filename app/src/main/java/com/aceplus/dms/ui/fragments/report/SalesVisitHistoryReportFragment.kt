@@ -11,7 +11,7 @@ import android.widget.ArrayAdapter
 import com.aceplus.dms.R
 import com.aceplus.dms.ui.adapters.report.SalesVisitHistoryReportAdapter
 import com.aceplus.dms.utils.Utils
-import com.aceplus.dms.viewmodel.report.ReportViewiModel
+import com.aceplus.dms.viewmodel.report.ReportViewModel
 import com.aceplus.domain.model.sale.SaleVisitForUI
 import com.aceplus.domain.vo.report.SalesVisitHistoryReport
 import com.aceplus.shared.ui.activities.BaseFragment
@@ -94,42 +94,21 @@ class SalesVisitHistoryReportFragment : BaseFragment(), KodeinAware {
     }
 
     private fun setupAdapter() {
-        var saleVisitDataList = ArrayList<SaleVisitForUI>()
-        saleVisitDataList = getSaleVisitFromDB()
-        for (ip in saleVisitDataList) {
-            var index = -1
-            for (i in customerIdList.indices) {
-                if (ip.customerId == customerIdList[i]) {
-                    index = i
-                }
-            }
-
-            ip.customerName = customerNameList[index]
-            ip.customerNo = customerNextIdList[index]
-            ip.address = customerAddressList[index]
-        }
-        salesVisitHistoryReportAdapter.setNewList(saleVisitDataList)
-        saleVisitList.apply {
-            layoutManager = LinearLayoutManager(activity)
-            adapter = salesVisitHistoryReportAdapter
-        }
-    }
-
-    private fun getSaleVisitFromDB(): ArrayList<SaleVisitForUI> {
         val visitedCustomerMap = HashMap<Int, SaleVisitForUI>()
-        val ipList = ArrayList<SaleVisitForUI>()
+        val saleVisitDataList = ArrayList<SaleVisitForUI>()
         var fromCusNo = 0
         var toCusNo = 0
         val sdf = SimpleDateFormat("yyyy-MM-dd")
         fromCusNo = customerIdList[fromId]
         toCusNo = customerIdList[toId]
 
-            if (fragment_sale_visit_spinner_from_customer.selectedItemPosition > fragment_sale_visit_spinner_to_customer.selectedItemPosition) {
-                fromCusNo = customerIdList[fragment_sale_visit_spinner_to_customer.selectedItemPosition]
-                toCusNo = customerIdList[fragment_sale_visit_spinner_from_customer.selectedItemPosition]
-            }
+        if (fragment_sale_visit_spinner_from_customer.selectedItemPosition > fragment_sale_visit_spinner_to_customer.selectedItemPosition) {
+            fromCusNo = customerIdList[fragment_sale_visit_spinner_to_customer.selectedItemPosition]
+            toCusNo = customerIdList[fragment_sale_visit_spinner_from_customer.selectedItemPosition]
+        }
 
         salesVisitHistoryReportViewModel.customerIdCollection.observe(this, Observer {
+            saleVisitDataList.clear()
             for (i in it!!.invoiceCustomerId){
                 for (data in customerIdList.indices){
                     if (!visitedCustomerMap.containsKey(customerIdList[data])){
@@ -233,13 +212,30 @@ class SalesVisitHistoryReportFragment : BaseFragment(), KodeinAware {
                     }
                 }
             }
+
+            for (value in visitedCustomerMap.values) {
+                saleVisitDataList.add(value)
+            }
+            for (ip in saleVisitDataList) {
+                var index = -1
+                for (i in customerIdList.indices) {
+                    if (ip.customerId == customerIdList[i]) {
+                        index = i
+                    }
+                }
+
+                ip.customerName = customerNameList[index]
+                ip.customerNo = customerNextIdList[index]
+                ip.address = customerAddressList[index]
+            }
+            salesVisitHistoryReportAdapter.setNewList(saleVisitDataList)
         })
         salesVisitHistoryReportViewModel.checkFromAndToCustomer(fromCusNo,toCusNo,sdf.format(Date()))
 
-        for (value in visitedCustomerMap.values) {
-            ipList.add(value)
+        saleVisitList.apply {
+            layoutManager = LinearLayoutManager(activity)
+            adapter = salesVisitHistoryReportAdapter
         }
-        return ipList
     }
 
 

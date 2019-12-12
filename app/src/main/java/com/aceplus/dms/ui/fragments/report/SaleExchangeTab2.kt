@@ -66,7 +66,7 @@ class SaleExchangeTab2 : BaseFragment(), KodeinAware {
 
         //sale exchange tab2 report detail list
         saleInvoiceReportViewModel.saleInvoiceDetailReportSuccessState.observe(this, Observer {
-            saleInvoiceDetailReportAdapter.setNewList(it as ArrayList<SaleInvoiceDetailReport>)
+            saleInvoiceDetailReportAdapter.setNewList(it!!.first as ArrayList<SaleInvoiceDetailReport>)
         })
     }
 

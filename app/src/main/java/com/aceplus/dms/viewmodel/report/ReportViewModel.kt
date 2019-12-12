@@ -365,7 +365,6 @@ class ReportViewModel(
 
     //sale visit history report
     val customerIdCollection = MutableLiveData<CustomerIdsForSaleVisit>()
-
     fun checkFromAndToCustomer(fromCusNo: Int, toCusNo: Int, newDate: String) {
         val invoiceCustomerId = ArrayList<Int>()
         val preOrderCustomerId = ArrayList<Int>()
