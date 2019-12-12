@@ -12,7 +12,7 @@ interface CreditCollectionRepo {
     fun getCreditCollectionCheckOutList(customerId:String): Observable<List<Credit>>
     fun saveCashReceiveDataIntoDatabase(creditData: MutableList<CashReceive>, creditItem:MutableList<CashReceiveItem>)
     fun updatePayAmount(payAmt:Double,invoiceNo:String)
-    fun getLocation():Observable<List<Location>>
+    fun getLocation():String
     fun getTownShipName(customerID:Int):String
     fun getCashReceiveCount():Observable<Int>
 }

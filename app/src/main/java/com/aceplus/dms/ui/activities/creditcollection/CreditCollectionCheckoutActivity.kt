@@ -132,7 +132,7 @@ import kotlin.collections.ArrayList
         side_total_amt_layout!!.visibility = View.GONE
         side_credit_amt_layout!!.visibility = View.GONE
         side_pay_amt_layout!!.visibility = View.GONE
-        creditDate = SimpleDateFormat("yyyy/MM/dd").format(Date())
+        creditDate = Utils.getCurrentDate(false)
 
         var customerId = intent.getSerializableExtra("CustomerID") as String
         var customerName = intent.getSerializableExtra("CUSTOMER_NAME") as String
@@ -151,14 +151,13 @@ import kotlin.collections.ArrayList
                     )
                 ) {
                     tempPayAmount =
-                      p0.toString().replace(",", "").toDouble()
+                        p0.toString().replace(",", "").toDouble()
                     tempNetAmount =
                         total_amount_txt.text.toString().replace(
                             ",",
                             ""
                         ).toDouble()
-                }
-                else {
+                } else {
                     refund_txt.text = "0"
                 }
 
@@ -208,7 +207,7 @@ import kotlin.collections.ArrayList
                 if (total_pay_layout.visibility == View.VISIBLE) {
 
                     if (payment_amount_edit.text.toString() == "") {
-                       payment_amount_edit.error = "Please enter pay amount"
+                        payment_amount_edit.error = "Please enter pay amount"
                     } else {
                         calculateList =
                             creditCollectionCheckOutViewModel.calculatePayAmount(payment_amount_edit.text.toString()) as MutableList<Credit>
@@ -222,7 +221,7 @@ import kotlin.collections.ArrayList
                             creditInvoice.amt = it.amount
                             creditInvoice.customerId = it.customer_id
                             creditInvoice.creditAmt = it.amount - it.pay_amount
-                            creditInvoice.invoiceDate = it.invoice_date
+                            creditInvoice.invoiceDate = creditDate
                             creditInvoice.invoiceNo = it.invoice_no
                             creditInvoice.invoiceStatus = it.invoice_status
                             creditInvoice.payAmt = it.pay_amount
@@ -239,48 +238,57 @@ import kotlin.collections.ArrayList
                                 selectedItemPosition,
                                 townShipName,
                                 salePersonName.toString(),
-                                customerName), Utils.RQ_BACK_TO_CUSTOMER
+                                customerName
+                            ), Utils.RQ_BACK_TO_CUSTOMER
+                        )
+                    }
+                } else {
+                    if (item_pay_edit.text.toString() == "") {
+                        item_pay_edit.error = "Please enter pay amount"
+                    } else {
+
+                        calculateList =
+                            creditCollectionCheckOutViewModel.calculatePayAmountForSelectedInvoice(
+                                item_pay_edit.text.toString(),
+                                selectedItemPosition
+                            ) as MutableList<Credit>
+
+                        creditCollectionCheckOutViewModel.getCashReceiveCount()
+                        val creditInvoiceList = mutableListOf<CreditInvoice>()
+                        calculateList.map {
+                            val creditInvoice = CreditInvoice()
+                            creditInvoice.id = it.id
+                            creditInvoice.amt = it.amount
+                            creditInvoice.customerId = it.customer_id
+                            creditInvoice.creditAmt = it.amount - it.pay_amount
+                            //val dateStr = "2014-01-09T09:33:20+0530"
+                            val curFormater = SimpleDateFormat("yyyy-MM-dd")
+                            val dateObj = curFormater.parse(it.invoice_date)
+
+                            val newDateStr = curFormater.format(dateObj)
+                            creditInvoice.invoiceDate = newDateStr
+                            creditInvoice.invoiceNo = it.invoice_no
+                            creditInvoice.invoiceStatus = it.invoice_status
+                            creditInvoice.payAmt = it.pay_amount
+                            creditInvoice.refund = it.refund
+                            creditInvoice.saleManId = it.sale_man_id!!.toInt()
+                            creditInvoice.saleStatus = it.sale_status
+                            creditInvoiceList.add(creditInvoice)
+                        }
+                        startActivityForResult(
+                            PrintInvoiceActivity.getIntentFromCredit(
+                                this,
+                                creditInvoiceList,
+                                selectedItemPosition,
+                                townShipName,
+                                salePersonName.toString(),
+                                customerName
+                            ), Utils.RQ_BACK_TO_CUSTOMER
                         )
                     }
                 }
-                    else  {
-                        if (item_pay_edit.text.toString() == "") {
-                            item_pay_edit.error = "Please enter pay amount"
-                        } else
-                        {
-
- calculateList = creditCollectionCheckOutViewModel.calculatePayAmountForSelectedInvoice(item_pay_edit.text.toString(),selectedItemPosition) as MutableList<Credit>
-
-                            creditCollectionCheckOutViewModel.getCashReceiveCount()
-                            val creditInvoiceList = mutableListOf<CreditInvoice>()
-                            calculateList.map {
-                                val creditInvoice = CreditInvoice()
-                                creditInvoice.id = it.id
-                                creditInvoice.amt = it.amount
-                                creditInvoice.customerId = it.customer_id
-                                creditInvoice.creditAmt = it.amount - it.pay_amount
-                                creditInvoice.invoiceDate = it.invoice_date
-                                creditInvoice.invoiceNo = it.invoice_no
-                                creditInvoice.invoiceStatus = it.invoice_status
-                                creditInvoice.payAmt = it.pay_amount
-                                creditInvoice.refund = it.refund
-                                creditInvoice.saleManId = it.sale_man_id!!.toInt()
-                                creditInvoice.saleStatus = it.sale_status
-                                creditInvoiceList.add(creditInvoice)
-                            }
-                            startActivityForResult(
-                                PrintInvoiceActivity.getIntentFromCredit(
-                                    this,
-                                    creditInvoiceList,
-                                    selectedItemPosition,
-                                    townShipName,
-                                    salePersonName.toString(),
-                                    customerName
-                                ), Utils.RQ_BACK_TO_CUSTOMER
-                            )                        }
-                    }
-                }
             }
+        }
 
         creditCollectionCheckOutViewModel.creditCollectionCheckOutSuccessState.observe(
             this,
@@ -306,6 +314,7 @@ import kotlin.collections.ArrayList
                 customer_name_txt.text = customerName
                 payment_amount_edit!!.text = null
                 item_pay_edit!!.text = null
+                date_txt.text = creditDate
 
             })
 
@@ -323,8 +332,8 @@ import kotlin.collections.ArrayList
         creditCollectionCheckOutViewModel.cashReceiveCountSuccessState.observe(
             this,
             android.arch.lifecycle.Observer {
-                var count=it
-                creditCollectionCheckOutViewModel.insertCashReceiveData(calculateList,count!!)
+                var count = it
+                creditCollectionCheckOutViewModel.insertCashReceiveData(calculateList, count!!)
 
             }
         )
@@ -332,47 +341,9 @@ import kotlin.collections.ArrayList
             this,
             android.arch.lifecycle.Observer {
             })
-
-            }
-
-
-
-    fun calculateRefundAmount() {
-
-       if (data1.invoice_no != null && payment_amount_edit.text.isNotBlank()){
-          val payAmount = payment_amount_edit.text.toString().toDouble()
-           if(payAmount>invoiceAmount)
-           {
-               var refund=payAmount-invoiceAmount
-               refund_txt.text = Utils.formatAmount(refund)
-           }
-     else
-           {
-               refund_txt.text="0"
-           }
-           // Toast.makeText(this,(payAmount - invoiceAmount).toString(),Toast.LENGTH_SHORT).show()
-        }
-       else if(payment_amount_edit.text.isNotBlank()){
-            val payAmount = payment_amount_edit.text.toString().toDouble()
-           if(payAmount>invoiceAmount)
-           {
-               var refund=payAmount-invoiceAmount
-               refund_txt.text = Utils.formatAmount(refund)
-           }
-           else
-           {
-
-               refund_txt.text="0"
-           }
-
-          // Toast.makeText(this,(payAmount - total).toString(),Toast.LENGTH_SHORT).show()
-      }
-
-
-
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+   override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == Utils.RQ_BACK_TO_CUSTOMER)
             if (resultCode == Activity.RESULT_OK){
                 setResult(Activity.RESULT_OK)

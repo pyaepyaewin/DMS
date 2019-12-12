@@ -42,19 +42,11 @@ class CreditCollectionCheckOutViewModel(
         }
     }
 
-    var locationSuccessState = MutableLiveData<List<Location>>()
-    var locationErrorState = MutableLiveData<String>()
-    fun getLocationID() {
-        launch {
-            creditCollectionCheckOutRepo.getLocation()
-                .subscribeOn(schedulerProvider.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({
-                    locationSuccessState.postValue(it)
-                }, {
-                    locationErrorState.value = it.localizedMessage
-                })
-        }
+
+    fun getLocationID():String {
+
+          return  creditCollectionCheckOutRepo.getLocation()
+
     }
 
     var cashReceiveCountSuccessState = MutableLiveData<Int>()
@@ -135,9 +127,6 @@ class CreditCollectionCheckOutViewModel(
             val creditAmount = i.amount - i.pay_amount
             if (creditAmount != 0.0) {
 
-                if (invoiceData == null)
-                {
-                    invoiceData = i
                     if (payAmount != 0.0 && payAmount < creditAmount) {
                         i.pay_amount = payAmount
                         payAmount = 0.0
@@ -158,32 +147,6 @@ class CreditCollectionCheckOutViewModel(
                         remainList.add(i)
 
                     }
-
-
-                }
-                else
-                    if (payAmount != 0.0 && payAmount < creditAmount) {
-                        i.pay_amount = payAmount
-                        payAmount = 0.0
-                        remainList.add(i)
-
-
-                    } else if (payAmount != 0.0 && payAmount > creditAmount) {
-                        payAmount -= creditAmount
-                        i.pay_amount = creditAmount
-                        tempCreditList.remove(i)
-                        remainList.add(i)
-
-
-                    } else if (payAmount != 0.0 && payAmount == creditAmount) {
-                        payAmount -= creditAmount
-                        i.pay_amount = creditAmount
-                        tempCreditList.remove(i)
-                        remainList.add(i)
-
-                    }
-
-
 
             }
 
@@ -195,7 +158,8 @@ class CreditCollectionCheckOutViewModel(
     fun calculatePayAmountForSelectedInvoice(payAmt: String, position: Int): List<Credit> {
 
         var payAmount: Double = payAmt.replace(",", "").toDouble()
-        val remainList = ArrayList<Credit>()
+//        val remainList = ArrayList<Credit>()
+        var remainList = mutableListOf<Credit>()
         val tempCreditList = ArrayList<Credit>()
         tempCreditList.addAll(creditList)
 
@@ -207,43 +171,41 @@ class CreditCollectionCheckOutViewModel(
             payAmount = 0.0
             remainList.add(creditList[position])
 
-        } else if (payAmount != 0.0 && payAmount > creditAmount) {
-            var refund = payAmount - creditList[position].amount
-            payAmount -= creditAmount
+        }
+//        payAmount -= creditAmount
+//        i.pay_amount = creditAmount
+//        tempCreditList.remove(i)
+//        remainList.add(i)
+//
+        else if (payAmount != 0.0 && payAmount > creditAmount) {
+            var refund = payAmount - creditAmount
             creditList[position].pay_amount = creditAmount
             tempCreditList.remove(creditList[position])
             remainList.add(creditList[position])
-            for (i in creditList) {
-                val creditAmount = i.amount - i.pay_amount
-
-                if (refund != 0.0 && refund < creditAmount) {
+            for (i in tempCreditList) {
+                if (refund != 0.0 && refund < i.amount) {
                     i.pay_amount = refund
                     refund = 0.0
                     remainList.add(i)
 
 
-                } else if (refund != 0.0 && refund > creditAmount) {
-                    refund -= creditAmount
-                    i.pay_amount = creditAmount
-                    tempCreditList.remove(i)
+                } else if (refund != 0.0 && refund > i.amount) {
+                    refund -= i.amount
+                    i.pay_amount = i.amount
+//                    tempCreditList.remove(i)
                     remainList.add(i)
-//                invoiceId=i.invoice_no!!
 
 
-                } else if (refund != 0.0 && refund == creditAmount) {
-                    refund -= creditAmount
-                    i.pay_amount = creditAmount
-                    tempCreditList.remove(i)
+                } else if (refund != 0.0 && refund == i.amount) {
+                    refund -= i.amount
+                    i.pay_amount = i.amount
+//                    tempCreditList.remove(i)
                     remainList.add(i)
 //                invoiceId=i.invoice_no!!
 
                 }
 
             }
-
-            Log.i("REMAIN -> ", payAmount.toString() + "")
-            Log.i("Remain item -> ", remainList.size.toString() + "")
-            Log.i("item remove -> ", tempCreditList.size.toString() + "")
 
             return remainList
 
@@ -254,11 +216,6 @@ class CreditCollectionCheckOutViewModel(
             remainList.add(creditList[position])
         }
 
-
-
-        Log.i("REMAIN -> ", payAmount.toString() + "")
-        Log.i("Remain item -> ", remainList.size.toString() + "")
-        Log.i("item remove -> ", tempCreditList.size.toString() + "")
 
         return remainList
     }

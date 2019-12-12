@@ -48,8 +48,8 @@ class CreditCollectionRepoImpl(val database: MyDatabase):CreditCollectionRepo {
 
 
 
-    override fun getLocation(): Observable<List<Location>> {
-        return Observable.just(database.locationDao().getLocation())
+    override fun getLocation():String {
+        return database.locationDao().getLocation()
 
     }
 
