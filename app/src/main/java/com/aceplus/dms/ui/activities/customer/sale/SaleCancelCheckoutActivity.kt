@@ -41,7 +41,7 @@ class SaleCancelCheckoutActivity : BaseActivity(), KodeinAware {
     override val kodein: Kodein by kodein()
     override val layoutId: Int
         get() = R.layout.activity_sale_checkout
-
+    var discountAmt = 0.0
     var totalAmt = 0.0
     private var netAmount: Double = 0.0
     private var volDisAmount: Double = 0.0
@@ -319,7 +319,11 @@ class SaleCancelCheckoutActivity : BaseActivity(), KodeinAware {
         saleCancelCheckOutViewModel.deleteInvoiceData(invoiceId)
         saleCancelCheckOutViewModel.deleteInvoiceProductData(invoiceId)
         saleCancelCheckOutViewModel.deleteInvoicePresenttData(invoiceId)
-
+        if (edtVolumeDiscountAmt.text.isNullOrBlank()) {
+            discountAmt = 0.0
+        } else {
+            discountAmt = edtVolumeDiscountAmt.text.toString().toDouble()
+        }
         saleCancelCheckOutViewModel.saveCheckoutData(
             customerId,
             saleDate,
@@ -339,7 +343,7 @@ class SaleCancelCheckoutActivity : BaseActivity(), KodeinAware {
             edit_txt_account_name.text.toString(),
             volDisAmount,
             volDisPercent,
-            edtVolumeDiscountAmt.text.toString().toDouble(),
+            discountAmt,
             deletedProductList
         )
         saleCancelCheckOutViewModel.loadSoldInvoiceData(invoiceId)
