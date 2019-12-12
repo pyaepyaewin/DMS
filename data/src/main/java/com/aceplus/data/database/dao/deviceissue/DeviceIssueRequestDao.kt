@@ -28,4 +28,7 @@ interface DeviceIssueRequestDao {
     @Query("select * from device_issue_request where invoice_no = :invoiceNo")
     fun getDataByID(invoiceNo: String): List<DeviceIssueRequest>
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insert(deviceIssueRequest: DeviceIssueRequest)
+
 }

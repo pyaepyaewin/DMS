@@ -27,6 +27,7 @@ public class SoldProductInfo implements Parcelable {
     private int size_in_store_share;
     private String remark;
     public boolean tf = false;
+    private int availableQty = 0;
 
     double promotionPrice;
     double totalAmt;
@@ -60,7 +61,6 @@ public class SoldProductInfo implements Parcelable {
         isFocTypePercent = true;
 
     }
-
 
     protected SoldProductInfo(Parcel in) {
         product = in.readParcelable(Product.class.getClassLoader());
@@ -229,8 +229,9 @@ public class SoldProductInfo implements Parcelable {
         /*if (!product.setSoldQty(quantity)) {
             return false;
         }*/
+
         product.setSold_quantity(quantity);
-        product.setRemaining_quantity(-quantity);
+        //product.setRemaining_quantity(product.getRemaining_quantity()-quantity);
         this.quantity = quantity;
 
         return true;
@@ -523,4 +524,13 @@ public class SoldProductInfo implements Parcelable {
         return totalAmt;
     }
 
+    public int getAvailableQty() {
+
+        int qty = product.getRemaining_quantity() - quantity;
+        return qty;
+    }
+
+    public void setAvailableQty(int availableQty) {
+        this.availableQty = availableQty;
+    }
 }

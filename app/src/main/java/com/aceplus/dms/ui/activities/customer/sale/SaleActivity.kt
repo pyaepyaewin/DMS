@@ -308,7 +308,7 @@ class SaleActivity : BaseActivity(), KodeinAware {
 
         alertDialog.setOnShowListener {
 
-            remainingQtyTextView.text = soldProduct.product.remaining_quantity.toString()
+            remainingQtyTextView.text = soldProduct.availableQty.toString()
 
             val confirmButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
             confirmButton.setOnClickListener {

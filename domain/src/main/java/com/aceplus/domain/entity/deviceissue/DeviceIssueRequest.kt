@@ -10,7 +10,7 @@ import com.google.gson.annotations.SerializedName
 @Entity(tableName = "device_issue_request")
 class DeviceIssueRequest {
 
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id")
     @SerializedName("id")
     @Expose
@@ -19,7 +19,7 @@ class DeviceIssueRequest {
     @ColumnInfo(name = "invoice_no")
     @SerializedName("invoice_no")
     @Expose
-    var invoice_no: Int = 0
+    var invoice_no: String? = null
 
     @ColumnInfo(name = " date")
     @SerializedName(" date")

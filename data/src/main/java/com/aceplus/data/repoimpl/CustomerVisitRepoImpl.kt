@@ -14,6 +14,7 @@ import com.aceplus.domain.entity.customer.Customer
 import com.aceplus.domain.entity.customer.CustomerFeedback
 import com.aceplus.domain.entity.customer.DidCustomerFeedback
 import com.aceplus.domain.entity.deviceissue.DeviceIssueRequest
+import com.aceplus.domain.entity.deviceissue.DeviceIssueRequestItem
 import com.aceplus.domain.entity.invoice.Invoice
 import com.aceplus.domain.entity.invoice.InvoiceProduct
 import com.aceplus.domain.entity.preorder.PreOrder
@@ -500,7 +501,14 @@ class CustomerVisitRepoImpl(
     }
 
     override fun getDeviceIssueRequestByID(invoiceNo: String): Observable<List<DeviceIssueRequest>> {
-        return Observable.just(db.deviceIssueRequestDao().allData)
+        return Observable.just(db.deviceIssueRequestDao().getDataByID(invoiceNo))
     }
 
+    override fun insertDeviceIssueRequest(deviceIssueRequest: DeviceIssueRequest) {
+        db.deviceIssueRequestDao().insert(deviceIssueRequest)
+    }
+
+    override fun insertAllDeviceIssueRequestItem(itemList: ArrayList<DeviceIssueRequestItem>) {
+        db.deviceIssueRequestItemDao().insertAll(itemList)
+    }
 }

@@ -50,6 +50,7 @@ class VanIssueActivity: BaseActivity(), KodeinAware {
     private var invoiceNo: String? = null
     private var saleManID: String? = null
     private var totalIssueQuantity = 0
+    private var routeID: Int = 0
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -68,13 +69,15 @@ class VanIssueActivity: BaseActivity(), KodeinAware {
         vanIssueViewModel.loadProductList()
         locationCode = vanIssueViewModel.getLocationCode()
         saleManID = vanIssueViewModel.getSaleManID()
-        setInvoiceNo()
+        routeID = vanIssueViewModel.getRouteID()
 
     }
 
     private fun setupUI(){
 
         saleDateTextView.text = Utils.getCurrentDate(false)
+        setInvoiceNo()
+        calculateTotalRemainingQty()
 
         searchAutoCompleteTextView.setAdapter(mSearchProductAdapter)
         searchAutoCompleteTextView.threshold = 1
@@ -103,6 +106,20 @@ class VanIssueActivity: BaseActivity(), KodeinAware {
             checkDuplicateProductAndAdd(mProductListAdapter.getDataList()[position])
             searchAutoCompleteTextView.setText("")
         }
+
+        vanIssueViewModel.errorMessage.observe(this, Observer {
+            if (it != null){
+                Utils.commonDialog(it, this, 1)
+                vanIssueViewModel.errorMessage.value = null
+            }
+        })
+
+        vanIssueViewModel.successState.observe(this, Observer {
+            if (it != null){
+                if (it == 1) finish()
+                vanIssueViewModel.successState.value = null
+            }
+        })
 
         cancel_img.setOnClickListener { onBackPressed() }
         checkout_img.setOnClickListener { Utils.askConfirmationDialog("Save", "Do you want to confirm?", "save", this, this::onClickSaveButton) }
@@ -181,6 +198,22 @@ class VanIssueActivity: BaseActivity(), KodeinAware {
 
     }
 
+    private fun calculateTotalRemainingQty(){
+
+        var totalRemainingQuantity = 0
+        var totalRequireQuantity = 0
+
+        for(soldProduct in mVanIssueProductAdapter.getDataList()){
+            if (soldProduct.product.remaining_quantity >= 0)
+                totalRemainingQuantity += soldProduct.product.remaining_quantity
+            else
+                totalRequireQuantity -= soldProduct.product.remaining_quantity
+        }
+
+        mTotalQuantity.text = totalRemainingQuantity.toString()
+
+    }
+
     private fun checkDuplicateProductAndAdd(tempProduct: Product){
 
         var isSameProduct = false
@@ -221,8 +254,13 @@ class VanIssueActivity: BaseActivity(), KodeinAware {
 
         if (type == "save"){
 
-            vanIssueViewModel.saveData(invoiceNo!!)
-            Utils.showToast(this, "Clicked")
+            vanIssueViewModel.saveData(
+                invoiceNo!!,
+                Utils.getCurrentDate(false),
+                routeID,
+                "Testing",
+                mVanIssueProductAdapter.getDataList() as ArrayList<SoldProductInfo>
+            )
 
         }
 
