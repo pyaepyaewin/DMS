@@ -98,6 +98,7 @@ class SaleCancelCheckOutViewModel(
         volDisAmount:Double,
         volDisPercent:Double,
         totalDiscountAmount: Double,
+        totalDiscountPercent:String,
         deletedProductList: ArrayList<SoldProductInfo>
     ) {
 
@@ -171,6 +172,7 @@ class SaleCancelCheckOutViewModel(
             invoice.bank_account_no = acc
             invoice.sale_flag = 0
             invoice.total_discount_amount=totalDiscountAmount
+            invoice.total_discount_percent=totalDiscountPercent
 
             if (soldProduct.quantity < soldProduct.currentProductQty) {
                 var unsoldQty = soldProduct.currentProductQty - soldProduct.quantity
