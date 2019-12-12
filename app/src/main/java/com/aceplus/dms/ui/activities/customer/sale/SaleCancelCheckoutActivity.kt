@@ -156,7 +156,7 @@ class SaleCancelCheckoutActivity : BaseActivity(), KodeinAware {
             android.arch.lifecycle.Observer {
                 it!!.map {
                     it.total_discount_percent = edtVolumeDiscountPercent.text.toString()
-                    it.total_discount_amount = edtVolumeDiscountAmt.text.toString().toDouble()
+                 //   it.total_discount_amount = edtVolumeDiscountAmt.text.toString().toDouble()
                 }
                 it?.let {
                     if (it.isNotEmpty()) {
