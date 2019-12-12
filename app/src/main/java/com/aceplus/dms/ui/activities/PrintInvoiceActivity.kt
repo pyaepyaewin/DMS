@@ -382,7 +382,8 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
             print_totalAmount.text = orderedDInvoice!!.amount.toString()
             print_totalDiscount.text = orderedDInvoice!!.discount.toString()
             print_net_amount.text = (orderedDInvoice!!.amount - orderedDInvoice!!.paidAmount).toString()
-            print_prepaidAmount.text = Utils.formatAmount(invoice!!.pay_amount!!.toDouble())
+            if (invoice!!.pay_amount.isNullOrEmpty())  print_prepaidAmount.text = "0.0"
+            else print_prepaidAmount.text = (invoice!!.pay_amount!!.toDouble()).toString()
             print_prepaidAmountShow.text = Utils.formatAmount(orderedDInvoice!!.paidAmount)
             print_discountAmount.text = orderedDInvoice!!.discountPercent.toString()
 
