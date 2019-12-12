@@ -97,6 +97,7 @@ interface ReportRepo {
     fun saleTargetSaleManReport(): Observable<List<SaleTargetSaleMan>>
     fun getCategoryListFromInvoiceProduct(categoryId:String) : Observable<List<TargetAndSaleForSaleMan>>
     fun getGroupListFromInvoiceProduct(groupId:String) : Observable<List<TargetAndSaleForSaleMan>>
+    fun getAllListFromInvoiceProduct() : Observable<List<TargetAndSaleForSaleMan>>
     fun getAllInvoiceData(): Observable<List<Invoice>>
     fun getTargetSaleDB(customerId:Int) : Observable<List<SaleTargetSaleMan>>
 

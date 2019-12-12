@@ -187,6 +187,10 @@ class ReportRepoImpl(private val db: MyDatabase) : ReportRepo {
         return Observable.just(db.invoiceProductDao().getGroupListFromInvoiceProduct(groupId))
     }
 
+    override fun getAllListFromInvoiceProduct() : Observable<List<TargetAndSaleForSaleMan>>{
+        return Observable.just(db.invoiceProductDao().getAllListFromInvoiceProduct())
+    }
+
     override fun getAllInvoiceData(): Observable<List<Invoice>> {
         return Observable.just(db.invoiceDao().allData)
     }

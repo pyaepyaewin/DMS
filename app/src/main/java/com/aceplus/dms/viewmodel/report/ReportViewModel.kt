@@ -444,6 +444,7 @@ class ReportViewModel(
     //"sale target and sale man" and "customer"
     var categorySaleTargetDataList = MutableLiveData<List<TargetAndSaleForSaleMan>>()
     var groupSaleTargetDataList = MutableLiveData<List<TargetAndSaleForSaleMan>>()
+    var allSaleTargetDataList = MutableLiveData<List<TargetAndSaleForSaleMan>>()
     var customerSaleTargetDataList = MutableLiveData<List<TargetAndSaleForSaleMan>>()
     var productGroupAndCategoryDataList =
         MutableLiveData<Pair<List<GroupCode>, List<ProductCategory>>>()
@@ -492,6 +493,18 @@ class ReportViewModel(
                 .observeOn(schedulerProvider.mainThread())
                 .subscribe {
                     groupSaleTargetDataList.postValue(it)
+                }
+        }
+
+    }
+
+    fun loadAllSaleTargetAndSaleIdList() {
+        launch {
+            reportRepo.getAllListFromInvoiceProduct()
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.mainThread())
+                .subscribe {
+                    allSaleTargetDataList.postValue(it)
                 }
         }
 

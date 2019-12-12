@@ -57,6 +57,9 @@ interface InvoiceProductDao {
     @Query("select * from invoice_product where product_id = :id group by product_id")
     fun getInvoiceProductList(id: String): List<InvoiceProduct>?
 
+    @Query(" select distinct(invoice_product.total_amount),product.product_id,invoice_product.sale_quantity from invoice_product,product where product.id = invoice_product.product_id")
+    fun getAllListFromInvoiceProduct(): List<TargetAndSaleForSaleMan>?
+
     @Query(" select distinct(invoice_product.total_amount),product.product_id,invoice_product.sale_quantity from invoice_product,product where product.id = invoice_product.product_id and  product.category_id = :categoryId")
     fun getCategoryListFromInvoiceProduct(categoryId: String): List<TargetAndSaleForSaleMan>?
 

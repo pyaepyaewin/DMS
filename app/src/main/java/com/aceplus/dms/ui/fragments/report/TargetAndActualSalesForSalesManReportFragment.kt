@@ -169,6 +169,21 @@ class TargetAndActualSalesForSalesManReportFragment : BaseFragment(), KodeinAwar
             groupId = groupIdArr[spinner_group.selectedItemPosition]
         }
 
+        if (groupId == "-1" && categoryId == "-1"){
+            targetAndActualSalesForSalesManReportViewModel.allSaleTargetDataList.observe(this, Observer {
+                allActualSaleValue = 0.0
+                if (it!!.isEmpty()) {
+                    sale_txt.text = "0.0"
+                } else {
+                    for (i in it!!) {
+                        allActualSaleValue += i.totalAmount
+                        sale_txt.text = allActualSaleValue.toString()
+                    }
+                }
+            })
+            targetAndActualSalesForSalesManReportViewModel.loadAllSaleTargetAndSaleIdList()
+        }
+
         if (groupId != "-1") {
             targetAndActualSalesForSalesManReportViewModel.groupSaleTargetDataList.observe(this, Observer {
                 allActualSaleValue = 0.0
