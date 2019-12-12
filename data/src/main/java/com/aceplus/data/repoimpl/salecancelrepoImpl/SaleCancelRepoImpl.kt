@@ -172,7 +172,8 @@ class SaleCancelRepoImpl(val database: MyDatabase,val shf:SharedPreferences) : S
     }
 
     override fun getProductIdList(invoiceID: String): Observable<List<String>> {
-        return Observable.just(database.invoiceProductDao().getProductIdList(invoiceID))
+        val productList = database.invoiceProductDao().getProductIdList(invoiceID)
+        return Observable.just(productList)
 
     }
     override fun getSaleCancelList(): Observable<List<SaleCancelItem>> {

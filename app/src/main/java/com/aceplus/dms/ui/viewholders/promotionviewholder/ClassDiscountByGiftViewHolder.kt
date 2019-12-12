@@ -9,12 +9,12 @@ class ClassDiscountByGiftViewHolder(itemView: View) :
     BaseViewHolder<ClassDiscountByGiftDataClass>(itemView) {
     override fun setData(data: ClassDiscountByGiftDataClass) {
         itemView.txt_categoryName.text = data.name
-        itemView.txt_fromQty.text = data.from_quantity
-        itemView.txt_toQty.text = data.to_quantity
-        itemView.txt_fromAmt.text = data.from_amount
-        itemView.txt_toAmt.text = data.to_amount
+        itemView.txt_fromQty.text = data.from_quantity.toDouble().toInt().toString()
+        itemView.txt_toQty.text = data.to_quantity.toDouble().toInt().toString()
+        itemView.txt_fromAmt.text = data.from_amount.toDouble().toInt().toString()
+        itemView.txt_toAmt.text = data.to_amount.toDouble().toInt().toString()
         itemView.txt_product_name.text = data.product_name
-        itemView.txt_giftQty.text = data.quantity
+        itemView.txt_giftQty.text = data.quantity.toDouble().toInt().toString()
 
     }
 }

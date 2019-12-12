@@ -310,6 +310,7 @@
                                         android:layout_height="wrap_content"
                                         android:layout_weight="2"
                                         android:hint="0"
+                                        android:text="0.0"
                                         android:imeOptions="actionDone"
                                         android:inputType="numberDecimal"
                                         android:selectAllOnFocus="true" />
@@ -343,6 +344,7 @@
                                         android:layout_height="wrap_content"
                                         android:layout_weight="2"
                                         android:hint="0"
+                                        android:text="0.0"
                                         android:imeOptions="actionDone"
                                         android:inputType="numberDecimal"
                                         android:selectAllOnFocus="true" />

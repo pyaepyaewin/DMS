@@ -84,7 +84,8 @@ class SaleOrderActivity : BaseActivity(), KodeinAware {
 
     private val saleViewModel: SaleViewModel by viewModel()
     private val mProductListAdapter by lazy { ProductListAdapter(this::onClickProductListItem) }
-    private val mOrderedProductListAdapter: OrderedProductListAdapter by lazy { OrderedProductListAdapter(this::onLongClickOrderedProductListItem, this::onFocCheckChange, this::onClickQtyButton, this.isDelivery) }
+    private val mOrderedProductListAdapter: OrderedProductListAdapter by lazy {
+        OrderedProductListAdapter(this::onLongClickOrderedProductListItem, this::onFocCheckChange, this::onClickQtyButton, this.isDelivery) }
     private val mSearchProductAdapter by lazy { ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, ArrayList<String>()) }
 
     private val duplicateProductList = mutableListOf<Product>()

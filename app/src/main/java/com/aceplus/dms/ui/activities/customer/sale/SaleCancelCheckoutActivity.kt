@@ -41,7 +41,8 @@ class SaleCancelCheckoutActivity : BaseActivity(), KodeinAware {
     override val kodein: Kodein by kodein()
     override val layoutId: Int
         get() = R.layout.activity_sale_checkout
-
+    var discountAmt = 0.0
+   var discountPercent="0"
     var totalAmt = 0.0
     private var netAmount: Double = 0.0
     private var volDisAmount: Double = 0.0
@@ -55,7 +56,7 @@ class SaleCancelCheckoutActivity : BaseActivity(), KodeinAware {
     private var invoice = arrayListOf<Invoice>()
     var totalQtyForInvoice = 0
     val invoiceProductList: ArrayList<InvoiceProduct> = ArrayList()
-    var productIdList: ArrayList<Int> = ArrayList()
+    var deletedProductList: ArrayList<SoldProductInfo> = ArrayList()
 
 
     private val df = DecimalFormat(".##")
@@ -69,7 +70,7 @@ class SaleCancelCheckoutActivity : BaseActivity(), KodeinAware {
             date: String,
             customerID: String,
             customerName: String,
-            productIdList: ArrayList<Int>
+            deletedProductList: ArrayList<SoldProductInfo>
 
 
         ): Intent {
@@ -79,7 +80,7 @@ class SaleCancelCheckoutActivity : BaseActivity(), KodeinAware {
             saleCancelDetailIntent.putExtra("DATE", date)
             saleCancelDetailIntent.putExtra("CUSTOMER_ID", customerID)
             saleCancelDetailIntent.putExtra("CUSTOMER_NAME", customerName)
-            saleCancelDetailIntent.putIntegerArrayListExtra("INDEX_LIST", productIdList)
+            saleCancelDetailIntent.putExtra("DELETED_PRODUCT_LIST", deletedProductList)
 
 
             return saleCancelDetailIntent
@@ -106,7 +107,7 @@ class SaleCancelCheckoutActivity : BaseActivity(), KodeinAware {
         llSaleStatus.visibility = View.GONE
         tableHeaderDiscount.text = "Promotion Price"
         soldProductList = intent.getParcelableArrayListExtra("SOLD_PRODUCT_LIST")
-        productIdList = intent.getIntegerArrayListExtra("INDEX_LIST")
+        deletedProductList = intent.getParcelableArrayListExtra("DELETED_PRODUCT_LIST")
         saleDateTextView.text = Utils.getCurrentDate(false)
         calculateTotalAmountForProduct()
 //        for (i in soldProductList) {
@@ -156,6 +157,10 @@ class SaleCancelCheckoutActivity : BaseActivity(), KodeinAware {
             android.arch.lifecycle.Observer {
 
                 it?.let {
+//                    it.map {
+//                        it.total_discount_percent = edtVolumeDiscountPercent.text.toString()
+//                        //   it.total_discount_amount = edtVolumeDiscountAmt.text.toString().toDouble()
+//                    }
                     if (it.isNotEmpty()) {
                         startActivityForResult(
                             PrintInvoiceActivity.newIntentFromSaleCancelCheckout(
@@ -316,10 +321,19 @@ class SaleCancelCheckoutActivity : BaseActivity(), KodeinAware {
         saleCancelCheckOutViewModel.deleteInvoiceData(invoiceId)
         saleCancelCheckOutViewModel.deleteInvoiceProductData(invoiceId)
         saleCancelCheckOutViewModel.deleteInvoicePresenttData(invoiceId)
-//        for (soldProduct in soldProductList) {
-//
-//        }
-
+        if (edtVolumeDiscountAmt.text.isNullOrBlank()) {
+            discountAmt = 0.0
+        } else {
+            discountAmt = edtVolumeDiscountAmt.text.toString().toDouble()
+        }
+        if(edtVolumeDiscountPercent.text.isNullOrBlank())
+        {
+            discountPercent="0"
+        }
+        else
+        {
+            discountPercent=edtVolumeDiscountPercent.text.toString()
+        }
         saleCancelCheckOutViewModel.saveCheckoutData(
             customerId,
             saleDate,
@@ -339,7 +353,9 @@ class SaleCancelCheckoutActivity : BaseActivity(), KodeinAware {
             edit_txt_account_name.text.toString(),
             volDisAmount,
             volDisPercent,
-            productIdList
+            discountAmt,
+            discountPercent,
+            deletedProductList
         )
         saleCancelCheckOutViewModel.loadSoldInvoiceData(invoiceId)
 

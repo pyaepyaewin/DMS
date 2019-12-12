@@ -22,4 +22,7 @@ interface CashReceiveDao {
     @Query("Delete from cash_receive")
     fun deleteAll()
 
+
+    @Query("SELECT count(id) from cash_receive")
+    fun getCashReceiveCount():Int
 }

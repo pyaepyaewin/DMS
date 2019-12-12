@@ -113,6 +113,7 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
             customerTownShip: String,
             salePersonName: String,
             customerName: String
+
         ): Intent {
             val printIntent = Intent(context, PrintInvoiceActivity::class.java)
             printIntent.putExtra("CREDIT", credit as Serializable)
@@ -120,7 +121,7 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
             printIntent.putExtra(IE_PRINT_MODE, "C")
             printIntent.putExtra(CUSTOMER_TOWNSHIP, customerTownShip)
             printIntent.putExtra(SALE_MAN_NAME, salePersonName)
-            printIntent.putExtra(CUSTOMER_NAME, customerName)
+            printIntent.putExtra(CUSTOMER_NAME,customerName)
             return printIntent
         }
 
@@ -429,19 +430,18 @@ class PrintInvoiceActivity : BaseActivity(), KodeinAware {
         val myBitmap = v1.drawingCache
 
         if (printMode == "C" && !creditFlg.isNullOrBlank()){
-
-            Utils.saveInvoiceImageIntoGallery(creditList[pos].invoiceNo, this, myBitmap, "Credit Collect") //To Check
+            Utils.saveInvoiceImageIntoGallery(creditList[0].invoiceNo, this, myBitmap, "Credit Collect") // Doesn't work
             if (creditList.isNotEmpty()){
                 val customerData: Customer = relatedDataForPrint!!.customer
                 PrintUtils.printCreditWithHSPOS(
                     this,
                     customerData.customer_name,
                     customerData.address,
-                    creditList[pos].invoiceNo,
+                    creditList[0].invoiceNo,
                     salePersonName,
                     relatedDataForPrint!!.routeName,
                     relatedDataForPrint!!.customerTownShipName,
-                    creditList[pos],
+                    creditList[0],
                     mBluetoothService!!,
                     relatedDataForPrint!!.companyInfo
                 ) //To check - sale person name

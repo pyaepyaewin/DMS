@@ -47,9 +47,9 @@ class SaleCancelCheckOutViewModel(
         launch {
             saleCancelRepo.getSoldInvoice(invoiceID)
                 .subscribeOn(schedulerProvider.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .observeOn(schedulerProvider.mainThread())
                 .subscribe({
-                    soldInvoiceListSuccessState.value = it
+                    soldInvoiceListSuccessState.postValue(it)
 
                 }, {
                     soldInvoiceListErrorState.value = it.localizedMessage
@@ -95,42 +95,26 @@ class SaleCancelCheckOutViewModel(
         taxAmt: Double,
         bank: String,
         acc: String,
+        volDisAmount:Double,
+        volDisPercent:Double,
         totalDiscountAmount: Double,
-        totalVolumeDiscountPercent: Double,
-        productIdList: List<Int>
+        totalDiscountPercent:String,
+        deletedProductList: ArrayList<SoldProductInfo>
     ) {
 
         var totalQtyForInvoice = 0
         var totalAmountForInvoice = 0.0
-        var totalDiscountAmount = 0.0
         val invoiceProductList: ArrayList<InvoiceProduct> = ArrayList()
         val invoiceDetailList: ArrayList<InvoiceDetail> = ArrayList()
-        val invoiceList: MutableList<Invoice> = mutableListOf()
+        val invoice = Invoice()
+        for (deletedProduct in deletedProductList) {
+            saleCancelRepo.updateProductRemainingQtyForUnsold(
+                deletedProduct.quantity,
+                deletedProduct.product.id.toString()
+            )
+        }
 
         for (soldProduct in soldProductList) {
-
-            val invoiceDetail = InvoiceDetail()
-            invoiceDetail.tsaleId = invoiceId
-            invoiceDetail.productId = soldProduct.product.id
-            invoiceDetail.qty = soldProduct.quantity
-            invoiceDetail.discountAmt = soldProduct.discountAmount
-            invoiceDetail.amt = soldProduct.totalAmt
-            invoiceDetail.discountPercent = soldProduct.discountPercent
-            invoiceDetail.s_price = soldProduct.product.selling_price!!.toDouble()
-            invoiceDetail.p_price = soldProduct.product.purchase_price!!.toDouble()
-            invoiceDetail.promotionPrice = soldProduct.promotionPrice
-            invoiceDetail.itemDiscountPercent = soldProduct.focPercent
-            invoiceDetail.itemDiscountAmount = soldProduct.focAmount
-
-            if (!soldProduct.promotionPlanId.isNullOrEmpty())
-                invoiceDetail.promotion_plan_id =
-                    soldProduct.promotionPlanId.toInt()
-            if (soldProduct.exclude != null && !soldProduct.exclude.equals("")) {
-                invoiceDetail.exclude = soldProduct.exclude
-            }
-            invoiceDetailList.add(invoiceDetail)
-
-
             val invoiceProduct = InvoiceProduct()
             invoiceProduct.invoice_product_id = invoiceId
             invoiceProduct.product_id = soldProduct.product.id.toString()
@@ -150,15 +134,14 @@ class SaleCancelCheckOutViewModel(
                 promoPrice = soldProduct.product.selling_price!!.toDouble()
             }
             totalQtyForInvoice += soldProduct.quantity
-            if (soldProduct.totalAmt != 0.0) {
-                invoiceProductList.add(invoiceProduct)
-            }
+            invoiceProductList.add(invoiceProduct)
+//            if (soldProduct.totalAmt != 0.0) {
+//
+//            }
 
-            var unsoldQty=soldProduct.currentProductQty-soldProduct.quantity
-          // saleCancelRepo.updateProductRemainingQtyForLongClickDelete(unsoldQty,productIdList)
-            saleCancelRepo.insertInvoiceProduct(invoiceProductList)
+            var unsoldQty = soldProduct.currentProductQty - soldProduct.quantity
+            // saleCancelRepo.updateProductRemainingQtyForLongClickDelete(unsoldQty,productIdList)
 
-            val invoice = Invoice()
 
             invoice.invoice_id = invoiceId
             invoice.customer_id = id
@@ -182,16 +165,32 @@ class SaleCancelCheckOutViewModel(
             invoice.total_quantity =
                 totalQtyForInvoice.toDouble()
             invoice.invoice_status = cashOrLoanOrBank
-            invoice.total_discount_percent =
-                totalVolumeDiscountPercent.toString()
+            invoice.total_discount_percent =""
             invoice.rate = "1"
             invoice.tax_amount = taxAmt
             invoice.bank_name = bank
             invoice.bank_account_no = acc
             invoice.sale_flag = 0
-            //invoiceList.add(invoice)
-            saleCancelRepo.insertInvoice(invoice)
+            invoice.total_discount_amount=totalDiscountAmount
+            invoice.total_discount_percent=totalDiscountPercent
+
+            if (soldProduct.quantity < soldProduct.currentProductQty) {
+                var unsoldQty = soldProduct.currentProductQty - soldProduct.quantity
+                saleCancelRepo.updateProductRemainingQtyForUnsoldProduct(
+                    unsoldQty,
+                    soldProduct.product.id.toString()
+                )
+
+            } else {
+                var soldQty = soldProduct.quantity - soldProduct.currentProductQty
+                saleCancelRepo.updateProductRemainingQtyForSoldProduct(
+                    soldQty,
+                    soldProduct.product.id.toString()
+                )
+            }
         }
+        saleCancelRepo.insertInvoiceProduct(invoiceProductList)
+        saleCancelRepo.insertInvoice(invoice)
 
 
     }
@@ -199,19 +198,8 @@ class SaleCancelCheckOutViewModel(
 
 
 
-//if (soldProduct.quantity < soldProduct.currentProductQty) {
-//    var unsoldQty = soldProduct.currentProductQty - soldProduct.quantity
-//    saleCancelRepo.updateProductRemainingQtyForUnsoldProduct(
-//        unsoldQty,
-//        soldProduct.product.id.toString()
-//    )
-//
-//} else {
-//    var soldQty = soldProduct.quantity - soldProduct.currentProductQty
-//    saleCancelRepo.updateProductRemainingQtyForSoldProduct(
-//        soldQty,
-//        soldProduct.product.id.toString()
-//    )
-//}
+
+
+
 
 

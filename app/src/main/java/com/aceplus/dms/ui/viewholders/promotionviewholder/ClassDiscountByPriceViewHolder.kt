@@ -10,10 +10,10 @@ class ClassDiscountByPriceViewHolder(itemView: View) :
     BaseViewHolder<ClassDiscountByPriceDataClass>(itemView) {
     override fun setData(data: ClassDiscountByPriceDataClass) {
         itemView.txt_categoryName.text = data.name
-        itemView.txt_fromQty.text = data.from_quantity
-        itemView.txt_toQty.text = data.to_quantity
-        itemView.txt_fromAmt.text = data.from_amount
-        itemView.txt_toAmt.text = data.to_amount
+        itemView.txt_fromQty.text = data.from_quantity.toDouble().toInt().toString()
+        itemView.txt_toQty.text = data.to_quantity.toDouble().toInt().toString()
+        itemView.txt_fromAmt.text = data.from_amount.toDouble().toInt().toString()
+        itemView.txt_toAmt.text = data.to_amount.toDouble().toInt().toString()
         itemView.txt_discountCategoryPercent.text = data.discount_percent
 
     }

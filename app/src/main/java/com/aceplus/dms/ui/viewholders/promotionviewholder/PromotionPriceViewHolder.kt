@@ -13,8 +13,8 @@ class PromotionPriceViewHolder(itemView: View):BaseViewHolder<PromotionPriceData
  {
     override fun setData(data: PromotionPriceDataClass) {
         itemView.product_name.text=data.product_name
-        itemView.fromQty.text=data.from_quantity
-        itemView.toQty.text=data.to_quantity
+        itemView.fromQty.text=data.from_quantity.toDouble().toInt().toString()
+      itemView.toQty.text=data.to_quantity.toDouble().toInt().toString()
         itemView.promotion_price.text=Utils.formatAmount(data.promotion_price?.toDouble())
 
     }

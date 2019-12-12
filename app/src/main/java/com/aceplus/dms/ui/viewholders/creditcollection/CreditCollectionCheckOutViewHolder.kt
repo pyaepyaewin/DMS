@@ -7,7 +7,7 @@ import com.aceplus.domain.entity.credit.Credit
 import com.aceplussolutions.rms.ui.viewholder.BaseViewHolder
 import kotlinx.android.synthetic.main.credit_collection_list_row.view.*
 
-class CreditCollectionCheckOutViewHolder(itemView: View,val onClick: (data: Credit) -> Unit):BaseViewHolder<Credit>(itemView){
+class CreditCollectionCheckOutViewHolder(itemView: View,val onClick: (data: Credit,position:Int,id:String) -> Unit):BaseViewHolder<Credit>(itemView){
 
     override fun setData(data: Credit) {
         itemView.invoice_id.text=data.invoice_no
@@ -29,7 +29,7 @@ class CreditCollectionCheckOutViewHolder(itemView: View,val onClick: (data: Cred
 
         }
         itemView.setOnClickListener {
-            onClick(data)
+            onClick(data,adapterPosition,data.invoice_no!!)
         }
 
     }

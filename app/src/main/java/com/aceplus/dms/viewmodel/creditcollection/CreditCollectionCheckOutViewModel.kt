@@ -4,6 +4,7 @@ import android.arch.lifecycle.MutableLiveData
 import android.content.SharedPreferences
 import android.util.Log
 import com.aceplus.data.utils.Constant
+import com.aceplus.dms.di.provideDownloadApi
 import com.aceplus.domain.entity.Location
 import com.aceplus.domain.entity.cash.CashReceive
 import com.aceplus.domain.entity.cash.CashReceiveItem
@@ -19,6 +20,8 @@ class CreditCollectionCheckOutViewModel(
     private val schedulerProvider: SchedulerProvider,
     private val shf: SharedPreferences
 ) : BaseViewModel() {
+    private var invoiceData : Credit? =null
+
     var creditList = listOf<Credit>()
     var creditCollectionCheckOutSuccessState = MutableLiveData<List<Credit>>()
     var creditCollectionCheckOutErrorState = MutableLiveData<String>()
@@ -28,7 +31,7 @@ class CreditCollectionCheckOutViewModel(
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
-//                    creditCollectionCheckOutSuccessState.postValue(it)
+                    //                    creditCollectionCheckOutSuccessState.postValue(it)
                     creditCollectionCheckOutSuccessState.value = it
                     creditList = it
 //                    creditCollectionCheckOutSuccessState.value = null
@@ -39,32 +42,39 @@ class CreditCollectionCheckOutViewModel(
         }
     }
 
-    var locationSuccessState = MutableLiveData<List<Location>>()
-    var locationErrorState = MutableLiveData<String>()
-    fun getLocationID() {
+
+    fun getLocationID():String {
+
+          return  creditCollectionCheckOutRepo.getLocation()
+
+    }
+
+    var cashReceiveCountSuccessState = MutableLiveData<Int>()
+    var cashReceiveCountErrorState = MutableLiveData<String>()
+    fun getCashReceiveCount() {
         launch {
-            creditCollectionCheckOutRepo.getLocation()
+            creditCollectionCheckOutRepo.getCashReceiveCount()
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
-                    locationSuccessState.postValue(it)
+                    cashReceiveCountSuccessState.postValue(it)
                 }, {
-                    locationErrorState.value = it.localizedMessage
+                    cashReceiveCountErrorState.value = it.localizedMessage
                 })
         }
     }
 
-
-    fun insertCashReceiveData(creditDataList: List<Credit>) {
+    fun insertCashReceiveData(creditDataList: List<Credit>, count: Int) {
         var cashList: MutableList<CashReceive> = mutableListOf()
         var cashItemList: MutableList<CashReceiveItem> = mutableListOf()
-
+        var newCount=count
+       // creditCollectionCheckOutRepo.getCashReceiveCount()
         for (credit in creditDataList) {
             val cashReceive = CashReceive()
             val cashReceiveItem = CashReceiveItem()
-
-            cashReceive.id = credit.id
-            cashReceive.receive_no = credit.invoice_no
+            newCount += 1
+            cashReceive.id = newCount
+            cashReceive.receive_no = credit.invoice_no?.replace("W", "CR")
             cashReceive.receive_date = credit.invoice_date
             cashReceive.customer_id = credit.customer_id.toString()
             cashReceive.amount = credit.pay_amount.toString()
@@ -76,7 +86,7 @@ class CreditCollectionCheckOutViewModel(
                 cashReceive.payment_type = "CR"
             }
             val saleManId = AppUtils.getStringFromShp(Constant.SALEMAN_ID, shf)
-            var locationId = getLocationID()
+            var locationId =getLocationID()
             cashReceive.location_id = locationId.toString()
             cashReceive.status = ""
             cashReceive.cash_receive_type = ""
@@ -100,79 +110,110 @@ class CreditCollectionCheckOutViewModel(
 
     }
 
-    fun getTownShipName(customerId: Int) :String{
-        return  creditCollectionCheckOutRepo.getTownShipName(customerId)
+    fun getTownShipName(customerId: Int): String {
+        return creditCollectionCheckOutRepo.getTownShipName(customerId)
     }
 
     fun calculatePayAmount(payAmt: String): List<Credit> {
 
         var payAmount: Double = payAmt.replace(",", "").toDouble()
         val remainList = ArrayList<Credit>()
+
         val tempCreditList = ArrayList<Credit>()
         tempCreditList.addAll(creditList)
 
         for (i in creditList) {
+
             val creditAmount = i.amount - i.pay_amount
+            if (creditAmount != 0.0) {
 
-            if (payAmount != 0.0 && payAmount < creditAmount) {
-                i.pay_amount = payAmount
-                payAmount = 0.0
-                remainList.add(i)
+                    if (payAmount != 0.0 && payAmount < creditAmount) {
+                        i.pay_amount = payAmount
+                        payAmount = 0.0
+                        remainList.add(i)
 
-            } else if (payAmount != 0.0 && payAmount > creditAmount) {
-                payAmount -= creditAmount
-                i.pay_amount = creditAmount
-                tempCreditList.remove(i)
-                remainList.add(i)
 
-            } else if (payAmount != 0.0 && payAmount == creditAmount) {
-                payAmount -= creditAmount
-                i.pay_amount = creditAmount
-                tempCreditList.remove(i)
-                remainList.add(i)
+                    } else if (payAmount != 0.0 && payAmount > creditAmount) {
+                        payAmount -= creditAmount
+                        i.pay_amount = creditAmount
+                        tempCreditList.remove(i)
+                        remainList.add(i)
+
+
+                    } else if (payAmount != 0.0 && payAmount == creditAmount) {
+                        payAmount -= creditAmount
+                        i.pay_amount = creditAmount
+                        tempCreditList.remove(i)
+                        remainList.add(i)
+
+                    }
+
             }
 
         }
-
-        Log.i("REMAIN -> ", payAmount.toString() + "")
-        Log.i("Remain item -> ", remainList.size.toString() + "")
-        Log.i("item remove -> ", tempCreditList.size.toString() + "")
-
         return remainList
     }
-    fun calculatePayAmountForSelectedInvoice(payAmt: String): List<Credit> {
+
+
+    fun calculatePayAmountForSelectedInvoice(payAmt: String, position: Int): List<Credit> {
 
         var payAmount: Double = payAmt.replace(",", "").toDouble()
-        val remainList = ArrayList<Credit>()
+//        val remainList = ArrayList<Credit>()
+        var remainList = mutableListOf<Credit>()
         val tempCreditList = ArrayList<Credit>()
         tempCreditList.addAll(creditList)
 
-        for (i in creditList) {
-            val creditAmount = i.amount - i.pay_amount
 
-            if (payAmount != 0.0 && payAmount < creditAmount) {
-                i.pay_amount = payAmount
-                payAmount = 0.0
-                remainList.add(i)
+        val creditAmount = creditList[position].amount - creditList[position].pay_amount
 
-            } else if (payAmount != 0.0 && payAmount > creditAmount) {
-                payAmount -= creditAmount
-                i.pay_amount = creditAmount
-                tempCreditList.remove(i)
-                remainList.add(i)
-
-            } else if (payAmount != 0.0 && payAmount == creditAmount) {
-                payAmount -= creditAmount
-                i.pay_amount = creditAmount
-                tempCreditList.remove(i)
-                remainList.add(i)
-            }
+        if (payAmount != 0.0 && payAmount < creditAmount) {
+            creditList[position].pay_amount = payAmount
+            payAmount = 0.0
+            remainList.add(creditList[position])
 
         }
 
-        Log.i("REMAIN -> ", payAmount.toString() + "")
-        Log.i("Remain item -> ", remainList.size.toString() + "")
-        Log.i("item remove -> ", tempCreditList.size.toString() + "")
+        else if (payAmount != 0.0 && payAmount > creditAmount) {
+            var refund = payAmount - creditAmount
+            creditList[position].pay_amount = creditAmount
+            tempCreditList.remove(creditList[position])
+            remainList.add(creditList[position])
+            for (i in tempCreditList) {
+                var newAmt=i.amount-i.pay_amount
+                if (newAmt!=0.0)
+                {
+                    if (refund != 0.0 && refund < i.amount) {
+                        i.pay_amount = refund
+                        refund = 0.0
+                        remainList.add(i)
+
+
+                    } else if (refund != 0.0 && refund > i.amount) {
+                        refund -= i.amount
+                        i.pay_amount = i.amount
+                        remainList.add(i)
+
+
+                    } else if (refund != 0.0 && refund == i.amount) {
+                        refund -= i.amount
+                        i.pay_amount = i.amount
+                        remainList.add(i)
+
+                    }
+                }
+
+
+            }
+
+            return remainList
+
+        } else if (payAmount != 0.0 && payAmount == creditAmount) {
+            payAmount -= creditAmount
+            creditList[position].pay_amount = creditAmount
+            tempCreditList.remove(creditList[position])
+            remainList.add(creditList[position])
+        }
+
 
         return remainList
     }
