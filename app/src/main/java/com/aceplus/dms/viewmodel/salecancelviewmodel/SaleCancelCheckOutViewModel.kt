@@ -47,9 +47,9 @@ class SaleCancelCheckOutViewModel(
         launch {
             saleCancelRepo.getSoldInvoice(invoiceID)
                 .subscribeOn(schedulerProvider.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .observeOn(schedulerProvider.mainThread())
                 .subscribe({
-                    soldInvoiceListSuccessState.value = it
+                    soldInvoiceListSuccessState.postValue(it)
 
                 }, {
                     soldInvoiceListErrorState.value = it.localizedMessage

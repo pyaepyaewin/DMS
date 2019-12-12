@@ -154,11 +154,12 @@ class SaleCancelCheckoutActivity : BaseActivity(), KodeinAware {
         saleCancelCheckOutViewModel.soldInvoiceListSuccessState.observe(
             this,
             android.arch.lifecycle.Observer {
-                it!!.map {
-                    it.total_discount_percent = edtVolumeDiscountPercent.text.toString()
-                 //   it.total_discount_amount = edtVolumeDiscountAmt.text.toString().toDouble()
-                }
+
                 it?.let {
+                    it.map {
+                        it.total_discount_percent = edtVolumeDiscountPercent.text.toString()
+                        //   it.total_discount_amount = edtVolumeDiscountAmt.text.toString().toDouble()
+                    }
                     if (it.isNotEmpty()) {
                         startActivityForResult(
                             PrintInvoiceActivity.newIntentFromSaleCancelCheckout(
