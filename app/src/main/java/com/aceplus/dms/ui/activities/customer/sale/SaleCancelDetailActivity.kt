@@ -103,14 +103,27 @@ class SaleCancelDetailActivity : BaseActivity(), KodeinAware {
             true
         }
         checkoutImg.setOnClickListener {
+
             if (netAmt <= 0.0) {
                 android.app.AlertDialog.Builder(this@SaleCancelDetailActivity)
                     .setTitle("Alert")
                     .setMessage("Net amount should be more than zero.")
                     .setPositiveButton("OK", null)
                     .show()
-
             } else {
+
+                for(soldProduct in saleCancelDetailAdapter.getDataList())
+                {
+                    if(soldProduct.quantity==0)
+                    {
+                        android.app.AlertDialog.Builder(this@SaleCancelDetailActivity)
+                            .setTitle("Alert")
+                            .setMessage("Quantity must not be zero.")
+                            .setPositiveButton("OK", null)
+                            .show()
+                        return@setOnClickListener
+                    }
+                }
 
                 startActivityForResult(
                     SaleCancelCheckoutActivity.getSaleCancelDetailIntent(
@@ -208,7 +221,15 @@ class SaleCancelDetailActivity : BaseActivity(), KodeinAware {
                         soldProductInfo.product.sold_quantity = it.sold_quantity
                         soldProductInfo.product.total_quantity = it.total_quantity
                         soldProductInfo.totalAmt = it.total_amount
-                        soldProductInfo.promotionPrice = it.promotion_price
+                        var promoPrice =it.promotion_price
+                        if (promoPrice == 0.0) {
+                            soldProductInfo.promotionPrice = it.selling_price.toDouble()
+                        }
+                        else{
+                            soldProductInfo.promotionPrice = promoPrice
+
+                        }
+
                         soldProductInfo.quantity = it.sale_quantity.toInt()
                         soldProductInfo.discountAmount = it.discount_amount
                         soldProductInfo.discountPercent = it.discount_percent
