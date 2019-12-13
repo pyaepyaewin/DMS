@@ -327,8 +327,18 @@ class SaleOrderActivity : BaseActivity(), KodeinAware {
                 .setMessage("You must specify at least one product.")
                 .setPositiveButton("OK", null)
                 .show()
-
             return
+        }
+
+        for (soldProduct in mOrderedProductListAdapter.getDataList()) {
+            if (soldProduct.quantity == 0){
+                AlertDialog.Builder(this)
+                    .setTitle("Alert!")
+                    .setMessage("Quantity must not be zero.")
+                    .setPositiveButton("OK", null)
+                    .show()
+                return
+            }
         }
 
         if (netAmount <= 0.0) {
@@ -338,7 +348,6 @@ class SaleOrderActivity : BaseActivity(), KodeinAware {
                 .setMessage("Net amount should be more than zero.")
                 .setPositiveButton("OK", null)
                 .show()
-
             return
         }
 
@@ -363,21 +372,12 @@ class SaleOrderActivity : BaseActivity(), KodeinAware {
             val arrList = ArrayList<String>()
             for (soldProduct in mOrderedProductListAdapter.getDataList()){
 
-                if (soldProduct.quantity == 0){
-                    AlertDialog.Builder(this)
-                        .setTitle("Alert")
-                        .setMessage("Quantity must not be zero.")
-                        .setPositiveButton("OK", null)
-                        .show()
-                    return false
-                } else{
-                    val stockId = soldProduct.product.id
-                    val tempStockId = product.id
-                    if (stockId == tempStockId){
-                        val isFoc = soldProduct.isFocIsChecked
-                        if (isFoc) arrList.add("T")
-                        else arrList.add("F")
-                    }
+                val stockId = soldProduct.product.id
+                val tempStockId = product.id
+                if (stockId == tempStockId){
+                    val isFoc = soldProduct.isFocIsChecked
+                    if (isFoc) arrList.add("T")
+                    else arrList.add("F")
                 }
 
             }

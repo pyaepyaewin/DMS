@@ -254,6 +254,19 @@ class VanIssueActivity: BaseActivity(), KodeinAware {
 
         if (type == "save"){
 
+            for (product in mVanIssueProductAdapter.getDataList()){
+
+                if (product.quantity == 0){
+                    AlertDialog.Builder(this)
+                        .setTitle("Alert")
+                        .setMessage("Quantity must not be zero.")
+                        .setPositiveButton("OK", null)
+                        .show()
+                    return
+                }
+
+            }
+
             vanIssueViewModel.saveData(
                 invoiceNo!!,
                 Utils.getCurrentDate(false),

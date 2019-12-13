@@ -427,6 +427,17 @@ class SaleActivity : BaseActivity(), KodeinAware {
             return
         }
 
+        for (soldProduct in mSoldProductListAdapter.getDataList()) {
+            if (soldProduct.quantity == 0){
+                AlertDialog.Builder(this@SaleActivity)
+                    .setTitle("Alert!")
+                    .setMessage("Quantity must not be zero.")
+                    .setPositiveButton("OK", null)
+                    .show()
+                return
+            }
+        }
+
         if (netAmount <= 0.0) {
             AlertDialog.Builder(this@SaleActivity)
                 .setTitle("Alert")
@@ -460,21 +471,12 @@ class SaleActivity : BaseActivity(), KodeinAware {
             val arrList = ArrayList<String>()
             for (soldProduct in mSoldProductListAdapter.getDataList()){
 
-                if (soldProduct.quantity == 0){
-                    AlertDialog.Builder(this@SaleActivity)
-                        .setTitle("Alert!")
-                        .setMessage("Quantity must not be zero.")
-                        .setPositiveButton("OK", null)
-                        .show()
-                    return false
-                } else{
-                    val stockId = soldProduct.product.id
-                    val tempStockId = product.id
-                    if (stockId == tempStockId){
-                        val isFoc = soldProduct.isFocIsChecked
-                        if (isFoc) arrList.add("T")
-                        else arrList.add("F")
-                    }
+                val stockId = soldProduct.product.id
+                val tempStockId = product.id
+                if (stockId == tempStockId){
+                    val isFoc = soldProduct.isFocIsChecked
+                    if (isFoc) arrList.add("T")
+                    else arrList.add("F")
                 }
 
             }
