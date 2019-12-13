@@ -28,6 +28,8 @@ import com.aceplus.domain.entity.invoice.InvoiceCancel
 import com.aceplus.domain.entity.invoice.InvoiceCancelProduct
 import com.aceplus.domain.entity.promotion.Promotion
 import com.aceplussolutions.rms.ui.activities.BaseActivity
+import kotlinx.android.synthetic.main.activity_sale.invoiceId
+import kotlinx.android.synthetic.main.list_row_sale_cancel_report.*
 
 
 class SaleCancelDetailActivity : BaseActivity(), KodeinAware {
@@ -49,7 +51,7 @@ class SaleCancelDetailActivity : BaseActivity(), KodeinAware {
     private var duplicateProductList = mutableListOf<SoldProductInfo>()
     private var promotionArrayList = ArrayList<Promotion>()
 
-
+    var netAmt=0.0
     lateinit var alertDialog1: AlertDialog
 
     companion object {
@@ -101,18 +103,41 @@ class SaleCancelDetailActivity : BaseActivity(), KodeinAware {
             true
         }
         checkoutImg.setOnClickListener {
-            startActivityForResult(
-                SaleCancelCheckoutActivity.getSaleCancelDetailIntent(
-                    this,
-                    saleCancelDetailAdapter.getDataList() as ArrayList,
-                    invoiceid,
-                    invoicedate,
-                    customerId,
-                    customerName,
-                    deletedProductList
-                ),
-                Utils.RQ_BACK_TO_CUSTOMER
-            )
+
+            if (netAmt <= 0.0) {
+                android.app.AlertDialog.Builder(this@SaleCancelDetailActivity)
+                    .setTitle("Alert")
+                    .setMessage("Net amount should be more than zero.")
+                    .setPositiveButton("OK", null)
+                    .show()
+            } else {
+
+                for(soldProduct in saleCancelDetailAdapter.getDataList())
+                {
+                    if(soldProduct.quantity==0)
+                    {
+                        android.app.AlertDialog.Builder(this@SaleCancelDetailActivity)
+                            .setTitle("Alert")
+                            .setMessage("Quantity must not be zero.")
+                            .setPositiveButton("OK", null)
+                            .show()
+                        return@setOnClickListener
+                    }
+                }
+
+                startActivityForResult(
+                    SaleCancelCheckoutActivity.getSaleCancelDetailIntent(
+                        this,
+                        saleCancelDetailAdapter.getDataList() as ArrayList,
+                        invoiceid,
+                        invoicedate,
+                        customerId,
+                        customerName,
+                        deletedProductList
+                    ),
+                    Utils.RQ_BACK_TO_CUSTOMER
+                )
+            }
         }
         saleCancelViewModel.productIdListSuccessState.observe(
             this,
@@ -160,7 +185,9 @@ class SaleCancelDetailActivity : BaseActivity(), KodeinAware {
         saleCancelViewModel.calculatedSoldProductList.observe(this, Observer {
             if (it != null) {
                 saleCancelDetailAdapter.setNewList(it.first)
+
                 tvNetAmount.text = Utils.formatAmount(it.second)
+                netAmt=it.second
                 saleCancelViewModel.calculatedSoldProductList.value = null
             }
         })
@@ -194,7 +221,15 @@ class SaleCancelDetailActivity : BaseActivity(), KodeinAware {
                         soldProductInfo.product.sold_quantity = it.sold_quantity
                         soldProductInfo.product.total_quantity = it.total_quantity
                         soldProductInfo.totalAmt = it.total_amount
-                        soldProductInfo.promotionPrice = it.promotion_price
+                        var promoPrice =it.promotion_price
+                        if (promoPrice == 0.0) {
+                            soldProductInfo.promotionPrice = it.selling_price.toDouble()
+                        }
+                        else{
+                            soldProductInfo.promotionPrice = promoPrice
+
+                        }
+
                         soldProductInfo.quantity = it.sale_quantity.toInt()
                         soldProductInfo.discountAmount = it.discount_amount
                         soldProductInfo.discountPercent = it.discount_percent

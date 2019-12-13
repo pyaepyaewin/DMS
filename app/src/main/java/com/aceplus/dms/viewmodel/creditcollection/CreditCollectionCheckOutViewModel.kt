@@ -182,21 +182,21 @@ class CreditCollectionCheckOutViewModel(
                 var newAmt=i.amount-i.pay_amount
                 if (newAmt!=0.0)
                 {
-                    if (refund != 0.0 && refund < i.amount) {
+                    if (refund != 0.0 && refund < newAmt) {
                         i.pay_amount = refund
                         refund = 0.0
                         remainList.add(i)
 
 
-                    } else if (refund != 0.0 && refund > i.amount) {
-                        refund -= i.amount
-                        i.pay_amount = i.amount
+                    } else if (refund != 0.0 && refund > newAmt) {
+                        refund -= newAmt
+                        i.pay_amount = newAmt
                         remainList.add(i)
 
 
-                    } else if (refund != 0.0 && refund == i.amount) {
-                        refund -= i.amount
-                        i.pay_amount = i.amount
+                    } else if (refund != 0.0 && refund == newAmt) {
+                        refund -= newAmt
+                        i.pay_amount = newAmt
                         remainList.add(i)
 
                     }

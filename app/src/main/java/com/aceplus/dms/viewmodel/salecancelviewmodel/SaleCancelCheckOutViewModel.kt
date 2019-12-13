@@ -131,7 +131,11 @@ class SaleCancelCheckOutViewModel(
             invoiceProduct.exclude = "${soldProduct.exclude}"
             var promoPrice = soldProduct.promotionPrice
             if (promoPrice == 0.0) {
-                promoPrice = soldProduct.product.selling_price!!.toDouble()
+                invoiceProduct.promotion_price = soldProduct.product.selling_price!!.toDouble()
+            }
+            else
+            {
+                invoiceProduct.promotion_price=promoPrice
             }
             totalQtyForInvoice += soldProduct.quantity
             invoiceProductList.add(invoiceProduct)
