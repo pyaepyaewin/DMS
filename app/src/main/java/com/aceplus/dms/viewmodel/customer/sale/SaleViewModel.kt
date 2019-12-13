@@ -354,6 +354,9 @@ class SaleViewModel(
 
         for (soldProductInfo in soldProductList){
 
+            //ToDo - set promo-price after add promotion
+            soldProductInfo.promotionPrice = soldProductInfo.product.selling_price?.toDouble() ?: 0.0
+
             var promoPrice = soldProductInfo.product.selling_price?.toDouble() ?: 0.0
             if (soldProductInfo.promotionPrice != 0.0) promoPrice = soldProductInfo.promotionPrice
 
