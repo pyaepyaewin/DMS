@@ -116,8 +116,8 @@ class TargetAndActualSalesForProductReportFragment : BaseFragment(), KodeinAware
                                         this,
                                         Observer { productList ->
                                             productListFromDB = productList as ArrayList<Product>
-                                            if (productList != null) {
-                                                for (i in productList) {
+                                            if (productListFromDB != null) {
+                                                for (i in productListFromDB) {
                                                     val groupId = i.group_id!!.toInt()
                                                     if (!targetArrList.containsKey(groupId)) {
                                                         targetArrList[groupId] = saleTarget
@@ -132,9 +132,7 @@ class TargetAndActualSalesForProductReportFragment : BaseFragment(), KodeinAware
                                                 }
                                             }
                                         })
-                                    targetAndActualSalesForProductReportViewModel.loadGroupIdListFromProduct(
-                                        productId.toInt()
-                                    )
+                                    targetAndActualSalesForProductReportViewModel.loadGroupIdListFromProduct(productId.toInt())
                                 } else if (type == 1) {
                                     if (productListFromDB != null) {
                                         for (i in productListFromDB) {
@@ -163,9 +161,33 @@ class TargetAndActualSalesForProductReportFragment : BaseFragment(), KodeinAware
     }
 
     private fun initialize() {
-        val xAxisList = getXAxisValues()
-        if (xAxisList.size == 0) {
-            xAxisList.add("")
+        val xAxis = ArrayList<String>()
+        for (saleTarget in saleTargetArrayList) {
+            when {
+                saleTarget.stockId != null -> {
+                    targetAndActualSalesForProductReportViewModel.stockName.observe(this, Observer {
+                        xAxis.add(it!!)
+                    })
+                    targetAndActualSalesForProductReportViewModel.loadProductNameFromProduct((saleTarget.stockId.toInt()))
+                }
+                saleTarget.groupCodeId != null -> {
+                    targetAndActualSalesForProductReportViewModel.groupCodeName.observe(this, Observer {
+                        xAxis.add(it!!)
+                    })
+                    targetAndActualSalesForProductReportViewModel.loadGroupCodeNameFromGroupCode((saleTarget.groupCodeId.toInt()))
+                }
+                saleTarget.categoryId != null -> {
+                    targetAndActualSalesForProductReportViewModel.categoryName.observe(this, Observer {
+                        xAxis.add(it!!)
+                    })
+                    targetAndActualSalesForProductReportViewModel.loadCategoryNameFromProductCategory((saleTarget.categoryId.toInt()))
+                }
+                else -> xAxis.add("")
+            }
+
+        }
+        if (xAxis.size == 0) {
+            xAxis.add("")
         }
         val barDataArrayList = getDataSet()
         var data: BarData? = null
@@ -178,32 +200,7 @@ class TargetAndActualSalesForProductReportFragment : BaseFragment(), KodeinAware
         chart.animateXY(2000, 2000)
         chart.xAxis.getFormattedLabel(0)
         chart.invalidate()
-        chart.xAxis.valueFormatter = IndexAxisValueFormatter(xAxisList)
-    }
-
-    private fun getXAxisValues(): ArrayList<String> {
-        val xAxis = ArrayList<String>()
-        for (saleTarget in saleTargetArrayList) {
-            when {
-                saleTarget.stockId != null -> xAxis.add(
-                    targetAndActualSalesForProductReportViewModel.loadProductNameFromProduct(
-                        Integer.parseInt(saleTarget.stockId)
-                    )
-                )
-                saleTarget.groupCodeId != null -> xAxis.add(
-                    targetAndActualSalesForProductReportViewModel.loadGroupCodeNameFromGroupCode(
-                        Integer.parseInt(saleTarget.groupCodeId)
-                    )
-                )
-                saleTarget.categoryId != null -> xAxis.add(
-                    targetAndActualSalesForProductReportViewModel.loadCategoryNameFromProductCategory(
-                        Integer.parseInt(saleTarget.categoryId)
-                    )
-                )
-                else -> xAxis.add("")
-            }
-        }
-        return xAxis
+        chart.xAxis.valueFormatter = IndexAxisValueFormatter(xAxis)
     }
 
     private fun getDataSet(): ArrayList<BarDataSet> {

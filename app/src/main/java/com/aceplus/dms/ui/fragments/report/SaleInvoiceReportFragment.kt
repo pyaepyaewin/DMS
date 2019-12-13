@@ -178,7 +178,12 @@ class SaleInvoiceReportFragment : BaseFragment(), KodeinAware {
                     soldProduct.discountPercent = i.discountPercent
                     soldProduct.focPercent = i.itemDiscountPercent
                     soldProduct.focAmount = i.itemDiscountAmount
-                    soldProduct.itemDiscountAmount = i.sPrice - i.itemDiscountAmount
+                    if (i.itemDiscountPercent > 0){
+                        soldProduct.itemDiscountAmount = i.sPrice * i.itemDiscountPercent / 100
+                    }
+                    else{
+                        soldProduct.itemDiscountAmount = i.itemDiscountAmount
+                    }
                     soldProduct.totalAmt = i.totalAmount
                     soldProductList.add(soldProduct)
                 }

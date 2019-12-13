@@ -643,8 +643,7 @@ class ReportViewModel(
                         saleQuantity += i.sale_quantity!!.toInt()
                         productIdList.add(i.product_id!!)
                     }
-                    val productForSaleTarget =
-                        TargetAndActualSaleForProduct(id, totalAmount, saleQuantity.toString())
+                    val productForSaleTarget = TargetAndActualSaleForProduct(id, totalAmount, saleQuantity.toString())
                     product.add(productForSaleTarget)
                     invoiceProductList.postValue(product)
                 }
@@ -665,43 +664,40 @@ class ReportViewModel(
         }
     }
 
-    fun loadProductNameFromProduct(stockId: Int): String {
-        var name = ""
+    val stockName = MutableLiveData<String>()
+    fun loadProductNameFromProduct(stockId: Int) {
         launch {
             reportRepo.getProductNameFromProduct(stockId)
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.mainThread())
                 .subscribe {
-                    name = it.product_name!!
+                    stockName.postValue(it!!.product_name)
                 }
         }
-        return name
     }
 
-    fun loadGroupCodeNameFromGroupCode(groupId: Int): String {
-        var name = ""
+    val groupCodeName = MutableLiveData<String>()
+    fun loadGroupCodeNameFromGroupCode(groupId: Int) {
         launch {
             reportRepo.getGroupCodeNameFromGroupCode(groupId)
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.mainThread())
                 .subscribe {
-                    name = it.name!!
+                    groupCodeName.postValue(it.name)
                 }
         }
-        return name
     }
 
-    fun loadCategoryNameFromProductCategory(categoryId: Int): String {
-        var name = ""
+    val categoryName = MutableLiveData<String>()
+    fun loadCategoryNameFromProductCategory(categoryId: Int) {
         launch {
             reportRepo.getCategoryNameFromProductCategory(categoryId)
                 .subscribeOn(schedulerProvider.io())
                 .observeOn(schedulerProvider.mainThread())
                 .subscribe {
-                    name = it.category_name!!
+                    categoryName.postValue(it.category_name)
                 }
         }
-        return name
     }
 
     //end of day report
