@@ -3,6 +3,7 @@ package com.aceplus.dms.ui.fragments.report
 import android.arch.lifecycle.Observer
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -28,6 +29,7 @@ class SalesVisitHistoryReportFragment : BaseFragment(), KodeinAware {
     var customerIdList = mutableListOf<Int>()
     var customerNextIdList = mutableListOf<String>()
     var customerAddressList = mutableListOf<String>()
+    val sdf = SimpleDateFormat("yyyy-MM-dd")
     private var fromId = 0
     private var toId = 0
     private val salesVisitHistoryReportAdapter: SalesVisitHistoryReportAdapter by lazy { SalesVisitHistoryReportAdapter() }
@@ -90,24 +92,10 @@ class SalesVisitHistoryReportFragment : BaseFragment(), KodeinAware {
     }
 
     private fun catchEvents() {
-        btn_sale_visit_search.setOnClickListener { setupAdapter() }
-    }
-
-    private fun setupAdapter() {
         val visitedCustomerMap = HashMap<Int, SaleVisitForUI>()
         val saleVisitDataList = ArrayList<SaleVisitForUI>()
-        var fromCusNo = 0
-        var toCusNo = 0
-        val sdf = SimpleDateFormat("yyyy-MM-dd")
-        fromCusNo = customerIdList[fromId]
-        toCusNo = customerIdList[toId]
-
-        if (fragment_sale_visit_spinner_from_customer.selectedItemPosition > fragment_sale_visit_spinner_to_customer.selectedItemPosition) {
-            fromCusNo = customerIdList[fragment_sale_visit_spinner_to_customer.selectedItemPosition]
-            toCusNo = customerIdList[fragment_sale_visit_spinner_from_customer.selectedItemPosition]
-        }
-
         salesVisitHistoryReportViewModel.customerIdCollection.observe(this, Observer {
+            visitedCustomerMap.clear()
             saleVisitDataList.clear()
             for (i in it!!.invoiceCustomerId){
                 for (data in customerIdList.indices){
@@ -212,7 +200,6 @@ class SalesVisitHistoryReportFragment : BaseFragment(), KodeinAware {
                     }
                 }
             }
-
             for (value in visitedCustomerMap.values) {
                 saleVisitDataList.add(value)
             }
@@ -230,6 +217,22 @@ class SalesVisitHistoryReportFragment : BaseFragment(), KodeinAware {
             }
             salesVisitHistoryReportAdapter.setNewList(saleVisitDataList)
         })
+        btn_sale_visit_search.setOnClickListener { setupAdapter() }
+    }
+
+    private fun setupAdapter() {
+        var fromCusNo = 0
+        var toCusNo = 0
+        fromCusNo = customerIdList[fromId]
+        toCusNo = customerIdList[toId]
+
+        if (fragment_sale_visit_spinner_from_customer.selectedItemPosition > fragment_sale_visit_spinner_to_customer.selectedItemPosition) {
+            fromCusNo = customerIdList[fragment_sale_visit_spinner_to_customer.selectedItemPosition]
+            toCusNo = customerIdList[fragment_sale_visit_spinner_from_customer.selectedItemPosition]
+        }
+
+        Log.d("List","$fromCusNo.......$toCusNo")
+
         salesVisitHistoryReportViewModel.checkFromAndToCustomer(fromCusNo,toCusNo,sdf.format(Date()))
 
         saleVisitList.apply {
