@@ -44,6 +44,7 @@ class SaleCancelCheckoutActivity : BaseActivity(), KodeinAware {
     var discountAmt = 0.0
    var discountPercent="0"
     var totalAmt = 0.0
+    var isSaleExchange=false
     private var netAmount: Double = 0.0
     private var volDisAmount: Double = 0.0
     private var refundAmount: Double = 0.0
@@ -290,14 +291,24 @@ class SaleCancelCheckoutActivity : BaseActivity(), KodeinAware {
             }
 
             if (validationInput(paymentMethod == "B")) {
+                val payAmt = if (payAmount.text.isNotBlank()) payAmount.text.toString().toDouble() else 0.0
 
-                if (refundAmount < 0 || payAmount.text.isBlank()) {
-                    //setInvoiceId()
+                if (payAmt < netAmount){
+                    if (paymentMethod == "B" && !isSaleExchange){
+                        Utils.commonDialog("Insufficient Pay Amount!", this, 1)
+                        return
+                    }
                     saveData("CR")
-                } else {
-                    //setInvoiceId()
+                } else{
                     saveData("CA")
                 }
+//                if (refundAmount < 0 || payAmount.text.isBlank()) {
+//                    //setInvoiceId()
+//                    saveData("CR")
+//                } else {
+//                    //setInvoiceId()
+//                    saveData("CA")
+//                }
 
             }
 

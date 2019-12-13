@@ -79,7 +79,7 @@ import kotlin.collections.ArrayList
         date_txt.text = data.invoice_date
         invno_txt.text = data.invoice_no
         item_pay_edit.setText("")
-        invoiceAmount=data.amount
+        invoiceAmount=data.amount-data.pay_amount
         val creditList = creditCollectionCheckOutAdapter.getDataList() as ArrayList
         selectedItemPosition=position
       creditList[position] = data
@@ -153,7 +153,7 @@ import kotlin.collections.ArrayList
                     tempPayAmount =
                         p0.toString().replace(",", "").toDouble()
                     tempNetAmount =
-                        total_amount_txt.text.toString().replace(
+                        remaining_pay_amount_txt.text.toString().replace(
                             ",",
                             ""
                         ).toDouble()
@@ -163,6 +163,7 @@ import kotlin.collections.ArrayList
 
                 if (tempPayAmount > tempNetAmount) {
                     refund_txt.text = Utils.formatAmount(tempPayAmount - tempNetAmount)
+
                 }
 
             }
