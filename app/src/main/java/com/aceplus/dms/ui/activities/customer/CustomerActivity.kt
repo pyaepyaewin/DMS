@@ -151,18 +151,15 @@ class CustomerActivity : BaseActivity(), KodeinAware {
         customerViewModel.customerDataList.observe(this, Observer {
             mCustomerListAdapter.setNewList(it as ArrayList<Customer>)
             allCustomerDataList = it
+            if (edtSearch.text.isNotBlank()){
+                filterName(edtSearch.text.toString())
+            }
         })
 
         edtSearch.addTextChangedListener(object : TextWatcher {
 
             override fun onTextChanged(characterSequence: CharSequence, arg1: Int, arg2: Int, arg3: Int) {
-                val newCustomerList = mutableListOf<Customer>()
-                for (customer in allCustomerDataList) {
-                    if (customer.customer_name!!.toLowerCase().contains(characterSequence.toString().toLowerCase())) {
-                        newCustomerList.add(customer)
-                    }
-                }
-                mCustomerListAdapter.setNewList(newCustomerList as ArrayList<Customer>)
+                filterName(characterSequence.toString())
             }
             override fun beforeTextChanged(arg0: CharSequence, arg1: Int, arg2: Int, arg3: Int) { "Nothing To Do" }
             override fun afterTextChanged(arg0: Editable) { "Nothing To Do" }
@@ -185,6 +182,18 @@ class CustomerActivity : BaseActivity(), KodeinAware {
         btnSaleReturn.setOnClickListener { onClickSaleReturnButton() }
         btnLocation.setOnClickListener { onClickBtnLocation() }
         btnOk.setOnClickListener { onClickOkButton() }
+
+    }
+
+    private fun filterName(characterSequence: String){
+
+        val newCustomerList = mutableListOf<Customer>()
+        for (customer in allCustomerDataList) {
+            if (customer.customer_name!!.toLowerCase().contains(characterSequence.toLowerCase())) {
+                newCustomerList.add(customer)
+            }
+        }
+        mCustomerListAdapter.setNewList(newCustomerList as ArrayList<Customer>)
 
     }
 
