@@ -111,11 +111,6 @@ class SaleCancelCheckoutActivity : BaseActivity(), KodeinAware {
         deletedProductList = intent.getParcelableArrayListExtra("DELETED_PRODUCT_LIST")
         saleDateTextView.text = Utils.getCurrentDate(false)
         calculateTotalAmountForProduct()
-//        for (i in soldProductList) {
-//
-//            val amt = i.quantity.toDouble() * i.product.selling_price!!.toDouble()
-//            totalAmt += amt
-//        }
         tvTotalAmount.text = totalAmt.toString()
         tvNetAmount.text = totalAmt.toString()
         tvInvoiceId.text = intent.getStringExtra("INVOICE_ID")
@@ -158,10 +153,7 @@ class SaleCancelCheckoutActivity : BaseActivity(), KodeinAware {
             android.arch.lifecycle.Observer {
 
                 it?.let {
-//                    it.map {
-//                        it.total_discount_percent = edtVolumeDiscountPercent.text.toString()
-//                        //   it.total_discount_amount = edtVolumeDiscountAmt.text.toString().toDouble()
-//                    }
+
                     if (it.isNotEmpty()) {
                         startActivityForResult(
                             PrintInvoiceActivity.newIntentFromSaleCancelCheckout(
@@ -223,6 +215,7 @@ class SaleCancelCheckoutActivity : BaseActivity(), KodeinAware {
 
     }
 
+    //discount percent to discount amount
     private fun calculateDiscPercentToAmt() {
 
         if (edtVolumeDiscountPercent.text.toString().isNotBlank() && edtVolumeDiscountPercent.text.toString() != ".") {
@@ -243,6 +236,7 @@ class SaleCancelCheckoutActivity : BaseActivity(), KodeinAware {
 
     }
 
+    //discount amount to percent
     private fun calculateDiscAmtToPercent() {
 
         if (edtVolumeDiscountAmt.text.toString().isNotBlank() && edtVolumeDiscountAmt.text.toString() != ".") {
@@ -264,6 +258,7 @@ class SaleCancelCheckoutActivity : BaseActivity(), KodeinAware {
 
     }
 
+    //to calculate refund amount
     fun calculateRefundAmount() {
 
         if (payAmount.text.isNotBlank()) {
@@ -280,6 +275,8 @@ class SaleCancelCheckoutActivity : BaseActivity(), KodeinAware {
 
     }
 
+
+    //save button click
     private fun onClickSaveButton(type: String) {
 
         if (type == "save") {
@@ -302,19 +299,14 @@ class SaleCancelCheckoutActivity : BaseActivity(), KodeinAware {
                 } else{
                     saveData("CA")
                 }
-//                if (refundAmount < 0 || payAmount.text.isBlank()) {
-//                    //setInvoiceId()
-//                    saveData("CR")
-//                } else {
-//                    //setInvoiceId()
-//                    saveData("CA")
-//                }
+
 
             }
 
         }
     }
 
+    //to save data to database
     private fun saveData(cashOrLoanOrBank: String) {
         val invoiceId = intent.getStringExtra("INVOICE_ID")
         val customerId = intent.getStringExtra("CUSTOMER_ID")
@@ -373,6 +365,7 @@ class SaleCancelCheckoutActivity : BaseActivity(), KodeinAware {
     }
 
 
+    //to check validation input
     private fun validationInput(withBankInfo: Boolean): Boolean {
 
         var dateAndPayment = false
@@ -384,8 +377,6 @@ class SaleCancelCheckoutActivity : BaseActivity(), KodeinAware {
         edit_txt_account_name.error = null
 
         dateAndPayment = true
-
-
 
         if (receiptPerson.text.isNotBlank()) name = true
         else receiptPerson.error = "Please enter receipt person"
@@ -404,6 +395,7 @@ class SaleCancelCheckoutActivity : BaseActivity(), KodeinAware {
 
     }
 
+    //to calculate tax
     private fun calculateTax(): Double {
 
         var taxAmt = 0.0
@@ -416,6 +408,7 @@ class SaleCancelCheckoutActivity : BaseActivity(), KodeinAware {
 
     }
 
+    //to calculate total amount
     private fun calculateTotalAmountForProduct() {
         var soldPrice = 0.0
 

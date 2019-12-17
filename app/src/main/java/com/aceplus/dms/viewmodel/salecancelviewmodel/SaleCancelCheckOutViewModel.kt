@@ -24,7 +24,7 @@ class SaleCancelCheckOutViewModel(
         launch {
             saleCancelRepo.getTaxPercent()
                 .subscribeOn(schedulerProvider.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .observeOn(schedulerProvider.mainThread())
                 .subscribe({
                     taxPercentSuccessState.value = it
 
@@ -67,14 +67,6 @@ class SaleCancelCheckOutViewModel(
 
     fun deleteInvoicePresenttData(invoiceID: String) {
         saleCancelRepo.deleteInvoicePresent(invoiceID)
-    }
-
-    fun deleteInvoiceProductForLongClick(invoiceId: String, productIdList: List<Int>) {
-        saleCancelRepo.deleteInvoiceProductForLongClick(invoiceId, productIdList)
-    }
-
-    fun updateProductRemainingQuantity(soldProductInfo: SoldProductInfo) {
-        saleCancelRepo.updateProductRemainingQtyForSaleCancel(soldProductInfo)
     }
 
     @SuppressLint("CheckResult")
@@ -195,7 +187,7 @@ class SaleCancelCheckOutViewModel(
         }
         saleCancelRepo.insertInvoiceProduct(invoiceProductList)
         saleCancelRepo.insertInvoice(invoice)
-
+       // saleCancelRepo.insertInvoiceAndInvoiceProduct(invoice,invoiceProductList)
 
     }
 }

@@ -140,7 +140,6 @@ import kotlin.collections.ArrayList
 
         payment_amount_edit.text = null
         item_pay_edit.text = null
-
         payment_amount_edit.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(p0: Editable?) {
 

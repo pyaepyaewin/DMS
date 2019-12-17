@@ -19,8 +19,8 @@ class ViewByListViewModel(private val viewByListRepo: ViewByListRepo, private va
     fun loadTownShipData() {
         launch {
             viewByListRepo.getTownShipList()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.mainThread())
                 .subscribe({
                     townshipListSuccessState.postValue(it)
                 },{
@@ -32,8 +32,8 @@ class ViewByListViewModel(private val viewByListRepo: ViewByListRepo, private va
     {
         launch {
             viewByListRepo.getTownShipDetail()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.mainThread())
                 .subscribe(
                     {
                         townShipDetailListSuccessState.postValue(it)

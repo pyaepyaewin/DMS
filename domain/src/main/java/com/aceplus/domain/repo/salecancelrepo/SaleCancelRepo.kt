@@ -22,6 +22,7 @@ interface SaleCancelRepo {
     fun deleteInvoiceData(invoiceId: String)
     fun deleteInvoiceProduct(invoiceId: String)
     fun deleteInvoicePresent(invoiceId: String)
+    fun deleteData(invoiceId: String)
     fun updateQuantity(invoiceId: String, productId: String, qty: Int)
     fun deleteInvoiceProductForLongClick(invoiceId: String, productIdList: List<Int>)
     fun getTaxPercent(): Observable<List<CompanyInformation>>
@@ -34,6 +35,7 @@ interface SaleCancelRepo {
     fun updateTotalQtyForInvoice(invoiceId: String, totalQty: Int)
     fun updateInvoice(invoice: Invoice)
     fun insertInvoice(invoice: Invoice)
+    fun insertInvoiceAndInvoiceProduct(invoice: Invoice,invoiceProductList: List<InvoiceProduct>)
     fun getSoldInvoice(invoiceId: String): Observable<List<Invoice>>
     fun insertInvoiceCancel(
         invoiceCancel: InvoiceCancel,
@@ -50,7 +52,6 @@ interface SaleCancelRepo {
 
     fun updateProductRemainingQtyForSoldProduct(addQty:Int,productId: String)
     fun updateProductRemainingQtyForUnsoldProduct(unsoldQty:Int,productId: String)
-  //  fun updateProductRemainingQtyForLongClickDelete(unsoldQty: Int,productIdList: List<Int>)
 
 
 }

@@ -198,6 +198,7 @@ class SaleCancelDetailActivity : BaseActivity(), KodeinAware {
                 if (it!!.isNotEmpty()) {
                     soldProductDataList = it as MutableList<SaleCancelDetailItem>
                     var soldProductInfoList = ArrayList<SoldProductInfo>()
+                    //map to get sold product info object
                     soldProductDataList.map {
                         val soldProductInfo = SoldProductInfo()
                         soldProductInfo.product = Product()
@@ -301,7 +302,7 @@ class SaleCancelDetailActivity : BaseActivity(), KodeinAware {
 
     }
 
-
+    //choose to delete whole invoice or change quantity
     fun alertDialogWithRadioButtons() {
         val values = arrayOf<String>("Cancel the whole invoice", "Cancel only quantity")
         var builder = AlertDialog.Builder(this)
@@ -325,14 +326,14 @@ class SaleCancelDetailActivity : BaseActivity(), KodeinAware {
         alertDialog1.setCanceledOnTouchOutside(false)
 
     }
-
+   //insert deleted sale invoice to database
     private fun insertSaleCancelToDb() {
         val invoiceID = intent.getStringExtra("INVOICE_ID")
         saleCancelViewModel.loadInvoiceCancel(invoiceID)
 
     }
 
-
+    //change quantity
     private fun onClickQtyButton(soldProduct: SoldProductInfo, position: Int) {
 
         val layoutInflater =
@@ -375,6 +376,7 @@ class SaleCancelDetailActivity : BaseActivity(), KodeinAware {
 
     }
 
+    //delete select invoice
     private fun onLongClickSoldProductListItem(soldProduct: SoldProductInfo, position: Int) {
 
         android.app.AlertDialog.Builder(this)

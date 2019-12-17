@@ -26,7 +26,7 @@ class SaleCancelViewModel(
         launch {
             saleCancelRepo.getSaleCancelList()
                 .subscribeOn(schedulerProvider.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .observeOn(schedulerProvider.mainThread())
                 .subscribe({
                     saleCancelSuccessState.postValue(it)
 
@@ -36,17 +36,16 @@ class SaleCancelViewModel(
         }
     }
 
+    //to get id for sold product data list
     var calculatedSoldProductList = MutableLiveData<Pair<ArrayList<SoldProductInfo>, Double>>()
-
     var productIdListSuccessState = MutableLiveData<List<String>>()
     var productIdListErrorState = MutableLiveData<String>()
     fun loadSoldProductIdList(invoiceID: String) {
         launch {
             saleCancelRepo.getProductIdList(invoiceID)
                 .subscribeOn(schedulerProvider.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .observeOn(schedulerProvider.mainThread())
                 .subscribe({
-
 
                     productIdListSuccessState.value = it
 
@@ -56,13 +55,14 @@ class SaleCancelViewModel(
         }
     }
 
+    //sold product data list for recycler view
     var soldProductListSuccessState = MutableLiveData<List<SaleCancelDetailItem>>()
     var soldProductListErrorState = MutableLiveData<String>()
     fun loadSoldProductList(productIdList: List<String>, invoiceID: String) {
         launch {
             saleCancelRepo.getSoldProductList(productIdList, invoiceID)
                 .subscribeOn(schedulerProvider.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .observeOn(schedulerProvider.mainThread())
                 .subscribe({
                     soldProductListSuccessState.value = it
 
@@ -80,7 +80,7 @@ class SaleCancelViewModel(
         launch {
             saleCancelRepo.getPromotionDateList(currentDate)
                 .subscribeOn(schedulerProvider.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .observeOn(schedulerProvider.mainThread())
                 .subscribe({
                     promotionDateSuccessState.value = it
 
@@ -96,7 +96,7 @@ class SaleCancelViewModel(
         launch {
             saleCancelRepo.getPromotionPriceById(promotionPlanId, buy_qty, stockID)
                 .subscribeOn(schedulerProvider.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .observeOn(schedulerProvider.mainThread())
                 .subscribe({
                     promotionPriceSuccessState.value = it
 
@@ -106,13 +106,14 @@ class SaleCancelViewModel(
         }
     }
 
+    //to get deleted invoice
     var invoiceCancelSuccessState = MutableLiveData<Invoice>()
     var invoiceCancelErrorState = MutableLiveData<String>()
     fun loadInvoiceCancel(invoiceId: String) {
         launch {
             saleCancelRepo.getInvoiceCancel(invoiceId)
                 .subscribeOn(schedulerProvider.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .observeOn(schedulerProvider.mainThread())
                 .subscribe({
                     invoiceCancelSuccessState.value = it
                     invoiceCancelSuccessState.value = null
@@ -123,6 +124,7 @@ class SaleCancelViewModel(
         }
     }
 
+    //save deleted invoice to database
     fun saveDeleteInvoice(
         soldProductList: ArrayList<SoldProductInfo>,
         invoice: Invoice,
@@ -160,11 +162,7 @@ class SaleCancelViewModel(
             totalQty += soldProduct.quantity
             saleCancelRepo.updateProductRemainingQtyForUnsold(soldProduct.quantity,soldProduct.product.id.toString())
         }
-
-//        saleCancelRepo.updateProductRemainingQty(
-//            soldProductList[0].quantity,
-//            soldProductList[0].product.id
-//        )
+         //to insert sale cancel table
         var invoiceCancel = InvoiceCancel()
         invoiceCancel.id = invoice.invoice_id
         invoiceCancel.invoice_id = invoice.invoice_product_id.toString()
@@ -197,13 +195,14 @@ class SaleCancelViewModel(
 
 
         saleCancelRepo.insertInvoiceCancel(invoiceCancel, invoiceProductList)
-
+// saleCancelRepo.deleteData(invoiceID)
         saleCancelRepo.deleteInvoiceProduct(invoiceID)
         saleCancelRepo.deleteInvoiceData(invoiceID)
         saleCancelRepo.deleteInvoicePresent(invoiceID)
 
 
     }
+
 
     fun calculateSoldProductData(soldProductList: ArrayList<SoldProductInfo>) {
 
@@ -228,6 +227,7 @@ class SaleCancelViewModel(
 
     }
 
+    //calculate net amount
     private fun calculateNetAmount(soldProductList: ArrayList<SoldProductInfo>): Double {
         var netAmount = 0.0
         for (soldProduct in soldProductList) {

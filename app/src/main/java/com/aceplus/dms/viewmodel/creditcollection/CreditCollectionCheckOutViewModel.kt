@@ -29,12 +29,10 @@ class CreditCollectionCheckOutViewModel(
         launch {
             creditCollectionCheckOutRepo.getCreditCollectionCheckOutList(customerId)
                 .subscribeOn(schedulerProvider.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .observeOn(schedulerProvider.mainThread())
                 .subscribe({
-                    //                    creditCollectionCheckOutSuccessState.postValue(it)
                     creditCollectionCheckOutSuccessState.value = it
                     creditList = it
-//                    creditCollectionCheckOutSuccessState.value = null
 
                 }, {
                     creditCollectionCheckOutErrorState.value = it.localizedMessage
@@ -42,20 +40,21 @@ class CreditCollectionCheckOutViewModel(
         }
     }
 
-
+   //to get location id
     fun getLocationID():String {
 
           return  creditCollectionCheckOutRepo.getLocation()
 
     }
 
+    //to get cash receive table size to insert cash receive data
     var cashReceiveCountSuccessState = MutableLiveData<Int>()
     var cashReceiveCountErrorState = MutableLiveData<String>()
     fun getCashReceiveCount() {
         launch {
             creditCollectionCheckOutRepo.getCashReceiveCount()
                 .subscribeOn(schedulerProvider.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .observeOn(schedulerProvider.mainThread())
                 .subscribe({
                     cashReceiveCountSuccessState.postValue(it)
                 }, {
@@ -64,11 +63,11 @@ class CreditCollectionCheckOutViewModel(
         }
     }
 
+    //insert cash receive data to cash receive table and cash receive item table from database after pay amount
     fun insertCashReceiveData(creditDataList: List<Credit>, count: Int) {
         var cashList: MutableList<CashReceive> = mutableListOf()
         var cashItemList: MutableList<CashReceiveItem> = mutableListOf()
         var newCount=count
-       // creditCollectionCheckOutRepo.getCashReceiveCount()
         for (credit in creditDataList) {
             val cashReceive = CashReceive()
             val cashReceiveItem = CashReceiveItem()
@@ -103,17 +102,19 @@ class CreditCollectionCheckOutViewModel(
         creditCollectionCheckOutRepo.saveCashReceiveDataIntoDatabase(cashList, cashItemList)
     }
 
-
+    //update pay amount after paying
     fun updatePayAmount(payAmt: Double, invoiceNo: String) {
 
         creditCollectionCheckOutRepo.updatePayAmount(payAmt, invoiceNo)
 
     }
 
+    //get township name for print view
     fun getTownShipName(customerId: Int): String {
         return creditCollectionCheckOutRepo.getTownShipName(customerId)
     }
 
+    //calculate pay amount for unselected invoice
     fun calculatePayAmount(payAmt: String): List<Credit> {
 
         var payAmount: Double = payAmt.replace(",", "").toDouble()
@@ -155,15 +156,15 @@ class CreditCollectionCheckOutViewModel(
     }
 
 
+    //calculate payamount for selected invoice
     fun calculatePayAmountForSelectedInvoice(payAmt: String, position: Int): List<Credit> {
 
         var payAmount: Double = payAmt.replace(",", "").toDouble()
-//        val remainList = ArrayList<Credit>()
         var remainList = mutableListOf<Credit>()
         val tempCreditList = ArrayList<Credit>()
         tempCreditList.addAll(creditList)
 
-
+        //pay selected invoice and then if is refund,pay another invoice
         val creditAmount = creditList[position].amount - creditList[position].pay_amount
 
         if (payAmount != 0.0 && payAmount < creditAmount) {

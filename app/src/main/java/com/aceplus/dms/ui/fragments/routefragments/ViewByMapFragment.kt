@@ -92,6 +92,7 @@ class ViewByMapFragment : BaseFragment(), KodeinAware {
 
     }
 
+    //to get customer location
     private fun CustomerLocation() {
         for (i in latlngList!!) {
 

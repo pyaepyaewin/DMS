@@ -15,8 +15,8 @@ class CustomerLocationViewModel(private val customerLocationRepo: CustomerLocati
     fun loadCustomerLocation() {
         launch {
             customerLocationRepo.getCustomerLocation()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.mainThread())
                 .subscribe({
                     customerLocationSuccessState.postValue(it)
                 },{

@@ -20,7 +20,7 @@ class PromotionViewModel(
         launch {
             promotionRepo.getPromotionPriceList()
                 .subscribeOn(schedulerProvider.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .observeOn(schedulerProvider.mainThread())
                 .subscribe({
                     promotionPriceSuccessState.postValue(it)
                 }, {
@@ -53,8 +53,8 @@ class PromotionViewModel(
     fun loadCategoryDiscount() {
         launch {
            promotionRepo.getCategoryDiscountList()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.mainThread())
                 .subscribe({
                     categoryDiscountSuccessState.postValue(it)
                 },{
@@ -68,8 +68,8 @@ class PromotionViewModel(
     fun loadVolumeDiscount() {
         launch {
             promotionRepo.getVolumeDiscountList()
-                .subscribeOn(io.reactivex.schedulers.Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.mainThread())
                 .subscribe({
                     volumeDiscountSuccessState.postValue(it)
                 },{
@@ -83,8 +83,8 @@ class PromotionViewModel(
     fun loadVolumeDiscountFilterList() {
         launch {
             promotionRepo.getVolumeDiscountFilterList()
-                .subscribeOn(io.reactivex.schedulers.Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.mainThread())
                 .subscribe({
                     volumeDiscountFilterSuccessState.postValue(it)
                 },{
@@ -98,8 +98,8 @@ class PromotionViewModel(
     fun loadClassDiscountByPrice(currentDate : String) {
         launch {
             promotionRepo.getClassDiscountByPrice(currentDate)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.mainThread())
                 .subscribe({
                     classDiscountByPriceSuccessState.postValue(it)
                 },{
@@ -113,8 +113,8 @@ class PromotionViewModel(
     fun loadClassDiscountByGift(currentDate: String) {
         launch {
             promotionRepo.getClassDiscountByGift(currentDate)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.mainThread())
                 .subscribe({
                     classDiscountByGiftSuccessState.postValue(it)
                 },{
@@ -128,8 +128,8 @@ class PromotionViewModel(
     fun loadClassDiscountForShowPrice(currentDate: String) {
         launch {
             promotionRepo.getClassDiscountForShowPrice(currentDate)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.mainThread())
                 .subscribe({
                     classDiscountForShowPriceSuccessState.postValue(it)
                 },{
@@ -143,8 +143,8 @@ class PromotionViewModel(
     fun loadClassDiscountForShowGift(currentDate: String) {
         launch {
             promotionRepo.getClassDiscountForShowGift(currentDate)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(schedulerProvider.io())
+                .observeOn(schedulerProvider.mainThread())
                 .subscribe({
                     classDiscountForShowGiftSuccessState.postValue(it)
                 },{

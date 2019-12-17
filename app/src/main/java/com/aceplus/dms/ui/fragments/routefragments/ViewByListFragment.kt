@@ -86,6 +86,7 @@ class ViewByListFragment : BaseFragment(), KodeinAware {
         }
         viewByListViewModel.loadTownShipDetail()
 
+        //spinner item select
         townshipspinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onNothingSelected(parent: AdapterView<*>?) {
 
@@ -110,8 +111,6 @@ class ViewByListFragment : BaseFragment(), KodeinAware {
                             filterList.add(c)
                     }
                 }
-
-
 
                 viewByListAdapter.setNewList(filterList)
 
