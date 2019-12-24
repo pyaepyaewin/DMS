@@ -195,10 +195,8 @@ class SaleCancelViewModel(
 
 
         saleCancelRepo.insertInvoiceCancel(invoiceCancel, invoiceProductList)
-// saleCancelRepo.deleteData(invoiceID)
-        saleCancelRepo.deleteInvoiceProduct(invoiceID)
-        saleCancelRepo.deleteInvoiceData(invoiceID)
-        saleCancelRepo.deleteInvoicePresent(invoiceID)
+        saleCancelRepo.deleteData(invoiceID)
+
 
 
     }

@@ -185,9 +185,9 @@ class SaleCancelCheckOutViewModel(
                 )
             }
         }
-        saleCancelRepo.insertInvoiceProduct(invoiceProductList)
-        saleCancelRepo.insertInvoice(invoice)
-       // saleCancelRepo.insertInvoiceAndInvoiceProduct(invoice,invoiceProductList)
+//        saleCancelRepo.insertInvoiceProduct(invoiceProductList)
+//        saleCancelRepo.insertInvoice(invoice)
+      saleCancelRepo.insertInvoiceAndInvoiceProduct(invoice,invoiceProductList)
 
     }
 }
