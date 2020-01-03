@@ -28,6 +28,20 @@ class CreditCollectionActivity : BaseActivity(), KodeinAware {
         CreditCollectionAdapter(this::onClickNoticeListItem)
     }
 
+    private val creditCollectionViewModel: CreditCollectionViewModel by viewModel()
+
+    companion object {
+        fun newIntent(context: Context): Intent {
+            return Intent(context, CreditCollectionActivity::class.java)
+        }
+    }
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        catchEvents()
+        setupUI()
+        creditCollectionViewModel.loadCreditCollection()
+
+    }
     private fun onClickNoticeListItem(data: CreditCollectionDataClass) {
         val unpaidAmt=data.amount-data.pay_amount!!
         if (unpaidAmt !== 0.0) {
@@ -37,23 +51,17 @@ class CreditCollectionActivity : BaseActivity(), KodeinAware {
             Utils.commonDialog("No credit for this customer", this, 2)
         }
     }
-
-    private val creditCollectionViewModel: CreditCollectionViewModel by viewModel()
-
-
-
-    companion object {
-        fun newIntent(context: Context): Intent {
-            return Intent(context, CreditCollectionActivity::class.java)
+    private fun setupUI()
+    {
+        rvCreditCollection.apply {
+            layoutManager = LinearLayoutManager(context)
+            adapter = creditCollectionAdapter
         }
     }
-
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    private fun catchEvents()
+    {
         cancel_img.setOnClickListener {
             onBackPressed()
-            true
         }
         creditCollectionViewModel.creditCollectionSuccessState.observe(
             this,
@@ -73,12 +81,6 @@ class CreditCollectionActivity : BaseActivity(), KodeinAware {
             android.arch.lifecycle.Observer {
                 i("Error",it)
             })
-        rvCreditCollection.apply {
-            layoutManager = LinearLayoutManager(context)
-            adapter = creditCollectionAdapter
-        }
-        creditCollectionViewModel.loadCreditCollection()
-
 
     }
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
