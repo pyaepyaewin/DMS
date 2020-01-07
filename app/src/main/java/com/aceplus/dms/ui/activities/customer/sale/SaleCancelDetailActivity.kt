@@ -36,23 +36,23 @@ class SaleCancelDetailActivity : BaseActivity(), KodeinAware {
     override val kodein: Kodein by kodein()
     override val layoutId: Int
         get() = com.aceplus.dms.R.layout.activity_sale
-
     var soldProductList1 = mutableListOf<String>()
-    val invoiceCancelProductList: ArrayList<InvoiceCancelProduct> = ArrayList()
-    var invoiceCancelList = ArrayList<InvoiceCancel>()
-    private var invoiceList: ArrayList<InvoiceCancel> = ArrayList()
     var invoice = Invoice()
     var deletedProductList = arrayListOf<SoldProductInfo>()
-    var soldInvoiceDataList = mutableListOf<Invoice>()
-
-    //    val customerId = intent.getStringExtra("CUSTOMER_ID")
     var soldProductDataList = mutableListOf<SaleCancelDetailItem>()
     private var isPreOrder: Boolean = false
-    private var duplicateProductList = mutableListOf<SoldProductInfo>()
     private var promotionArrayList = ArrayList<Promotion>()
+    var netAmt = 0.0
+    private lateinit var alertDialog1: AlertDialog
+    private var invoiceid: String = ""
+    private var invoicedate = ""
+    private var customerId = ""
+    private var customerName = ""
+    private val saleCancelViewModel: SaleCancelViewModel by viewModel()
 
-    var netAmt=0.0
-    lateinit var alertDialog1: AlertDialog
+    private val saleCancelDetailAdapter: SaleCancelDetailAdapter by lazy {
+        SaleCancelDetailAdapter(this::onClickQtyButton, this::onLongClickSoldProductListItem)
+    }
 
     companion object {
         fun getIntent(
@@ -71,36 +71,17 @@ class SaleCancelDetailActivity : BaseActivity(), KodeinAware {
         }
     }
 
-    private val saleCancelViewModel: SaleCancelViewModel by viewModel()
-
-    private val saleCancelDetailAdapter: SaleCancelDetailAdapter by lazy {
-        SaleCancelDetailAdapter(this::onClickQtyButton, this::onLongClickSoldProductListItem)
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        tvTitle.text = "SALES CANCEL"
-        tableHeaderOrderedQty.visibility = View.GONE
-        headerFoc.visibility = View.GONE
-        headerDiscount.visibility = View.GONE
-//        if (intent.getSerializableExtra(SaleCheckoutActivity.PRESENT_PROUDCT_LIST_KEY) != null) {
-//
-//            promotionArrayList =
-//                intent.getSerializableExtra(SaleCheckoutActivity.PRESENT_PROUDCT_LIST_KEY) as ArrayList<Promotion>
-//        }
-        if (soldProductDataList.size == 0) {
-            Utils.commonDialog("No issued product", this, 2)
+        setUpUI()
+        getIntentData()
+        catchEvents()
+        saleCancelViewModel.loadSoldProductIdList(invoiceid)
+    }
 
-        }
-        alertDialogWithRadioButtons()
-        var invoiceid = intent.getStringExtra("INVOICE_ID")
-        var invoicedate = intent.getStringExtra("INVOICE_DATE")
-        var customerId = intent.getStringExtra("CUSTOMER_ID")
-        var customerName = intent.getStringExtra("CUSTOMER_NAME")
-
+    private fun catchEvents() {
         cancelImg.setOnClickListener {
             onBackPressed()
-            true
         }
         checkoutImg.setOnClickListener {
 
@@ -112,10 +93,8 @@ class SaleCancelDetailActivity : BaseActivity(), KodeinAware {
                     .show()
             } else {
 
-                for(soldProduct in saleCancelDetailAdapter.getDataList())
-                {
-                    if(soldProduct.quantity==0)
-                    {
+                for (soldProduct in saleCancelDetailAdapter.getDataList()) {
+                    if (soldProduct.quantity == 0) {
                         android.app.AlertDialog.Builder(this@SaleCancelDetailActivity)
                             .setTitle("Alert")
                             .setMessage("Quantity must not be zero.")
@@ -142,12 +121,10 @@ class SaleCancelDetailActivity : BaseActivity(), KodeinAware {
         saleCancelViewModel.productIdListSuccessState.observe(
             this,
             android.arch.lifecycle.Observer {
-                    soldProductList1 = it as MutableList<String>
-                    //saleCancelViewModel.soldProductListSuccessState.value=null
+                soldProductList1 = it as MutableList<String>
+                //saleCancelViewModel.soldProductListSuccessState.value=null
 
-                    saleCancelViewModel.loadSoldProductList(it, invoiceid)
-
-
+                saleCancelViewModel.loadSoldProductList(it, invoiceid)
 
 
             })
@@ -158,7 +135,7 @@ class SaleCancelDetailActivity : BaseActivity(), KodeinAware {
 
             })
 
-        saleCancelViewModel.loadSoldProductIdList(invoiceid)
+
         saleCancelViewModel.invoiceCancelSuccessState.observe(
             this,
             android.arch.lifecycle.Observer {
@@ -173,7 +150,6 @@ class SaleCancelDetailActivity : BaseActivity(), KodeinAware {
                     }
                 }
 
-
             })
 
         saleCancelViewModel.invoiceCancelErrorState.observe(
@@ -187,7 +163,7 @@ class SaleCancelDetailActivity : BaseActivity(), KodeinAware {
                 saleCancelDetailAdapter.setNewList(it.first)
 
                 tvNetAmount.text = Utils.formatAmount(it.second)
-                netAmt=it.second
+                netAmt = it.second
                 saleCancelViewModel.calculatedSoldProductList.value = null
             }
         })
@@ -222,11 +198,10 @@ class SaleCancelDetailActivity : BaseActivity(), KodeinAware {
                         soldProductInfo.product.sold_quantity = it.sold_quantity
                         soldProductInfo.product.total_quantity = it.total_quantity
                         soldProductInfo.totalAmt = it.total_amount
-                        var promoPrice =it.promotion_price
+                        var promoPrice = it.promotion_price
                         if (promoPrice == 0.0) {
                             soldProductInfo.promotionPrice = it.selling_price.toDouble()
-                        }
-                        else{
+                        } else {
                             soldProductInfo.promotionPrice = promoPrice
 
                         }
@@ -236,7 +211,7 @@ class SaleCancelDetailActivity : BaseActivity(), KodeinAware {
                         soldProductInfo.discountPercent = it.discount_percent
                         soldProductInfo.exclude = it.exclude
                         soldProductInfo.promotionPlanId = it.promotion_plan_id.toString()
-                        soldProductInfo.currentProductQty=it.sale_quantity.toInt()
+                        soldProductInfo.currentProductQty = it.sale_quantity.toInt()
                         soldProductInfoList.add(soldProductInfo)
                         saleCancelViewModel.calculateSoldProductData(soldProductInfoList)
 
@@ -250,18 +225,11 @@ class SaleCancelDetailActivity : BaseActivity(), KodeinAware {
                 }
             })
 
-
-
         saleCancelViewModel.soldProductListErrorState.observe(
             this,
             android.arch.lifecycle.Observer {
 
             })
-
-        rvSoldProductList.apply {
-            layoutManager = LinearLayoutManager(context)
-            adapter = saleCancelDetailAdapter
-        }
         saleCancelViewModel.promotionDateSuccessState.observe(
             this,
             android.arch.lifecycle.Observer {
@@ -289,7 +257,6 @@ class SaleCancelDetailActivity : BaseActivity(), KodeinAware {
             android.arch.lifecycle.Observer {
                 it?.let {
 
-
                 }
             })
 
@@ -298,8 +265,34 @@ class SaleCancelDetailActivity : BaseActivity(), KodeinAware {
             android.arch.lifecycle.Observer {
 
             })
+    }
 
+    private fun setUpUI() {
+        tvTitle.text = "SALES CANCEL"
+        tableHeaderOrderedQty.visibility = View.GONE
+        headerFoc.visibility = View.GONE
+        headerDiscount.visibility = View.GONE
+        if (soldProductDataList.size == 0) {
+            Utils.commonDialog("No issued product", this, 2)
 
+        }
+        alertDialogWithRadioButtons()
+        rvSoldProductList.apply {
+            layoutManager = LinearLayoutManager(context)
+            adapter = saleCancelDetailAdapter
+        }
+    }
+
+    private fun getIntentData() {
+        invoiceid = intent.getStringExtra("INVOICE_ID")
+        invoicedate = intent.getStringExtra("INVOICE_DATE")
+        customerId = intent.getStringExtra("CUSTOMER_ID")
+        customerName = intent.getStringExtra("CUSTOMER_NAME")
+        //        if (intent.getSerializableExtra(SaleCheckoutActivity.PRESENT_PROUDCT_LIST_KEY) != null) {
+//
+//            promotionArrayList =
+//                intent.getSerializableExtra(SaleCheckoutActivity.PRESENT_PROUDCT_LIST_KEY) as ArrayList<Promotion>
+//        }
     }
 
     //choose to delete whole invoice or change quantity
@@ -326,7 +319,8 @@ class SaleCancelDetailActivity : BaseActivity(), KodeinAware {
         alertDialog1.setCanceledOnTouchOutside(false)
 
     }
-   //insert deleted sale invoice to database
+
+    //insert deleted sale invoice to database
     private fun insertSaleCancelToDb() {
         val invoiceID = intent.getStringExtra("INVOICE_ID")
         saleCancelViewModel.loadInvoiceCancel(invoiceID)
@@ -349,7 +343,7 @@ class SaleCancelDetailActivity : BaseActivity(), KodeinAware {
                     Log.i("qty", "qqqqqqqqqqqqqqqqqqq")
                 } else {
                     val quantity = view.quantity.text.toString().toInt()
-                    if (soldProduct.quantity != 0 && soldProduct.quantity < quantity){
+                    if (soldProduct.quantity != 0 && soldProduct.quantity < quantity) {
 
                         soldProduct.currentProductQty = soldProduct.quantity
                     }
@@ -411,7 +405,6 @@ class SaleCancelDetailActivity : BaseActivity(), KodeinAware {
                 finish()
             }
     }
-
 
 
 }

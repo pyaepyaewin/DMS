@@ -42,13 +42,17 @@ class ClassDiscountByGiftFragment:BaseFragment(),KodeinAware {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        catchEvents()
+        setUpUI()
+        classDiscountByGiftViewModel.loadClassDiscountByGift(Utils.getCurrentDate(true))
+    }
+    private fun catchEvents()
+    {
         cancel_img.setOnClickListener {
             val intent = Intent(context, MainActivity::class.java)
             startActivity(intent)
 
         }
-        category_discount_title.text = "CLASS DISCOUNT BY Gift"
-        product_name.text = "CLASS ID"
         classDiscountByGiftViewModel.classDiscountByGiftSuccessState.observe(this, android.arch.lifecycle.Observer {
             classDiscountByGiftAdapter.setNewList(it as ArrayList<ClassDiscountByGiftDataClass>)
         })
@@ -56,13 +60,16 @@ class ClassDiscountByGiftFragment:BaseFragment(),KodeinAware {
         classDiscountByGiftViewModel.classDiscountByGiftErrorState.observe(this,android.arch.lifecycle.Observer {
             Toast.makeText(activity, it, Toast.LENGTH_LONG).show()
         })
+    }
+    private fun setUpUI()
+    {
+        category_discount_title.text = "CLASS DISCOUNT BY Gift"
+        product_name.text = "CLASS ID"
         rvClassDiscountByGift.apply {
             layoutManager = LinearLayoutManager(activity)
             adapter = classDiscountByGiftAdapter
         }
-        classDiscountByGiftViewModel.loadClassDiscountByGift(Utils.getCurrentDate(true))
     }
-
 
 }
 

@@ -39,22 +39,28 @@ class PromotionPriceFragment: BaseFragment() , KodeinAware {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        catchEvents()
+        setUpUI()
+        promotionPriceViewModel.loadPromotionPrice()
+    }
+    private fun setUpUI()
+    {
+        rvPromotionPrice.apply {
+            layoutManager = LinearLayoutManager(activity)
+            adapter = promotionPriceAdapter
+        }
+    }
+    private fun catchEvents()
+    {
         cancel_imgPromotionPrice.setOnClickListener {
             val intent = Intent(context, MainActivity::class.java)
             startActivity(intent)
-
         }
-
         promotionPriceViewModel.promotionPriceSuccessState.observe(this, Observer {
             promotionPriceAdapter.setNewList(it as ArrayList<PromotionPriceDataClass>)
         })
         promotionPriceViewModel.promotionPriceErrorState.observe(this,android.arch.lifecycle.Observer {
             Toast.makeText(activity, it, Toast.LENGTH_LONG).show()
         })
-        rvPromotionPrice.apply {
-            layoutManager = LinearLayoutManager(activity)
-            adapter = promotionPriceAdapter
-        }
-        promotionPriceViewModel.loadPromotionPrice()
     }
     }

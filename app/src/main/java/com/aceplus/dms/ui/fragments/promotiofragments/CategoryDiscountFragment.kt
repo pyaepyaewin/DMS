@@ -21,7 +21,7 @@ import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.support.kodein
 
-class CategoryDiscountFragment:BaseFragment(),KodeinAware {
+class CategoryDiscountFragment : BaseFragment(), KodeinAware {
     override val kodein: Kodein by kodein()
     private val categoryDiscountadapter: CategoryDiscountAdapter by lazy {
         CategoryDiscountAdapter()
@@ -29,34 +29,44 @@ class CategoryDiscountFragment:BaseFragment(),KodeinAware {
     private val categoryDiscountViewModel: PromotionViewModel by viewModel()
 
     override fun onCreateView(
-    inflater: LayoutInflater,
-    container: ViewGroup?,
-    savedInstanceState: Bundle?
-): View? {
-    return inflater.inflate(R.layout.tab_fragment_category_discount_quantity, container, false)
-}
-
-override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-    super.onViewCreated(view, savedInstanceState)
-    cancel_img.setOnClickListener {
-        val intent = Intent(context, MainActivity::class.java)
-        startActivity(intent)
-
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        return inflater.inflate(R.layout.tab_fragment_category_discount_quantity, container, false)
     }
-    categoryDiscountViewModel.categoryDiscountSuccessState.observe(this, android.arch.lifecycle.Observer {
-        categoryDiscountadapter.setNewList(it as ArrayList<CategoryDiscountDataClass>)
-    })
 
-    categoryDiscountViewModel.categoryDiscountErrorState.observe(this,android.arch.lifecycle.Observer {
-        Toast.makeText(activity, it, Toast.LENGTH_LONG).show()
-    })
-    rvCategoryDiscount.apply {
-        layoutManager = LinearLayoutManager(activity)
-        adapter = categoryDiscountadapter
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        catchEvents()
+        setUpUI()
+        categoryDiscountViewModel.loadCategoryDiscount()
     }
-    categoryDiscountViewModel.loadCategoryDiscount()
-}
 
+    private fun catchEvents() {
+        cancel_img.setOnClickListener {
+            val intent = Intent(context, MainActivity::class.java)
+            startActivity(intent)
 
+        }
+        categoryDiscountViewModel.categoryDiscountSuccessState.observe(
+            this,
+            android.arch.lifecycle.Observer {
+                categoryDiscountadapter.setNewList(it as ArrayList<CategoryDiscountDataClass>)
+            })
+
+        categoryDiscountViewModel.categoryDiscountErrorState.observe(
+            this,
+            android.arch.lifecycle.Observer {
+                Toast.makeText(activity, it, Toast.LENGTH_LONG).show()
+            })
+    }
+
+    private fun setUpUI() {
+        rvCategoryDiscount.apply {
+            layoutManager = LinearLayoutManager(activity)
+            adapter = categoryDiscountadapter
+        }
+    }
 }
 

@@ -18,12 +18,13 @@ import com.aceplus.dms.viewmodel.promotionviewmodels.PromotionViewModel
 import com.aceplus.domain.model.promotionDataClass.PromotionGiftDataClass
 import com.aceplus.shared.ui.activities.BaseFragment
 import kotlinx.android.synthetic.main.tab_fragment_promotion_gift.*
+import kotlinx.android.synthetic.main.tab_fragment_volume_discount.*
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.support.kodein
 import java.util.ArrayList
 
-class PromotionGiftFragment:BaseFragment() ,KodeinAware{
+class PromotionGiftFragment : BaseFragment(), KodeinAware {
     override val kodein: Kodein by kodein()
     private val promotionGiftAdapter: PromotionGiftAdapter by lazy {
         PromotionGiftAdapter()
@@ -40,23 +41,32 @@ class PromotionGiftFragment:BaseFragment() ,KodeinAware{
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        catchEvents()
+        setUpUI()
+        promotionGiftViewModel.loadPromotionGift()
+    }
+
+    private fun setUpUI() {
+        rvPromotionGift.apply {
+            layoutManager = LinearLayoutManager(activity)
+            adapter = promotionGiftAdapter
+        }
+    }
+
+    private fun catchEvents() {
         cancel_img.setOnClickListener {
             val intent = Intent(context, MainActivity::class.java)
             startActivity(intent)
-
         }
         promotionGiftViewModel.promotionGiftSuccessState.observe(this, Observer {
             promotionGiftAdapter.setNewList(it as ArrayList<PromotionGiftDataClass>)
         })
 
-        promotionGiftViewModel.promotionGiftErrorState.observe(this,android.arch.lifecycle.Observer {
-            Toast.makeText(activity, it, Toast.LENGTH_LONG).show()
-        })
-        rvPromotionGift.apply {
-            layoutManager = LinearLayoutManager(activity)
-            adapter = promotionGiftAdapter
-        }
-        promotionGiftViewModel.loadPromotionGift()
+        promotionGiftViewModel.promotionGiftErrorState.observe(
+            this,
+            android.arch.lifecycle.Observer {
+                Toast.makeText(activity, it, Toast.LENGTH_LONG).show()
+            })
     }
 }
 

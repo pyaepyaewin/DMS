@@ -131,14 +131,6 @@ class SaleCancelCheckOutViewModel(
             }
             totalQtyForInvoice += soldProduct.quantity
             invoiceProductList.add(invoiceProduct)
-//            if (soldProduct.totalAmt != 0.0) {
-//
-//            }
-
-            var unsoldQty = soldProduct.currentProductQty - soldProduct.quantity
-            // saleCancelRepo.updateProductRemainingQtyForLongClickDelete(unsoldQty,productIdList)
-
-
             invoice.invoice_id = invoiceId
             invoice.customer_id = id
             invoice.sale_date = saleDate
@@ -185,8 +177,6 @@ class SaleCancelCheckOutViewModel(
                 )
             }
         }
-//        saleCancelRepo.insertInvoiceProduct(invoiceProductList)
-//        saleCancelRepo.insertInvoice(invoice)
       saleCancelRepo.insertInvoiceAndInvoiceProduct(invoice,invoiceProductList)
 
     }

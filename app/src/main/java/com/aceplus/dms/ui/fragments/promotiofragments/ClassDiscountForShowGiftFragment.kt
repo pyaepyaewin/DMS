@@ -24,7 +24,7 @@ import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.support.kodein
 
-class ClassDiscountForShowGiftFragment :BaseFragment(),KodeinAware{
+class ClassDiscountForShowGiftFragment : BaseFragment(), KodeinAware {
     override val kodein: Kodein by kodein()
     private val classDiscountForShowGiftAdapter: ClassDiscountForShowGiftAdapter by lazy {
         ClassDiscountForShowGiftAdapter()
@@ -41,27 +41,36 @@ class ClassDiscountForShowGiftFragment :BaseFragment(),KodeinAware{
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        cancel_img.setOnClickListener {
-            val intent = Intent(context, MainActivity::class.java)
-            startActivity(intent)
+        catchEvents()
+        setUpUI()
+        classDiscountForShowGiftViewModel.loadClassDiscountForShowGift(Utils.getCurrentDate(true))
+    }
 
-        }
-
+    private fun setUpUI() {
         product_name.text = "CLASS ID"
         category_discount_title.text = "CLASS DISCOUNT FOR SHOW GIFT"
-
-        classDiscountForShowGiftViewModel.classDiscountForShowGiftSuccessState.observe(this, android.arch.lifecycle.Observer {
-            classDiscountForShowGiftAdapter.setNewList(it as ArrayList<ClassDiscountForShowGiftDataClass>)
-        })
-
-        classDiscountForShowGiftViewModel.classDiscountForShowGiftErrorState.observe(this,android.arch.lifecycle.Observer {
-            Toast.makeText(activity, it, Toast.LENGTH_LONG).show()
-        })
         rvClassDiscountByGift.apply {
             layoutManager = LinearLayoutManager(activity)
             adapter = classDiscountForShowGiftAdapter
         }
-        classDiscountForShowGiftViewModel.loadClassDiscountForShowGift(Utils.getCurrentDate(true))
+    }
+
+    private fun catchEvents() {
+        cancel_img.setOnClickListener {
+            val intent = Intent(context, MainActivity::class.java)
+            startActivity(intent)
+        }
+        classDiscountForShowGiftViewModel.classDiscountForShowGiftSuccessState.observe(
+            this,
+            android.arch.lifecycle.Observer {
+                classDiscountForShowGiftAdapter.setNewList(it as ArrayList<ClassDiscountForShowGiftDataClass>)
+            })
+
+        classDiscountForShowGiftViewModel.classDiscountForShowGiftErrorState.observe(
+            this,
+            android.arch.lifecycle.Observer {
+                Toast.makeText(activity, it, Toast.LENGTH_LONG).show()
+            })
     }
 }
 

@@ -54,14 +54,14 @@ class SaleCancelCheckoutActivity : BaseActivity(), KodeinAware {
     private var taxType: String = ""
     private var volDisPercent: Double = 0.0
     private var salePersonId: String? = null
-    private var invoice = arrayListOf<Invoice>()
-    var totalQtyForInvoice = 0
-    val invoiceProductList: ArrayList<InvoiceProduct> = ArrayList()
     var deletedProductList: ArrayList<SoldProductInfo> = ArrayList()
-
-
     private val df = DecimalFormat(".##")
+    private var soldProductList: ArrayList<SoldProductInfo> = ArrayList()
 
+    private val saleCancelCheckOutAdapter: SaleCancelCheckoutAdapter by lazy {
+        SaleCancelCheckoutAdapter()
+    }
+    private val saleCancelCheckOutViewModel: SaleCancelCheckOutViewModel by viewModel()
 
     companion object {
         fun getSaleCancelDetailIntent(
@@ -73,7 +73,6 @@ class SaleCancelCheckoutActivity : BaseActivity(), KodeinAware {
             customerName: String,
             deletedProductList: ArrayList<SoldProductInfo>
 
-
         ): Intent {
             val saleCancelDetailIntent = Intent(context, SaleCancelCheckoutActivity::class.java)
             saleCancelDetailIntent.putExtra("SOLD_PRODUCT_LIST", soldProductList)
@@ -82,24 +81,33 @@ class SaleCancelCheckoutActivity : BaseActivity(), KodeinAware {
             saleCancelDetailIntent.putExtra("CUSTOMER_ID", customerID)
             saleCancelDetailIntent.putExtra("CUSTOMER_NAME", customerName)
             saleCancelDetailIntent.putExtra("DELETED_PRODUCT_LIST", deletedProductList)
-
-
             return saleCancelDetailIntent
 
         }
-
     }
 
-    private var soldProductList: ArrayList<SoldProductInfo> = ArrayList()
-
-    private val saleCancelCheckOutAdapter: SaleCancelCheckoutAdapter by lazy {
-        SaleCancelCheckoutAdapter()
-    }
-    private val saleCancelCheckOutViewModel: SaleCancelCheckOutViewModel by viewModel()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        title1.text = getString(R.string.sale_cancel_checkout)
+        getIntentData()
+        setUpUI()
+        catchEvents()
+        calculateTotalAmountForProduct()
+        saleCancelCheckOutAdapter.setNewList(soldProductList)
+        rvSoldProductList.apply {
+            layoutManager = LinearLayoutManager(context)
+            adapter = saleCancelCheckOutAdapter
+        }
+    }
 
+    private fun getIntentData()
+    {
+        soldProductList = intent.getParcelableArrayListExtra("SOLD_PRODUCT_LIST")
+        deletedProductList = intent.getParcelableArrayListExtra("DELETED_PRODUCT_LIST")
+        tvInvoiceId.text = intent.getStringExtra("INVOICE_ID")
+    }
+    private fun setUpUI()
+    {
+        title1.text = getString(R.string.sale_cancel_checkout)
         advancedPaidAmountLayout.visibility = View.GONE
         totalInfoForPreOrder.visibility = View.GONE
         tax_layout.visibility = View.VISIBLE
@@ -107,22 +115,14 @@ class SaleCancelCheckoutActivity : BaseActivity(), KodeinAware {
         volumeDiscountLayout2.visibility = View.GONE
         llSaleStatus.visibility = View.GONE
         tableHeaderDiscount.text = "Promotion Price"
-        soldProductList = intent.getParcelableArrayListExtra("SOLD_PRODUCT_LIST")
-        deletedProductList = intent.getParcelableArrayListExtra("DELETED_PRODUCT_LIST")
         saleDateTextView.text = Utils.getCurrentDate(false)
-        calculateTotalAmountForProduct()
-        tvTotalAmount.text = totalAmt.toString()
-        tvNetAmount.text = totalAmt.toString()
-        tvInvoiceId.text = intent.getStringExtra("INVOICE_ID")
-        saleCancelCheckOutAdapter.setNewList(soldProductList)
-        rvSoldProductList.apply {
-            layoutManager = LinearLayoutManager(context)
-            adapter = saleCancelCheckOutAdapter
-        }
+
+    }
+    private fun catchEvents()
+    {
         saleCancelCheckOutViewModel.taxPercentSuccessState.observe(
             this,
             android.arch.lifecycle.Observer {
-
                 taxPercent = it?.get(0)!!.tax!!
                 taxType = it?.get(0)!!.tax_type.toString()
                 netAmount = totalAmt
@@ -135,7 +135,8 @@ class SaleCancelCheckoutActivity : BaseActivity(), KodeinAware {
                     netAmount = totalAmt - totalDiscountAmount
                 }
                 tax_txtView.text = Utils.formatAmount(taxAmt)
-
+                tvTotalAmount.text = totalAmt.toString()
+                tvNetAmount.text = totalAmt.toString()
 
             })
 
@@ -169,7 +170,6 @@ class SaleCancelCheckoutActivity : BaseActivity(), KodeinAware {
                     }
                 }
 
-
             })
 
         saleCancelCheckOutViewModel.soldInvoiceListErrorState.observe(
@@ -192,8 +192,7 @@ class SaleCancelCheckoutActivity : BaseActivity(), KodeinAware {
         }
         back_img.setOnClickListener {
             onBackPressed()
-            true
-        }
+                 }
         activity_sale_checkout_radio_bank.setOnCheckedChangeListener { button, isChecked ->
             bank_branch_layout.visibility = if (isChecked) View.VISIBLE else View.GONE
             bank_account_layout.visibility = if (isChecked) View.VISIBLE else View.GONE
@@ -212,7 +211,6 @@ class SaleCancelCheckoutActivity : BaseActivity(), KodeinAware {
                 calculateRefundAmount()
             }
         })
-
     }
 
     //discount percent to discount amount

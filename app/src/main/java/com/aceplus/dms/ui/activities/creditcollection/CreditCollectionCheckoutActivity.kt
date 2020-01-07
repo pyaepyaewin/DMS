@@ -42,20 +42,13 @@ import kotlin.collections.ArrayList
     private var selectedItemPosition= 0
     var calculateList = mutableListOf<Credit>()
     var total = 0.0
-    private val df = DecimalFormat(".##")
-    private var refundAmount: Double = 0.0
     private var creditDate: String=""
-    private var invoiceId:String=""
     private var invoiceAmount: Double = 0.0
-     private var locationId=""
     var data1 : Credit = Credit()
-
     private val creditCollectionCheckOutAdapter: CreditCollectionCheckOutAdapter by lazy {
         CreditCollectionCheckOutAdapter(this::onClickNoticeListItem)
     }
     private val creditCollectionCheckOutViewModel: CreditCollectionCheckOutViewModel by viewModel()
-
-
     companion object {
         fun getIntent(
             context: Context,
@@ -71,69 +64,10 @@ import kotlin.collections.ArrayList
         }
     }
 
-
-    private fun onClickNoticeListItem(data: Credit,position:Int,id:String) {
-        total_pay_layout.visibility = View.GONE
-        item_pay_layout.visibility = View.VISIBLE
-         data1 = data
-        date_txt.text = data.invoice_date
-        invno_txt.text = data.invoice_no
-        item_pay_edit.setText("")
-        invoiceAmount=data.amount-data.pay_amount
-        val creditList = creditCollectionCheckOutAdapter.getDataList() as ArrayList
-        selectedItemPosition=position
-      creditList[position] = data
-        customer_name_txt.text= intent.getSerializableExtra("CUSTOMER_NAME") as String
-        item_pay_edit.setText("")
-
-        item_pay_edit.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(p0: Editable?) {
-                var tempPayAmount = 0.0
-                var tempNetAmount = 0.0
-                if (p0.toString() != "" && invno_total_amount_txt.text.toString() != "" && !p0.toString().endsWith(
-                        "."
-                    )
-                ) {
-                    tempPayAmount =
-                        p0.toString().replace(",", "").toDouble()
-                    tempNetAmount =invoiceAmount
-
-                } else {
-                    refund_txt.text = "0"
-                }
-
-                if (tempPayAmount > tempNetAmount) {
-                    refund_txt.text = Utils.formatAmount(tempPayAmount - tempNetAmount)
-                }            }
-
-            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                "Nothing to do"
-            }
-
-            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                if (p0.toString().isNotEmpty() && !p0.toString().endsWith(".")) {
-                    val convertedString = p0.toString()
-                    //                    convertedString = Utils.formatAmount(Double.parseDouble(charSequence.toString().replace(",", "")));
-                    if (item_pay_edit.text.toString() != convertedString && convertedString.isNotEmpty()) {
-                        item_pay_edit.setText(convertedString)
-                        item_pay_edit.setSelection(item_pay_edit.text.length)
-                    }
-                }
-            }
-        })
-
-
-
-    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val saleManId = AppUtils.getStringFromShp(Constant.SALEMAN_ID, this)
         val salePersonName = AppUtils.getStringFromShp(Constant.SALEMAN_NAME, this)
-        side_total_amt_layout!!.visibility = View.GONE
-        side_credit_amt_layout!!.visibility = View.GONE
-        side_pay_amt_layout!!.visibility = View.GONE
-        creditDate = Utils.getCurrentDate(false)
-
+        setUpUI()
         var customerId = intent.getSerializableExtra("CustomerID") as String
         var customerName = intent.getSerializableExtra("CUSTOMER_NAME") as String
         var townShipName = creditCollectionCheckOutViewModel.getTownShipName(customerId.toInt())
@@ -323,16 +257,16 @@ import kotlin.collections.ArrayList
         creditCollectionCheckOutViewModel.creditCollectionCheckOutErrorState.observe(
             this,
             android.arch.lifecycle.Observer {
-            })
-        rvCreditCheckOut.apply {
-            layoutManager = LinearLayoutManager(context)
-            adapter = creditCollectionCheckOutAdapter
-        }
-        creditCollectionCheckOutViewModel.loadCreditCollectionCheckOut(customerId)
-        creditCollectionCheckOutViewModel.cashReceiveCountSuccessState.observe(
-            this,
-            android.arch.lifecycle.Observer {
-                var count = it
+                })
+                rvCreditCheckOut.apply {
+                    layoutManager = LinearLayoutManager(context)
+                    adapter = creditCollectionCheckOutAdapter
+                }
+                creditCollectionCheckOutViewModel.loadCreditCollectionCheckOut(customerId)
+                creditCollectionCheckOutViewModel.cashReceiveCountSuccessState.observe(
+                    this,
+                    android.arch.lifecycle.Observer {
+                        var count = it
                 creditCollectionCheckOutViewModel.insertCashReceiveData(calculateList, count!!)
 
             }
@@ -342,6 +276,71 @@ import kotlin.collections.ArrayList
             android.arch.lifecycle.Observer {
             })
     }
+     private fun setUpUI()
+     {
+         side_total_amt_layout!!.visibility = View.GONE
+         side_credit_amt_layout!!.visibility = View.GONE
+         side_pay_amt_layout!!.visibility = View.GONE
+         creditDate = Utils.getCurrentDate(false)
+
+     }
+     private fun catchEvennts()
+     {
+
+     }
+     private fun onClickNoticeListItem(data: Credit,position:Int,id:String) {
+         total_pay_layout.visibility = View.GONE
+         item_pay_layout.visibility = View.VISIBLE
+         data1 = data
+         date_txt.text = data.invoice_date
+         invno_txt.text = data.invoice_no
+         item_pay_edit.setText("")
+         invoiceAmount=data.amount-data.pay_amount
+         val creditList = creditCollectionCheckOutAdapter.getDataList() as ArrayList
+         selectedItemPosition=position
+         creditList[position] = data
+         customer_name_txt.text= intent.getSerializableExtra("CUSTOMER_NAME") as String
+         item_pay_edit.setText("")
+
+         item_pay_edit.addTextChangedListener(object : TextWatcher {
+             override fun afterTextChanged(p0: Editable?) {
+                 var tempPayAmount = 0.0
+                 var tempNetAmount = 0.0
+                 if (p0.toString() != "" && invno_total_amount_txt.text.toString() != "" && !p0.toString().endsWith(
+                         "."
+                     )
+                 ) {
+                     tempPayAmount =
+                         p0.toString().replace(",", "").toDouble()
+                     tempNetAmount =invoiceAmount
+
+                 } else {
+                     refund_txt.text = "0"
+                 }
+
+                 if (tempPayAmount > tempNetAmount) {
+                     refund_txt.text = Utils.formatAmount(tempPayAmount - tempNetAmount)
+                 }            }
+
+             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                 "Nothing to do"
+             }
+
+             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                 if (p0.toString().isNotEmpty() && !p0.toString().endsWith(".")) {
+                     val convertedString = p0.toString()
+                     //                    convertedString = Utils.formatAmount(Double.parseDouble(charSequence.toString().replace(",", "")));
+                     if (item_pay_edit.text.toString() != convertedString && convertedString.isNotEmpty()) {
+                         item_pay_edit.setText(convertedString)
+                         item_pay_edit.setSelection(item_pay_edit.text.length)
+                     }
+                 }
+             }
+         })
+
+
+
+     }
 
    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == Utils.RQ_BACK_TO_CUSTOMER)

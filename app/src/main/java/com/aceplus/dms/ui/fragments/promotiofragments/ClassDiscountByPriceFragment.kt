@@ -22,7 +22,7 @@ import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.support.kodein
 
-class ClassDiscountByPriceFragment:BaseFragment(),KodeinAware {
+class ClassDiscountByPriceFragment : BaseFragment(), KodeinAware {
     override val kodein: Kodein by kodein()
     private val classDiscountByPriceAdapter: ClassDiscountByPriceAdapter by lazy {
         ClassDiscountByPriceAdapter()
@@ -40,29 +40,37 @@ class ClassDiscountByPriceFragment:BaseFragment(),KodeinAware {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        catchEvents()
+        setUpUI()
+        classDiscountByPriceViewModel.loadClassDiscountByPrice(Utils.getCurrentDate(true))
+    }
+
+    private fun setUpUI() {
+        category_discount_title.text = "CLASS DISCOUNT BY PRICE"
+        product_name.text = "CLASS ID"
+        rvCategoryDiscount.apply {
+            layoutManager = LinearLayoutManager(activity)
+            adapter = classDiscountByPriceAdapter
+        }
+    }
+
+    private fun catchEvents() {
         cancel_img.setOnClickListener {
             val intent = Intent(context, MainActivity::class.java)
             startActivity(intent)
 
         }
+        classDiscountByPriceViewModel.classDiscountByPriceSuccessState.observe(
+            this,
+            android.arch.lifecycle.Observer {
+                classDiscountByPriceAdapter.setNewList(it as ArrayList<ClassDiscountByPriceDataClass>)
+            })
 
-        category_discount_title.text = "CLASS DISCOUNT BY PRICE"
-        product_name.text = "CLASS ID"
-        classDiscountByPriceViewModel.classDiscountByPriceSuccessState.observe(this, android.arch.lifecycle.Observer {
-            classDiscountByPriceAdapter.setNewList(it as ArrayList<ClassDiscountByPriceDataClass>)
-        })
-
-        classDiscountByPriceViewModel.classDiscountByPriceErrorState.observe(this,android.arch.lifecycle.Observer {
-            Toast.makeText(activity, it, Toast.LENGTH_LONG).show()
-        })
-        rvCategoryDiscount.apply {
-            layoutManager = LinearLayoutManager(activity)
-            adapter = classDiscountByPriceAdapter
-        }
-        classDiscountByPriceViewModel.loadClassDiscountByPrice(Utils.getCurrentDate(true))
-//        classDiscountByPriceViewModel.loadClassDiscountByPrice("2019-10-02 14:56:35")
+        classDiscountByPriceViewModel.classDiscountByPriceErrorState.observe(
+            this,
+            android.arch.lifecycle.Observer {
+                Toast.makeText(activity, it, Toast.LENGTH_LONG).show()
+            })
     }
-
-
 }
 

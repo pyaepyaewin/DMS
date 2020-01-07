@@ -21,7 +21,7 @@ import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.support.kodein
 
-class VolumeDiscountFragment:BaseFragment(),KodeinAware {
+class VolumeDiscountFragment : BaseFragment(), KodeinAware {
     override val kodein: Kodein by kodein()
     private val volumeDiscountadapter: VolumeDiscountAdapter by lazy {
         VolumeDiscountAdapter()
@@ -37,26 +37,36 @@ class VolumeDiscountFragment:BaseFragment(),KodeinAware {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        catchEvents()
+        volumeDiscountViewModel.loadVolumeDiscount()
+        setUpUI()
+    }
+
+    private fun catchEvents() {
         cancel_img.setOnClickListener {
             val intent = Intent(context, MainActivity::class.java)
             startActivity(intent)
 
         }
-        volumeDiscountViewModel.volumeDiscountSuccessState.observe(this, android.arch.lifecycle.Observer {
-            volumeDiscountadapter.setNewList(it as ArrayList<VolumeDiscountDataClass>)
-        })
+        volumeDiscountViewModel.volumeDiscountSuccessState.observe(
+            this,
+            android.arch.lifecycle.Observer {
+                volumeDiscountadapter.setNewList(it as ArrayList<VolumeDiscountDataClass>)
+            })
 
-        volumeDiscountViewModel.volumeDiscountErrorState.observe(this,android.arch.lifecycle.Observer {
-            Toast.makeText(activity, it, Toast.LENGTH_LONG).show()
-        })
+        volumeDiscountViewModel.volumeDiscountErrorState.observe(
+            this,
+            android.arch.lifecycle.Observer {
+                Toast.makeText(activity, it, Toast.LENGTH_LONG).show()
+            })
+    }
+
+    private fun setUpUI() {
         rvVolumeDiscount.apply {
             layoutManager = LinearLayoutManager(activity)
             adapter = volumeDiscountadapter
         }
-        volumeDiscountViewModel.loadVolumeDiscount()
     }
-
-
 }
 
 

@@ -197,10 +197,7 @@ class SaleCancelViewModel(
         saleCancelRepo.insertInvoiceCancel(invoiceCancel, invoiceProductList)
         saleCancelRepo.deleteData(invoiceID)
 
-
-
     }
-
 
     fun calculateSoldProductData(soldProductList: ArrayList<SoldProductInfo>) {
 

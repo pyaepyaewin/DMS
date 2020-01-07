@@ -38,6 +38,12 @@ class VolumeDiscountFilterFragment:BaseFragment(),KodeinAware {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        catchEvents()
+        setUpUI()
+        volumeDiscountFilterViewModel.loadVolumeDiscountFilterList()
+    }
+    private fun catchEvents()
+    {
         cancel_img.setOnClickListener {
             val intent = Intent(context, MainActivity::class.java)
             startActivity(intent)
@@ -50,10 +56,12 @@ class VolumeDiscountFilterFragment:BaseFragment(),KodeinAware {
         volumeDiscountFilterViewModel.volumeDiscountFilterErrorState.observe(this,android.arch.lifecycle.Observer {
             Toast.makeText(activity, it, Toast.LENGTH_LONG).show()
         })
+    }
+    private fun setUpUI()
+    {
         rvVolumeDiscountFilter.apply {
             layoutManager = LinearLayoutManager(activity)
             adapter = volumeDiscountFilteradapter
         }
-        volumeDiscountFilterViewModel.loadVolumeDiscountFilterList()
     }
     }

@@ -21,6 +21,10 @@ class SaleCancelActivity : BaseActivity(), KodeinAware {
     override val layoutId: Int
         get() = R.layout.activity_sale_cancel
 
+    private val saleCancelViewModel: SaleCancelViewModel by viewModel()
+    private val saleCancelAdapter: SalesCancelAdapter by lazy {
+        SalesCancelAdapter(this::onClickNoticeListItem)
+    }
 
     companion object {
         fun newIntentFromCustomer(context: Context): Intent {
@@ -28,27 +32,23 @@ class SaleCancelActivity : BaseActivity(), KodeinAware {
         }
     }
 
-    private val saleCancelViewModel: SaleCancelViewModel by viewModel()
-
-
-    private val saleCancelAdapter: SalesCancelAdapter by lazy {
-        SalesCancelAdapter(this::onClickNoticeListItem)
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        catchEvents()
+        setUpUI()
+        saleCancelViewModel.loadSaleCancelList()
+
+    }
+
+    private fun catchEvents() {
         sale_cancel_img.setOnClickListener {
             onBackPressed()
-            true
-        }
+                   }
         saleCancelViewModel.saleCancelSuccessState.observe(
             this,
             android.arch.lifecycle.Observer {
 
                 saleCancelAdapter.setNewList(it as ArrayList<SaleCancelItem>)
-
-
-
             })
 
         saleCancelViewModel.saleCancelErrorState.observe(
@@ -56,16 +56,25 @@ class SaleCancelActivity : BaseActivity(), KodeinAware {
             android.arch.lifecycle.Observer {
                 i("Tag", it)
             })
+    }
+
+    private fun setUpUI() {
         sale_cancel_item_list.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = saleCancelAdapter
         }
-        saleCancelViewModel.loadSaleCancelList()
-
     }
 
     private fun onClickNoticeListItem(data: SaleCancelItem) {
-        startActivity(SaleCancelDetailActivity.getIntent(this, data.invoice_id, data.sale_date,data.id,data.customer_name))
+        startActivity(
+            SaleCancelDetailActivity.getIntent(
+                this,
+                data.invoice_id,
+                data.sale_date,
+                data.id,
+                data.customer_name
+            )
+        )
         finish()
     }
 }

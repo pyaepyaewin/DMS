@@ -20,9 +20,7 @@ class CreditCollectionCheckOutViewModel(
     private val schedulerProvider: SchedulerProvider,
     private val shf: SharedPreferences
 ) : BaseViewModel() {
-    private var invoiceData : Credit? =null
-
-    var creditList = listOf<Credit>()
+     var creditList = listOf<Credit>()
     var creditCollectionCheckOutSuccessState = MutableLiveData<List<Credit>>()
     var creditCollectionCheckOutErrorState = MutableLiveData<String>()
     fun loadCreditCollectionCheckOut(customerId: String) {
@@ -148,13 +146,11 @@ class CreditCollectionCheckOutViewModel(
                         remainList.add(i)
 
                     }
-
             }
 
         }
         return remainList
     }
-
 
     //calculate payamount for selected invoice
     fun calculatePayAmountForSelectedInvoice(payAmt: String, position: Int): List<Credit> {
@@ -173,7 +169,6 @@ class CreditCollectionCheckOutViewModel(
             remainList.add(creditList[position])
 
         }
-
         else if (payAmount != 0.0 && payAmount > creditAmount) {
             var refund = payAmount - creditAmount
             creditList[position].pay_amount = creditAmount
@@ -202,8 +197,6 @@ class CreditCollectionCheckOutViewModel(
 
                     }
                 }
-
-
             }
 
             return remainList
@@ -214,8 +207,6 @@ class CreditCollectionCheckOutViewModel(
             tempCreditList.remove(creditList[position])
             remainList.add(creditList[position])
         }
-
-
         return remainList
     }
 
